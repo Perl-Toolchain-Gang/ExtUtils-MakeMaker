@@ -18,6 +18,7 @@ the semantics.
 
 =cut 
 
+use strict;
 use Config;
 use File::Basename;
 
@@ -31,11 +32,9 @@ use ExtUtils::MakeMaker qw( &neatvalue );
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-$BORLAND  = 1 if $Config{'cc'} =~ /^bcc/i;
-$GCC      = 1 if $Config{'cc'} =~ /^gcc/i;
-$DMAKE    = 1 if $Config{'make'} =~ /^dmake/i;
-$NMAKE    = 1 if $Config{'make'} =~ /^nmake/i;
-$PERLMAKE = 1 if $Config{'make'} =~ /^pmake/i;
+my $BORLAND  = 1 if $Config{'cc'} =~ /^bcc/i;
+my $GCC      = 1 if $Config{'cc'} =~ /^gcc/i;
+my $DMAKE    = 1 if $Config{'make'} =~ /^dmake/i;
 
 
 sub init_others {
@@ -126,6 +125,11 @@ XS_DEFINE_VERSION = -D\$(XS_VERSION_MACRO)=\\\"\$(XS_VERSION)\\\"
     # Copy this to makefile as INCLUDE = d:\...;d:\;
     (my $inc = $Config{'incpath'}) =~ s/([ ]*)-I/;/g;
 
+    # Get the additional include path and append to INCLUDE, keeping it
+    # in INC will give problems during compilation, hence reset it
+    # after getting the value
+    $self->{INC} = '';
+
     push @m, qq{
 INCLUDE = $inc;
 };
@@ -189,12 +193,6 @@ makemakerdflt: all
 
 .SUFFIXES: .xs .c .C .cpp .cxx .cc \$(OBJ_EXT)
 
-# Nick wanted to get rid of .PRECIOUS. I don't remember why. I seem to recall, that
-# some make implementations will delete the Makefile when we rebuild it. Because
-# we call false(1) when we rebuild it. So make(1) is not completely wrong when it
-# does so. Our milage may vary.
-# .PRECIOUS: Makefile    # seems to be not necessary anymore
-
 .PHONY: all config static dynamic test linkext manifest
 
 # Where is the Config information that we are using/depend on
@@ -234,12 +232,6 @@ EXPORT_LIST = $tmp
 PERL_ARCHIVE = $tmp
 ";
 
-#    push @m, q{
-#INST_PM = }.join(" \\\n\t", sort values %{$self->{PM}}).q{
-#
-#PM_TO_BLIB = }.join(" \\\n\t", %{$self->{PM}}).q{
-#};
-
     push @m, q{
 TO_INST_PM = }.join(" \\\n\t", sort keys %{$self->{PM}}).q{
 
@@ -247,6 +239,52 @@ PM_TO_BLIB = }.join(" \\\n\t", %{$self->{PM}}).q{
 };
 
     join('',@m);
+}
+
+
+=item static_lib (o)
+
+=cut
+
+sub static_lib {
+    my($self) = @_;
+
+    return '' unless $self->has_link_code;
+
+    my $m = <<'END';
+$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)\.exists
+	$(RM_RF) $@
+END
+
+    # If this extension has it's own library (eg SDBM_File)
+    # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
+    $m .= <<'END'  if $self->{MYEXTLIB};
+	$self->{CP} $(MYEXTLIB) $\@
+END
+
+    my $ar_arg;
+    if( $BORLAND ) {
+        $ar_arg = '$@ $(OBJECT:^"+")';
+    }
+    elsif( $GCC ) {
+        $ar_arg = '-ru $@ $(OBJECT)';
+    }
+    else {
+        $ar_arg = '-type library -o $@ $(OBJECT)';
+    }
+
+    $m .= sprintf <<'END', $ar_arg;
+	$(AR) %s
+	$(NOECHO)echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
+	$(CHMOD) 755 $@
+END
+
+    $m .= <<'END' if $self->{PERL_SRC};
+        $(NOECHO)echo "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
+
+END
+
+    return $m;
 }
 
 
@@ -302,7 +340,7 @@ MAKE_FRAG
     }
 
     # Add additional lib files if any (SDBM_File)
-    $m .= q{ $(MYEXTLIB) } if($self->{MYEXTLIB};
+    $m .= q{ $(MYEXTLIB) } if $self->{MYEXTLIB};
 
     $m .= q{ $(PERL_INC)\Main.lib -commandfile $(BASEEXT).def}."\n";
 
