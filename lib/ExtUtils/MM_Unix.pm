@@ -3371,7 +3371,9 @@ sub prefixify {
     print STDERR "  prefixify $var => $path\n" if $Verbose >= 2;
     print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
 
-    if( $path !~ s{^\Q$sprefix\E\b}{$rprefix}s && $self->{ARGS}{PREFIX} ) {
+    if( $self->{ARGS}{PREFIX} && $self->file_name_is_absolute($path) && 
+        $path !~ s{^\Q$sprefix\E\b}{$rprefix}s ) 
+    {
 
         print STDERR "    cannot prefix, using default.\n" if $Verbose >= 2;
         print STDERR "    no default!\n" if !$default && $Verbose >= 2;

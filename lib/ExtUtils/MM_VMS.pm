@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71';
-($Revision) = q$Revision: 1.112 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.113 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2042,6 +2042,9 @@ sub prefixify {
     if( !$path ) {
         print STDERR "  no Config found for $var.\n" if $Verbose >= 2;
         $path = $self->_prefixify_default($rprefix, $default);
+    }
+    elsif( !$self->{ARGS}{PREFIX} || !$self->file_name_is_absolute($path) ) {
+        # do nothing if there's no prefix or if its relative
     }
     elsif( $sprefix eq $rprefix ) {
         print STDERR "  no new prefix.\n" if $Verbose >= 2;
