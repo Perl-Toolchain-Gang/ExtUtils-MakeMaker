@@ -1,4 +1,4 @@
-6.25_09
+6.25_09  Sat Mar 12 10:10:34 PST 2005
     - Stubbing out PASTHRU on VMS.  $(MMSQUALIFIERS) should do the equivalent
       and better.
     - Added test to check for the existence of a compiler so XS tests are
