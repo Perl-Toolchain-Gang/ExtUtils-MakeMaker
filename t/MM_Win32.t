@@ -1,9 +1,12 @@
-#!perl
+#!/usr/bin/perl
 
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
+    if( $ENV{PERL_CORE} ) {
+        chdir 't' if -d 't';
+        @INC = '../lib';
+    }
 }
+chdir 't';
 
 use Test::More;
 
@@ -18,23 +21,14 @@ BEGIN {
 use Config;
 use File::Spec;
 use File::Basename;
-
-# Does this mimic ExtUtils::MakeMaker ok?
-{
-    @MM::ISA = qw(
-        ExtUtils::MM_Unix 
-        ExtUtils::Liblist::Kid 
-        ExtUtils::MakeMaker
-    );
-    # MM package faked up by messy MI entanglement
-    package MM;
-    sub DESTROY {}
-}
+use ExtUtils::MakeMaker;
 
 require_ok( 'ExtUtils::MM_Win32' );
 
 # test import of $Verbose and &neatvalue
 can_ok( 'MM', 'neatvalue' );
+() = $ExtUtils::MM_Win32::Verbose;
+() = $ExtUtils::MakeMaker::Verbose;
 is( $ExtUtils::MM_Win32::Verbose, $ExtUtils::MakeMaker::Verbose, 
 	'ExtUtils::MM_Win32 should import $Verbose from ExtUtils::MakeMaker' );
 
