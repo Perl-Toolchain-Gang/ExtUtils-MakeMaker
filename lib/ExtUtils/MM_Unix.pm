@@ -2283,9 +2283,8 @@ sub installbin {
 EXE_FILES = @{$self->{EXE_FILES}}
 
 } . ($Is_Win32
-  ? q{FIXIN = $(PERLRUN) \
-    -e "system qq[pl2bat.bat ].shift"
-} : q{FIXIN = $(PERLRUN) -MExtUtils::MakeMaker \
+  ? q{FIXIN = pl2bat.bat
+} : q{FIXIN = $(PERLRUN) -MExtUtils::MY \
     -e "MY->fixin(shift)"
 }).qq{
 pure_all :: @to
