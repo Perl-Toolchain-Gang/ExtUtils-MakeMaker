@@ -32,5 +32,3 @@ below the cwd.
 Properly test INSTALL* generation.
 
 Make INSTALL* generation portable.
-
-Make INSTALL*MAN* use MAN*EXT
