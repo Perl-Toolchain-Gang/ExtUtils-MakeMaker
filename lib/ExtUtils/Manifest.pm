@@ -432,7 +432,7 @@ sub cp_if_diff {
 	if (-e $to) {
 	    unlink($to) or confess "unlink $to: $!";
 	}
-      STRICT_SWITCH: {
+        STRICT_SWITCH: {
 	    best($from,$to), last STRICT_SWITCH if $how eq 'best';
 	    cp($from,$to), last STRICT_SWITCH if $how eq 'cp';
 	    ln($from,$to), last STRICT_SWITCH if $how eq 'ln';
