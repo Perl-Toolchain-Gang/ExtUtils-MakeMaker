@@ -500,13 +500,13 @@ sub max_exec_len {
 }
 
 
-=item one_liner
+=item os_flavor
 
 Windows is Win32.
 
 =cut
 
-sub one_liner {
+sub os_flavor {
     return('Win32');
 }
 
