@@ -12,8 +12,9 @@ chdir 't';
 
 use strict;
 use Test::More tests => 9;
-use File::Path;
 use File::Basename;
+use File::Path;
+use File::Spec;
 
 my %Files = (
              'Big-Dummy/lib/Big/Dummy.pm'     => <<'END',
@@ -92,6 +93,9 @@ END
             );
 
 while(my($file, $text) = each %Files) {
+    # Convert to a relative, native file path.
+    $file = File::Spec->catfile(File::Spec->curdir, split m{\/}, $file);
+
     my $dir = dirname($file);
     mkpath $dir;
     open(FILE, ">$file");
