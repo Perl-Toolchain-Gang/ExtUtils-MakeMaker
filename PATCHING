@@ -28,6 +28,8 @@ Code formatting
   ExtUtils::*) should be named normally (no leading underscore) but
   documented as protected (see Documentation below).
 
+- Do not use indirect object syntax (ie. new Foo::Bar (@args))
+
 
 Refactoring and Cleanup
 
