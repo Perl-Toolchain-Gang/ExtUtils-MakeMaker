@@ -13,7 +13,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 3;
+use Test::More tests => 5;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use TieOut;
@@ -44,9 +44,22 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
                           );
     is( $warnings, '', 'postamble argument not warned about' );
 }
+
 sub MY::postamble {
     my($self, %extra) = @_;
 
     is_deeply( \%extra, { FOO => 1, BAR => 'fugawazads' }, 
                'postamble args passed' );
+
+    return <<OUT;
+# This makes sure the postamble gets written
+OUT
+
+}
+
+
+ok( open(MAKEFILE, $Makefile) ) or diag "Can't open $Makefile: $!";
+{ local $/; 
+  like( <MAKEFILE>, qr/^\# This makes sure the postamble gets written\n/m,
+        'postamble added to the Makefile' );
 }
