@@ -315,21 +315,27 @@ sub init_main {
 Provide VMS-specific forms of various utility commands, then hand
 off to the default MM_Unix method.
 
+DEV_NULL should probably be overriden with something.
+
 =cut
 
 sub init_others {
     my($self) = @_;
 
     $self->{NOOP}               = 'Continue';
+    $self->{NOECHO}             ||= '@ ';
+
     $self->{MAKEFILE}           ||= 'Descrip.MMS';
     $self->{FIRST_MAKEFILE}     ||= '$(MAKEFILE)';
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
     $self->{MAKEFILE_OLD}       ||= '$(MAKEFILE)_old';
-    $self->{NOECHO}             ||= '@ ';
-    $self->{RM_F} = '$(PERL) -e "foreach (@ARGV) { 1 while ( -d $_ ? rmdir $_ : unlink $_)}"';
-    $self->{RM_RF} = '$(PERLRUN) -e "use File::Path; @dirs = map(VMS::Filespec::unixify($_),@ARGV); rmtree(\@dirs,0,0)"';
-    $self->{TOUCH} = '$(PERL) -e "$t=time; foreach (@ARGV) { -e $_ ? utime($t,$t,@ARGV) : (open(F,qq(>$_)),close F)}"';
-    $self->{CHMOD} = '$(PERL) -e "chmod @ARGV"';  # expect Unix syntax from MakeMaker
+
+    $self->{'TOUCH'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e touch';
+    $self->{'CHMOD'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e chmod'; 
+    $self->{'RM_F'}     ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_f';
+    $self->{'RM_RF'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_rf';
+    $self->{'TEST_F'}   ||= '$(PERLRUN) "-MExtUtils::Command" -e test_f';
+
     $self->{CP} = 'Copy/NoConfirm';
     $self->{MV} = 'Rename/NoConfirm';
     $self->{UMASK_NULL} = '! ';  
