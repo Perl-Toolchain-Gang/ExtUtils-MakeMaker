@@ -3064,10 +3064,12 @@ sub pasthru {
     $sep .= "\\\n\t";
 
     foreach $key (qw(LIB LIBPERL_A LINKTYPE PREFIX OPTIMIZE)) {
+        next unless defined $self->{$key};
 	push @pasthru, "$key=\"\$($key)\"";
     }
 
     foreach $key (qw(DEFINE INC)) {
+        next unless defined $self->{$key};
 	push @pasthru, "PASTHRU_$key=\"\$(PASTHRU_$key)\"";
     }
 
