@@ -54,65 +54,69 @@ if ($^O eq 'VMS') {
     push(@cmd2,$Config{'ld'}, $Config{'ldflags'}, "/exe=$exe"); 
     push(@cmd2,"$obj,[-]perlshr.opt/opt,[-]perlshr_attr.opt/opt");
 
-} else {
+}
+else {
    if ($cl) {
-    push(@cmd,$cc,"-Fe$exe");
+       push(@cmd,$cc,"-Fe$exe");
    }
    else {
-    push(@cmd,$cc,'-o' => $exe);
+       push(@cmd,$cc,'-o' => $exe);
    }
    push(@cmd,"-I$inc",ccopts(),'embed_test.c');
    if ($^O eq 'MSWin32') {
-    $inc = File::Spec->catdir($inc,'win32');
-    push(@cmd,"-I$inc");
-    $inc = File::Spec->catdir($inc,'include');
-    push(@cmd,"-I$inc");
-    if ($cc eq 'cl') {
-	push(@cmd,'-link',"-libpath:$lib",$Config{'libperl'},$Config{'libc'});
-    }
-    else {
-	push(@cmd,"-L$lib",File::Spec->catfile($lib,$Config{'libperl'}),$Config{'libc'});
-    }
+       $inc = File::Spec->catdir($inc,'win32');
+       push(@cmd,"-I$inc");
+       $inc = File::Spec->catdir($inc,'include');
+       push(@cmd,"-I$inc");
+       if ($cc eq 'cl') {
+           push(@cmd, '-link', "-libpath:$lib", $Config{'libperl'},
+                      $Config{'libc'});
+       }
+       else {
+           push(@cmd,"-L$lib",File::Spec->catfile($lib,$Config{'libperl'}),
+                                                  $Config{'libc'});
+       }
    }
    else {
-    push(@cmd,"-L$lib",'-lperl');
+       push(@cmd,"-L$lib",'-lperl');
    }
    {
-    local $SIG{__WARN__} = sub {
-	warn $_[0] unless $_[0] =~ /No library found for -lperl/
-    };
-    push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!
-	if $^O eq 'os2' and $Config{ldflags} =~ /(?<!\S)-Zomf\b/;
-    push(@cmd,ldopts());
+       local $SIG{__WARN__} = sub {
+           warn $_[0] unless $_[0] =~ /No library found for -lperl/
+       };
+       # Otherwise puts a warning to STDOUT!
+       push(@cmd, '-Zlinker', '/PM:VIO')
+         if $^O eq 'os2' and $Config{ldflags} =~ /(?<!\S)-Zomf\b/;
+       push(@cmd,ldopts());
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
-    my ($perl_exp) = grep { -f } qw(perl.exp ../perl.exp);
-    die "where is perl.exp?\n" unless defined $perl_exp;
-    for (@cmd) {
-        s!-bE:(\S+)!-bE:$perl_exp!;
-    }
+       my ($perl_exp) = grep { -f } qw(perl.exp ../perl.exp);
+       die "where is perl.exp?\n" unless defined $perl_exp;
+       for (@cmd) {
+           s!-bE:(\S+)!-bE:$perl_exp!;
+       }
    }
    elsif ($^O eq 'cygwin') { # Cygwin needs the libperl copied
-     my $v_e_r_s = $Config{version};
-     $v_e_r_s =~ tr/./_/;
-     system("cp ../libperl$v_e_r_s.dll ./");    # for test 1
-     system("cp ../$Config{'libperl'} ../libperl.a");    # for test 1
+       my $v_e_r_s = $Config{version};
+       $v_e_r_s =~ tr/./_/;
+       system("cp ../libperl$v_e_r_s.dll ./");    # for test 1
+       system("cp ../$Config{'libperl'} ../libperl.a");    # for test 1
    }
    elsif ($Config{'libperl'} !~ /\Alibperl\./) {
-     # Everyone needs libperl copied if it's not found by '-lperl'.
-     $testlib = $Config{'libperl'};
-     my $srclib = $testlib;
-     $testlib =~ s/^[^.]+/libperl/;
-     $testlib = File::Spec::->catfile($lib, $testlib);
-     $srclib = File::Spec::->catfile($lib, $srclib);
-     if (-f $srclib) {
-       unlink $testlib if -f $testlib;
-       my $ln_or_cp = $Config{'ln'} || $Config{'cp'};
-       my $lncmd = "$ln_or_cp $srclib $testlib";
-       #print "# $lncmd\n";
-       $libperl_copied = 1	unless system($lncmd);
-     }
+       # Everyone needs libperl copied if it's not found by '-lperl'.
+       $testlib = $Config{'libperl'};
+       my $srclib = $testlib;
+       $testlib =~ s/^[^.]+/libperl/;
+       $testlib = File::Spec::->catfile($lib, $testlib);
+       $srclib = File::Spec::->catfile($lib, $srclib);
+       if (-f $srclib) {
+           unlink $testlib if -f $testlib;
+           my $ln_or_cp = $Config{'ln'} || $Config{'cp'};
+           my $lncmd = "$ln_or_cp $srclib $testlib";
+           #print "# $lncmd\n";
+           $libperl_copied = 1	unless system($lncmd);
+       }
    }
 }
 my $status;
@@ -121,8 +125,8 @@ chomp($display_cmd); # where is the newline coming from? ldopts()?
 print "# $display_cmd\n"; 
 $status = system(join(' ',@cmd));
 if ($^O eq 'VMS' && !$status) {
-  print "# @cmd2\n";
-  $status = system(join(' ',@cmd2)); 
+    print "# @cmd2\n";
+    $status = system(join(' ',@cmd2)); 
 }
 print (($status? 'not ': '')."ok 1\n");
 
