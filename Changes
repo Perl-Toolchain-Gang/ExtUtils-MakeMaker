@@ -1,4 +1,4 @@
-6.06_06
+6.10_01
     - Making install "Skip ... (unchanged)" message happen consistently
     - Checking file sizes as well as modification times when deciding
       to skip installing a file.
