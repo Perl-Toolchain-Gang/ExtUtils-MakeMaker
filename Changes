@@ -31,6 +31,7 @@
     - Fixing minor bug in VMS prefixification logic when PREFIX was not set
       by the user.
     - Fixing potential bug in prefixification for relative directories
+    * Documented UNINST=1
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)

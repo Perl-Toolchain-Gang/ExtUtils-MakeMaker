@@ -20,8 +20,6 @@ below the cwd.
 
 Fill in the IMPORTS docs.
 
-Document "make install UNINST=1"
-
 Remove tar -I Sun-ism from instmodsh.
 
 Consider adding a timeout option to prompt() and env variable.

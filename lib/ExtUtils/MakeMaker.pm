@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.18';
-($Revision) = q$Revision: 1.138 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.139 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -1094,6 +1094,15 @@ searched by perl, run
 
     perl -le 'print join $/, @INC'
 
+Sometimes older versions of the module you're installing live in other
+directories in @INC.  Because Perl loads the first version of a module it 
+finds, not the newest, you might accidentally get one of these older
+versions even after installing a brand new version.  To delete I<all other
+versions of the module you're installing> (not simply older ones) set the
+C<UNINST> variable.
+
+    make install UNINST=1
+
 
 =head2 PREFIX and LIB attribute
 
@@ -2053,7 +2062,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.138 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.139 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
