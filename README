@@ -5,8 +5,22 @@ do not install in a production environment.
 
 Known Good:
 
-Linux     back to 5.6.0
-OpenVMS   back to 5.6.1
+Linux                   5.6.0, 5.6.1, 5.7.3
+OpenVMS                 5.6.1
+Cygwin                  5.6.1
+ActivePerl/Win32        5.6.1 build 631
+
+
+Known Problems:
+
+PREFIX/LIB broken on Debian systems.
+
+ActivePerl likely broken if installed in C:\Program Files or other
+prefix with a space in the name.
+
+manifypods target produces command lines too long for some systems
+
+See TODO for details.
 
 
 Please report any bugs via http://rt.cpan.org or to makemaker@perl.org.
