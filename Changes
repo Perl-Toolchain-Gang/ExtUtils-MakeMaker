@@ -10,6 +10,8 @@
     * Added maniadd() to ExtUtils::Manifest to add entries to the MANIFEST
     * ExtUtils::Command::chmod was not interpreting file permissions as
       octal.  Also, docs & tests slightly wrong (thanks Stas Bekman).
+    - ExtUtils::Install was hard coding blib/lib and blib/arch, unportable
+      [perl #21526]
 
 6.06_02 Mon Dec 23 20:39:57 PST 2002
     * Lots of Win32 fixes busted between 6.05 and 6.06_01.  
