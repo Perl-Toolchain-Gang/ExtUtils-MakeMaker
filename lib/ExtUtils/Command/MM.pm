@@ -53,6 +53,7 @@ sub test_harness {
 
     # Because Windows doesn't do this for us and listing all the *.t files
     # out on the command line can blow over its exec limit.
+    require ExtUtils::Command;
     my @argv = ExtUtils::Command::expand_wildcards(@ARGV);
 
     local @INC = @INC;
