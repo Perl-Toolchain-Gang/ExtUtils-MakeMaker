@@ -1,3 +1,7 @@
+6.19
+    - Removed 00setup_dummy.t and zz_cleanup_dummy.t.  Tests now setup and
+      teardown the dummy modules as needed.
+
 6.18 Mon Nov  3 20:09:51 PST 2003
     - parse_version() was blowing over $_ (Ilya Zakharevich)
     - 5.6.2 has the same Cygwin shared lib name fix as 5.7.0. (Gerrit Haase)

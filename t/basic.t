@@ -16,8 +16,9 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 76;
+use Test::More tests => 79;
 use MakeMaker::Test::Utils;
+use MakeMaker::Test::Setup::BFD;
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -37,6 +38,12 @@ perl_lib;
 my $Touch_Time = calibrate_mtime();
 
 $| = 1;
+
+ok( setup_recurs(), 'setup' );
+END {
+    ok( chdir File::Spec->updir );
+    ok( teardown_recurs(), 'teardown' );
+}
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");

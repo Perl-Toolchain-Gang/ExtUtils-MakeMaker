@@ -40,7 +40,6 @@ NOTES
 PATCHING
 README
 t/00compile.t
-t/00setup_dummy.t
 t/backwards.t
 t/basic.t
 t/bytes.t
@@ -82,6 +81,5 @@ t/testlib.t
 t/VERSION_FROM.t
 t/vmsish.t
 t/writemakefile_args.t
-t/zz_cleanup_dummy.t
 TODO
 SIGNATURE                                Public-key signature (added by MakeMaker)
