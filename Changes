@@ -1,4 +1,6 @@
-6.10_07
+6.10_07 Sat Jul  5 16:12:52 PDT 2003
+    * Fixing location of perllocal.pod so its always in INSTALLARCHLIB
+      instead of one for each perl, site and vendor.
     - Sun's make treats escaped newlines oddly.  Switching oneliner() back
       to using multiple -e's.
     * Bug in libscan() meant that any .pm containing RCS or CVS or SCCS
