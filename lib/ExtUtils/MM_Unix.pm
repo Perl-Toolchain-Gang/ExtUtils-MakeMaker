@@ -406,6 +406,7 @@ sub constants {
 	      PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
               FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
               FULL_AR PERL_CORE NOOP NOECHO
+              PERM_RW PERM_RWX
 
 	      / ) 
     {
@@ -467,15 +468,6 @@ MAN3PODS = ".join(" \\\n\t", sort keys %{$self->{MAN3PODS}})."
 	push @m, "$tmp = $self->{$tmp}\n";
     }
 
-    for $tmp (qw(
-		PERM_RW PERM_RWX
-		)
-	     ) 
-    {
-        my $method = lc($tmp);
-	# warn "self[$self] method[$method]";
-        push @m, "$tmp = ", $self->$method(), "\n";
-    }
 
     push @m, q{
 .NO_CONFIG_REC: Makefile
@@ -2147,8 +2139,8 @@ Called by init_main.  Initializes PERL_*
 sub init_PERM {
     my($self) = shift;
 
-    $self->{PERM_RW}  = 644;
-    $self->{PERM_RWX} = 755;
+    $self->{PERM_RW}  = 644  unless defined $self->{PERM_RW};
+    $self->{PERM_RWX} = 755  unless defined $self->{PERM_RWX};
 
     return 1;
 }
@@ -2937,7 +2929,7 @@ interpreted as an octal value.
 =cut
 
 sub perm_rw {
-    shift->{PERM_RW} || "644";
+    return shift->{PERM_RW};
 }
 
 =item perm_rwx (o)
@@ -2950,7 +2942,7 @@ See also perl_rw.
 =cut
 
 sub perm_rwx {
-    shift->{PERM_RWX} || "755";
+    return shift->{PERM_RWX};
 }
 
 =item pm_to_blib
@@ -3056,21 +3048,19 @@ sub ppd {
     $author =~ s/>/&gt;/g;
     $author =~ s/@/\\@/g;
 
-    my $ppd_html = sprintf <<'PPD_HTML', $pack_ver, $abstract, $author;
+    my $ppd_xml = sprintf <<'PPD_HTML', $pack_ver, $abstract, $author;
 <SOFTPKG NAME="$(DISTNAME)" VERSION="%s">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>%s</ABSTRACT>\n\t<AUTHOR>%s</AUTHOR>
 PPD_HTML
 
     # strip off that trailing newline.
-    chomp $ppd_html;
+    chomp $ppd_xml;
 
-    # Abstracts sometimes have quotes in them which can interfere
-    # with the code below (RT 1473)
-    $ppd_html =~ s{"}{\\"}g;
+    my $ppd_oneliner = $self->perl_oneliner(qq{print q{$ppd_xml}."\\n"});
 
-    my $make_ppd = sprintf <<'PPD_OUT', $ppd_html;
+    my $make_ppd = <<"PPD_OUT";
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	@$(PERL) -e "print qq{%s\n}" > $(DISTNAME).ppd
+	@ $ppd_oneliner > \$(DISTNAME).ppd
 PPD_OUT
 
 
