@@ -15,6 +15,7 @@ chdir 't';
 use strict;
 use TieOut;
 use File::Path;
+use File::Spec;
 
 use Test::More tests => 17;
 
@@ -58,7 +59,8 @@ open(PACKLIST, 'install-test/packlist' );
 my %packlist = map { chomp;  ($_ => 1) } <PACKLIST>;
 close PACKLIST;
 
-is_deeply( \%packlist, { 'install-test/lib/perl/Big/Dummy.pm' => 1 },
+my $native_dummy = File::Spec->catfile(qw(install-test lib perl Big Dummy.pm));
+is_deeply( \%packlist, { $native_dummy => 1 },
                               'packlist written');
 
 END { rmtree 'blib' }
