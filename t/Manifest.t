@@ -13,13 +13,12 @@ chdir 't';
 
 use strict;
 
-# these files help the test run
-use Test::More tests => 41;
+use Test::More tests => 47;
 use Cwd;
 
-# these files are needed for the module itself
 use File::Spec;
 use File::Path;
+use File::Find;
 
 # We're going to be chdir'ing and modules are sometimes loaded on the
 # fly in this test, so we need an absolute @INC.
@@ -38,20 +37,20 @@ sub add_file {
 }
 
 sub read_manifest {
-	open( M, 'MANIFEST' ) or return;
-	chomp( my @files = <M> );
+    open( M, 'MANIFEST' ) or return;
+    chomp( my @files = <M> );
     close M;
-	return @files;
+    return @files;
 }
 
 sub catch_warning {
-	my $warn;
-	local $SIG{__WARN__} = sub { $warn .= $_[0] };
-	return join('', $_[0]->() ), $warn;
+    my $warn;
+    local $SIG{__WARN__} = sub { $warn .= $_[0] };
+    return join('', $_[0]->() ), $warn;
 }
 
 sub remove_dir {
-	ok( rmdir( $_ ), "remove $_ directory" ) for @_;
+    ok( rmdir( $_ ), "remove $_ directory" ) for @_;
 }
 
 # use module, import functions
@@ -134,13 +133,27 @@ is( join(' ', sort { lc($a) cmp lc($b) } keys %$files), 'foo MANIFEST',
                                         'both files found' );
 is( $_, 'foo', q{maniread() doesn't clobber $_} );
 
+ok( mkdir( 'copy', 0777 ), 'made copy directory' );
+
+# Check that manicopy copies files.
+manicopy( $files, 'copy', 'cp' );
+my %copies = ();
+find( sub { $copies{$_} = (stat $_)[2] if -f $_ }, 'copy' );
+is_deeply( [sort keys %copies], [sort keys %$files] );
+
+# cp would leave files readonly, so check permissions.
+foreach my $file (%$files) {
+    is( $copies{$file}, (stat $file)[2] );
+}
+rmtree('copy');
+
+
 # poison the manifest, and add a comment that should be reported
 add_file( 'MANIFEST', 'none #none' );
 is( ExtUtils::Manifest::maniread()->{none}, '#none', 
                                         'maniread found comment' );
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
-
 $files = maniread();
 eval { (undef, $warn) = catch_warning( sub {
  		manicopy( $files, 'copy', 'cp' ) }) 
