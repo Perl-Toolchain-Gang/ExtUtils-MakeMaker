@@ -2,7 +2,7 @@ package ExtUtils::Install;
 
 use 5.00503;
 use vars qw(@ISA @EXPORT $VERSION);
-$VERSION = 1.30;
+$VERSION = 1.31;
 
 use Exporter;
 use Carp ();
@@ -21,27 +21,58 @@ my $INSTALL_ROOT = $ENV{PERL_INSTALL_ROOT};
 
 use File::Spec;
 
-sub install_rooted_file {
-    if (defined $INSTALL_ROOT) {
-	File::Spec->catfile($INSTALL_ROOT, $_[0]);
-    } else {
-	$_[0];
-    }
-}
 
-sub install_rooted_dir {
-    if (defined $INSTALL_ROOT) {
-	File::Spec->catdir($INSTALL_ROOT, $_[0]);
-    } else {
-	$_[0];
-    }
-}
+=head1 NAME
+
+ExtUtils::Install - install files from here to there
+
+=head1 SYNOPSIS
+
+  use ExtUtils::Install;
+
+  install({ 'blib/lib' => 'some/install/dir' } );
+
+  uninstall($packlist);
+
+  pm_to_blib({ 'lib/Foo/Bar.pm' => 'blib/lib/Foo/Bar.pm' });
 
 
-sub forceunlink {
-    chmod 0666, $_[0];
-    unlink $_[0] or Carp::croak("Cannot forceunlink $_[0]: $!")
-}
+=head1 DESCRIPTION
+
+Handles the installing and uninstalling of perl modules, scripts, man
+pages, etc...
+
+Both install() and uninstall() are specific to the way
+ExtUtils::MakeMaker handles the installation and deinstallation of
+perl modules. They are not designed as general purpose tools.
+
+=head2 Functions
+
+=over 4
+
+=item B<install>
+
+    install(\%from_to);
+    install(\%from_to, $verbose, $dont_execute);
+
+Copies each directory tree of %from_to to its corresponding value
+preserving timestamps and permissions.
+
+There are two keys with a special meaning in the hash: "read" and
+"write".  These contain packlist files.  After the copying is done,
+install() will write the list of target files to $from_to{write}. If
+$from_to{read} is given the contents of this file will be merged into
+the written file. The read and the written file may be identical, but
+on AFS it is quite likely that people are installing to a different
+directory than the one where the files later appear.
+
+If $verbose is true, will print out each file removed.  Default is
+false.
+
+If $dont_execute is true it will only print what it was going to do
+without actually doing it.  Default is false.
+
+=cut
 
 sub install {
     my($hash,$verbose,$nonono,$inc_uninstall) = @_;
@@ -165,6 +196,30 @@ sub install {
     }
 }
 
+sub install_rooted_file {
+    if (defined $INSTALL_ROOT) {
+	File::Spec->catfile($INSTALL_ROOT, $_[0]);
+    } else {
+	$_[0];
+    }
+}
+
+
+sub install_rooted_dir {
+    if (defined $INSTALL_ROOT) {
+	File::Spec->catdir($INSTALL_ROOT, $_[0]);
+    } else {
+	$_[0];
+    }
+}
+
+
+sub forceunlink {
+    chmod 0666, $_[0];
+    unlink $_[0] or Carp::croak("Cannot forceunlink $_[0]: $!")
+}
+
+
 sub directory_not_empty ($) {
   my($dir) = @_;
   my $files = 0;
@@ -177,6 +232,28 @@ sub directory_not_empty ($) {
        }, $dir);
   return $files;
 }
+
+
+=item B<install_default> I<DISCOURAGED>
+
+    install_default();
+    install_default($fullext);
+
+Calls install() with arguments to copy a module from blib/ to the
+default site installation location.
+
+$fullext is the name of the module converted to a directory
+(ie. Foo::Bar would be Foo/Bar).  If $fullext is not specified, it
+will attempt to read it from @ARGV.
+
+This is primarily useful for install scripts.
+
+B<NOTE> This function is not really useful because of the hard-coded
+install location with no way to control site vs core vs vendor
+directories and the strange way in which the module name is given.
+Consider its use discouraged.
+
+=cut
 
 sub install_default {
   @_ < 2 or die "install_default should be called with 0 or 1 argument";
@@ -201,6 +278,22 @@ sub install_default {
 	   $INST_MAN3DIR => $Config{installman3dir},
 	  },1,0,0);
 }
+
+
+=item B<uninstall>
+
+    uninstall($packlist_file);
+    uninstall($packlist_file, $verbose, $dont_execute);
+
+Removes the files listed in a $packlist_file.
+
+If $verbose is true, will print out each file removed.  Default is
+false.
+
+If $dont_execute is true it will only print what it was going to do
+without actually doing it.  Default is false.
+
+=cut
 
 sub uninstall {
     use ExtUtils::Packlist;
@@ -273,6 +366,24 @@ sub run_filter {
     close SRC;
     close CMD or die "Filter command '$cmd' failed for $src";
 }
+
+
+=item B<pm_to_blib>
+
+    pm_to_blib(\%from_to, $autosplit_dir);
+    pm_to_blib(\%from_to, $autosplit_dir, $filter_cmd);
+
+Copies each key of %from_to to its corresponding value efficiently.
+Filenames with the extension .pm are autosplit into the $autosplit_dir.
+
+$filter_cmd is an optional shell command to run each .pm file through
+prior to splitting and copying.  Input is the contents of the module,
+output the new module contents.
+
+You can have an environment variable PERL_INSTALL_ROOT set which will
+be prepended as a directory to each installed file (and directory).
+
+=cut
 
 sub pm_to_blib {
     my($fromto,$autodir,$pm_filter) = @_;
@@ -358,109 +469,6 @@ sub DESTROY {
 	}
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-ExtUtils::Install - install files from here to there
-
-=head1 SYNOPSIS
-
-  use ExtUtils::Install;
-
-  install({ 'blib/lib' => 'some/install/dir' } );
-
-  uninstall($packlist);
-
-  pm_to_blib({ 'lib/Foo/Bar.pm' => 'blib/lib/Foo/Bar.pm' });
-
-
-=head1 DESCRIPTION
-
-Handles the installing and uninstalling of perl modules, scripts, man
-pages, etc...
-
-Both install() and uninstall() are specific to the way
-ExtUtils::MakeMaker handles the installation and deinstallation of
-perl modules. They are not designed as general purpose tools.
-
-
-=over 4
-
-=item B<install>
-
-    install(\%from_to);
-    install(\%from_to, $verbose, $dont_execute);
-
-Copies each directory tree of %from_to to its corresponding value
-preserving timestamps and permissions.
-
-There are two keys with a special meaning in the hash: "read" and
-"write".  These contain packlist files.  After the copying is done,
-install() will write the list of target files to $from_to{write}. If
-$from_to{read} is given the contents of this file will be merged into
-the written file. The read and the written file may be identical, but
-on AFS it is quite likely that people are installing to a different
-directory than the one where the files later appear.
-
-If $verbose is true, will print out each file removed.  Default is
-false.
-
-If $dont_execute is true it will only print what it was going to do
-without actually doing it.  Default is false.
-
-
-=item B<uninstall>
-
-    uninstall($packlist_file);
-    uninstall($packlist_file, $verbose, $dont_execute);
-
-Removes the files listed in a $packlist_file.
-
-If $verbose is true, will print out each file removed.  Default is
-false.
-
-If $dont_execute is true it will only print what it was going to do
-without actually doing it.  Default is false.
-
-
-=item B<pm_to_blib>
-
-    pm_to_blib(\%from_to, $autosplit_dir);
-    pm_to_blib(\%from_to, $autosplit_dir, $filter_cmd);
-
-Copies each key of %from_to to its corresponding value efficiently.
-Filenames with the extension .pm are autosplit into the $autosplit_dir.
-
-$filter_cmd is an optional shell command to run each .pm file through
-prior to splitting and copying.  Input is the contents of the module,
-output the new module contents.
-
-You can have an environment variable PERL_INSTALL_ROOT set which will
-be prepended as a directory to each installed file (and directory).
-
-
-=item B<install_default> I<DISCOURAGED>
-
-    install_default();
-    install_default($fullext);
-
-Calls install() with arguments to copy a module from blib/ to the
-default site installation location.
-
-$fullext is the name of the module converted to a directory
-(ie. Foo::Bar would be Foo/Bar).  If $fullext is not specified, it
-will attempt to read it from @ARGV.
-
-This is primarily useful for install scripts.
-
-B<NOTE> This function is not really useful because of the hard-coded
-install location with no way to control site vs core vs vendor
-directories and the strange way in which the module name is given.
-Consider its use discouraged.
-
 =back
 
 
@@ -497,3 +505,5 @@ See F<http://www.perl.com/perl/misc/Artistic.html>
 
 
 =cut
+
+1;
