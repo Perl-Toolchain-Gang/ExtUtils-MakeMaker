@@ -1,4 +1,4 @@
-6.14
+6.14 Sun Aug  3 16:23:27 PDT 2003
     - Adding a reference to the Module::Build META.yml spec in the META.yml
       itself and the metafile documentation.
     - Removed Begin/End comments from manifypods that were getting in the
