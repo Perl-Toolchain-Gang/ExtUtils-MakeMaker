@@ -1,6 +1,6 @@
 6.10_08
     * $Config{installvendorman*dir} was being ignored and our default
-      always used.
+      always used. [rt.cpan.org #2949]
 
 6.10_07 Sat Jul  5 16:12:52 PDT 2003
     * Fixing location of perllocal.pod so its always in INSTALLARCHLIB
