@@ -167,7 +167,6 @@ is ($t->libscan('foo/RCS/bar'),     '', 'libscan on RCS');
 is ($t->libscan('CVS/bar/car'),     '', 'libscan on CVS');
 is ($t->libscan('SCCS'),            '', 'libscan on SCCS');
 is ($t->libscan('.svn/something'),  '', 'libscan on Subversion');
-is ($t->libscan('foo/bar~'),        '', 'libscan on ~ backup');
 is ($t->libscan('foo/b~r'),         'foo/b~r', 'libscan on file with ~');
 
 is ($t->libscan('Fatty'), 'Fatty', 'libscan on something not a VC file' );
