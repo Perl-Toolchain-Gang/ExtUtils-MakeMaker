@@ -267,42 +267,6 @@ sub maybe_command {
     return 0;
 }
 
-=item maybe_command_in_dirs (override)
-
-Uses DCL argument quoting on test command line.
-
-=cut
-
-sub maybe_command_in_dirs {	# $ver is optional argument if looking for perl
-    my($self, $names, $dirs, $trace, $ver) = @_;
-    my($name, $dir);
-    foreach $dir (@$dirs){
-	next unless defined $dir; # $self->{PERL_SRC} may be undefined
-	foreach $name (@$names){
-	    my($abs,$tryabs);
-	    if (File::Spec->file_name_is_absolute($name)) {
-		$abs = $name;
-	    } else {
-		$abs = $self->catfile($dir, $name);
-	    }
-	    print "Checking $abs for $name\n" if ($trace >= 2);
-	    next unless $tryabs = $self->maybe_command($abs);
-	    print "Substituting $tryabs instead of $abs\n" 
-		if ($trace >= 2 and $tryabs ne $abs);
-	    $abs = $tryabs;
-	    if (defined $ver) {
-		print "Executing $abs\n" if ($trace >= 2);
-		if (`$abs -e 'require $ver; print "VER_OK\n" ' 2>&1` =~ /VER_OK/) {
-		    print "Using $abs\n" if $trace;
-		    return $abs;
-		}
-	    } else { # Do not look for perl
-		return $abs;
-	    }
-	}
-    }
-}
-
 =item perl_script (override)
 
 If name passed in doesn't specify a readable file, appends F<.com> or

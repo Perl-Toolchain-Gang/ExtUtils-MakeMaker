@@ -120,7 +120,6 @@ sub macro;
 sub makeaperl;
 sub makefile;
 sub maybe_command;
-sub maybe_command_in_dirs;
 sub needs_linking;
 sub nicetext;
 sub parse_abstract;
@@ -2769,44 +2768,6 @@ sub maybe_command {
     return;
 }
 
-=item maybe_command_in_dirs
-
-method under development. Not yet used. Ask Ilya :-)
-
-=cut
-
-sub maybe_command_in_dirs {	# $ver is optional argument if looking for perl
-# Ilya's suggestion. Not yet used, want to understand it first, but at least the code is here
-    my($self, $names, $dirs, $trace, $ver) = @_;
-    my($name, $dir);
-    foreach $dir (@$dirs){
-	next unless defined $dir; # $self->{PERL_SRC} may be undefined
-	foreach $name (@$names){
-	    my($abs,$tryabs);
-	    if (File::Spec->file_name_is_absolute($name)) { # /foo/bar
-		$abs = $name;
-	    } elsif (File::Spec->canonpath($name) eq File::Spec->canonpath(basename($name))) { # bar
-		$abs = $self->catfile($dir, $name);
-	    } else { # foo/bar
-		$abs = $self->catfile($Curdir, $name);
-	    }
-	    print "Checking $abs for $name\n" if ($trace >= 2);
-	    next unless $tryabs = $self->maybe_command($abs);
-	    print "Substituting $tryabs instead of $abs\n"
-		if ($trace >= 2 and $tryabs ne $abs);
-	    $abs = $tryabs;
-	    if (defined $ver) {
-		print "Executing $abs\n" if ($trace >= 2);
-		if (`$abs -e 'require $ver; print "VER_OK\n" ' 2>&1` =~ /VER_OK/) {
-		    print "Using PERL=$abs\n" if $trace;
-		    return $abs;
-		}
-	    } else { # Do not look for perl
-		return $abs;
-	    }
-	}
-    }
-}
 
 =item needs_linking (o)
 
