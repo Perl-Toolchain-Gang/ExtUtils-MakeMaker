@@ -14,8 +14,8 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 2c330d0d018795fdc70eaea102a686a9727c22a5 .patch
-SHA1 4a1815ad68fe671e02d994b2a6ee184c1979d18e Changes
+SHA1 0fd1f3e789ca65686bb874d94e62e87aef88cd18 .patch
+SHA1 8a5522039843f173cda8aa8e42bca9a231c20f08 Changes
 SHA1 48d4d61ef13a011113ea1ed6bb29047b9c7a6b91 MANIFEST
 SHA1 a61b9aa4655eb498906b3ff0babf01d3aea244af MANIFEST.SKIP
 SHA1 685c4f8dc9b7cb5263a258068a1781558c740ae0 META.yml
@@ -25,15 +25,15 @@ SHA1 a894493ee3809cd37657385b131617ed11afb389 PATCHING
 SHA1 4bca88259c865023cf1feb83e24ad8dbefd901bd README
 SHA1 235b9eb61a7b6c7c64fa534da53d87999c13f3cc TODO
 SHA1 ea7325428d3dfc04897a1efeb744b6637287d9d8 bin/instmodsh
-SHA1 bbbe33c8268320acca958decb6b4847ace402c17 lib/ExtUtils/Command.pm
+SHA1 e7ef76d2473ae15d9f361c2a2a93e2a7f1f3faac lib/ExtUtils/Command.pm
 SHA1 4e5d05c6fdebb6db2f45a7597f13cfc94d00f3f1 lib/ExtUtils/Command/MM.pm
-SHA1 a335f25f3a17c20c78dbe9e10a60d384c743d613 lib/ExtUtils/Install.pm
+SHA1 15c2f8e45114d1f46ef76b50af3a004df151b5e8 lib/ExtUtils/Install.pm
 SHA1 7d74c6a0911c18264bc0fe744a440e14d9e58ab3 lib/ExtUtils/Installed.pm
 SHA1 f8eda8ce72cf783b201b30ea7de318e7cb42575d lib/ExtUtils/Liblist.pm
 SHA1 e6163cf5e7e240eaf5e78fbf5b3f3a386212cc6b lib/ExtUtils/Liblist/Kid.pm
 SHA1 49327e65aeea05e2c1bdd672788c8ae81b861ae8 lib/ExtUtils/MANIFEST.SKIP
 SHA1 cf6ef9aabbb3092ebee02f9c88f613f776b947d3 lib/ExtUtils/MM.pm
-SHA1 c8660c0b7fd71c64cb0c0ca62a763660b9c62e32 lib/ExtUtils/MM_Any.pm
+SHA1 306ee5841d03edaa1dba6b0694f895835bc4a343 lib/ExtUtils/MM_Any.pm
 SHA1 3586e4d48ab36bc57f27f414871cdbf376d4e575 lib/ExtUtils/MM_BeOS.pm
 SHA1 e1555751ebc59dff97ded68db139d7496589dece lib/ExtUtils/MM_Cygwin.pm
 SHA1 861544f8e7a840853f767f35bb391a895f9aa1db lib/ExtUtils/MM_DOS.pm
@@ -41,17 +41,17 @@ SHA1 7eed153d0aae182d035739604f78fc8e454b5644 lib/ExtUtils/MM_MacOS.pm
 SHA1 de38d740614d3340a87be2bf585aec5ef7367836 lib/ExtUtils/MM_NW5.pm
 SHA1 441da7524783ae12ce40f26353adbf4696a8f5b4 lib/ExtUtils/MM_OS2.pm
 SHA1 02b916060571fd20ced334ba4f2d1542d1590023 lib/ExtUtils/MM_UWIN.pm
-SHA1 556590f086e4cf7b678a5fd4cee5cde00dd9e3d7 lib/ExtUtils/MM_Unix.pm
+SHA1 8f8073e7912a8ed9f78e184743517e16f4ffe066 lib/ExtUtils/MM_Unix.pm
 SHA1 04d940beb921b0ef9c43d9c91a1b03df1af78b53 lib/ExtUtils/MM_VMS.pm
 SHA1 c6ab78ae156669adf7bab2ac2a1906340f29c457 lib/ExtUtils/MM_Win32.pm
-SHA1 43bb17685c2499a285c645a0e9b71b0c079e56f7 lib/ExtUtils/MM_Win95.pm
+SHA1 e3142ac122edbb45f899435084c84f58219bae73 lib/ExtUtils/MM_Win95.pm
 SHA1 0f51f0dce4cb33bac94c85c86d19ae361e59597a lib/ExtUtils/MY.pm
-SHA1 eb6a6022467aaf3bf4651dc4f5c3fbe6bda9cf55 lib/ExtUtils/MakeMaker.pm
+SHA1 2d3f120608b084831f6034be484ca13bd691d133 lib/ExtUtils/MakeMaker.pm
 SHA1 2941c3d867595a9b6aef2ffa71f1ab85848bf236 lib/ExtUtils/MakeMaker/FAQ.pod
 SHA1 34d8c354eea23b0b7f467b476069a5180826eafc lib/ExtUtils/MakeMaker/Tutorial.pod
 SHA1 4685bb3361c2b9c42094ef68454e849edaf6f549 lib/ExtUtils/MakeMaker/bytes.pm
 SHA1 c9b221c60380328eae6eec826efeb368b11b4f8f lib/ExtUtils/MakeMaker/vmsish.pm
-SHA1 c3b115b96b3fe2691ab085ee4ef425220eff0cd6 lib/ExtUtils/Manifest.pm
+SHA1 581b03fad921a4db3eb3523e56206ecefd557fa5 lib/ExtUtils/Manifest.pm
 SHA1 9d125f3e2d3d52e060f5da038f294f00ff5c6196 lib/ExtUtils/Mkbootstrap.pm
 SHA1 fab07df80a333281a360e21caf61eb4850f04305 lib/ExtUtils/Mksymlists.pm
 SHA1 49ec9b062163ecc527e66f190ad791395b6f1277 lib/ExtUtils/Packlist.pm
@@ -77,7 +77,7 @@ SHA1 f384c878aa09e4c5745df052b083cf47f5c15e50 t/Mkbootstrap.t
 SHA1 eb257e4895dad4632691b1f71816b17a29b00534 t/Packlist.t
 SHA1 0ac9591b5de9a319042ee8c574b5e03e3ed52063 t/VERSION_FROM.t
 SHA1 a81882d0264b9cfa86514336b261aa6b75eabfa0 t/backwards.t
-SHA1 37037a48f9b94a581fdb5374b101ebf52ff5fd1d t/basic.t
+SHA1 14dabb62fb4c8f20f82ef61e2f0439b46ea742ee t/basic.t
 SHA1 80b3341f11cefd4cf79533198b3ecedf3faa7a1c t/bytes.t
 SHA1 20e4f3e535fd75ba854685a817ad9fcc07732325 t/hints.t
 SHA1 5a0be32608cd81ec0af3dc2048195a05bf57301f t/lib/MakeMaker/Test/Setup/Recurs.pm
@@ -103,7 +103,7 @@ SHA1 8f21b6971b81f650e4ec7eb1dc62037afb1f1587 t/zz_cleanup_dummy.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQE/oiewT4Li3Cw/PzQRAs5dAJ4u9oOOt8qCEL95Zgn/T7MUPDcATACffx+R
-8dsbmmM78QsULm8azHrbdwk=
-=UVw0
+iD8DBQE/pZpiT4Li3Cw/PzQRAqqjAKCMa864SMFqKWNRiEXyGKXaTj8XewCfWSsK
+4Rpo7cPN7ECxwzOySaTD+nw=
+=tVtx
 -----END PGP SIGNATURE-----
