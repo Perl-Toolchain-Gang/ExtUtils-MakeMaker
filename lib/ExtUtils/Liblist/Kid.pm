@@ -24,6 +24,8 @@ sub ext {
 
 sub _unix_os2_ext {
     my($self,$potential_libs, $verbose, $give_libs) = @_;
+    $verbose ||= 0;
+
     if ($^O =~ 'os2' and $Config{perllibs}) { 
 	# Dynamic libraries are not transitive, so we may need including
 	# the libraries linked against perl.dll again.
@@ -212,6 +214,7 @@ sub _win32_ext {
     require Text::ParseWords;
 
     my($self, $potential_libs, $verbose, $give_libs) = @_;
+    $verbose ||= 0;
 
     # If user did not supply a list, we punt.
     # (caller should probably use the list in $Config{libs})
@@ -364,6 +367,8 @@ sub _win32_ext {
 
 sub _vms_ext {
   my($self, $potential_libs,$verbose,$give_libs) = @_;
+  $verbose ||= 0;
+
   my(@crtls,$crtlstr);
   my($dbgqual) = $self->{OPTIMIZE} || $Config{'optimize'} ||
                  $self->{CCFLAGS}   || $Config{'ccflags'};
