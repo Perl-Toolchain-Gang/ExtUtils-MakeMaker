@@ -4,9 +4,11 @@
       errors when cleaning up things that are going to be rebuilt anyway.
     - Adding SCCS to the list of directories in MANIFEST.SKIP.
     - Fixing blibdirs so it doesn't rebuild every make run.
+    - Using a more conservative MAX_EXEC_LEN for Win98 to allow building
+      large modules like Encode. [Greg Matheson]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
-    - NetBSD was looking in INSTALLARCHLIB/CORE for libperl isntead of 
+    - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 
       PERL_ARCHLIB/CORE.  Would cause problems if INSTALLARCHLIB was changed
       (ie. LIB or PREFIX used). [Jochen Eisinger]
     - Turns out a handful of modules use dir_target().  Restored a version
