@@ -3192,10 +3192,10 @@ sub pm_to_blib {
     my $r = q{
 pm_to_blib: $(TO_INST_PM)
 };
-    my %pm_to_blib = %{$self->{PM}};
+
     my @a;
     my $l = 0;
-    while (my ($pm, $blib) = each %pm_to_blib) {
+    while (my ($pm, $blib) = each %{$self->{PM}}) {
 	my $la = length $pm;
 	my $lb = length $blib;
 	if ($l + $la + $lb + @a / 2 > 200) { # limit line length
