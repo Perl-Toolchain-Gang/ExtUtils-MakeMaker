@@ -25,7 +25,7 @@ $perl = rel2abs( $^X ) unless $] < 5.006; # Hack. Until 5.00503 has rel2abs
 $^X = $perl;
 
 print "# perl=$perl\n";
-my $runperl = "$perl -x \"-I../../lib\"";
+my $runperl = "$perl \"-I../../lib\"";
 
 $| = 1;
 
@@ -453,9 +453,26 @@ if ($?) {
 }
 $test++;
 
-my $regen = `$runperl $package.xs`;
+
+# -x is busted on Win32 < 5.6.1, so we emulate it.
+my $regen;
+if( $^O eq 'MSWin32' && $] <= 5.006001 ) {
+    open(REGENTMP, ">regentmp") or die $!;
+    open(XS, "$package.xs")     or die $!;
+    my $saw_shebang;
+    while(<XS>) {
+        $saw_shebang++ if /^#!.*/i ;
+        print REGENTMP $_ if $saw_shebang;
+    }
+    close XS;  close REGENTMP;
+    $regen = `$runperl regentmp`;
+    unlink 'regentmp';
+}
+else {
+    $regen = `$runperl -x $package.xs`;
+}
 if ($?) {
-  print "not ok $test # $runperl $package.xs failed: $?\n";
+  print "not ok $test # $runperl -x $package.xs failed: $?\n";
 } else {
   print "ok $test - regen\n";
 }
