@@ -41,6 +41,7 @@ my $mm = WriteMakefile(
     NAME          => 'Big::Fat::Dummy',
     VERSION_FROM  => 'lib/Big/Fat/Dummy.pm',
     PREREQ_PM     => {},
+    PERL_CORE     => $ENV{PERL_CORE},
 );
 like( $stdout->read, qr{
                         Writing\ $Makefile\ for\ Big::Fat::Liar\n
@@ -96,13 +97,7 @@ is( $c_mm->{INST_BIN},     File::Spec->catdir($Updir, 'blib', 'bin'),
                                      'CHILD INST_BIN' );
 
 
-my $inst_lib;
-if( $ENV{PERL_CORE} ) {
-    $inst_lib = $mm->{PERL_LIB};
-}
-else {
-    $inst_lib = File::Spec->catdir($Curdir, 'blib', 'lib');
-}
+my $inst_lib = File::Spec->catdir($Curdir, 'blib', 'lib');
 is( $mm->{INST_LIB}, $inst_lib,     'INST_LIB' );
 
 
