@@ -123,7 +123,7 @@ print FH <<"EOT";
 #include "XSUB.h"
 #include "test.h"
 
-$constant_types;
+$constant_types
 $C_constant
 MODULE = $package		PACKAGE = $package
 PROTOTYPES: ENABLE

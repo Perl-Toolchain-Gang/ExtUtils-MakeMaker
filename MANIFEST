@@ -36,8 +36,8 @@ t/Big-Fat-Dummy/Makefile.PL
 t/Big-Fat-Dummy/lib/Big/Fat/Dummy.pm
 t/Big-Fat-Dummy/t/compile.t
 t/Command.t
+t/Constant.t
 t/Embed.t
-t/ExtUtils.t
 t/Installed.t
 t/MM_BeOS.t
 t/MM_Cygwin.t
