@@ -263,16 +263,16 @@ clean ::
     # clean subdirectories first
     for $dir (@{$self->{DIR}}) {
 	if ($Is_Win32  &&  Win32::IsWin95()) {
-	    push @m, <<EOT;
-	cd $dir
-	\$(TEST_F) $self->{MAKEFILE}
-	\$(MAKE) clean
+	    push @m, sprintf <<EOT, $dir;
+	cd %s
+	$(TEST_F) $(MAKEFILE)
+	$(MAKE) clean
 	cd ..
 EOT
 	}
 	else {
-	    push @m, <<EOT;
-	-cd $dir && \$(TEST_F) $self->{MAKEFILE} && \$(MAKE) clean
+	    push @m, sprintf <<EOT, $dir;
+	-cd %s && $(TEST_F) $(MAKEFILE) && $(MAKE) clean
 EOT
 	}
     }
@@ -304,7 +304,7 @@ EOT
     push @m, "\t-$self->{RM_RF} @otherfiles\n";
     # See realclean and ext/utils/make_ext for usage of Makefile.old
     push(@m,
-	 "\t-$self->{MV} $self->{MAKEFILE} $self->{MAKEFILE}.old \$(DEV_NULL)\n");
+	 "\t-\$(MV) \$(MAKEFILE) \$(MAKEFILE).old \$(DEV_NULL)\n");
     push(@m,
 	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
     join("", @m);
@@ -588,11 +588,11 @@ sub dir_target {
 	next if $self->{DIR_TARGET}{$self}{$targdir}++;
 	push @m, qq{
 $targ :: $src
-	$self->{NOECHO}\$(MKPATH) $targdir
-	$self->{NOECHO}\$(EQUALIZE_TIMESTAMP) $src $targ
+	\$(NOECHO) \$(MKPATH) $targdir
+	\$(NOECHO) \$(EQUALIZE_TIMESTAMP) $src $targ
 };
 	push(@m, qq{
-	-$self->{NOECHO}\$(CHMOD) \$(PERM_RWX) $targdir
+	-\$(NOECHO) \$(CHMOD) \$(PERM_RWX) $targdir
 }) unless $Is_VMS;
     }
     join "", @m;
@@ -617,9 +617,9 @@ sub dist {
     $attribs{COMPRESS} ||= 'gzip --best';
     $attribs{SUFFIX}   ||= '.gz';
     $attribs{SHAR}     ||= 'shar';
-    $attribs{PREOP}    ||= "$self->{NOECHO}\$(NOOP)"; # eg update MANIFEST
-    $attribs{POSTOP}   ||= "$self->{NOECHO}\$(NOOP)"; # eg remove the distdir
-    $attribs{TO_UNIX}  ||= "$self->{NOECHO}\$(NOOP)";
+    $attribs{PREOP}    ||= '$(NOECHO) $(NOOP)'; # eg update MANIFEST
+    $attribs{POSTOP}   ||= '$(NOECHO) $(NOOP)'; # eg remove the distdir
+    $attribs{TO_UNIX}  ||= '$(NOECHO) $(NOOP)';
 
     $attribs{CI}       ||= 'ci -u';
     $attribs{RCS_LABEL}||= 'rcs -Nv$(VERSION_SYM): -q';
@@ -699,8 +699,8 @@ sub dist_core {
     my @m;
     push @m, q{
 dist : $(DIST_DEFAULT)
-	}.$self->{NOECHO}.q{$(PERL) -le 'print "Warning: Makefile possibly out of date with $$vf" if ' \
-	    -e '-e ($$vf="$(VERSION_FROM)") and -M $$vf < -M "}.$self->{MAKEFILE}.q{";'
+	$(NOECHO) $(PERL) -le 'print "Warning: Makefile possibly out of date with $$vf" if ' \
+	    -e '-e ($$vf="$(VERSION_FROM)") and -M $$vf < -M "$(MAKEFILE)";'
 
 tardist : $(DISTVNAME).tar$(SUFFIX)
 
@@ -825,9 +825,8 @@ sub dynamic {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make dynamic"
-#dynamic :: '.$self->{MAKEFILE}.' $(INST_DYNAMIC) $(INST_BOOT) $(INST_PM)
-dynamic :: '.$self->{MAKEFILE}.' $(INST_DYNAMIC) $(INST_BOOT)
-	'.$self->{NOECHO}.'$(NOOP)
+dynamic :: $(MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
+	$(NOECHO) $(NOOP)
 ';
 }
 
@@ -849,17 +848,17 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP): '."$self->{MAKEFILE} $self->{BOOTDEP}".' $(INST_ARCHAUTODIR)/.exists
-	'.$self->{NOECHO}.'echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
-	'.$self->{NOECHO}.'$(PERLRUN) \
+$(BOOTSTRAP): $(MAKEFILE) '.$self->{BOOTDEP}.' $(INST_ARCHAUTODIR)/.exists
+	$(NOECHO) echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
+	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
 		-e "Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
-	'.$self->{NOECHO}.'$(TOUCH) $(BOOTSTRAP)
+	$(NOECHO) $(TOUCH) $(BOOTSTRAP)
 	$(CHMOD) $(PERM_RW) $@
 
 $(INST_BOOT): $(BOOTSTRAP) $(INST_ARCHAUTODIR)/.exists
-	'."$self->{NOECHO}$self->{RM_RF}".' $(INST_BOOT)
-	-'.$self->{CP}.' $(BOOTSTRAP) $(INST_BOOT)
+	$(NOECHO) $(RM_RF) $(INST_BOOT)
+	-$(CP) $(BOOTSTRAP) $(INST_BOOT)
 	$(CHMOD) $(PERM_RW) $@
 ';
 }
@@ -1154,7 +1153,7 @@ sub force {
     my($self) = shift;
     '# Phony target to force checking subdirectories.
 FORCE:
-	'.$self->{NOECHO}.'$(NOOP)
+	$(NOECHO) $(NOOP)
 ';
 }
 
@@ -2176,7 +2175,7 @@ doc__install : doc_site_install
 	@echo INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 pure_perl_install ::
-	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
+	$(NOECHO) $(MOD_INSTALL) \
 		read }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
 		write }.$self->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLPRIVLIB) \
@@ -2185,12 +2184,12 @@ pure_perl_install ::
 		$(INST_SCRIPT) $(INSTALLSCRIPT) \
 		$(INST_MAN1DIR) $(INSTALLMAN1DIR) \
 		$(INST_MAN3DIR) $(INSTALLMAN3DIR)
-	}.$self->{NOECHO}.q{$(WARN_IF_OLD_PACKLIST) \
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.File::Spec->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{
 
 
 pure_site_install ::
-	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
+	$(NOECHO) $(MOD_INSTALL) \
 		read }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
 		write }.$self->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLSITELIB) \
@@ -2199,11 +2198,11 @@ pure_site_install ::
 		$(INST_SCRIPT) $(INSTALLSCRIPT) \
 		$(INST_MAN1DIR) $(INSTALLSITEMAN1DIR) \
 		$(INST_MAN3DIR) $(INSTALLSITEMAN3DIR)
-	}.$self->{NOECHO}.q{$(WARN_IF_OLD_PACKLIST) \
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.File::Spec->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{
 
 pure_vendor_install ::
-	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
+	$(NOECHO) $(MOD_INSTALL) \
 		read }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
 		write }.$self->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLVENDORLIB) \
@@ -2214,9 +2213,9 @@ pure_vendor_install ::
 		$(INST_MAN3DIR) $(INSTALLVENDORMAN3DIR)
 
 doc_perl_install ::
-	}.$self->{NOECHO}.q{echo Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-}.$self->{NOECHO}.q{$(MKPATH) $(INSTALLARCHLIB)
-	-}.$self->{NOECHO}.q{$(DOC_INSTALL) \
+	$(NOECHO) echo Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
+	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLPRIVLIB)" \
 		LINKTYPE "$(LINKTYPE)" \
@@ -2225,9 +2224,9 @@ doc_perl_install ::
 		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
 
 doc_site_install ::
-	}.$self->{NOECHO}.q{echo Appending installation info to $(INSTALLSITEARCH)/perllocal.pod
-	-}.$self->{NOECHO}.q{$(MKPATH) $(INSTALLSITEARCH)
-	-}.$self->{NOECHO}.q{$(DOC_INSTALL) \
+	$(NOECHO) echo Appending installation info to $(INSTALLSITEARCH)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(INSTALLSITEARCH)
+	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLSITELIB)" \
 		LINKTYPE "$(LINKTYPE)" \
@@ -2236,9 +2235,9 @@ doc_site_install ::
 		>> }.$self->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
 
 doc_vendor_install ::
-	}.$self->{NOECHO}.q{echo Appending installation info to $(INSTALLVENDORLIB)/perllocal.pod
-	-}.$self->{NOECHO}.q{$(MKPATH) $(INSTALLVENDORLIB)
-	-}.$self->{NOECHO}.q{$(DOC_INSTALL) \
+	$(NOECHO) echo Appending installation info to $(INSTALLVENDORLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(INSTALLVENDORLIB)
+	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLVENDORLIB)" \
 		LINKTYPE "$(LINKTYPE)" \
@@ -2252,16 +2251,13 @@ doc_vendor_install ::
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 
 uninstall_from_perldirs ::
-	}.$self->{NOECHO}.
-	q{$(UNINSTALL) }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{
+	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{
 
 uninstall_from_sitedirs ::
-	}.$self->{NOECHO}.
-	q{$(UNINSTALL) }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{
+	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{
 
 uninstall_from_vendordirs ::
-	}.$self->{NOECHO}.
-        q{$(UNINSTALL) }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{
+	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{
 };
 
     join("",@m);
@@ -2296,21 +2292,21 @@ EXE_FILES = @{$self->{EXE_FILES}}
     -e "MY->fixin(shift)"
 }).qq{
 pure_all :: @to
-	$self->{NOECHO}\$(NOOP)
+	\$(NOECHO) \$(NOOP)
 
 realclean ::
-	$self->{RM_F} @to
+	\$(RM_F) @to
 });
 
     while (($from,$to) = each %fromto) {
 	last unless defined $from;
 	my $todir = dirname($to);
 	push @m, "
-$to: $from $self->{MAKEFILE} " . File::Spec->catdir($todir,'.exists') . "
-	$self->{NOECHO}$self->{RM_F} $to
-	$self->{CP} $from $to
+$to: $from \$(MAKEFILE) " . File::Spec->catdir($todir,'.exists') . "
+	\$(NOECHO) \$(RM_F) $to
+	\$(CP) $from $to
 	\$(FIXIN) $to
-	-$self->{NOECHO}\$(CHMOD) \$(PERM_RWX) $to
+	-\$(NOECHO) \$(CHMOD) \$(PERM_RWX) $to
 ";
     }
     join "", @m;
@@ -2330,7 +2326,7 @@ sub linkext {
       $attribs{LINKTYPE} : '$(LINKTYPE)';
     "
 linkext :: $linktype
-	$self->{NOECHO}\$(NOOP)
+	\$(NOECHO) \$(NOOP)
 ";
 }
 
@@ -2401,8 +2397,8 @@ $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) -f $(MAKE_APERL_FILE) $@
 
 $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
-	}.$self->{NOECHO}.q{echo Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
-	}.$self->{NOECHO}.q{$(PERLRUNINST) \
+	$(NOECHO) echo Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
+	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR=}, $dir, q{ \
 		MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
 		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=};
@@ -2554,10 +2550,10 @@ LLIBPERL    = $llibperl
 ";
 
     push @m, "
-\$(INST_ARCHAUTODIR)/extralibs.all: \$(INST_ARCHAUTODIR)/.exists ".join(" \\\n\t", @$extra)."
-	$self->{NOECHO}$self->{RM_F} \$\@
-	$self->{NOECHO}\$(TOUCH) \$\@
-";
+\$(INST_ARCHAUTODIR)/extralibs.all: \$(INST_ARCHAUTODIR)/.exists ".join(" \\\n\t", @$extra).'
+	$(NOECHO) $(RM_F)  $@
+	$(NOECHO) $(TOUCH) $@
+';
 
     my $catfile;
     foreach $catfile (@$extra){
@@ -2567,10 +2563,10 @@ LLIBPERL    = $llibperl
 push @m, "
 \$(MAP_TARGET) :: $tmp/perlmain\$(OBJ_EXT) \$(MAP_LIBPERL) \$(MAP_STATIC) \$(INST_ARCHAUTODIR)/extralibs.all
 	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) \$(LLIBPERL) `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
-	$self->{NOECHO}echo 'To install the new \"\$(MAP_TARGET)\" binary, call'
-	$self->{NOECHO}echo '    make -f $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
-	$self->{NOECHO}echo 'To remove the intermediate files say'
-	$self->{NOECHO}echo '    make -f $makefilename map_clean'
+	\$(NOECHO) echo 'To install the new \"\$(MAP_TARGET)\" binary, call'
+	\$(NOECHO) echo '    make -f $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
+	\$(NOECHO) echo 'To remove the intermediate files say'
+	\$(NOECHO) echo '    make -f $makefilename map_clean'
 
 $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 ";
@@ -2578,20 +2574,20 @@ $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 
     push @m, qq{
 $tmp/perlmain.c: $makefilename}, q{
-	}.$self->{NOECHO}.q{echo Writing $@
-	}.$self->{NOECHO}.q{$(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
+	$(NOECHO) echo Writing $@
+	$(NOECHO) $(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
 		-e "writemain(grep s#.*/auto/##s, split(q| |, q|$(MAP_STATIC)|))" > $@t && $(MV) $@t $@
 
 };
-    push @m, "\t",$self->{NOECHO}.q{$(PERL) $(INSTALLSCRIPT)/fixpmain
+    push @m, "\t", q{$(NOECHO) $(PERL) $(INSTALLSCRIPT)/fixpmain
 } if (defined (&Dos::UseLFN) && Dos::UseLFN()==0);
 
 
     push @m, q{
 doc_inst_perl:
-	}.$self->{NOECHO}.q{echo Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-}.$self->{NOECHO}.q{$(MKPATH) $(INSTALLARCHLIB)
-	-}.$self->{NOECHO}.q{$(DOC_INSTALL) \
+	$(NOECHO) echo Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
+	-$(NOECHO) $(DOC_INSTALL) \
 		"Perl binary" "$(MAP_TARGET)" \
 		MAP_STATIC "$(MAP_STATIC)" \
 		MAP_EXTRA "`cat $(INST_ARCHAUTODIR)/extralibs.all`" \
@@ -2634,15 +2630,15 @@ $(OBJECT) : $(FIRST_MAKEFILE)
     push @m, q{
 # We take a very conservative approach here, but it\'s worth it.
 # We move Makefile to Makefile.old here to avoid gnu make looping.
-}.$self->{MAKEFILE}.q{ : Makefile.PL $(CONFIGDEP)
-	}.$self->{NOECHO}.q{echo "Makefile out-of-date with respect to $?"
-	}.$self->{NOECHO}.q{echo "Cleaning current config before rebuilding Makefile..."
-	-}.$self->{NOECHO}.q{$(RM_F) }."$self->{MAKEFILE}.old".q{
-	-}.$self->{NOECHO}.q{$(MV) }."$self->{MAKEFILE} $self->{MAKEFILE}.old".q{
-	-$(MAKE) -f }.$self->{MAKEFILE}.q{.old clean $(DEV_NULL) || $(NOOP)
+$(MAKEFILE) : Makefile.PL $(CONFIGDEP)
+	$(NOECHO) echo "Makefile out-of-date with respect to $?"
+	$(NOECHO) echo "Cleaning current config before rebuilding Makefile..."
+	$(NOECHO) $(RM_F) $(MAKEFILE).old
+	$(NOECHO) $(MV)   $(MAKEFILE) $(MAKEFILE).old
+	-$(MAKE) -f $(MAKEFILE).old clean $(DEV_NULL) || $(NOOP)
 	$(PERLRUN) Makefile.PL }.join(" ",map(qq["$_"],@ARGV)).q{
-	}.$self->{NOECHO}.q{echo "==> Your Makefile has been rebuilt. <=="
-	}.$self->{NOECHO}.q{echo "==> Please rerun the make command.  <=="
+	$(NOECHO) echo "==> Your Makefile has been rebuilt. <=="
+	$(NOECHO) echo "==> Please rerun the make command.  <=="
 	false
 
 };
@@ -2834,10 +2830,10 @@ sub perldepend {
 # We do NOT just update config.h because that is not sufficient.
 # An out of date config.h is not fatal but complains loudly!
 $(PERL_INC)/config.h: $(PERL_SRC)/config.sh
-	-}.$self->{NOECHO}.q{echo "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; false
+	-$(NOECHO) echo "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; false
 
 $(PERL_ARCHLIB)/Config.pm: $(PERL_SRC)/config.sh
-	}.$self->{NOECHO}.q{echo "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(PERL_SRC)/config.sh"
+	$(NOECHO) echo "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(PERL_SRC)/config.sh"
 	cd $(PERL_SRC) && $(MAKE) lib/Config.pm
 } if $self->{PERL_SRC};
 
@@ -2940,7 +2936,7 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 sub _pm_to_blib_flush {
     my ($self, $autodir, $rr, $ra, $rl) = @_;
     $$rr .= 
-q{	}.$self->{NOECHO}.q[$(PERLRUNINST) "-MExtUtils::Install" \
+q[	$(NOECHO) $(PERLRUNINST) "-MExtUtils::Install" \
 	-e "pm_to_blib({qw{].qq[@$ra].q[}},'].$autodir.q{','$(PM_FILTER)')"
 };
     @$ra = ();
@@ -2966,7 +2962,7 @@ pm_to_blib: $(TO_INST_PM)
 	$l += $la + $lb;
     }
     $self->_pm_to_blib_flush($autodir, \$r, \@a, \$l);
-    return $r.q{	}.$self->{NOECHO}.q{$(TOUCH) $@};
+    return $r.q{	$(NOECHO) $(TOUCH) $@};
 }
 
 =item post_constants (o)
@@ -3158,7 +3154,7 @@ sub processPL {
 	foreach $target (@$list) {
 	push @m, "
 all :: $target
-	$self->{NOECHO}\$(NOOP)
+	\$(NOECHO) \$(NOOP)
 
 $target :: $plfile
 	\$(PERLRUNINST) $plfile $target
@@ -3214,14 +3210,14 @@ REALCLEAN
     }
 
     foreach(@{$self->{DIR}}){
-	push(@m, sprintf($sub,$_,"$self->{MAKEFILE}.old","-f $self->{MAKEFILE}.old"));
-	push(@m, sprintf($sub,$_,"$self->{MAKEFILE}",''));
+	push(@m, sprintf($sub,$_,'$(MAKEFILE).old','-f $(MAKEFILE).old'));
+	push(@m, sprintf($sub,$_,'$(MAKEFILE)',''));
     }
-    push(@m, "	$self->{RM_RF} \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n");
-    push(@m, "	$self->{RM_RF} \$(DISTVNAME)\n");
+    push(@m, "	\$(RM_RF) \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n");
+    push(@m, "	\$(RM_RF) \$(DISTVNAME)\n");
     if( $self->has_link_code ){
-        push(@m, "	$self->{RM_F} \$(INST_DYNAMIC) \$(INST_BOOT)\n");
-        push(@m, "	$self->{RM_F} \$(INST_STATIC)\n");
+        push(@m, "	\$(RM_F) \$(INST_DYNAMIC) \$(INST_BOOT)\n");
+        push(@m, "	\$(RM_F) \$(INST_STATIC)\n");
     }
     # Issue a several little RM_F commands rather than risk creating a
     # very long command line (useful for extensions such as Encode
@@ -3237,13 +3233,13 @@ REALCLEAN
 		$line .= " $_"; 
 	    }
 	}
-    push @m, "\t$self->{RM_F} $line\n" if $line;
+        push @m, "\t\$(RM_F) $line\n" if $line;
     }
-    my(@otherfiles) = ($self->{MAKEFILE},
-		       "$self->{MAKEFILE}.old"); # Makefiles last
-    push(@otherfiles, $attribs{FILES}) if $attribs{FILES};
-    push(@m, "	$self->{RM_RF} @otherfiles\n") if @otherfiles;
-    push(@m, "	$attribs{POSTOP}\n")       if $attribs{POSTOP};
+    my(@otherfiles) = ('$(MAKEFILE)',
+		       '$(MAKEFILE).old'); # Makefiles last
+    push(@otherfiles, $attribs{FILES})    if $attribs{FILES};
+    push(@m, "	\$(RM_RF) @otherfiles\n") if @otherfiles;
+    push(@m, "	$attribs{POSTOP}\n")      if $attribs{POSTOP};
     join("", @m);
 }
 
@@ -3295,9 +3291,8 @@ sub static {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
-#static :: '.$self->{MAKEFILE}.' $(INST_STATIC) $(INST_PM)
-static :: '.$self->{MAKEFILE}.' $(INST_STATIC)
-	'.$self->{NOECHO}.'$(NOOP)
+static :: $(MAKEFILE) $(INST_STATIC)
+	$(NOECHO) $(NOOP)
 ';
 }
 
@@ -3335,11 +3330,11 @@ END
         "\t\$($ar) ".'$(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@'."\n";
     push @m,
 q{	$(CHMOD) $(PERM_RWX) $@
-	}.$self->{NOECHO}.q{echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
+	$(NOECHO) echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
 };
     # Old mechanism - still available:
     push @m,
-"\t$self->{NOECHO}".q{echo "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
+q{\t$(NOECHO) echo "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
 }	if $self->{PERL_SRC} && $self->{EXTRALIBS};
     push @m, "\n";
 
@@ -3462,13 +3457,13 @@ test :: \$(TEST_TYPE)
 ");
 
     if ($Is_Win32 && Win32::IsWin95()) {
-        push(@m, map(qq{\t$self->{NOECHO}\$(PERLRUN) -e "exit unless -f shift; chdir '$_'; system q{\$(MAKE) test \$(PASTHRU)}" $self->{MAKEFILE}\n}, @{$self->{DIR}}));
+        push(@m, map(qq{\t\$(NOECHO) \$(PERLRUN) -e "exit unless -f shift; chdir '$_'; system q{\$(MAKE) test \$(PASTHRU)}" \$(MAKEFILE)\n}, @{$self->{DIR}}));
     }
     else {
-        push(@m, map("\t$self->{NOECHO}cd $_ && \$(TEST_F) $self->{MAKEFILE} && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
+        push(@m, map("\t\$(NOECHO) cd $_ && \$(TEST_F) \$(MAKEFILE) && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
     }
 
-    push(@m, "\t$self->{NOECHO}echo 'No tests defined for \$(NAME) extension.'\n")
+    push(@m, "\t\$(NOECHO) echo 'No tests defined for \$(NAME) extension.'\n")
 	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 
@@ -3735,41 +3730,41 @@ sub top_targets {
 
     push @m, '
 all :: pure_all manifypods
-	'.$self->{NOECHO}.'$(NOOP)
+	$(NOECHO) $(NOOP)
 ' 
 	  unless $self->{SKIPHASH}{'all'};
     
     push @m, '
 pure_all :: config pm_to_blib subdirs linkext
-	'.$self->{NOECHO}.'$(NOOP)
+	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)
-	'.$self->{NOECHO}.'$(NOOP)
+	$(NOECHO) $(NOOP)
 
-config :: '.$self->{MAKEFILE}.' $(INST_LIBDIR)/.exists
-	'.$self->{NOECHO}.'$(NOOP)
+config :: $(MAKEFILE) $(INST_LIBDIR)/.exists
+	$(NOECHO) $(NOOP)
 
 config :: $(INST_ARCHAUTODIR)/.exists
-	'.$self->{NOECHO}.'$(NOOP)
+	$(NOECHO) $(NOOP)
 
 config :: $(INST_AUTODIR)/.exists
-	'.$self->{NOECHO}.'$(NOOP)
+	$(NOECHO) $(NOOP)
 ';
 
     push @m, $self->dir_target(qw[$(INST_AUTODIR) $(INST_LIBDIR) $(INST_ARCHAUTODIR)]);
 
     if (%{$self->{MAN1PODS}}) {
-	push @m, qq[
-config :: \$(INST_MAN1DIR)/.exists
-	$self->{NOECHO}\$(NOOP)
+	push @m, q[
+config :: $(INST_MAN1DIR)/.exists
+	$(NOECHO) $(NOOP)
 
 ];
 	push @m, $self->dir_target(qw[$(INST_MAN1DIR)]);
     }
     if (%{$self->{MAN3PODS}}) {
-	push @m, qq[
-config :: \$(INST_MAN3DIR)/.exists
-	$self->{NOECHO}\$(NOOP)
+	push @m, q[
+config :: $(INST_MAN3DIR)/.exists
+	$(NOECHO) $(NOOP)
 
 ];
 	push @m, $self->dir_target(qw[$(INST_MAN3DIR)]);
