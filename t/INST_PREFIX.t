@@ -38,13 +38,14 @@ my $Updir  = File::Spec->updir;
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
+my $PREFIX = File::Spec->catdir('foo', 'bar');
 my $stdout = tie *STDOUT, 'TieOut' or die;
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => {},
     PERL_CORE     => $ENV{PERL_CORE},
-    PREFIX        => 'foo/bar/',
+    PREFIX        => $PREFIX,
 );
 like( $stdout->read, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
@@ -61,7 +62,7 @@ isa_ok( $mm, 'ExtUtils::MakeMaker' );
 is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
-is( $mm->{PREFIX}, 'foo/bar/',   'PREFIX' );
+is( $mm->{PREFIX}, $PREFIX,   'PREFIX' );
 
 is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );
 
@@ -87,7 +88,7 @@ my @Vend_Install = qw(vendorarch vendorlib vendorbin
                       vendorman1dir vendorman3dir);
 
 foreach my $var (@Perl_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
+    my $prefix = $Is_VMS ? '[.foo.bar' : File::Spec->catdir(qw(foo bar));
 
     # support for man page skipping
     $prefix = 'none' if $var =~ /man/ && !$Config{"install$var"};
@@ -95,13 +96,15 @@ foreach my $var (@Perl_Install) {
 }
 
 foreach my $var (@Site_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
+    my $prefix = $Is_VMS ? '[.foo.bar' : File::Spec->catdir(qw(foo bar));
+
     like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, 
                                                     "SITEPREFIX + $var" );
 }
 
 foreach my $var (@Vend_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
+    my $prefix = $Is_VMS ? '[.foo.bar' : File::Spec->catdir(qw(foo bar));
+
     like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/,
                                                     "VENDORPREFIX + $var" );
 }
@@ -115,17 +118,17 @@ foreach my $var (@Vend_Install) {
     $ExtUtils::MM_Unix::Config{installman1dir} = '';
     $ExtUtils::MM_Unix::Config{installman3dir} = '';
 
+    my $wibble = File::Spec->catdir(qw(wibble and such));
     my $stdout = tie *STDOUT, 'TieOut' or die;
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
                            PREREQ_PM     => {},
                            PERL_CORE     => $ENV{PERL_CORE},
-                           PREFIX        => 'foo/bar/',
-                           INSTALLMAN1DIR=> 'wibble/and/such'
+                           PREFIX        => $PREFIX,
+                           INSTALLMAN1DIR=> $wibble,
                           );
 
-    my $wibble = File::Spec->catdir(qw(wibble and such));
     is( $mm->{INSTALLMAN1DIR}, $wibble );
     is( $mm->{INSTALLMAN3DIR}, 'none'  );
 }

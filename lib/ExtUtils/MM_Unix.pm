@@ -1857,15 +1857,15 @@ sub init_INSTALL {
 
     # There are no Config.pm defaults for these.
     $Config_Override{installsiteman1dir} = 
-        "$Config{siteprefixexp}/man/man\$(MAN1EXT)";
+        File::Spec->catdir($Config{siteprefixexp}, 'man', 'man$(MAN1EXT)');
     $Config_Override{installsiteman3dir} = 
-        "$Config{siteprefixexp}/man/man\$(MAN3EXT)";
+        File::Spec->catdir($Config{siteprefixexp}, 'man', 'man$(MAN3EXT)');
 
     if( $Config{usevendorprefix} ) {
         $Config_Override{installvendorman1dir} =
-          "$Config{vendorprefixexp}/man/man\$(MAN1EXT)";
+          File::Spec->catdir($Config{vendorprefixexp}, 'man', 'man$(MAN1EXT)');
         $Config_Override{installvendorman3dir} =
-          "$Config{vendorprefixexp}/man/man\$(MAN3EXT)";
+          File::Spec->catdir($Config{vendorprefixexp}, 'man', 'man$(MAN3EXT)');
     }
     else {
         $Config_Override{installvendorman1dir} = '';

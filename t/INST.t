@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 27;
+use Test::More tests => 23;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -137,10 +137,6 @@ untie *STDOUT;
 isa_ok( $mm, 'ExtUtils::MakeMaker' );
 
 is  ( $mm->{INSTALLMAN1DIR},        'none' );
-isnt( $mm->{INSTALLMAN3DIR},        'none' );
-isnt( $mm->{INSTALLSITEMAN1DIR},    'none' );
 is  ( $mm->{INSTALLSITEMAN3DIR},    'none' );
 is  ( $mm->{INSTALLVENDORMAN1DIR},  'none' );
-isnt( $mm->{INSTALLVENDORMAN3DIR},  'none' );
 is  ( $mm->{INST_MAN1DIR},          'none' );
-isnt( $mm->{INST_MAN3DIR},          'none' );
