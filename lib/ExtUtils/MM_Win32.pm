@@ -146,7 +146,8 @@ Using \ for Windows.
 sub init_DIRFILESEP {
     my($self) = shift;
 
-    $self->{DIRFILESEP} = '\\';
+    # gotta be careful this isn't interpreted as an escape.
+    $self->{DIRFILESEP} = '^\\';
 }
 
 =item B<init_others>
