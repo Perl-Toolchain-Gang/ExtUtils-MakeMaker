@@ -268,7 +268,7 @@ sub cflags {
 
     my($name);
     ( $name = $self->{NAME} . "_cflags" ) =~ s/:/_/g ;
-    if ($prog = $Config::Config{$name}) {
+    if ($prog = $Config{$name}) {
 	# Expand hints for this extension via the shell
 	print STDOUT "Processing $name hint:\n" if $Verbose;
 	my(@o)=`cc=\"$cflags{cc}\"
@@ -300,10 +300,11 @@ sub cflags {
     }
 
     for (qw(ccflags optimize perltype)) {
+        $cflags{$_} ||= '';
 	$cflags{$_} =~ s/^\s+//;
 	$cflags{$_} =~ s/\s+/ /g;
 	$cflags{$_} =~ s/\s+$//;
-	$self->{uc $_} ||= $cflags{$_}
+	$self->{uc $_} = $cflags{$_};
     }
 
     if ($self->{POLLUTE}) {
@@ -983,8 +984,8 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)/.exists 
     $ldfrom = "-all $ldfrom -none" if ($^O eq 'dec_osf');
 
     # The IRIX linker doesn't use LD_RUN_PATH
-    my $ldrun = qq{-rpath "$self->{LD_RUN_PATH}"}
-	if ($^O eq 'irix' && $self->{LD_RUN_PATH});
+    my $ldrun = $^O eq 'irix' && $self->{LD_RUN_PATH} ?         
+                       qq{-rpath "$self->{LD_RUN_PATH}"} : '';
 
     # For example in AIX the shared objects/libraries from previous builds
     # linger quite a while in the shared dynalinker cache even when nobody
@@ -994,7 +995,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)/.exists 
     push(@m,'	$(RM_F) $@
 ');
 
-    my $libs = $self->{LDLOADLIBS};
+    my $libs = $self->{LDLOADLIBS} || '';
 
     if ($^O eq 'netbsd') {
 	# Use nothing on static perl platforms, and to the flags needed
@@ -1108,7 +1109,7 @@ Inserts the sharpbang or equivalent magic number to a set of @files.
 sub fixin { # stolen from the pink Camel book, more or less
     my($self, @files) = @_;
 
-    my($does_shbang) = $Config::Config{'sharpbang'} =~ /^\s*\#\!/;
+    my($does_shbang) = $Config{'sharpbang'} =~ /^\s*\#\!/;
     for my $file (@files) {
 	local(*FIXIN);
 	local(*FIXOUT);
@@ -1500,6 +1501,7 @@ sub init_main {
     }
 
     ($self->{PARENT_NAME}, $self->{BASEEXT}) = $self->{NAME} =~ m!(?:([\w:]+)::)?(\w+)\z! ;
+    $self->{PARENT_NAME} ||= '';
 
     if (defined &DynaLoader::mod2fname) {
 	# As of 5.001m, dl_os2 appends '_'
@@ -1572,8 +1574,8 @@ from the perl source tree.
     } else {
 	# we should also consider $ENV{PERL5LIB} here
         my $old = $self->{PERL_LIB} || $self->{PERL_ARCHLIB} || $self->{PERL_INC};
-	$self->{PERL_LIB}     ||= $Config::Config{privlibexp};
-	$self->{PERL_ARCHLIB} ||= $Config::Config{archlibexp};
+	$self->{PERL_LIB}     ||= $Config{privlibexp};
+	$self->{PERL_ARCHLIB} ||= $Config{archlibexp};
 	$self->{PERL_INC}     = File::Spec->catdir("$self->{PERL_ARCHLIB}","CORE"); # wild guess for now
 	my $perl_h;
 
@@ -1630,21 +1632,21 @@ usually solves this kind of problem.
     $self->init_INST;
     $self->init_INSTALL;
 
-    $self->{MAN1EXT} ||= $Config::Config{man1ext};
-    $self->{MAN3EXT} ||= $Config::Config{man3ext};
+    $self->{MAN1EXT} ||= $Config{man1ext};
+    $self->{MAN3EXT} ||= $Config{man3ext};
 
     # Get some stuff out of %Config if we haven't yet done so
     print STDOUT "CONFIG must be an array ref\n"
 	if ($self->{CONFIG} and ref $self->{CONFIG} ne 'ARRAY');
     $self->{CONFIG} = [] unless (ref $self->{CONFIG});
     push(@{$self->{CONFIG}}, @ExtUtils::MakeMaker::Get_from_Config);
-    push(@{$self->{CONFIG}}, 'shellflags') if $Config::Config{shellflags};
+    push(@{$self->{CONFIG}}, 'shellflags') if $Config{shellflags};
     my(%once_only,$m);
     foreach $m (@{$self->{CONFIG}}){
 	next if $once_only{$m};
 	print STDOUT "CONFIG key '$m' does not exist in Config.pm\n"
-		unless exists $Config::Config{$m};
-	$self->{uc $m} ||= $Config::Config{$m};
+		unless exists $Config{$m};
+	$self->{uc $m} ||= $Config{$m};
 	$once_only{$m} = 1;
     }
 
@@ -1727,7 +1729,8 @@ sub init_others {	# --- Initialize Other Attributes
 	my(@libs) = $self->extliblist($libs);
 	if ($libs[0] or $libs[1] or $libs[2]){
 	    # LD_RUN_PATH now computed by ExtUtils::Liblist
-	    ($self->{EXTRALIBS}, $self->{BSLOADLIBS}, $self->{LDLOADLIBS}, $self->{LD_RUN_PATH}) = @libs;
+	    ($self->{EXTRALIBS},  $self->{BSLOADLIBS}, 
+             $self->{LDLOADLIBS}, $self->{LD_RUN_PATH}) = @libs;
 	    last;
 	}
     }
@@ -1751,7 +1754,7 @@ sub init_others {	# --- Initialize Other Attributes
     if (!$self->{LINKTYPE}) {
        $self->{LINKTYPE} = $self->{SKIPHASH}{'dynamic'}
                         ? 'static'
-                        : ($Config::Config{usedl} ? 'dynamic' : 'static');
+                        : ($Config{usedl} ? 'dynamic' : 'static');
     };
 
     # These get overridden for VMS and maybe some other systems
@@ -1787,7 +1790,7 @@ sub init_INST {
 
     # INST_LIB typically pre-set if building an extension after
     # perl has been built and installed. Setting INST_LIB allows
-    # you to build directly into, say $Config::Config{privlibexp}.
+    # you to build directly into, say $Config{privlibexp}.
     unless ($self->{INST_LIB}){
 	if ($self->{PERL_CORE}) {
 	    $self->{INST_LIB} = $self->{INST_ARCHLIB} = $self->{PERL_LIB};
@@ -1959,7 +1962,7 @@ sub init_PERL {
 
     my @defpath = ();
     foreach my $component ($self->{PERL_SRC}, $self->path(), 
-                           $Config::Config{binexp}) 
+                           $Config{binexp}) 
     {
 	push @defpath, $component if defined $component;
     }
@@ -2305,8 +2308,8 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
     $cccmd = $self->const_cccmd($libperl);
     $cccmd =~ s/^CCCMD\s*=\s*//;
     $cccmd =~ s/\$\(INC\)/ "-I$self->{PERL_INC}" /;
-    $cccmd .= " $Config::Config{cccdlflags}"
-	if ($Config::Config{useshrplib} eq 'true');
+    $cccmd .= " $Config{cccdlflags}"
+	if ($Config{useshrplib} eq 'true');
     $cccmd =~ s/\(CC\)/\(PERLMAINCC\)/;
 
     # The front matter of the linkcommand...
@@ -2394,7 +2397,7 @@ MAP_PERLINC   = @{$perlinc || []}
 MAP_STATIC    = ",
 join(" \\\n\t", reverse sort keys %static), "
 
-MAP_PRELIBS   = $Config::Config{perllibs} $Config::Config{cryptlib}
+MAP_PRELIBS   = $Config{perllibs} $Config{cryptlib}
 ";
 
     if (defined $libperl) {
@@ -2411,7 +2414,7 @@ MAP_PRELIBS   = $Config::Config{perllibs} $Config::Config{cryptlib}
         if (! -f $libperl and ! -f $lperl) {
           # We did not find a static libperl. Maybe there is a shared one?
           if ($^O eq 'solaris' or $^O eq 'sunos') {
-            $lperl  = $libperl = "$dir/$Config::Config{libperl}";
+            $lperl  = $libperl = "$dir/$Config{libperl}";
             # SUNOS ld does not take the full path to a shared library
             $libperl = '' if $^O eq 'sunos';
           }
