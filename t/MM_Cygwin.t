@@ -48,7 +48,7 @@ delete $args->{CFLAGS};
 {
     local $SIG{__WARN__} = sub { 
         # no warnings 'redefine';
-        warn @_ unless $_[0] =~ /^Subroutine redefined/;
+        warn @_ unless $_[0] =~ /^Subroutine .* redefined/;
     };
     sub ExtUtils::MM_Unix::cflags { return $_[1] };
 }

@@ -319,7 +319,7 @@ sub ln {
 unless (defined $Config{d_link}) {
     # Really cool fix from Ilya :)
     local $SIG{__WARN__} = sub { 
-        warn @_ unless $_[0] =~ /^Subroutine redefined/;
+        warn @_ unless $_[0] =~ /^Subroutine .* redefined/;
     };
     *ln = \&cp;
 }

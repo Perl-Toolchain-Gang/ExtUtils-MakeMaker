@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "5.93_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.48 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.49 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -648,7 +648,7 @@ sub mv_all_methods {
 
     local $SIG{__WARN__} = sub { 
         # can't use 'no warnings redefined', 5.6 only
-        warn @_ unless $_[0] =~ /^Subroutine redefined/ 
+        warn @_ unless $_[0] =~ /^Subroutine .* redefined/ 
     };
     foreach my $method (@Overridable) {
 
@@ -1815,7 +1815,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.48 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.49 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
