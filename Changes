@@ -1,3 +1,9 @@
+6.10_05
+    * Documenting META.yml, NO_META
+    * Documenting the fact that distdir will auto generate META.yml and 
+      alter your manifest.
+    * Adding META.yml autogeneration to the FAQ
+
 6.10_04 Fri May 23 01:13:04 PDT 2003
     - Working around BSD threaading bug in version check. [from bleadperl]
     - Added the Makefile to the dist dependencies. (Slaven Rezic)
