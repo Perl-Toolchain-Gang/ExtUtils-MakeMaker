@@ -15,6 +15,8 @@ chdir 't';
 use ExtUtils::MM;
 use MakeMaker::Test::Utils;
 
+my $Is_VMS = $^O eq 'VMS';
+
 use Test::More tests => 6;
 
 my $perl = which_perl;
@@ -33,8 +35,8 @@ my @test_args = qw(foo bar baz yar car har ackapicklerootyjamboree);
 my @cmds = $mm->split_command($echo, @test_args);
 isnt( @cmds, 0 );
 
-s{\$\(PERLRUN\)}{$perl} foreach @cmds;
-is( join('', map { s/\n+$//; $_ } map { `$_` } @cmds), join('', @test_args));
+@results = _run(@cmds);
+is( join('', @results), join('', @test_args));
 
 
 my %test_args = ( foo => 42, bar => 23, car => 'har' );
@@ -42,6 +44,17 @@ $even_args = $mm->oneliner(q{print !(@ARGV % 2)});
 @cmds = $mm->split_command($even_args, %test_args);
 isnt( @cmds, 0 );
 
-s{\$\(PERLRUN\)}{$perl} foreach @cmds;
-like( join('', map { s/\n+$//; $_ } map { `$_` } @cmds), qr/^1+$/,
+@results = _run(@cmds);
+like( join('', @results ), qr/^1+$/,
                                                     'pairs preserved' );
+
+sub _run {
+    my @cmds = @_;
+
+    s{\$\(PERLRUN\)}{$perl} foreach @cmds;
+    if( $Is_VMS ) {
+        s{-\n}{} foreach @cmds
+    }
+
+    return map { s/\n+$//; $_ } map { `$_` } @cmds
+}
