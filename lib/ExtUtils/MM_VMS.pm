@@ -2174,8 +2174,8 @@ part of a filespec.
 =cut
 
 sub nicetext {
-
     my($self,$text) = @_;
+    return $text if $text =~ m/^\w+\s*=/; # leave macro defs alone
     $text =~ s/([^\s:])(:+\s)/$1 $2/gs;
     $text;
 }
