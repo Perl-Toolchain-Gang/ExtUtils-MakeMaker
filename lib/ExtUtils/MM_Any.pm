@@ -87,6 +87,34 @@ sub os_flavor_is {
     return (grep { $flavors{$_} } @_) ? 1 : 0;
 }
 
+=item blibdirs_target (o)
+
+    my $make_frag = $mm->blibdirs_target;
+
+Creates the blibdirs target which creates all the directories we use in
+blib/.
+
+=cut
+
+sub blibdirs_target {
+    my $self = shift;
+
+    my @dirs = map { uc "\$(INST_$_)" } qw(libdir
+                                       autodir archautodir
+                                       bin script
+                                       man1dir man3dir
+                                      );
+    my @mkpath = $self->split_command('$(NOECHO) $(MKPATH)', @dirs);
+    my @chmod  = $self->split_command('$(NOECHO) $(CHMOD) 755', @dirs);
+
+    my $make = "\nblibdirs : \n";
+    $make .= join "", map { "\t$_\n" } @mkpath, @chmod;
+    $make .= "\t\$(NOECHO) \$(TOUCH) blibdirs\n\n";
+
+    return $make;
+}
+
+
 =back
 
 =head2 File::Spec wrappers
