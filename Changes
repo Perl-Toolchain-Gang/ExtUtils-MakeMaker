@@ -1,3 +1,7 @@
+5.55_03 Sat Apr  6 21:57:01 EST 2002
+    - Reversing "fix" for RT 444.  It wasn't really fixed and it
+      caused havoc with Compress::Zlib and Tk.
+
 5.55_02 Sat Apr  6 03:09:15 EST 2002
     [[ Bug Fixes ]]
     - Craig Berry fixed install on VMS (again, I munged the last patch)
@@ -8,8 +12,6 @@
     - Fix (well, hack) for creating ABSPERL on VMS.
     - Quieting some warnings revealed by ExtUtils::Constant
     - test_via_script had a typo and forgot INST_ARCHLIB
-    - Reversing "fix" for RT 444.  It wasn't really fixed and it
-      caused havoc with Compress::Zlib and Tk.
 
     [[ Test Fixes ]]
     - INST.t has to tell MakeMaker it's in the PERL_CORE
