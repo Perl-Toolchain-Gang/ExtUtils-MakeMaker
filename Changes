@@ -1,3 +1,6 @@
+5.91_02 Wed Apr 24 01:29:56 EDT 2002
+    - Adjustments to tests for inclusion in the core.
+
 5.91_01 Wed Apr 24 00:11:06 EDT 2002
     [[ API Changes ]]
     * A failing Makefile.PL in a subdir will now kill the whole
