@@ -48,6 +48,7 @@ t/Problem-Module/Makefile.PL
 t/Problem-Module/subdir/Makefile.PL
 t/basic.t
 t/hints.t
+t/INST.t
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
