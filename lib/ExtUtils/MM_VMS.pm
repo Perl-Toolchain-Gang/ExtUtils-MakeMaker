@@ -313,7 +313,7 @@ sub dir_target {
         
         $make .= sprintf <<'MAKE', $dir, $dirfile;
 %s : %s
-        $(NOECHO) $(NOOP)
+	$(NOECHO) $(NOOP)
 
 MAKE
 
