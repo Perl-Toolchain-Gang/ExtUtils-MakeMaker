@@ -19,6 +19,10 @@
     * manicopy() would make the copied files read-only if 'cp' was used.
     * Fixed prereq check for modules which are also keywords like if.pm and
       open.pm (Autrijus Tang)
+    - Made ExtUtils::Command mv and cp return whether or not they succeeded.
+    * metafile_addtomanifest now mentions what its doing.
+    * metafile will not die if it can't write to META.yml, just emit a 
+      warning.  This lets 'make dist' continue with a read-only META.yml
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
