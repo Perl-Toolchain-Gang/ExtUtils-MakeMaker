@@ -5,7 +5,7 @@
 # - Fill in your dependencies in PREREQ_PM
 # Alternatively, you can say the hell with this and use h2xs.
 
-use 5.006;
+use 5.00503;
 
 use lib qw(lib);    # build ourself with ourself
 use ExtUtils::MakeMaker;
@@ -63,6 +63,7 @@ WriteMakefile(
                         qw(bleadperl
                            perl5.6.1
                            perl5.6.0
+                           perl5.005_03
                           )
           if $ENV{PERL_TEST_ALL};
 

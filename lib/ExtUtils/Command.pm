@@ -1,15 +1,14 @@
 package ExtUtils::Command;
 
-use 5.006;
+use 5.00503;
 use strict;
-# use AutoLoader;
 use Carp;
 use File::Copy;
 use File::Compare;
 use File::Basename;
 use File::Path qw(rmtree);
 require Exporter;
-our(@ISA, @EXPORT, $VERSION);
+use vars qw(@ISA @EXPORT $VERSION);
 @ISA     = qw(Exporter);
 @EXPORT  = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f);
 $VERSION = '1.03_01';
@@ -43,6 +42,7 @@ I<NOT>
 
   perl -MExtUtils::Command -e 'some_command qw(some files to work on)'
 
+Filenames with * and ? will be glob expanded.
 
 =over 4
 

@@ -1,6 +1,16 @@
-5.93_01
+5.93_01 Mon May  6 00:24:58 EDT 2002
     - fixed basic.t for limited depth VMS systems
     * MM_BeOS was totally hosed by a typo.
+
+    * Backporting to 5.005_03
+    - 'require 5.006' statements to 5.00503
+    - Removing uses of File::Spec::Functions
+    - Adding MODE arg to mkdir()
+    - Changing uses of 'our' to 'use vars'
+    - Changing uses of 'no warnings' to 'local $SIG{__WARN__}'
+    - Changing 3-arg opens to 2-arg
+    - Changing 'open my $fh' to 'open FH'
+    - 5.005_03's File::Find doesn't have 'no_chdir'
 
 5.92_01 Mon Apr 29 23:09:38 EDT 2002
     - Fixing case of modules with no .pm files on VMS.

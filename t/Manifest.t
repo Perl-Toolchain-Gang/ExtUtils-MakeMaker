@@ -20,7 +20,6 @@ use Cwd;
 # these files are needed for the module itself
 use File::Spec;
 use File::Path;
-use Carp::Heavy;
 
 # keep track of everything added so it can all be deleted
 my %files;
@@ -28,15 +27,17 @@ sub add_file {
 	my ($file, $data) = @_;
 	$data ||= 'foo';
     unlink $file;  # or else we'll get multiple versions on VMS
-	open( my $T, '>', $file) or return;
-	print $T $data;
+	open( T, '>'.$file) or return;
+	print T $data;
 	++$files{$file};
+    close T;
 }
 
 sub read_manifest {
-	open( my $M, 'MANIFEST' ) or return;
-	chomp( my @files = <$M> );
+	open( M, 'MANIFEST' ) or return;
+	chomp( my @files = <M> );
 	return @files;
+    close M;
 }
 
 sub catch_warning {

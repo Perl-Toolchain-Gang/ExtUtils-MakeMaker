@@ -1603,7 +1603,6 @@ from the perl source tree.
 	$self->{PERL_INC}     = File::Spec->catdir("$self->{PERL_ARCHLIB}","CORE"); # wild guess for now
 	my $perl_h;
 
-	no warnings 'uninitialized' ;
 	if (not -f ($perl_h = File::Spec->catfile($self->{PERL_INC},"perl.h"))
 	    and not $old){
 	    # Maybe somebody tries to build an extension with an
@@ -1855,12 +1854,6 @@ sub init_INSTALL {
 
     $self->init_lib2arch;
 
-    # There are no Config.pm defaults for these.
-    $Config_Override{installsiteman1dir} = 
-        File::Spec->catdir($Config{siteprefixexp}, 'man', 'man$(MAN1EXT)');
-    $Config_Override{installsiteman3dir} = 
-        File::Spec->catdir($Config{siteprefixexp}, 'man', 'man$(MAN3EXT)');
-
     if( $Config{usevendorprefix} ) {
         $Config_Override{installvendorman1dir} =
           File::Spec->catdir($Config{vendorprefixexp}, 'man', 'man$(MAN1EXT)');
@@ -1876,6 +1869,12 @@ sub init_INSTALL {
                   $Config{prefixexp}        || $Config{prefix} || '';
     my $vprefix = $Config{usevendorprefix}  ? $Config{vendorprefixexp} : '';
     my $sprefix = $Config{siteprefixexp}    || '';
+
+    # There are no Config.pm defaults for these.
+    $Config_Override{installsiteman1dir} = 
+        File::Spec->catdir($sprefix, 'man', 'man$(MAN1EXT)');
+    $Config_Override{installsiteman3dir} = 
+        File::Spec->catdir($sprefix, 'man', 'man$(MAN3EXT)');
 
     my $u_prefix  = $self->{PREFIX}       || '';
     my $u_sprefix = $self->{SITEPREFIX}   || $u_prefix;
@@ -2876,7 +2875,7 @@ sub parse_version {
 		$_
 	    }; \$$2
 	};
-	no warnings;
+        local $^W = 0;
 	$result = eval($eval);
 	warn "Could not eval '$eval' in $parsefile: $@" if $@;
 	last;

@@ -7,8 +7,9 @@ require ExtUtils::Liblist::Kid;
 sub lsdir {
   shift;
   my $rex = qr/$_[1]/;
-  opendir my $dir, $_[0];
-  grep /$rex/, readdir $dir;
+  opendir DIR, $_[0];
+  grep /$rex/, readdir DIR;
+  closedir DIR;
 }
 
 __END__

@@ -52,32 +52,6 @@ $| = 1;
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-
-# The perl core test suite will run any .t file in the MANIFEST.
-# So we have to generate this on the fly.
-mkdir 't' || die "Can't create test dir: $!";
-open(TEST, ">t/compile.t") or die "Can't open t/compile.t: $!";
-print TEST <<'COMPILE_T';
-print "1..2\n";
-
-print eval "use Big::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
-print "ok 2 - TEST_VERBOSE\n";
-COMPILE_T
-close TEST;
-
-mkdir 'Liar/t' || die "Can't create test dir: $!";
-open(TEST, ">Liar/t/sanity.t") or die "Can't open Liar/t/sanity.t: $!";
-print TEST <<'SANITY_T';
-print "1..3\n";
-
-print eval "use Big::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
-print eval "use Big::Liar; 1;" ? "ok 2\n" : "not ok 2\n";
-print "ok 3 - TEST_VERBOSE\n";
-SANITY_T
-close TEST;
-
-END { unlink 't/compile.t', 'Liar/t/sanity.t' }
-
 my @mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
