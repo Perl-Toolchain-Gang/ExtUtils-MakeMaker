@@ -35,9 +35,9 @@ sub add_file {
 
 sub read_manifest {
 	open( M, 'MANIFEST' ) or return;
-	chomp( my @files = <M> );
-	return @files;
+	chomp( my @filees = <M> );
     close M;
+	return @files;
 }
 
 sub catch_warning {
