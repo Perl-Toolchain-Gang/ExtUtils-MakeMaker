@@ -432,7 +432,7 @@ sub constants {
 
     foreach $macro (qw/
 	      AR_STATIC_ARGS NAME DISTNAME NAME_SYM VERSION VERSION_SYM 
-              XS_VERSION
+              XS_VERSION EXISTS_EXT
 	      INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT 
               INSTALLDIRS
               PREFIX          SITEPREFIX      VENDORPREFIX
@@ -1410,11 +1410,11 @@ clean :: clean_subdirs
             ? @{$attribs{FILES}}
             : split /\s+/, $attribs{FILES};
 
-	foreach my $word (@fileist) {
-	    if (my($key) = $word =~ m#^\$\((.*)\)$# and 
-                ref $self->{$key} eq 'ARRAY') 
+	foreach my $word (@filelist) {
+	    if ($word =~ m#^\$\((.*)\)$# and 
+                ref $self->{$1} eq 'ARRAY') 
             {
-		push(@otherfiles, @{$self->{$key}});
+		push(@otherfiles, @{$self->{$1}});
 	    }
 	    else { push(@otherfiles, $word); }
 	}
