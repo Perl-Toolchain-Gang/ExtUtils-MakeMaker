@@ -6,7 +6,7 @@ use Test::More;
 
 my $Has_Test_Pod;
 BEGIN {
-    $Has_Test_Pod = eval 'use Test::Pod; 1';
+    $Has_Test_Pod = eval 'use Test::Pod 0.95; 1';
 }
 
 my(@modules);
@@ -32,7 +32,7 @@ foreach my $file (@modules) {
 
     SKIP: {
         skip "Test::Pod not installed" unless $Has_Test_Pod;
-        pod_ok($file, POD_WARNINGS, "$file POD check");
+        pod_file_ok($file);
     }
     
 }
