@@ -1,4 +1,4 @@
-6.26
+6.25_01  Fri Dec 17 21:29:04 EST 2004
     * *.bak added to the default MANIFEST.SKIP.
     * META.yml will no longer be generated in the build directory.  It will
       only appear in the distdir.  This should make it easier on developers,
