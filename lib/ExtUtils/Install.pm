@@ -370,6 +370,7 @@ sub inc_uninstall {
 
 sub run_filter {
     my ($cmd, $src, $dest) = @_;
+    local(*CMD, *SRC);
     open(CMD, "|$cmd >$dest") || die "Cannot fork: $!";
     open(SRC, $src)           || die "Cannot open $src: $!";
     my $buf;
