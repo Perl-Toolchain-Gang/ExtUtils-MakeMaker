@@ -487,6 +487,10 @@ sub constants {
 
 	      / ) {
 	next unless defined $self->{$tmp};
+
+        # pathnames can have sharp signs in them; escape them so
+        # make doesn't think it is a comment-start character.
+        $self->{$tmp} =~ s/#/\\#/g;
 	push @m, "$tmp = $self->{$tmp}\n";
     }
 
@@ -2029,9 +2033,6 @@ install :: all pure_install doc_install
 install_perl :: all pure_perl_install doc_perl_install
 
 install_site :: all pure_site_install doc_site_install
-
-install_ :: install_site
-	@echo INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 pure_install :: pure_$(INSTALLDIRS)_install
 
