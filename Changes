@@ -1,4 +1,7 @@
 6.06_03
+    - $(SAY) is now $(ECHO) on VMS
+    - Moved rogue initializations from tools_other() to init_others()
+    - Normalized MM_VMS's tools_other() to mostly use its superclass.
     - split_command() was off-by-one when calculating max command line
       lengths causing it to run over on VMS
     - made split_command() a bit smarter, taking into account some macro
