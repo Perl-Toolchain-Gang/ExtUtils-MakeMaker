@@ -2,6 +2,8 @@
     [[ Bug Fixes ]]
     - Removed duplicate NAME macro definition
     - Fixed makemakerdflt target for VMS
+    * bleadperl@11460 introduced a bug with recursive Makefile.PL's not
+      having '.' in @INC.  PDL should build now.
 
 5.52_01 Tue Mar 26 00:24:26 EST 2002
     [[ Bug Fixes ]]
@@ -137,7 +139,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.20 $ based $VERSIONs.
+    - Stripped out $Revision: 1.21 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
