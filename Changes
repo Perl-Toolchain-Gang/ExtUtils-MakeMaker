@@ -3,7 +3,7 @@
     * Fixed MANIFEST.SKIP so it avoids all the new *.ts files.
     - Don't spuriously define pasthru arguments
 
-6.21_03
+6.21_03 Sat Apr 3 2004
     - Minor potential glitch in the version check logic.
     - Making Makefile rebuild logic more resistant to inconsequential
       errors when cleaning up things that are going to be rebuilt anyway.
