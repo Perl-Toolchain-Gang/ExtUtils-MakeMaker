@@ -3440,7 +3440,7 @@ realclean purge ::  clean realclean_subdirs
         push(@m, "	\$(RM_F) \$(INST_STATIC)\n");
     }
 
-    my(@files) = (values %{$self->{PM}});
+    my @files = ();
     push @files, $attribs{FILES} if $attribs{FILES};
     push @files, '$(MAKEFILE)', '$(MAKEFILE_OLD)';
 
