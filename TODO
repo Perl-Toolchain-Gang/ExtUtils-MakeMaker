@@ -1,19 +1,5 @@
 Document prompt()
 
-Fix INSTALLMAN*DIR to honor PREFIX.
-
-Make the libs honor PREFIX.
-
-Don't assume everything is in $Config{PREFIX}/lib and
-$Config{PREFIX}/man.  Debian puts stuff in /usr/share/{perl,man}
-
-Add SITEPREFIX
-
-Fix prefixify to use $(PREFIX) instead of cut & pasting the prefix
-directly into the Makefile.
-
-Add INSTALLDIRS=vendor (see Debian patch)
-
 Shorten manifypods so it fits in < 200 character command line (like
 pm_to_blib).
 
@@ -43,3 +29,6 @@ Fix find_perl on Amiga trg@privat.utfors.se
 Fix appending of .. when DIRS contains directories not immediately
 below the cwd.
 
+Properly test INSTALL* generation.
+
+Make INSTALL* generation portable.
