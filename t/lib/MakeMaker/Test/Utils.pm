@@ -9,7 +9,7 @@ use vars qw($VERSION @ISA @EXPORT);
 require Exporter;
 @ISA = qw(Exporter);
 
-$VERSION = 0.01;
+$VERSION = 0.02;
 
 @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
              make make_run make_macro calibrate_mtime
@@ -65,20 +65,24 @@ sub which_perl {
     # VMS should have 'perl' aliased properly
     return $perl if $Is_VMS;
 
-    $perl = File::Spec->rel2abs( $perl );
+    $perl .= $Config{exe_ext} unless $perl =~ m/$Config{exe_ext}$/i;
 
-    unless( -x $perl ) { # $^X was probably 'perl'
+    my $perlpath = File::Spec->rel2abs( $perl );
+    unless( -x $perlpath ) {
+        # $^X was probably 'perl'
+
         # When building in the core, *don't* go off and find
         # another perl
-        die "Can't find a perl to use (\$^X=$^X)" if $ENV{PERL_CORE};
+        die "Can't find a perl to use (\$^X=$^X), (\$perlpath=$perlpath)" 
+          if $ENV{PERL_CORE};
 
         foreach my $path (File::Spec->path) {
-            $perl = File::Spec->catfile($path, $^X);
+            $perlpath = File::Spec->catfile($path, $perl);
             last if -x $perl;
         }
     }
 
-    return $perl;
+    return $perlpath;
 }
 
 =item B<perl_lib>

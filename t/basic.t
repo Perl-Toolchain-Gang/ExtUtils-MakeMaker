@@ -19,7 +19,7 @@ use MakeMaker::Test::Utils;
 use File::Spec;
 use TieOut;
 
-my $perl = which_perl;
+my $perl = which_perl();
 
 $ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
 
