@@ -18,6 +18,7 @@ use File::Spec;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = $Revision = '5.57_01';
 
+require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Unix File::Spec );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);

@@ -26,8 +26,9 @@ use ExtUtils::MakeMaker qw( neatvalue );
 
 use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE $PERLMAKE);
 
-$VERSION = '1.00_03';
+require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Unix );
+$VERSION = '1.00_03';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 

@@ -7,6 +7,8 @@ use ExtUtils::MakeMaker qw(neatvalue);
 use File::Spec;
 
 $VERSION = '1.01_01';
+
+require ExtUtils::MM_Unix;
 @ISA = qw(ExtUtils::MM_Unix);
 
 =pod
