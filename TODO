@@ -11,8 +11,6 @@ Investigate one method per make target.
 
 Test MM_Any and pull some redundant tests out of MM_*.t
 
-MakeMaker's warnhandler has to go away.
-
 Create a way to init MM objects.
 
 Move instmodsh to utils/ in the core.
@@ -28,9 +26,5 @@ Fix find_perl on Amiga trg@privat.utfors.se
 
 Fix appending of .. when DIRS contains directories not immediately
 below the cwd.
-
-Properly test INSTALL* generation.
-
-Make INSTALL* generation portable.
 
 Integrate bleadperl 16033
