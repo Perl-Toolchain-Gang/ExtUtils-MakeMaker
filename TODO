@@ -57,3 +57,8 @@ Fix 'make install PREFIX=foo' problem.
 Add "MAXCMDLEN" variable to set how long shell commands can be.
 
 Adapt code like manifypods and pm_to_blib to use "MAXCMDLEN".
+
+Make versions of PERL and FULLPERL (SAFEPERL?) which are safe to be used
+as shell commands.  ie. quoted, whitespace escaped, etc...
+
+ExtUtils::Install is a disaster.
