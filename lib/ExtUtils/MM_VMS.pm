@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.76 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.77 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -548,7 +548,7 @@ sub special_targets {
 
     my $make_frag .= <<'MAKE_FRAG';
 .SUFFIXES :
-.SUFFIXES : \$(OBJ_EXT) .c .cpp .cxx .xs
+.SUFFIXES : $(OBJ_EXT) .c .cpp .cxx .xs
 
 MAKE_FRAG
 
