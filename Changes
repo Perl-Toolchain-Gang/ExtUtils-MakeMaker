@@ -33,6 +33,9 @@
       by default.
     - Added MAKEFILE_OLD macro.
     * No longer generating man pages by default on VMS.
+    - Improved DISTNAME docs
+    * Documented DISTVNAME and VERSION_SYM
+    * Documented dist()
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
