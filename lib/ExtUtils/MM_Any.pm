@@ -331,12 +331,9 @@ sub manifypods {
 
     return <<END_OF_TARGET;
 
-# --- Begin manifypods section:
 $POD2MAN_EXE_macro
 
 $manifypods_target
-
-# --- End manifypods section --- #
 
 END_OF_TARGET
 
@@ -588,6 +585,7 @@ MAKE_FRAG
     }
     
     my $meta = <<YAML;
+# http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         $self->{DISTNAME}
 version:      $self->{VERSION}
