@@ -16,7 +16,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision);
 use vars qw($VERSION @ISA);
-$VERSION = '5.72';
+$VERSION = '5.73';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
