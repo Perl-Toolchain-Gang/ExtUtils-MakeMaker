@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.81 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.82 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2156,6 +2156,27 @@ sub oneliner {
     $switches = join ' ', map { qq{"$_"} } @$switches;
 
     return qq{\$(PERLRUN) $switches -e $cmd};
+}
+
+
+=item B<echo> (o)
+
+perl trips up on "<foo>" thinking its an input redirect.  So we use the
+native Write sys$output instead.
+
+=cut
+
+sub echo {
+    my($self, $text, $file, $appending) = @_;
+    $appending ||= 0;
+
+    die "The VMS version of echo() cannot currently append" if $appending;
+
+    my @cmds = ("\$(NOECHO) Assign $file Sys\$Output");
+    push @cmds, map { '$(NOECHO) Write Sys$Output '.$self->quote_literal($_) } 
+                split /\n/, $text;
+    push @cmds, '$(NOECHO) Deassign Sys$Output';
+    return @cmds;
 }
 
 
