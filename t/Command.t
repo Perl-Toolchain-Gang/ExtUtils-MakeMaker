@@ -97,8 +97,8 @@ BEGIN {
 	# to the beginning of the day in Win95.
     # There's a small chance of a 1 second flutter here.
     my $stamp = (stat($ARGV[0]))[9];
-	ok( abs($now - $stamp) <= 1, 'checking modify time stamp' ) ||
-      print "# mtime == $stamp, should be $now\n";
+	cmp_ok( abs($now - $stamp), '<=', 1, 'checking modify time stamp' ) ||
+      diag "mtime == $stamp, should be $now";
 
     SKIP: {
         if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' ||
