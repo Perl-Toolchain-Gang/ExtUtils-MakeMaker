@@ -78,7 +78,8 @@ Removes directories - recursively (even if readonly)
 
 sub rm_rf
 {
- rmtree([grep -e $_,expand_wildcards()],0,0);
+ expand_wildcards();
+ rmtree([grep -e $_,@ARGV],0,0);
 }
 
 =item rm_f files....
@@ -89,7 +90,8 @@ Removes files (even if readonly)
 
 sub rm_f
 {
- foreach (expand_wildcards())
+ expand_wildcards();
+ foreach (@ARGV)
   {
    next unless -f $_;        
    next if unlink($_);
@@ -165,7 +167,8 @@ Sets UNIX like permissions 'mode' on all the files.
 sub chmod
 {
  my $mode = shift(@ARGV);
- chmod($mode,expand_wildcards()) || die "Cannot chmod ".join(' ',$mode,@ARGV).":$!";
+ expand_wildcards();
+ chmod($mode,@ARGV) || die "Cannot chmod ".join(' ',$mode,@ARGV).":$!";
 }
 
 =item mkpath directory...
@@ -176,7 +179,8 @@ Creates directory, including any parent directories.
 
 sub mkpath
 {
- File::Path::mkpath([expand_wildcards()],0,0777);
+ expand_wildcards();
+ File::Path::mkpath([@ARGV],0,0777);
 }
 
 =item test_f file
