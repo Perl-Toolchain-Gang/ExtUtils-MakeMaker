@@ -497,7 +497,6 @@ MM_VERSION = $ExtUtils::MakeMaker::VERSION
     push @m, q{
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
-# ROOTEXT = Directory part of FULLEXT with leading slash (eg /DBD)  !!! Deprecated from MM 5.32  !!!
 # PARENT_NAME = NAME without BASEEXT and no trailing :: (eg Foo::Bar)
 # DLBASE  = Basename part of dynamic library. May be just equal BASEEXT.
 };
@@ -596,12 +595,6 @@ PERL_ARCHIVE = $tmp
     push @m, "
 PERL_ARCHIVE_AFTER = $tmp
 ";
-
-#    push @m, q{
-#INST_PM = }.join(" \\\n\t", sort values %{$self->{PM}}).q{
-#
-#PM_TO_BLIB = }.join(" \\\n\t", %{$self->{PM}}).q{
-#};
 
     push @m, q{
 TO_INST_PM = }.join(" \\\n\t", sort keys %{$self->{PM}}).q{
@@ -1349,11 +1342,16 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 		return;
 	    }
 	    return if /\#/;
-	    my($path, $prefix) = ($File::Find::name, $self->{INST_LIBDIR});
-	    my($striplibpath,$striplibname);
-	    $prefix =  $self->{INST_LIB} if (($striplibpath = $path) =~ s:^(\W*)lib\W:$1:i);
-	    ($striplibname,$striplibpath) = fileparse($striplibpath);
-	    my($inst) = File::Spec->catfile($prefix,$striplibpath,$striplibname);
+            return if /~$/;    # emacs temp files
+
+	    my $path   = $File::Find::name;
+            my $prefix = $self->{INST_LIBDIR};
+            my $striplibpath;
+
+	    $prefix =  $self->{INST_LIB} 
+                if ($striplibpath = $path) =~ s:^(\W*)lib\W:$1:i;
+
+	    my($inst) = File::Spec->catfile($prefix,$striplibpath);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
@@ -1470,7 +1468,6 @@ sub init_main {
     # NAME    = Foo::Bar::Oracle
     # FULLEXT = Foo/Bar/Oracle
     # BASEEXT = Oracle
-    # ROOTEXT = Directory part of FULLEXT with leading /. !!! Deprecated from MM 5.32 !!!
     # PARENT_NAME = Foo::Bar
 ### Only UNIX:
 ###    ($self->{FULLEXT} =
@@ -1498,12 +1495,6 @@ sub init_main {
     } else {
 	$self->{DLBASE} = '$(BASEEXT)';
     }
-
-
-    ### ROOTEXT deprecated from MM 5.32
-###    ($self->{ROOTEXT} =
-###     $self->{FULLEXT}) =~ s#/?\Q$self->{BASEEXT}\E$## ;      #eg. /BSD/Foo
-###    $self->{ROOTEXT} = ($Is_VMS ? '' : '/') . $self->{ROOTEXT} if $self->{ROOTEXT};
 
 
     # --- Initialize PERL_LIB, INST_LIB, PERL_SRC
