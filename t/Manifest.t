@@ -27,6 +27,7 @@ my %files;
 sub add_file {
 	my ($file, $data) = @_;
 	$data ||= 'foo';
+    unlink $file;  # or else we'll get multiple versions on VMS
 	open( my $T, '>', $file) or return;
 	print $T $data;
 	++$files{$file};
