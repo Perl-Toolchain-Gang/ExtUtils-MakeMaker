@@ -1,9 +1,7 @@
+# $Id$
 package ExtUtils::MakeMaker;
 
 BEGIN {require 5.005_03;}
-
-$VERSION = '6.25_02';
-($Revision) = q$Revision: 1.147 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use ExtUtils::MakeMaker::Config;
@@ -12,12 +10,19 @@ use File::Path;
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
-            $Revision $VERSION $Verbose %Config 
+            $VERSION $Verbose %Config 
             @Prepend_parent @Parent
             %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
             $Filename
            );
+
+# Has to be on its own line with no $ after it to avoid being noticed by
+# the version control system
+use vars qw($Revision);
 use strict;
+
+$VERSION = '6.25_02';
+($Revision) = q$Revision: 4056 $ =~ /Revision:\s+(\S+)/;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
@@ -2065,7 +2070,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.147 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 4056 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
