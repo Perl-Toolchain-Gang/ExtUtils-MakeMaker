@@ -32,6 +32,7 @@ lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/Packlist.pm
 lib/ExtUtils/testlib.pm
 t/00setup_dummy.t
+t/backwards.t
 t/basic.t
 t/Command.t
 t/INST.t
