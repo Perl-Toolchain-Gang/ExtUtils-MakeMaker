@@ -1,3 +1,7 @@
+6.04
+    - Little fix for pre-5.8 Cygwin test to get the shared library names 
+      right.
+
 6.03 Wed Jun 19 17:06:14 EDT 2002
     - Documented that we're clamping down on cargo-cult MakeMaker
       programming.
