@@ -3851,10 +3851,11 @@ sub tools_other {
     my($self) = shift;
     my @m;
 
-    for (qw/ SHELL CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
-             UMASK_NULL DEV_NULL/ ) 
+    for my $tool (qw/ SHELL CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
+                      UMASK_NULL DEV_NULL/ ) 
     {
-	push @m, "$_ = $self->{$_}\n";
+        next unless defined $self->{$tool}
+	push @m, "$tool = $self->{$tool}\n";
     }
 
     push @m, q{
