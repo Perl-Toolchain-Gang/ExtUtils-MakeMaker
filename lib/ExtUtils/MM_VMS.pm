@@ -7,7 +7,6 @@ package ExtUtils::MM_VMS;
 
 use strict;
 
-use Carp qw( &carp );
 use Config;
 require Exporter;
 
@@ -318,8 +317,6 @@ sub init_DIRFILESEP {
 
 =item init_main (override)
 
-Override DISTVNAME so it uses VERSION_SYM to avoid getting too many
-dots in the name.
 
 =cut
 
@@ -327,7 +324,6 @@ sub init_main {
     my($self) = shift;
 
     $self->SUPER::init_main;
-    $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION_SYM}";
 
     $self->{DEFINE} ||= '';
     if ($self->{DEFINE} ne '') {
@@ -482,7 +478,7 @@ sub constants {
             INSTALLMAN1DIR INSTALLSITEMAN1DIR INSTALLVENDORMAN1DIR
             INSTALLMAN3DIR INSTALLSITEMAN3DIR INSTALLVENDORMAN3DIR
             PERL_LIB PERL_ARCHLIB
-            PERL_INC PERL_SRC FULLEXT ] ) 
+            PERL_INC PERL_SRC ] ) 
     {
         next unless defined $self->{$macro};
         next if $macro =~ /MAN/ && $self->{$macro} eq 'none';
@@ -503,7 +499,7 @@ sub constants {
                    FULLEXT VERSION_FROM OBJECT LDFROM
 	      /	) {
         next unless defined $self->{$macro};
-        $self->{$macro} = $self->fixpath($self->{$macro},0)."\n";
+        $self->{$macro} = $self->fixpath($self->{$macro},0);
     }
 
 
@@ -770,7 +766,7 @@ sub xsubpp_version
     print "Running: $command\n" if $Verbose;
     $version = `$command` ;
     if ($?) {
-	use vmsish 'status';
+	use ExtUtils::MakeMaker::vmsish 'status';
 	warn "Running '$command' exits with status $?";
     }
     chop $version ;
@@ -800,7 +796,7 @@ EOM
     print "Running: $command\n" if $Verbose;
     my $text = `$command` ;
     if ($?) {
-	use vmsish 'status';
+	use ExtUtils::MakeMaker::vmsish 'status';
 	warn "Running '$command' exits with status $?";
     }
     unlink $file ;
@@ -872,6 +868,9 @@ VMSish defaults for some values.
   DIST_DEFAULT  default target to use to        tardist
                 create a distribution
 
+  DISTVNAME     Use VERSION_SYM instead of      $(DISTNAME)-$(VERSION_SYM)
+                VERSION for the name
+
 =cut
 
 sub init_dist {
@@ -881,6 +880,7 @@ sub init_dist {
     $self->{SUFFIX}       ||= '-gz';
     $self->{SHAR}         ||= 'vms_share';
     $self->{DIST_DEFAULT} ||= 'zipdist';
+    $self->{DISTVNAME}    ||= "$self->{DISTNAME}-$self->{VERSION_SYM}";
 
     $self->SUPER::init_dist;
 }
