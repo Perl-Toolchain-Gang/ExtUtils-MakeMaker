@@ -79,8 +79,8 @@ SPACE_WARN
 
     my($lib, $tlib);
     BEGIN { 
-        $lib  = File::Spec->rel2abs('lib/'); 
-        $tlib = File::Spec->rel2abs('t/lib/');
+        $lib  = File::Spec->canonpath('lib/'); 
+        $tlib = File::Spec->canonpath('t/lib/');
     }
 
     # Make sure PERLRUN uses the MakeMaker about to be installed
