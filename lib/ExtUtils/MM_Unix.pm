@@ -5,6 +5,7 @@ require 5.005_03;  # Maybe further back, dunno
 use strict;
 
 use Exporter ();
+use Carp ();
 use Config;
 use File::Basename qw(basename dirname fileparse);
 use File::Spec;
