@@ -3,6 +3,7 @@
     * MM_BeOS was totally hosed by a typo.
     - Made the ExtUtils::Command docs clear about how things come
       from @ARGV not @_.
+    - Quieted nmake banners in disttest
 
     * Backporting to 5.005_03
     - 'require 5.006' statements to 5.00503

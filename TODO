@@ -26,7 +26,3 @@ Fix find_perl on Amiga trg@privat.utfors.se
 
 Fix appending of .. when DIRS contains directories not immediately
 below the cwd.
-
-Gsar reported spurious nmake banners from the 'make disttest' test
-in basic.t.  Haven't been able to reproduce.
-
