@@ -373,6 +373,7 @@ sub constants {
     # Be kind about case for pollution
     for (@ARGV) { $_ = uc($_) if /POLLUTE/i; }
 
+    $self->{DEFINE} ||= '';
     if ($self->{DEFINE} ne '') {
 	my(@terms) = split(/\s+/,$self->{DEFINE});
 	my(@defs,@udefs);
@@ -391,8 +392,12 @@ sub constants {
 	    push @$targ, $def;
 	}
 	$self->{DEFINE} = '';
-	if (@defs)  { $self->{DEFINE}  = '/Define=(' . join(',',@defs)  . ')'; }
-	if (@udefs) { $self->{DEFINE} .= '/Undef=('  . join(',',@udefs) . ')'; }
+	if (@defs)  { 
+            $self->{DEFINE}  = '/Define=(' . join(',',@defs)  . ')'; 
+        }
+	if (@udefs) { 
+            $self->{DEFINE} .= '/Undef=('  . join(',',@udefs) . ')'; 
+        }
     }
 
     if ($self->{OBJECT} =~ /\s/) {
@@ -631,6 +636,8 @@ sub cflags {
     $quals .= "$incstr)";
 #    $quals =~ s/,,/,/g; $quals =~ s/\(,/(/g;
     $self->{CCFLAGS} = $quals;
+
+    $self->{PERLTYPE} ||= '';
 
     $self->{OPTIMIZE} ||= $flagoptstr || $Config{'optimize'};
     if ($self->{OPTIMIZE} !~ m!/!) {
