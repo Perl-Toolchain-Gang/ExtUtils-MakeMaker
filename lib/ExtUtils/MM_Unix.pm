@@ -1990,15 +1990,14 @@ sub init_INST {
     }
 
     my @parentdir = split(/::/, $self->{PARENT_NAME});
-    $self->{INST_LIBDIR} = $self->catdir($self->{INST_LIB},@parentdir);
-    $self->{INST_ARCHLIBDIR} = $self->catdir($self->{INST_ARCHLIB},
-                                                  @parentdir);
-    $self->{INST_AUTODIR} = $self->catdir($self->{INST_LIB},'auto',
-                                               $self->{FULLEXT});
-    $self->{INST_ARCHAUTODIR} = $self->catdir($self->{INST_ARCHLIB},
-                                                   'auto',$self->{FULLEXT});
+    $self->{INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     @parentdir);
+    $self->{INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', @parentdir);
+    $self->{INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto', 
+                                              '$(FULLEXT)');
+    $self->{INST_ARCHAUTODIR} = $self->catdir('$(INST_ARCHLIB)', 'auto',
+                                              '$(FULLEXT)');
 
-    $self->{INST_SCRIPT} ||= $self->catdir($Curdir,'blib','script');
+    $self->{INST_SCRIPT}  ||= $self->catdir($Curdir,'blib','script');
 
     $self->{INST_MAN1DIR} ||= $self->catdir($Curdir,'blib','man1');
     $self->{INST_MAN3DIR} ||= $self->catdir($Curdir,'blib','man3');
