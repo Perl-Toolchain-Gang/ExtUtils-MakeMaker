@@ -481,7 +481,7 @@ sub escape_newlines {
     my($self, $text) = @_;
 
     # Escape newlines
-    $text =~ s{\n}{\\\n}g;
+    $text =~ s{\n}{\\\n\t}g;
 
     return $text;
 }

@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.67';
-($Revision) = q$Revision: 1.95 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.96 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2213,7 +2213,7 @@ sub quote_literal {
 sub escape_newlines {
     my($self, $text) = @_;
 
-    $text =~ s{\n}{-\n}g;
+    $text =~ s{\n}{-\n\t}g;
 
     return $text;
 }

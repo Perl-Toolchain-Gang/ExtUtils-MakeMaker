@@ -792,7 +792,7 @@ sub dist_target {
 
     my $date_check = $self->oneliner(<<'CODE', ['-l']);
 print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
-  if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(FIRST_MAKEFILE)';
+    if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(FIRST_MAKEFILE)';
 CODE
 
     return sprintf <<'MAKE_FRAG', $date_check;
@@ -3597,7 +3597,7 @@ sub quote_literal {
 sub escape_newlines {
     my($self, $text) = @_;
 
-    $text =~ s{\n}{\\\n}g;
+    $text =~ s{\n}{\\\n\t}g;
 
     return $text;
 }
