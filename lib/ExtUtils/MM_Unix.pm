@@ -2886,7 +2886,7 @@ PERL_HDRS = \
 	$(PERL_INC)/warnings.h
 
 $(OBJECT) : $(PERL_HDRS)
-    } if $self->{OBJECT};
+} if $self->{OBJECT};
 
     push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
 
