@@ -23,7 +23,7 @@ BEGIN {
 }
 
 BEGIN {
-    use Test::More tests => 30;
+    use Test::More tests => 34;
     use File::Spec;
 }
 
@@ -66,6 +66,7 @@ BEGIN {
 
     @ARGV = ( $Testfile );
     ok( test_f(), 'now creating that file' );
+    is_deeply( \@ARGV, [$Testfile], 'test_f preserves @ARGV' );
 
     @ARGV = ( $Testfile );
     ok( -e $ARGV[0], 'created!' );
@@ -134,7 +135,9 @@ BEGIN {
 
     # change a file to read-write
     @ARGV = ( '0600', $Testfile );
+    my @orig_argv = @ARGV;
     ExtUtils::Command::chmod();
+    is_deeply( \@ARGV, \@orig_argv, 'chmod preserves @ARGV' );
 
     is( ((stat($Testfile))[2] & 07777) & 0700,
         ($^O eq 'vos' ? 0700 : 0600), 'change a file to read-write' );
@@ -148,7 +151,9 @@ BEGIN {
 
     # copy a file to a nested subdirectory
     unshift @ARGV, $Testfile;
+    @orig_argv = @ARGV;
     cp();
+    is_deeply( \@ARGV, \@orig_argv, 'cp preserves @ARGV' );
 
     ok( -e File::Spec->join( 'ecmddir', 'temp2', $Testfile ), 'copied okay' );
 
@@ -160,7 +165,9 @@ BEGIN {
 
     # move a file to a subdirectory
     @ARGV = ( $Testfile, 'ecmddir' );
+    @orig_argv = @ARGV;
     ok( mv() );
+    is_deeply( \@ARGV, \@orig_argv, 'mv preserves @ARGV' );
 
     ok( ! -e $Testfile, 'moved file away' );
     ok( -e File::Spec->join( 'ecmddir', $Testfile ), 'file in new location' );

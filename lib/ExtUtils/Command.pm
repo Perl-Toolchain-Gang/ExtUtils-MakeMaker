@@ -142,12 +142,14 @@ Returns true if all moves succeeded, false otherwise.
 =cut 
 
 sub mv {
-    my $dst = pop(@ARGV);
     expand_wildcards();
-    croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
+    my @src = @ARGV;
+    my $dst = pop @src;
+
+    croak("Too many arguments") if (@src > 1 && ! -d $dst);
 
     my $nok = 0;
-    foreach my $src (@ARGV) {
+    foreach my $src (@src) {
         $nok ||= !move($src,$dst);
     }
     return !$nok;
@@ -163,12 +165,14 @@ Returns true if all copies succeeded, false otherwise.
 =cut
 
 sub cp {
-    my $dst = pop(@ARGV);
     expand_wildcards();
-    croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
+    my @src = @ARGV;
+    my $dst = pop @src;
+
+    croak("Too many arguments") if (@src > 1 && ! -d $dst);
 
     my $nok = 0;
-    foreach my $src (@ARGV) {
+    foreach my $src (@src) {
         $nok ||= !copy($src,$dst);
     }
     return $nok;
@@ -181,6 +185,7 @@ Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 =cut 
 
 sub chmod {
+    local @ARGV = @ARGV;
     my $mode = shift(@ARGV);
     expand_wildcards();
     chmod(oct $mode,@ARGV) || die "Cannot chmod ".join(' ',$mode,@ARGV).":$!";
@@ -206,7 +211,7 @@ Tests if a file exists
 
 sub test_f
 {
- exit !-f shift(@ARGV);
+ exit !-f $ARGV[0];
 }
 
 =item dos2unix
