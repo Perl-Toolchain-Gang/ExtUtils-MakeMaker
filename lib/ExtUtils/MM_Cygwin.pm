@@ -32,17 +32,11 @@ PERLTYPE = $self->{PERLTYPE}
 }
 
 
-# Override to change man page name styles from Foo::Bar.N Unix style to
-# Foo.Bar.N Cygwin style.
-sub init_dirscan {
-    my($self) = shift;
-    $self->SUPER::init_dirscan;
-
-    foreach my $manpage (values %{$self->{MAN1PODS}}, 
-                         values %{$self->{MAN3PODS}})
-    {
-        $manpage =~ s/::/./g;
-    }
+# Cygwin uses Foo.Bar.3 man page styles.
+sub replace_manpage_separator {
+    my($self, $man) = @_;
+    $man =~ s{/+}{.}g;
+    return $man;
 }
 
 sub perl_archive {
