@@ -107,7 +107,7 @@ SKIP: {
 
 # test perl_archive
 my $libperl = $Config{libperl} || 'libperl.a';
-$libperl =~ s/\.a/.dll.a/;
+$libperl =~ s/\.a/.dll.a/ if $] >= 5.007;
 is( $args->perl_archive(), "\$(PERL_INC)/$libperl",
 	'perl_archive() should respect libperl setting' );
 
