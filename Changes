@@ -10,6 +10,8 @@
     - Documented the fourth argument to ExtUtils::Install::install()
     - install() will now honor a PERL5LIB change between ExtUtils::Install
       loading and install() running when uninstalling shadows.
+    - META.yml generation deals gracefully when the MANIFEST is read-only
+      (Slaven rt.cpan.org 2723)
 
 6.10_04 Fri May 23 01:13:04 PDT 2003
     - Working around BSD threaading bug in version check. [from bleadperl]

@@ -16,7 +16,7 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 52;
+use Test::More tests => 54;
 use MakeMaker::Test::Utils;
 use File::Find;
 use File::Spec;
@@ -169,6 +169,14 @@ cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
 my $metafile_out = run("$make metafile");
 is( $?, 0, 'metafile' ) || diag($metafile_out);
 ok( !-f 'META.yml',   'META.yml generation suppressed by NO_META' );
+
+# Test if MANIFEST is read-only.
+chmod 0444, 'MANIFEST';
+@mpl_out = run(qq{$perl Makefile.PL});
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
+$metafile_out = run("$make metafile_addtomanifest");
+is( $?, 0, q{metafile_addtomanifest didn't die with locked MANIFEST} ) || 
+    diag($metafile_out);
 
 
 # Make sure init_dirscan doesn't go into the distdir
