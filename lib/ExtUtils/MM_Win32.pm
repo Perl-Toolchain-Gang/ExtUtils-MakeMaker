@@ -171,7 +171,6 @@ sub init_others {
       '$(PERLRUN) ../../win32/bin/pl2bat.pl' : 
       'pl2bat.bat';
 
-
     $self->{LD}     ||= $Config{ld} || 'link';
     $self->{AR}     ||= $Config{ar} || 'lib';
 
