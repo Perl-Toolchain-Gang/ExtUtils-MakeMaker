@@ -65,8 +65,11 @@ sub which_perl {
 
     $perl = File::Spec->rel2abs( $perl );
 
-    unless( -x $perl ) {
-        # $^X was probably 'perl'
+    unless( -x $perl ) { # $^X was probably 'perl'
+        # When building in the core, *don't* go off and find
+        # another perl
+        die "Can't find a perl to use (\$^X=$^X)" if $ENV{PERL_CORE};
+
         foreach my $path (File::Spec->path) {
             $perl = File::Spec->catfile($path, $^X);
             last if -x $perl;
