@@ -23,7 +23,7 @@
     * MacOS Classic (MacPerl) is no longer supported.  Please use
       Module::Build instead.
     * Restored pm_to_blib.ts so pm_to_blib generation will be quiessent on
-      VMS.
+      VMS. [rt 4675]
     - For simplicity, dir_target() is now a no-op.  Should not effect any
       existing uses.
     - Converted utility commands from using $(PERLRUN) to $(ABSPERLRUN).
