@@ -317,7 +317,7 @@ sub dir_target {
 
 MAKE
 
-        $make .= $self->SUPER::dir_target($dir);
+        $make .= $self->SUPER::dir_target($dirfile);
     }
 
     return $make;
@@ -486,11 +486,16 @@ CODE
 
     $self->{SHELL}    ||= 'Posix';
 
+    $self->SUPER::init_others;
+
     $self->{CP} = 'Copy/NoConfirm';
     $self->{MV} = 'Rename/NoConfirm';
     $self->{UMASK_NULL} = '! ';  
 
-    $self->SUPER::init_others;
+    # Redirection on VMS goes before the command, not after as on Unix.
+    # $(DEV_NULL) is used once and its not worth going nuts over making
+    # it work.  However, Unix's DEV_NULL is quite wrong for VMS.
+    $self->{DEV_NULL}   = '';
 
     if ($self->{OBJECT} =~ /\s/) {
         $self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
