@@ -3034,21 +3034,47 @@ PPD_OUT
 
 =item prefixify
 
-  my $prefixed = $MM->prefixify($var, $search, $replace);
+  $MM->prefixify($var, $prefix, $new_prefix, $default);
 
-Check a path variable in $self from %Config, if it contains a prefix,
-and replace it with another one.
+Using either $MM->{uc $var} || $Config{lc $var}, it will attempt to
+replace it's $prefix with a $new_prefix.  Should the $prefix fail to
+match it sill simply set it to the $new_prefix + $default.
 
-Takes as arguments an attribute name, a search prefix and a
-replacement prefix. Changes the attribute in the object.
+This is for heuristics which attempt to create directory structures
+that mirror those of the installed perl.
+
+For example:
+
+    $MM->prefixify('installman1dir', '/usr', '/home/foo', 'man/man1');
+
+this will attempt to remove '/usr' from the front of the
+$MM->{INSTALLMAN1DIR} path (initializing it to $Config{installman1dir}
+if necessary) and replace it with '/home/foo'.  If this fails it will
+simply use '/home/foo/man/man1'.
 
 =cut
 
 sub prefixify {
-    my($self,$var,$sprefix,$rprefix) = @_;
-    $self->{uc $var} ||= $Config{lc $var};
-    $self->{uc $var} = VMS::Filespec::unixpath($self->{uc $var}) if $Is_VMS;
-    $self->{uc $var} =~ s,^\Q$sprefix\E(?=/|\z),$rprefix,s;
+    my($self,$var,$sprefix,$rprefix,$default) = @_;
+
+    my $path = $self->{uc $var} || $Config{lc $var};
+
+    print STDERR "Prefixing $var=$path\n" if $Verbose >= 2;
+    print STDERR "  from $sprefix to $rprefix\n" 
+      if $Verbose >= 2;
+
+    $path = VMS::Filespec::unixpath($path) if $Is_VMS;
+
+    unless( $path =~ s,^\Q$sprefix\E(?=/|\z),$rprefix,s ) {
+
+        print STDERR "  cannot prefix, using default.\n" if $Verbose >= 2;
+        print STDERR "  no default!\n" if $Verbose >= 2;
+
+        $path = File::Spec->catdir($rprefix, $default) if $default;
+    }
+
+    print "  now $path\n" if $Verbose >= 2;
+    return $self->{uc $var} = $path;
 }
 
 
