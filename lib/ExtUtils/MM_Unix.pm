@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.16_01';
+$VERSION = '1.17_01';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -127,7 +127,6 @@ sub needs_linking;
 sub nicetext;
 sub parse_version;
 sub pasthru;
-sub path;
 sub perl_archive;
 sub perl_archive_after;
 sub perl_script;
@@ -161,6 +160,9 @@ sub xs_o;
 sub xsubpp_version;
 
 use SelfLoader;
+
+# SelfLoader not smart enough to avoid autoloading DESTROY
+sub DESTROY { }
 
 1;
 
@@ -2695,16 +2697,6 @@ sub pasthru {
 
     push @m, "\nPASTHRU = ", join ($sep, @pasthru), "\n";
     join "", @m;
-}
-
-=item path
-
-Takes no argument, returns the environment variable PATH as an array.
-
-=cut
-
-sub path {
-    return File::Spec->path();
 }
 
 =item perl_script
