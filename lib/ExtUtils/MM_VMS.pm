@@ -14,7 +14,7 @@ use VMS::Filespec;
 use File::Basename;
 use File::Spec;
 use vars qw($Revision @ISA $VERSION);
-($VERSION) = $Revision = '5.65';
+($VERSION) = $Revision = '5.66';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1287,56 +1287,6 @@ $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
     join('',@m);
 }
 
-
-=item manifypods (override)
-
-Use VMS-style quoting on command line, and VMS logical name
-to specify fallback location at build time if we can't find pod2man.
-
-=cut
-
-
-sub manifypods {
-    my($self, %attribs) = @_;
-    return "\nmanifypods :\n\t\$(NOECHO) \$(NOOP)\n" unless %{$self->{MAN3PODS}} or %{$self->{MAN1PODS}};
-    my($dist);
-    my($pod2man_exe);
-    if (defined $self->{PERL_SRC}) {
-	$pod2man_exe = $self->catfile($self->{PERL_SRC},'pod','pod2man');
-    } else {
-	$pod2man_exe = $self->catfile($Config{scriptdirexp},'pod2man');
-    }
-    if (not ($pod2man_exe = $self->perl_script($pod2man_exe))) {
-	# No pod2man but some MAN3PODS to be installed
-	print <<END;
-
-Warning: I could not locate your pod2man program.  As a last choice,
-         I will look for the file to which the logical name POD2MAN
-         points when MMK is invoked.
-
-END
-        $pod2man_exe = "pod2man";
-    }
-    my(@m);
-    push @m,
-qq[POD2MAN_EXE = $pod2man_exe\n],
-q[POD2MAN = $(PERLRUN) "-MPod::Man" -we "%m=@ARGV;for(keys %m){" -
--e "Pod::Man->new->parse_from_file($_,$m{$_}) }"
-];
-    push @m, "\nmanifypods : \$(MAN1PODS) \$(MAN3PODS)\n";
-    if (%{$self->{MAN1PODS}} || %{$self->{MAN3PODS}}) {
-	my($pod);
-	foreach $pod (sort keys %{$self->{MAN1PODS}}) {
-	    push @m, qq[\t\@- If F\$Search("\$(POD2MAN_EXE)").nes."" Then \$(POD2MAN) ];
-	    push @m, "$pod $self->{MAN1PODS}{$pod}\n";
-	}
-	foreach $pod (sort keys %{$self->{MAN3PODS}}) {
-	    push @m, qq[\t\@- If F\$Search("\$(POD2MAN_EXE)").nes."" Then \$(POD2MAN) ];
-	    push @m, "$pod $self->{MAN3PODS}{$pod}\n";
-	}
-    }
-    join('', @m);
-}
 
 =item processPL (override)
 
