@@ -37,36 +37,45 @@ temporary solution.
 
 B<THIS MAY BE TEMPORARY!>
 
-=head1 Inherently Cross-Platform Methods
 
-These are methods which are by their nature cross-platform and should
-always be cross-platform.
+=head1 METHODS
+
+Any methods marked I<Abstract> must be implemented by subclasses.
+
+
+=head2 Cross-platform helper methods
+
+These are methods which help writing cross-platform code.
 
 =over 4
 
-=item installvars
+=item os_flavor  I<Abstract>
 
-    my @installvars = $mm->installvars;
+    my @os_flavor = $mm->os_flavor;
 
-A list of all the INSTALL* variables without the INSTALL prefix.  Useful
-for iteration or building related variable sets.
+@os_flavor is the style of operating system this is, usually
+corresponding to the MM_*.pm file we're using.  
 
-=cut
+The first element of @os_flavor is the major family (ie. Unix,
+Windows, VMS, OS/2, etc...) and the rest are sub families.
 
-sub installvars {
-    return qw(PRIVLIB SITELIB  VENDORLIB
-              ARCHLIB SITEARCH VENDORARCH
-              BIN     SITEBIN  VENDORBIN
-              SCRIPT
-              MAN1DIR SITEMAN1DIR VENDORMAN1DIR
-              MAN3DIR SITEMAN3DIR VENDORMAN3DIR
-             );
-}
+Some examples:
+
+    Cygwin98       ('Unix',  'Cygwin', 'Cygwin9x')
+    Windows NT     ('Win32', 'WinNT')
+    Win98          ('Win32', 'Win9x')
+    Linux          ('Unix',  'Linux')
+    MacOS X        ('Unix',  'Darwin', 'MacOS', 'MacOS X')
+    OS/2           ('OS/2')
+
+This is used to write code for styles of operating system.  
+See os_flavor_is() for use.
+
 
 =item os_flavor_is
 
-    $mm->os_flavor_is($this_flavor);
-    $mm->os_flavor_is(@one_of_these_flavors);
+    my $is_this_flavor = $mm->os_flavor_is($this_flavor);
+    my $is_this_flavor = $mm->os_flavor_is(@one_of_these_flavors);
 
 Checks to see if the current operating system is one of the given flavors.
 
@@ -88,98 +97,7 @@ sub os_flavor_is {
 }
 
 
-=item dir_target B<DEPRECATED>
-
-    my $make_frag = $mm->dir_target(@directories);
-
-I<This function is deprecated> its use is no longer necessary and is
-I<only provided for backwards compatibility>.  It is now a no-op.
-blibdirs_target provides a much simpler mechanism and pm_to_blib() can
-create its own directories anyway.
-
-=cut
-
-sub dir_target {}
-
-
-=item blibdirs_target (o)
-
-    my $make_frag = $mm->blibdirs_target;
-
-Creates the blibdirs.ts target which creates all the directories we use in
-blib/.
-
-=cut
-
-sub blibdirs_target {
-    my $self = shift;
-
-    my @dirs = map { uc "\$(INST_$_)" } qw(libdir archlib
-                                           autodir archautodir
-                                           bin script
-                                           man1dir man3dir
-                                          );
-    my @mkpath = $self->split_command('$(NOECHO) $(MKPATH)', @dirs);
-    my @chmod  = $self->split_command('$(NOECHO) $(CHMOD) 755', @dirs);
-
-    my $make = "\nblibdirs.ts :\n";
-    $make .= join "", map { "\t$_\n" } @mkpath, @chmod;
-    $make .= <<'MAKE';
-	$(NOECHO) $(TOUCH) $@
-
-MAKE
-
-    return $make;
-}
-
-
-=back
-
-=head2 File::Spec wrappers
-
-ExtUtils::MM_Any is a subclass of File::Spec.  The methods noted here
-override File::Spec.
-
-=over 4
-
-=item catfile
-
-File::Spec <= 0.83 has a bug where the file part of catfile is not
-canonicalized.  This override fixes that bug.
-
-=cut
-
-sub catfile {
-    my $self = shift;
-    return $self->canonpath($self->SUPER::catfile(@_));
-}
-
-=back
-
-=head1 Thought To Be Cross-Platform Methods
-
-These are methods which are thought to be cross-platform by virtue of
-having been written in a way to avoid incompatibilities.  They may
-require partial overrides.
-
-=over 4
-
-=item B<extra_clean_files>
-
-    my @files_to_clean = $MM->extra_clean_files;
-
-Returns a list of OS specific files to be removed in the clean target in
-addition to the usual set.
-
-=cut
-
-# An empty method here tickled a perl 5.8.1 bug and would return its object.
-sub extra_clean_files { 
-    return;
-}
-
-
-=item B<split_command>
+=item split_command
 
     my @cmds = $MM->split_command($cmd, @args);
 
@@ -256,7 +174,7 @@ sub _expand_macros {
 }
 
 
-=item B<echo>
+=item echo
 
     my @commands = $MM->echo($text);
     my @commands = $MM->echo($text, $file);
@@ -287,81 +205,9 @@ sub echo {
 }
 
 
-=item init_VERSION
-
-    $mm->init_VERSION
-
-Initialize macros representing versions of MakeMaker and other tools
-
-MAKEMAKER: path to the MakeMaker module.
-
-MM_VERSION: ExtUtils::MakeMaker Version
-
-MM_REVISION: ExtUtils::MakeMaker version control revision (for backwards 
-             compat)
-
-VERSION: version of your module
-
-VERSION_MACRO: which macro represents the version (usually 'VERSION')
-
-VERSION_SYM: like version but safe for use as an RCS revision number
-
-DEFINE_VERSION: -D line to set the module version when compiling
-
-XS_VERSION: version in your .xs file.  Defaults to $(VERSION)
-
-XS_VERSION_MACRO: which macro represents the XS version.
-
-XS_DEFINE_VERSION: -D line to set the xs version when compiling.
-
-Called by init_main.
-
-=cut
-
-sub init_VERSION {
-    my($self) = shift;
-
-    $self->{MAKEMAKER}  = $ExtUtils::MakeMaker::Filename;
-    $self->{MM_VERSION} = $ExtUtils::MakeMaker::VERSION;
-    $self->{MM_REVISION}= $ExtUtils::MakeMaker::Revision;
-    $self->{VERSION_FROM} ||= '';
-
-    if ($self->{VERSION_FROM}){
-        $self->{VERSION} = $self->parse_version($self->{VERSION_FROM});
-        if( $self->{VERSION} eq 'undef' ) {
-            require Carp;
-            Carp::carp("WARNING: Setting VERSION via file ".
-                       "'$self->{VERSION_FROM}' failed\n");
-        }
-    }
-
-    # strip blanks
-    if (defined $self->{VERSION}) {
-        $self->{VERSION} =~ s/^\s+//;
-        $self->{VERSION} =~ s/\s+$//;
-    }
-    else {
-        $self->{VERSION} = '';
-    }
-
-
-    $self->{VERSION_MACRO}  = 'VERSION';
-    ($self->{VERSION_SYM} = $self->{VERSION}) =~ s/\W/_/g;
-    $self->{DEFINE_VERSION} = '-D$(VERSION_MACRO)=\"$(VERSION)\"';
-
-
-    # Graham Barr and Paul Marquess had some ideas how to ensure
-    # version compatibility between the *.pm file and the
-    # corresponding *.xs file. The bottomline was, that we need an
-    # XS_VERSION macro that defaults to VERSION:
-    $self->{XS_VERSION} ||= $self->{VERSION};
-
-    $self->{XS_VERSION_MACRO}  = 'XS_VERSION';
-    $self->{XS_DEFINE_VERSION} = '-D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"';
-
-}
-
 =item wraplist
+
+  my $args = $mm->wraplist(@list);
 
 Takes an array of items and turns them into a well-formatted list of
 arguments.  In most cases this is simply something like:
@@ -377,27 +223,149 @@ sub wraplist {
     return join " \\\n\t", @_;
 }
 
-=item manifypods
 
-Defines targets and routines to translate the pods into manpages and
-put them into the INST_* directories.
+=item cd  I<Abstract>
+
+  my $subdir_cmd = $MM->cd($subdir, @cmds);
+
+This will generate a make fragment which runs the @cmds in the given
+$dir.  The rough equivalent to this, except cross platform.
+
+  cd $subdir && $cmd
+
+Currently $dir can only go down one level.  "foo" is fine.  "foo/bar" is
+not.  "../foo" is right out.
+
+The resulting $subdir_cmd has no leading tab nor trailing newline.  This
+makes it easier to embed in a make string.  For example.
+
+      my $make = sprintf <<'CODE', $subdir_cmd;
+  foo :
+      $(ECHO) what
+      %s
+      $(ECHO) mouche
+  CODE
+
+
+=item oneliner  I<Abstract>
+
+  my $oneliner = $MM->oneliner($perl_code);
+  my $oneliner = $MM->oneliner($perl_code, \@switches);
+
+This will generate a perl one-liner safe for the particular platform
+you're on based on the given $perl_code and @switches (a -e is
+assumed) suitable for using in a make target.  It will use the proper
+shell quoting and escapes.
+
+$(PERLRUN) will be used as perl.
+
+Any newlines in $perl_code will be escaped.  Leading and trailing
+newlines will be stripped.  Makes this idiom much easier:
+
+    my $code = $MM->oneliner(<<'CODE', [...switches...]);
+some code here
+another line here
+CODE
+
+Usage might be something like:
+
+    # an echo emulation
+    $oneliner = $MM->oneliner('print "Foo\n"');
+    $make = '$oneliner > somefile';
+
+All dollar signs must be doubled in the $perl_code if you expect them
+to be interpreted normally, otherwise it will be considered a make
+macro.  Also remember to quote make macros else it might be used as a
+bareword.  For example:
+
+    # Assign the value of the $(VERSION_FROM) make macro to $vf.
+    $oneliner = $MM->oneliner('$$vf = "$(VERSION_FROM)"');
+
+Its currently very simple and may be expanded sometime in the figure
+to include more flexible code and switches.
+
+
+=item quote_literal  I<Abstract>
+
+    my $safe_text = $MM->quote_literal($text);
+
+This will quote $text so it is interpreted literally in the shell.
+
+For example, on Unix this would escape any single-quotes in $text and
+put single-quotes around the whole thing.
+
+
+=item escape_newlines  I<Abstract>
+
+    my $escaped_text = $MM->escape_newlines($text);
+
+Shell escapes newlines in $text.
+
+
+=item max_exec_len  I<Abstract>
+
+    my $max_exec_len = $MM->max_exec_len;
+
+Calculates the maximum command size the OS can exec.  Effectively,
+this is the max size of a shell command line.
+
+=for _private
+$self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
+
+
+=back
+
+
+=head2 Targets
+
+These are methods which produce make targets.
+
+
+=over 4
+
+
+=item dir_target B<DEPRECATED>
+
+    my $make_frag = $mm->dir_target(@directories);
+
+I<This function is deprecated> its use is no longer necessary and is
+I<only provided for backwards compatibility>.  It is now a no-op.
+blibdirs_target provides a much simpler mechanism and pm_to_blib() can
+create its own directories anyway.
 
 =cut
 
-sub manifypods {
-    my $self          = shift;
+sub dir_target {}
 
-    my $POD2MAN_macro = $self->POD2MAN_macro();
-    my $manifypods_target = $self->manifypods_target();
 
-    return <<END_OF_TARGET;
+=item blibdirs_target (o)
 
-$POD2MAN_macro
+    my $make_frag = $mm->blibdirs_target;
 
-$manifypods_target
+Creates the blibdirs.ts target which creates all the directories we use in
+blib/.
 
-END_OF_TARGET
+=cut
 
+sub blibdirs_target {
+    my $self = shift;
+
+    my @dirs = map { uc "\$(INST_$_)" } qw(libdir archlib
+                                           autodir archautodir
+                                           bin script
+                                           man1dir man3dir
+                                          );
+    my @mkpath = $self->split_command('$(NOECHO) $(MKPATH)', @dirs);
+    my @chmod  = $self->split_command('$(NOECHO) $(CHMOD) 755', @dirs);
+
+    my $make = "\nblibdirs.ts :\n";
+    $make .= join "", map { "\t$_\n" } @mkpath, @chmod;
+    $make .= <<'MAKE';
+	$(NOECHO) $(TOUCH) $@
+
+MAKE
+
+    return $make;
 }
 
 
@@ -488,115 +456,6 @@ MAKE_FRAG
 MAKE_FRAG
 
     return $make_frag;
-}
-
-=item POD2MAN_macro
-
-  my $pod2man_macro = $self->POD2MAN_macro
-
-Returns a definition for the POD2MAN macro.  This is a program
-which emulates the pod2man utility.  You can add more switches to the
-command by simply appending them on the macro.
-
-Typical usage:
-
-    $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) podfile1 man_page1 ...
-
-=cut
-
-sub POD2MAN_macro {
-    my $self = shift;
-
-# Need the trailing '--' so perl stops gobbling arguments and - happens
-# to be an alternative end of line seperator on VMS so we quote it
-    return <<'END_OF_DEF';
-POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
-POD2MAN = $(POD2MAN_EXE)
-END_OF_DEF
-}
-
-
-=item test_via_harness
-
-  my $command = $mm->test_via_harness($perl, $tests);
-
-Returns a $command line which runs the given set of $tests with
-Test::Harness and the given $perl.
-
-Used on the t/*.t files.
-
-=cut
-
-sub test_via_harness {
-    my($self, $perl, $tests) = @_;
-
-    return qq{\t$perl "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
-}
-
-=item test_via_script
-
-  my $command = $mm->test_via_script($perl, $script);
-
-Returns a $command line which just runs a single test without
-Test::Harness.  No checks are done on the results, they're just
-printed.
-
-Used for test.pl, since they don't always follow Test::Harness
-formatting.
-
-=cut
-
-sub test_via_script {
-    my($self, $perl, $script) = @_;
-    return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" $script\n};
-}
-
-=item libscan
-
-  my $wanted = $self->libscan($path);
-
-Takes a path to a file or dir and returns an empty string if we don't
-want to include this file in the library.  Otherwise it returns the
-the $path unchanged.
-
-Mainly used to exclude RCS, CVS, and SCCS directories from
-installation.
-
-=cut
-
-sub libscan {
-    my($self,$path) = @_;
-    my($dirs,$file) = ($self->splitpath($path))[1,2];
-    return '' if grep /^(?:RCS|CVS|SCCS|\.svn)$/, 
-                     $self->splitdir($dirs), $file;
-
-    return $path;
-}
-
-=item tool_autosplit
-
-Defines a simple perl call that runs autosplit. May be deprecated by
-pm_to_blib soon.
-
-=cut
-
-sub tool_autosplit {
-    my($self, %attribs) = @_;
-
-    my $maxlen = $attribs{MAXLEN} ? '$$AutoSplit::Maxlen=$attribs{MAXLEN};' 
-                                  : '';
-
-    my $asplit = $self->oneliner(sprintf <<'PERL_CODE', $maxlen);
-use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)
-PERL_CODE
-
-    return sprintf <<'MAKE_FRAG', $asplit;
-# Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = %s
-
-MAKE_FRAG
-
 }
 
 
@@ -754,105 +613,92 @@ MAKE_FRAG
 
 }
 
-
 =back
 
-=head2 Abstract methods
 
-Methods which cannot be made cross-platform and each subclass will
-have to do their own implementation.
+=head2 Init methods
+
+Methods which help initialize the MakeMaker object and macros.
+
 
 =over 4
 
-=item cd
+=item init_VERSION  I<Abstract>
 
-  my $subdir_cmd = $MM->cd($subdir, @cmds);
+    $mm->init_VERSION
 
-This will generate a make fragment which runs the @cmds in the given
-$dir.  The rough equivalent to this, except cross platform.
+Initialize macros representing versions of MakeMaker and other tools
 
-  cd $subdir && $cmd
+MAKEMAKER: path to the MakeMaker module.
 
-Currently $dir can only go down one level.  "foo" is fine.  "foo/bar" is
-not.  "../foo" is right out.
+MM_VERSION: ExtUtils::MakeMaker Version
 
-The resulting $subdir_cmd has no leading tab nor trailing newline.  This
-makes it easier to embed in a make string.  For example.
+MM_REVISION: ExtUtils::MakeMaker version control revision (for backwards 
+             compat)
 
-      my $make = sprintf <<'CODE', $subdir_cmd;
-  foo :
-      $(ECHO) what
-      %s
-      $(ECHO) mouche
-  CODE
+VERSION: version of your module
 
+VERSION_MACRO: which macro represents the version (usually 'VERSION')
 
-=item oneliner
+VERSION_SYM: like version but safe for use as an RCS revision number
 
-  my $oneliner = $MM->oneliner($perl_code);
-  my $oneliner = $MM->oneliner($perl_code, \@switches);
+DEFINE_VERSION: -D line to set the module version when compiling
 
-This will generate a perl one-liner safe for the particular platform
-you're on based on the given $perl_code and @switches (a -e is
-assumed) suitable for using in a make target.  It will use the proper
-shell quoting and escapes.
+XS_VERSION: version in your .xs file.  Defaults to $(VERSION)
 
-$(PERLRUN) will be used as perl.
+XS_VERSION_MACRO: which macro represents the XS version.
 
-Any newlines in $perl_code will be escaped.  Leading and trailing
-newlines will be stripped.  Makes this idiom much easier:
+XS_DEFINE_VERSION: -D line to set the xs version when compiling.
 
-    my $code = $MM->oneliner(<<'CODE', [...switches...]);
-some code here
-another line here
-CODE
+Called by init_main.
 
-Usage might be something like:
+=cut
 
-    # an echo emulation
-    $oneliner = $MM->oneliner('print "Foo\n"');
-    $make = '$oneliner > somefile';
+sub init_VERSION {
+    my($self) = shift;
 
-All dollar signs must be doubled in the $perl_code if you expect them
-to be interpreted normally, otherwise it will be considered a make
-macro.  Also remember to quote make macros else it might be used as a
-bareword.  For example:
+    $self->{MAKEMAKER}  = $ExtUtils::MakeMaker::Filename;
+    $self->{MM_VERSION} = $ExtUtils::MakeMaker::VERSION;
+    $self->{MM_REVISION}= $ExtUtils::MakeMaker::Revision;
+    $self->{VERSION_FROM} ||= '';
 
-    # Assign the value of the $(VERSION_FROM) make macro to $vf.
-    $oneliner = $MM->oneliner('$$vf = "$(VERSION_FROM)"');
+    if ($self->{VERSION_FROM}){
+        $self->{VERSION} = $self->parse_version($self->{VERSION_FROM});
+        if( $self->{VERSION} eq 'undef' ) {
+            require Carp;
+            Carp::carp("WARNING: Setting VERSION via file ".
+                       "'$self->{VERSION_FROM}' failed\n");
+        }
+    }
 
-Its currently very simple and may be expanded sometime in the figure
-to include more flexible code and switches.
+    # strip blanks
+    if (defined $self->{VERSION}) {
+        $self->{VERSION} =~ s/^\s+//;
+        $self->{VERSION} =~ s/\s+$//;
+    }
+    else {
+        $self->{VERSION} = '';
+    }
 
 
-=item B<quote_literal>
-
-    my $safe_text = $MM->quote_literal($text);
-
-This will quote $text so it is interpreted literally in the shell.
-
-For example, on Unix this would escape any single-quotes in $text and
-put single-quotes around the whole thing.
+    $self->{VERSION_MACRO}  = 'VERSION';
+    ($self->{VERSION_SYM} = $self->{VERSION}) =~ s/\W/_/g;
+    $self->{DEFINE_VERSION} = '-D$(VERSION_MACRO)=\"$(VERSION)\"';
 
 
-=item B<escape_newlines>
+    # Graham Barr and Paul Marquess had some ideas how to ensure
+    # version compatibility between the *.pm file and the
+    # corresponding *.xs file. The bottomline was, that we need an
+    # XS_VERSION macro that defaults to VERSION:
+    $self->{XS_VERSION} ||= $self->{VERSION};
 
-    my $escaped_text = $MM->escape_newlines($text);
+    $self->{XS_VERSION_MACRO}  = 'XS_VERSION';
+    $self->{XS_DEFINE_VERSION} = '-D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"';
 
-Shell escapes newlines in $text.
+}
 
 
-=item max_exec_len
-
-    my $max_exec_len = $MM->max_exec_len;
-
-Calculates the maximum command size the OS can exec.  Effectively,
-this is the max size of a shell command line.
-
-=for _private
-$self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
-
-=item B<init_others>
+=item init_others  I<Abstract>
 
     $MM->init_others();
 
@@ -890,7 +736,8 @@ Defines at least these macros.
   UMASK_NULL        Nullify umask
   DEV_NULL          Supress all command output
 
-=item init_DIRFILESEP
+
+=item init_DIRFILESEP  I<Abstract>
 
   $MM->init_DIRFILESEP;
   my $dirfilesep = $MM->{DIRFILESEP};
@@ -911,7 +758,7 @@ Do not use this as a seperator between directories.  Some operating
 systems use different seperators between subdirectories as between
 directories and filenames (for example:  VOLUME:[dir1.dir2]file on VMS).
 
-=item init_linker
+=item init_linker  I<Abstract>
 
     $mm->init_linker;
 
@@ -940,6 +787,222 @@ Initialize any macros which are for platform specific use only.
 A typical one is the version number of your OS specific mocule.
 (ie. MM_Unix_VERSION or MM_VMS_VERSION).
 
+=cut
+
+sub init_platform {
+    return '';
+}
+
+
+=back
+
+
+=head2 Tools
+
+A grab bag of methods to generate specific macros and commands.
+
+=over 4
+
+=item manifypods
+
+Defines targets and routines to translate the pods into manpages and
+put them into the INST_* directories.
+
+=cut
+
+sub manifypods {
+    my $self          = shift;
+
+    my $POD2MAN_macro = $self->POD2MAN_macro();
+    my $manifypods_target = $self->manifypods_target();
+
+    return <<END_OF_TARGET;
+
+$POD2MAN_macro
+
+$manifypods_target
+
+END_OF_TARGET
+
+}
+
+
+=item POD2MAN_macro
+
+  my $pod2man_macro = $self->POD2MAN_macro
+
+Returns a definition for the POD2MAN macro.  This is a program
+which emulates the pod2man utility.  You can add more switches to the
+command by simply appending them on the macro.
+
+Typical usage:
+
+    $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) podfile1 man_page1 ...
+
+=cut
+
+sub POD2MAN_macro {
+    my $self = shift;
+
+# Need the trailing '--' so perl stops gobbling arguments and - happens
+# to be an alternative end of line seperator on VMS so we quote it
+    return <<'END_OF_DEF';
+POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
+POD2MAN = $(POD2MAN_EXE)
+END_OF_DEF
+}
+
+
+=item test_via_harness
+
+  my $command = $mm->test_via_harness($perl, $tests);
+
+Returns a $command line which runs the given set of $tests with
+Test::Harness and the given $perl.
+
+Used on the t/*.t files.
+
+=cut
+
+sub test_via_harness {
+    my($self, $perl, $tests) = @_;
+
+    return qq{\t$perl "-MExtUtils::Command::MM" }.
+           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
+}
+
+=item test_via_script
+
+  my $command = $mm->test_via_script($perl, $script);
+
+Returns a $command line which just runs a single test without
+Test::Harness.  No checks are done on the results, they're just
+printed.
+
+Used for test.pl, since they don't always follow Test::Harness
+formatting.
+
+=cut
+
+sub test_via_script {
+    my($self, $perl, $script) = @_;
+    return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" $script\n};
+}
+
+
+=item tool_autosplit
+
+Defines a simple perl call that runs autosplit. May be deprecated by
+pm_to_blib soon.
+
+=cut
+
+sub tool_autosplit {
+    my($self, %attribs) = @_;
+
+    my $maxlen = $attribs{MAXLEN} ? '$$AutoSplit::Maxlen=$attribs{MAXLEN};' 
+                                  : '';
+
+    my $asplit = $self->oneliner(sprintf <<'PERL_CODE', $maxlen);
+use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)
+PERL_CODE
+
+    return sprintf <<'MAKE_FRAG', $asplit;
+# Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
+AUTOSPLITFILE = %s
+
+MAKE_FRAG
+
+}
+
+=back
+
+
+=head2 File::Spec wrappers
+
+ExtUtils::MM_Any is a subclass of File::Spec.  The methods noted here
+override File::Spec.
+
+=over 4
+
+=item catfile
+
+File::Spec <= 0.83 has a bug where the file part of catfile is not
+canonicalized.  This override fixes that bug.
+
+=cut
+
+sub catfile {
+    my $self = shift;
+    return $self->canonpath($self->SUPER::catfile(@_));
+}
+
+=back
+
+=head2 Misc
+
+Methods I can't really figure out where they should go yet.
+
+=over 4
+
+=item extra_clean_files
+
+    my @files_to_clean = $MM->extra_clean_files;
+
+Returns a list of OS specific files to be removed in the clean target in
+addition to the usual set.
+
+=cut
+
+# An empty method here tickled a perl 5.8.1 bug and would return its object.
+sub extra_clean_files { 
+    return;
+}
+
+
+=item installvars
+
+    my @installvars = $mm->installvars;
+
+A list of all the INSTALL* variables without the INSTALL prefix.  Useful
+for iteration or building related variable sets.
+
+=cut
+
+sub installvars {
+    return qw(PRIVLIB SITELIB  VENDORLIB
+              ARCHLIB SITEARCH VENDORARCH
+              BIN     SITEBIN  VENDORBIN
+              SCRIPT
+              MAN1DIR SITEMAN1DIR VENDORMAN1DIR
+              MAN3DIR SITEMAN3DIR VENDORMAN3DIR
+             );
+}
+
+
+=item libscan
+
+  my $wanted = $self->libscan($path);
+
+Takes a path to a file or dir and returns an empty string if we don't
+want to include this file in the library.  Otherwise it returns the
+the $path unchanged.
+
+Mainly used to exclude RCS, CVS, and SCCS directories from
+installation.
+
+=cut
+
+sub libscan {
+    my($self,$path) = @_;
+    my($dirs,$file) = ($self->splitpath($path))[1,2];
+    return '' if grep /^(?:RCS|CVS|SCCS|\.svn)$/, 
+                     $self->splitdir($dirs), $file;
+
+    return $path;
+}
+
+
 =item platform_constants
 
     my $make_frag = $mm->platform_constants
@@ -949,38 +1012,12 @@ init_platform() rather than put them in constants().
 
 =cut
 
-sub init_platform {
-    return '';
-}
-
 sub platform_constants {
     return '';
 }
 
-=item os_flavor
-
-    my @os_flavor = $mm->os_flavor;
-
-@os_flavor is the style of operating system this is, usually
-corresponding to the MM_*.pm file we're using.  
-
-The first element of @os_flavor is the major family (ie. Unix,
-Windows, VMS, OS/2, etc...) and the rest are sub families.
-
-Some examples:
-
-    Cygwin98       ('Unix',  'Cygwin', 'Cygwin9x')
-    Windows NT     ('Win32', 'WinNT')
-    Win98          ('Win32', 'Win9x')
-    Linux          ('Unix',  'Linux')
-    MacOS X        ('Unix',  'Darwin', 'MacOS', 'MacOS X')
-    OS/2           ('OS/2')
-
-This is used to write code for styles of operating system.  
-See os_flavor_is() for use.
-
-
 =back
+
 
 =head1 AUTHOR
 
