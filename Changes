@@ -5,6 +5,8 @@
       [rt.cpan.org 4545]
     - clean and realclean are now more careful about accidentally deleting
       directories instead of files.  [rt.cpan.org 6851]
+    - small fix for parallel builds, make sure pm_to_blib has run before
+      we try to use stuff in blib. [rt.cpan.org 6460]
 
 6.25_01  Fri Dec 17 21:29:04 EST 2004
     * *.bak added to the default MANIFEST.SKIP.

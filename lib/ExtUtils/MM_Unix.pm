@@ -2549,7 +2549,7 @@ FULLPERL      = $self->{FULLPERL}
 $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
 
-$(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
+$(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib.ts
 	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR=}, $dir, q{ \
@@ -3312,7 +3312,7 @@ sub processPL {
 all :: %s
 	$(NOECHO) $(NOOP)
 
-%s :: %s
+%s :: %s pm_to_blib.ts
 	$(PERLRUNINST) %s
 MAKE_FRAG
 
