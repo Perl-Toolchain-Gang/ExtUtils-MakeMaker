@@ -459,7 +459,6 @@ sub ln {
     return &cp if $Is_VMS or ($^O eq 'MSWin32' and Win32::IsWin95());
     link($srcFile, $dstFile);
 
-    # chmod a+r,go-w+X (except "X" only applies to u=x)
     unless( _manicopy_chmod($dstFile) ) {
         unlink $dstFile;
         return;
@@ -467,7 +466,9 @@ sub ln {
     1;
 }
 
-# chmod a+rX-w,g-w... or something like that.
+# 1) Strip off all group and world permissions.
+# 2) Let everyone read it.
+# 3) If the owner can execute it, everyone can.
 sub _manicopy_chmod {
     my($file) = shift;
 
@@ -500,9 +501,9 @@ sub _macify {
 
 sub _maccat {
     my($f1, $f2) = @_;
-    
+
     return "$f1/$f2" unless $Is_MacOS;
-    
+
     $f1 .= ":$f2";
     $f1 =~ s/([^:]:):/$1/g;
     return $f1;
