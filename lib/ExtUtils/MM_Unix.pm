@@ -3217,7 +3217,7 @@ sub prefixify {
     my($self,$var,$sprefix,$rprefix,$default) = @_;
 
     my $path = $self->{uc $var} || 
-               $Config_Override{lc $var} || $Config{lc $var};
+               $Config_Override{lc $var} || $Config{lc $var} || '';
 
     print STDERR "  prefixify $var => $path\n" if $Verbose >= 2;
     print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
