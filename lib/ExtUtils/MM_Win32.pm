@@ -425,40 +425,21 @@ $(PM_TO_BLIB)
 }
 
 
-=item tool_autosplit (override)
-
-Use Win32 quoting on command line.
-
-=cut
-
-sub tool_autosplit{
-    my($self, %attribs) = @_;
-    my($asl) = "";
-    $asl = "\$AutoSplit::Maxlen=$attribs{MAXLEN};" if $attribs{MAXLEN};
-    q{
-# Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = $(PERLRUN) -MAutoSplit }.$asl.q{ -e "autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1);"
-};
-}
-
-
 =item xs_o (o)
 
-Defines suffix rules to go from XS to object files directly. This is
-only intended for broken make implementations.
+This target is stubbed out.  Not sure why.
 
 =cut
 
-sub xs_o {	# many makes are too dumb to use xs_c then c_o
-    my($self) = shift;
+sub xs_o {
     return ''
 }
 
 
 =item pasthru (o)
 
-Defines the string that is passed to recursive make calls in
-subdirectories.
+All we send is -nologo to nmake to prevent it from printing its damned
+banner.
 
 =cut
 
