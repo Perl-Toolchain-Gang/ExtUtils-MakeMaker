@@ -1,20 +1,48 @@
+# THIS IS NOT THE REAL MANIFEST.SKIP FILE!!!!
+#
+# There is a MANIFEST.SKIP file which is installed with MakeMaker.  This
+# is not it.  It lives in lib/ExtUtils/MANIFEST.SKIP and gets installed
+# with the rest of the distribution.
+#
+# This MANIFEST.SKIP is specially crafted for MakeMaker itself.
+
 \.ppd$
-\bCVS\b
-~$
 t/lib/File/
 t/Big-Dummy
 t/Problem-Module
 .gz$
 .bak$
-Makefile$
 MANIFEST.perl$
-\.old$
 merge_bleadperl$
-^blib/
-^pm_to_blib
-^blibdirs
-.DS_Store
-\#
 ^bleadperl\.patch$
 ^ExtUtils-MakeMaker
 ^bleadperl.patch
+
+
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bblibdirs\.ts$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+
+# Avoid Devel::Cover files.
+\bcover_db\b
