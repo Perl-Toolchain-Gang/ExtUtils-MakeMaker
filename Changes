@@ -1,3 +1,9 @@
+6.26
+    - Set PM_FILTER as late as possible so it can see all the earlier
+      macro definitions.  Necessary for challenged make implementations
+      like nmake.  Should fix Mail::SpamAssassin installs on Win32.
+      [rt.cpan.org 4545]
+
 6.25_01  Fri Dec 17 21:29:04 EST 2004
     * *.bak added to the default MANIFEST.SKIP.
     * META.yml will no longer be generated in the build directory.  It will

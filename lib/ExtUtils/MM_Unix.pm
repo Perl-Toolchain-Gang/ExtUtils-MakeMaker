@@ -413,7 +413,7 @@ MM_REVISION = $self->{MM_REVISION}
     for my $macro (qw/
               MAKE
 	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
-	      LDFROM LINKTYPE PM_FILTER
+	      LDFROM LINKTYPE
 	      /	) 
     {
 	next unless defined $self->{$macro};
@@ -3781,7 +3781,7 @@ Returns a make fragment containing definitions for:
 SHELL, CHMOD, CP, MV, NOOP, NOECHO, RM_F, RM_RF, TEST_F, TOUCH,
 DEV_NULL, UMASK_NULL, MKPATH, EQUALIZE_TIMESTAMP,
 WARN_IF_OLD_PACKLIST, UNINST, VERBINST, MOD_INSTALL, DOC_INSTALL and
-UNINSTALL, MACROSTART, MACROEND
+UNINSTALL, MACROSTART, MACROEND, PMFILTER
 
 init_others() initializes all these values.
 
@@ -3791,6 +3791,9 @@ sub tools_other {
     my($self) = shift;
     my @m;
 
+    # We set PM_FILTER as late as possible so it can see all the earlier
+    # on macro-order sensitive makes such as nmake.
+
     for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
                       UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP 
                       ECHO ECHO_N
@@ -3798,6 +3801,7 @@ sub tools_other {
                       MOD_INSTALL DOC_INSTALL UNINSTALL
                       WARN_IF_OLD_PACKLIST
                       MACROSTART MACROEND USEMAKEFILE
+                      PM_FILTER
                     } ) 
     {
         next unless defined $self->{$tool};
