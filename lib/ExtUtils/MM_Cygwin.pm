@@ -11,11 +11,6 @@ require ExtUtils::MM_Unix;
 
 $VERSION = 1.01_01;
 
-sub canonpath {
-    shift;
-    return File::Spec->canonpath(@_);
-}
-
 sub cflags {
     my($self,$libperl)=@_;
     return $self->{CFLAGS} if $self->{CFLAGS};
