@@ -410,7 +410,9 @@ sub const_loadlibs {
 
 =item constants (o)
 
-Initializes lots of constants.
+  my $make_frag = $mm->constants;
+
+Prints out macros for lots of constants.
 
 =cut
 
