@@ -3,7 +3,10 @@
 BEGIN {
     if( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = '../lib';
+        @INC = ('../lib', 'lib/');
+    }
+    else {
+        unshift @INC, 't/lib/';
     }
 }
 chdir 't';
@@ -53,6 +56,7 @@ BEGIN {
 
 	# concatenate this file with itself
 	# be extra careful the regex doesn't match itself
+    use TieOut;
 	my $out = tie *STDOUT, 'TieOut';
 	my $self = $0;
 	unless (-f $self) {
@@ -150,14 +154,4 @@ BEGIN {
 END {
 	1 while unlink 'ecmdfile';
 	File::Path::rmtree( 'ecmddir' );
-}
-
-package TieOut;
-
-sub TIEHANDLE {
-	bless( \(my $text), $_[0] );
-}
-
-sub PRINT {
-	${ $_[0] } .= join($/, @_);
 }
