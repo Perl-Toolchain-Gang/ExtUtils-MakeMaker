@@ -111,6 +111,9 @@
     - Eliminated duplicate top_targets() overrides
     - Made tool_autosplit() method portable.  Moved to MM_Any.  Eliminated
       overrides.
+    - Adding realclean_subdirs target and realclean_subdirs_target()
+      method to generate same.  This allows easier overriding of an 
+      unportable part of the realclean target.    
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
