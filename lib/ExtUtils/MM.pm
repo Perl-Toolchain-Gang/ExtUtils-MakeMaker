@@ -55,14 +55,13 @@ $Is{Cygwin} = $^O eq 'cygwin';
 $Is{NW5}    = $Config{osname} eq 'NetWare';  # intentional
 $Is{BeOS}   = $^O =~ /beos/i;    # XXX should this be that loose?
 $Is{DOS}    = $^O eq 'dos';
-
-$Is{Unix}   = !keys %Is;
-
 if( $Is{NW5} ) {
     $^O = 'NetWare';
     delete $Is{Win32};
 }
+$Is{Unix}   = !grep { $_ } values %Is;
 
+map { delete $Is{$_} unless $Is{$_} } keys %Is;
 _assert( keys %Is == 1 );
 my($OS) = keys %Is;
 
