@@ -12,3 +12,4 @@ merge_bleadperl$
 ^pm_to_blib
 .DS_Store
 \#
+^bleadperl\.patch$
