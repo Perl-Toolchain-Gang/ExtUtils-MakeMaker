@@ -39,6 +39,7 @@ META.yml
 NOTES
 PATCHING
 README
+SIGNATURE			Public-key signature (added by MakeMaker)
 t/00compile.t
 t/backwards.t
 t/basic.t
@@ -49,6 +50,8 @@ t/INST.t
 t/INST_PREFIX.t
 t/Install.t
 t/Installed.t
+t/lib/MakeMaker/Test/Setup/BFD.pm
+t/lib/MakeMaker/Test/Setup/Problem.pm
 t/lib/MakeMaker/Test/Setup/Recurs.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
@@ -82,4 +85,3 @@ t/VERSION_FROM.t
 t/vmsish.t
 t/writemakefile_args.t
 TODO
-SIGNATURE                                Public-key signature (added by MakeMaker)
