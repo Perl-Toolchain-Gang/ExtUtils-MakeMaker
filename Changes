@@ -5,6 +5,9 @@
       fall back to $Config{installman*dir}.  Similar for 
       $Config{install(site|vendor)bin}.  This preserves behavior for older
       Perls.
+    * Eliminated the dependency on perl.h for pure-perl builds.
+    * Eliminated .exists files.  Added blibdirs target using MKPATH instead.
+    - Removed now unused dir_target() method.
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
