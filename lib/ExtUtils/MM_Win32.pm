@@ -135,6 +135,19 @@ sub find_tests {
 }
 
 
+=item B<init_EXISTS_EXT>
+
+Using \.exists
+
+=cut
+
+sub init_EXISTS_EXT {
+    my($self) = shift;
+
+    $self->{EXISTS_EXT} = '\.exists';
+    return 1;
+}
+
 =item B<init_others>
 
 Override some of the Unix specific commands with portable
@@ -200,6 +213,7 @@ sub constants {
               AR_STATIC_ARGS NAME DISTNAME NAME_SYM VERSION
               VERSION_SYM XS_VERSION 
               INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT 
+              EXISTS_EXT
               INSTALLDIRS
               PREFIX          SITEPREFIX      VENDORPREFIX
               INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
@@ -340,6 +354,8 @@ PM_TO_BLIB = }.join(" \\\n\t", %{$self->{PM}}).q{
 
 Defines how to produce the *.a (or equivalent) files.
 
+Most of this is copied from MM_Unix except for the AR bits.
+
 =cut
 
 sub static_lib {
@@ -348,7 +364,7 @@ sub static_lib {
 
     my(@m);
     push(@m, <<'END');
-$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)\.exists
+$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(RM_RF) $@
 END
 
@@ -375,38 +391,6 @@ MAKE_FRAG
     join('', @m);
 }
 
-=item dynamic_bs (o)
-
-Defines targets for bootstrap files.
-
-=cut
-
-sub dynamic_bs {
-    my($self, %attribs) = @_;
-    return '
-BOOTSTRAP =
-' unless $self->has_link_code();
-
-    return '
-BOOTSTRAP = '."$self->{BASEEXT}.bs".'
-
-# As Mkbootstrap might not write a file (if none is required)
-# we use touch to prevent make continually trying to remake it.
-# The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP): $(MAKEFILE) '.$self->{BOOTDEP}.' $(INST_ARCHAUTODIR)\.exists
-	'.$self->{NOECHO}.'echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
-	'.$self->{NOECHO}.'$(PERLRUN) \
-		-MExtUtils::Mkbootstrap \
-		-e "Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
-	'.$self->{NOECHO}.'$(TOUCH) $(BOOTSTRAP)
-	$(CHMOD) $(PERM_RW) $@
-
-$(INST_BOOT): $(BOOTSTRAP) $(INST_ARCHAUTODIR)\.exists
-	'."$self->{NOECHO}$self->{RM_RF}".' $(INST_BOOT)
-	-'.$self->{CP}.' $(BOOTSTRAP) $(INST_BOOT)
-	$(CHMOD) $(PERM_RW) $@
-';
-}
 
 =item dynamic_lib (o)
 
@@ -442,7 +426,7 @@ sub dynamic_lib {
 OTHERLDFLAGS = '.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)\.exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_EXT) $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 ');
     if ($GCC) {
       push(@m,  
@@ -595,13 +579,13 @@ pure_all :: config pm_to_blib subdirs linkext
 subdirs :: $(MYEXTLIB)
 	'.$self->{NOECHO}.'$(NOOP)
 
-config :: $(MAKEFILE) $(INST_LIBDIR)\.exists
+config :: $(MAKEFILE) $(INST_LIBDIR)$(EXISTS_EXT)
 	'.$self->{NOECHO}.'$(NOOP)
 
-config :: $(INST_ARCHAUTODIR)\.exists
+config :: $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	'.$self->{NOECHO}.'$(NOOP)
 
-config :: $(INST_AUTODIR)\.exists
+config :: $(INST_AUTODIR)$(EXISTS_EXT)
 	'.$self->{NOECHO}.'$(NOOP)
 ';
 
@@ -609,7 +593,7 @@ config :: $(INST_AUTODIR)\.exists
 
     if (%{$self->{MAN1PODS}}) {
 	push @m, qq[
-config :: \$(INST_MAN1DIR)\\.exists
+config :: \$(INST_MAN1DIR)\$(EXISTS_EXT)
 	$self->{NOECHO}\$(NOOP)
 
 ];
@@ -617,7 +601,7 @@ config :: \$(INST_MAN1DIR)\\.exists
     }
     if (%{$self->{MAN3PODS}}) {
 	push @m, qq[
-config :: \$(INST_MAN3DIR)\\.exists
+config :: \$(INST_MAN3DIR)\$(EXISTS_EXT)
 	$self->{NOECHO}\$(NOOP)
 
 ];
