@@ -26,6 +26,8 @@
     - Small fix to identify UWIN on NT (Randy Sims)
     * metafile will not touch the META.yml if it does not need to be changed
       (Thanks to Tim Bunce for this idea)
+    * Fixed 'make uninstall' which looks like its been broken since last
+      November and nobody noticed.
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
