@@ -296,7 +296,7 @@ sub pm_to_blib {
      }
 
     mkpath($autodir,0,0755);
-    while(my($from, to) = each %$fromto) {
+    while(my($from, $to) = each %$fromto) {
 	next if -f $to && -M $to < -M $from;
 
 	# When a pm_filter is defined, we need to pre-process the source first
