@@ -229,6 +229,7 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 use ExtUtils::Manifest qw(maniread);
 
 my $distdir  = 'Big-Dummy-0.01';
+$distdir =~ s/\./_/g if $Is_VMS;
 my $meta_yml = "$distdir/META.yml";
 
 ok( !-f 'META.yml',  'META.yml not written to source dir' );
