@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.22';
-($Revision) = q$Revision: 1.145 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.146 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -1018,7 +1018,7 @@ The generated Makefile enables the user of the extension to invoke
 The Makefile to be produced may be altered by adding arguments of the
 form C<KEY=VALUE>. E.g.
 
-  perl Makefile.PL PREFIX=/tmp/myperl5
+  perl Makefile.PL PREFIX=/path/to/my/perl/
 
 Other interesting targets in the generated Makefile are
 
@@ -2064,7 +2064,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.145 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.146 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
