@@ -111,12 +111,16 @@ in these dirs:
 	next unless defined $dir; # $self->{PERL_SRC} may be undefined
 	foreach $name (@$names){
 	    my ($abs, $val);
-	    if (File::Spec->file_name_is_absolute($name)) { # /foo/bar
+	    if (File::Spec->file_name_is_absolute($name)) {  # /foo/bar
 		$abs = $name;
-	    } elsif (File::Spec->canonpath($name) eq File::Spec->canonpath(basename($name))) { # foo
+	    } elsif (File::Spec->canonpath($name) eq 
+                     File::Spec->canonpath(basename($name))) # foo
+            {
 		$abs = File::Spec->catfile($dir, $name);
-	    } else { # foo/bar
-		$abs = File::Spec->canonpath(File::Spec->catfile(File::Spec->curdir, $name));
+	    } else {                                         # foo/bar
+		$abs = File::Spec->canonpath(
+                           File::Spec->catfile(File::Spec->curdir, $name)
+                       );
 	    }
 	    print "Checking $abs\n" if ($trace >= 2);
 	    next unless $self->maybe_command($abs);
