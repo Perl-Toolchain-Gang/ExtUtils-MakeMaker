@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.53_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.19 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.20 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -617,7 +617,9 @@ sub _run_hintfile {
     my($hint_file) = shift;
 
     print STDERR "Processing hints file $hint_file\n";
-    do $hint_file;
+    local($!, $@);
+    do "./$hint_file";
+    print STDERR "Couldn't open hint file: $!" if $!;
     print STDERR $@ if $@;
 }
 
@@ -1749,7 +1751,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.19 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.20 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
