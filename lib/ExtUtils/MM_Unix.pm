@@ -1842,9 +1842,9 @@ usually solves this kind of problem.
 =item init_others
 
 Initializes EXTRALIBS, BSLOADLIBS, LDLOADLIBS, LIBS, LD_RUN_PATH,
-OBJECT, BOOTDEP, PERLMAINCC, LDFROM, LINKTYPE, NOOP, FIRST_MAKEFILE,
-MAKEFILE, MAKEFILE_OLD, NOECHO, RM_F, RM_RF, TEST_F, TOUCH, CP, MV,
-CHMOD, UMASK_NULL
+OBJECT, BOOTDEP, PERLMAINCC, LDFROM, LINKTYPE, SHELL, NOOP,
+FIRST_MAKEFILE, MAKEFILE, MAKEFILE_OLD, NOECHO, RM_F, RM_RF, TEST_F,
+TOUCH, CP, MV, CHMOD, UMASK_NULL
 
 =cut
 
@@ -1894,22 +1894,28 @@ sub init_others {	# --- Initialize Other Attributes
                         : ($Config{usedl} ? 'dynamic' : 'static');
     };
 
-    # These get overridden for VMS and maybe some other systems
-    $self->{NOOP}  ||= '$(SHELL) -c true';
-    $self->{FIRST_MAKEFILE} ||= "Makefile";
-    $self->{MAKEFILE}     ||= $self->{FIRST_MAKEFILE};
-    $self->{MAKEFILE_OLD} ||= $self->{MAKEFILE}.'.old';
-    $self->{MAKE_APERL_FILE} ||= "Makefile.aperl";
-    $self->{NOECHO} = '@' unless defined $self->{NOECHO};
-    $self->{RM_F}  ||= "rm -f";
-    $self->{RM_RF} ||= "rm -rf";
-    $self->{TOUCH} ||= "touch";
-    $self->{TEST_F} ||= "test -f";
-    $self->{CP} ||= "cp";
-    $self->{MV} ||= "mv";
-    $self->{CHMOD} ||= "chmod";
-    $self->{UMASK_NULL} ||= "umask 0";
-    $self->{DEV_NULL} ||= "> /dev/null 2>&1";
+    $self->{NOOP}               ||= '$(SHELL) -c true';
+    $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
+
+    $self->{MAKEFILE}           ||= 'Makefile';
+    $self->{FIRST_MAKEFILE}     ||= '$(MAKEFILE)';
+    $self->{MAKEFILE_OLD}       ||= '$(MAKEFILE).old';
+    $self->{MAKE_APERL_FILE}    ||= '$(MAKEFILE).aperl';
+
+    $self->{SHELL}              ||= $Config{sh} || '/bin/sh';
+
+    $self->{RM_F}               ||= "rm -f";
+    $self->{RM_RF}              ||= "rm -rf";
+    $self->{TOUCH}              ||= "touch";
+    $self->{TEST_F}             ||= "test -f";
+    $self->{CP}                 ||= "cp";
+    $self->{MV}                 ||= "mv";
+    $self->{CHMOD}              ||= "chmod";
+
+    $self->{UMASK_NULL}         ||= "umask 0";
+    $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
+
+    return 1;
 }
 
 =item init_INST
@@ -3718,21 +3724,20 @@ MAKE_FRAG
 
 Returns a make fragment containing definitions for:
 
-CHMOD, CP, LD, MV, NOOP, NOECHO, RM_F, RM_RF, TEST_F, TOUCH, DEV_NULL,
-UMASK_NULL, MKPATH, EQUALIZE_TIMESTAMP, WARN_IF_OLD_PACKLIST, UNINST,
-VERBINST, MOD_INSTALL, DOC_INSTALL and UNINSTALL
+SHELL, CHMOD, CP, LD, MV, NOOP, NOECHO, RM_F, RM_RF, TEST_F, TOUCH,
+DEV_NULL, UMASK_NULL, MKPATH, EQUALIZE_TIMESTAMP,
+WARN_IF_OLD_PACKLIST, UNINST, VERBINST, MOD_INSTALL, DOC_INSTALL and
+UNINSTALL
+
+init_others() initializes all these values.
 
 =cut
 
 sub tools_other {
     my($self) = shift;
     my @m;
-    my $bin_sh = $Config{sh} || '/bin/sh';
-    push @m, qq{
-SHELL = $bin_sh
-};
 
-    for (qw/ CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
+    for (qw/ SHELL CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
              UMASK_NULL DEV_NULL/ ) 
     {
 	push @m, "$_ = $self->{$_}\n";
