@@ -103,18 +103,32 @@ Removes files (even if readonly)
 
 =cut 
 
-sub rm_f
-{
- expand_wildcards();
- foreach (@ARGV)
-  {
-   next unless -f $_;
-   next if unlink($_);
-   chmod(0777,$_);
-   next if unlink($_);
-   carp "Cannot delete $_:$!";
-  }
+sub rm_f {
+    expand_wildcards();
+
+    foreach my $file (@ARGV) {
+        next unless -f $file;
+
+        next if _unlink($file);
+
+        chmod(0777, $file);
+
+        next if _unlink($file);
+            
+        carp "Cannot delete $file: $!";
+    }
 }
+
+sub _unlink {
+    my $files_unlinked = 0;
+    foreach my $file (@_) {
+        my $delete_count = 0;
+        $delete_count++ while unlink $file;
+        $files_unlinked++ if $delete_count;
+    }
+    return $files_unlinked;
+}
+
 
 =item touch files ...
 
