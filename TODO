@@ -26,17 +26,11 @@ Remove tar -I Sun-ism from instmodsh.
 
 Consider adding a timeout option to prompt() and env variable.
 
-Remove the dogmatic "always use h2xs" from the docs and replace with
-something a bit more sensible.  References to ModuleMaker and perhaps
-a small Makefile.PL tutorial.
-
 Unify VMS->find_perl
 
 Consider if VMS->find_perl needs to have pieces put into maybe_command()
 
 Consider if shell escaping all macro data is a good idea.
-
-Have 'make distdir' spit out a META.yml file.
 
 Move Win32->init_others() ExtUtils::Command overrides into MM_Any.
 
@@ -44,12 +38,6 @@ Figure out and document the 4th arg to ExtUtils::Install::install()
 
 Consider if adding a nativize() routine to replace macify() and
 fixpath() is useful.
-
-ExtUtils::Install is a disaster.
-
-Fix split_command() tests on Win32. (split_command() not broken, only tests)
-
-Copy eliminate_macros() and fixpath() from File::Spec::VMS and into MM_VMS.
 
 Eliminate the above from inside FS::VMS->catfile and catdir.  Make into 
 MM_VMS wrappers.
@@ -59,3 +47,5 @@ Make MM look for xsubpp through @INC.
 Add "NO_META" to stop autogeneration (and auto overwrite) of META.yml.
 
 Test ExtUtils::Command::MM
+
+Finish ExtUtils::MakeMaker::Tutorial
