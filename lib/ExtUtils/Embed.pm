@@ -1,4 +1,4 @@
-# $Id: Embed.pm,v 1.4 2002/02/04 08:14:29 schwern Exp $
+# $Id: Embed.pm,v 1.5 2002/02/06 08:35:19 schwern Exp $
 require 5.006_001;
 
 package ExtUtils::Embed;
@@ -14,7 +14,7 @@ use vars qw(@ISA @EXPORT $VERSION
 	    );
 use strict;
 
-$VERSION = 1.2506_01;
+$VERSION = 1.2506_02;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&xsinit &ldopts 
@@ -229,7 +229,7 @@ sub perl_inc {
 }
 
 sub ccopts {
-   ccflags . perl_inc;
+   ccflags() . perl_inc();
 }
 
 sub canon {
