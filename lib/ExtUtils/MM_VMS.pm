@@ -292,68 +292,6 @@ sub perl_script {
     return '';
 }
 
-=item dir_target (override)
-
-Override dir_target because MMS/K cannot have a directory be a target
-directly, but a directory file can be.
-
-Each directory target is translated into a directory file and that the
-target which makes a directory.  Then a directory target is made which
-depends on the dirfile target so the directory can be used as a
-dependency in other targets.
-
-=cut
-
-sub dir_target {
-    my($self, @dirs) = @_;
-
-    my $make = '';
-    foreach my $dir (@dirs) {
-        my $dirfile = $self->_to_dirfile($dir);
-        
-        $make .= sprintf <<'MAKE', $dir, $dirfile;
-%s : %s
-	$(NOECHO) $(NOOP)
-
-MAKE
-
-        $make .= $self->SUPER::dir_target($dirfile);
-    }
-
-    return $make;
-}
-
-
-=begin private
-
-=item _to_dirfile
-
-    my $dirfile = $mm->_to_dirfile($dir);
-
-Translate a directory specification into a directory file.  ie.
-
-    [foo.bar]
-
-to
-
-    [foo]bar.dir
-
-=end private
-
-=cut
-
-sub _to_dirfile {
-    my($self, $dir) = @_;
-
-    $dir = $self->fixpath($dir, 1);
-
-    my($vol, $dirs, $file) = $self->splitpath($dir);
-    my @dirs = $self->splitdir($dirs);
-    my $dirfile = pop @dirs;
-
-    return $self->catpath( $vol, $self->catdir(@dirs), "$dirfile.dir" );
-}
-
 
 =item replace_manpage_separator
 
