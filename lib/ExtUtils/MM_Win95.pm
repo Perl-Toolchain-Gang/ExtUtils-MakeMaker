@@ -91,8 +91,9 @@ sub cd {
 
     my $cmd = join "\n\t", map "$_", @cmds;
 
+    # No leading tab and no trailing newline makes for easier embedding.
     my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
-	cd %s
+cd %s
 	%s
 	cd ..
 MAKE_FRAG

@@ -751,15 +751,25 @@ have to do their own implementation.
 
 =item cd
 
-  my $make_frag = $MM->cd($dir, @cmds);
+  my $subdir_cmd = $MM->cd($subdir, @cmds);
 
 This will generate a make fragment which runs the @cmds in the given
 $dir.  The rough equivalent to this, except cross platform.
 
-  cd $dir && $cmd
+  cd $subdir && $cmd
 
 Currently $dir can only go down one level.  "foo" is fine.  "foo/bar" is
 not.  "../foo" is right out.
+
+The resulting $subdir_cmd has no leading tab nor trailing newline.  This
+makes it easier to embed in a make string.  For example.
+
+      my $make = sprintf <<'CODE', $subdir_cmd;
+  foo :
+      $(ECHO) what
+      %s
+      $(ECHO) mouche
+  CODE
 
 
 =item oneliner

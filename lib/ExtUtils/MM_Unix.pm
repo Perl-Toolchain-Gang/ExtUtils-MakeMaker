@@ -3667,6 +3667,7 @@ sub replace_manpage_separator {
 sub cd {
     my($self, $dir, @cmds) = @_;
 
+    # No leading tab and no trailing newline makes for easier embedding
     my $make_frag = join "\n\t", map { "cd $dir && $_" } @cmds;
 
     return $make_frag;

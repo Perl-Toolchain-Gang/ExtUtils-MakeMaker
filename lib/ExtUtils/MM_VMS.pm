@@ -1694,14 +1694,13 @@ sub _catprefix {
 sub cd {
     my($self, $dir, @cmds) = @_;
 
-    # Translate a Unix directory to a relative VMS dir.
-    $dir =~ s/\.dir$//;
-    $dir = "[.$dir]" unless $dir =~ /^\[.*\]$/;
+    $dir = vmspath($dir);
 
     my $cmd = join "\n\t", map "$_", @cmds;
 
+    # No leading tab makes it look right when embedded
     my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
-	startdir = F$Environment("Default")
+startdir = F$Environment("Default")
 	Set Default %s
 	%s
 	Set Default 'startdir'
