@@ -8,7 +8,9 @@
         INSTALLVENDORBIN INSTALLVENDORLIB INSTALLVENDORARCH
         SITEPREFIX VENDORPREFIX
     * INSTALLDIRS=site now properly using $Config{siteprefixexp}
-    * Added INSTALLDIRS=vendor & support for vendor directories.
+      (Thieved from Debian.  Thanks!)
+    * Added INSTALLDIRS=vendor & support for vendor directories
+      (Thieved from Debian.  Thanks!)
 
     [[ Bug Fixes ]]
     - nmake syntax nits from Mattia Barbon
