@@ -198,7 +198,7 @@ sub install {
             chdir $save_cwd;
 
         # File::Find seems to always be Unixy except on MacPerl :(
-	}, $Is_MacPerl ? '.' : $Curdir);
+	}, $Is_MacPerl ? $Curdir : '.' );
 	chdir($cwd) or Carp::croak("Couldn't chdir to $cwd: $!");
     }
     if ($pack{'write'}) {
