@@ -2,10 +2,10 @@ BEGIN {require 5.004;}
 
 package ExtUtils::MakeMaker;
 
-$VERSION = "5.52_01";
+$VERSION = "5.52_02";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.17 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.18 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -80,6 +80,7 @@ sub eval_in_subdirs {
     use Cwd qw(cwd abs_path);
     my $pwd = cwd();
     local @INC = map eval {abs_path($_) if -e} || $_, @INC;
+    push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir (@{$self->{DIR}}){
         my($abs) = $self->catdir($pwd,$dir);
@@ -92,7 +93,10 @@ sub eval_in_x {
     my($self,$dir) = @_;
     chdir $dir or Carp::carp("Couldn't change to directory $dir: $!");
 
-    eval { do './Makefile.PL' };
+    {
+        package main;
+        do './Makefile.PL';
+    };
     if ($@) {
 #         if ($@ =~ /prerequisites/) {
 #             die "MakeMaker WARNING: $@";
@@ -613,9 +617,7 @@ sub _run_hintfile {
     my($hint_file) = shift;
 
     print STDERR "Processing hints file $hint_file\n";
-    eval {
-        do $hint_file;
-    };
+    do $hint_file;
     print STDERR $@ if $@;
 }
 
@@ -1553,13 +1555,13 @@ of memory allocations, etc.
 
 Use this instead of $(PERL) or $(FULLPERL) when you wish to run perl.
 It will set up extra necessary flags for you.
-  
+
 =item PERLRUNINST
-  
+
 Use this instead of $(PERL) or $(FULLPERL) when you wish to run
 perl to work with modules.  It will add things like -I$(INST_ARCH)
 and other necessary flags.
-  
+
 =item PERL_SRC
 
 Directory containing the Perl source code (use of this should be
@@ -1716,7 +1718,7 @@ The set of -I's necessary to run a "make test".  Use as:
 $(PERL) $(TEST_LIBS) -e '...' for example.
 
 The paths will be absolute.
-  
+
 =item TYPEMAPS
 
 Ref to array of typemap file names.  Use this when the typemaps are
@@ -1747,7 +1749,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.17 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.18 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
