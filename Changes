@@ -1,5 +1,5 @@
 6.10_04
-    - Added the Makefile to the dist dependencies.
+    - Added the Makefile to the dist dependencies. (Slaven Rezic)
     - Reversing the find_perl() version check failure warning introced in
       6.10_03.  Too talkative, warned when nothing was wrong.
 
