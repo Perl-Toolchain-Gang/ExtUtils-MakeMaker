@@ -654,3 +654,5 @@ L<ExtUtils::MakeMaker> which has handy targets for most of the functionality.
 Andreas Koenig <F<andreas.koenig@anima.de>>
 
 =cut
+
+1;
