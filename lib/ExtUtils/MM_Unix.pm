@@ -3048,6 +3048,7 @@ realclean purge ::  clean
 	push(@m, sprintf($sub,$_,"$self->{MAKEFILE}",''));
     }
     push(@m, "	$self->{RM_RF} \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n");
+    push(@m, "	$self->{RM_RF} \$(DISTVNAME)\n");
     if( $self->has_link_code ){
         push(@m, "	$self->{RM_F} \$(INST_DYNAMIC) \$(INST_BOOT)\n");
         push(@m, "	$self->{RM_F} \$(INST_STATIC)\n");
