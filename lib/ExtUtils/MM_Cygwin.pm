@@ -57,7 +57,7 @@ Warning: I could not locate your pod2man program. Please make sure,
 END
         $pod2man_exe = "-S pod2man";
     }
-    my(@m);
+    my(@m) = ();
     push @m,
 qq[POD2MAN_EXE = $pod2man_exe\n],
 qq[POD2MAN = \$(PERL) -we '%m=\@ARGV;for (keys %m){' \\\n],
@@ -68,7 +68,8 @@ q[-e 'next if -e $$m{$$_} && -M $$m{$$_} < -M $$_ && -M $$m{$$_} < -M "],
 -e 'chmod(oct($(PERM_RW))), $$m{$$_} or warn "chmod $(PERM_RW) $$m{$$_}: $$!\n";}'
 ];
     push @m, "\nmanifypods : pure_all ";
-    push @m, join " \\\n\t", keys %{$self->{MAN1PODS}}, keys %{$self->{MAN3PODS}};
+    push @m, join " \\\n\t", keys %{$self->{MAN1PODS}},
+                             keys %{$self->{MAN3PODS}};
 
     push(@m,"\n");
     if (%{$self->{MAN1PODS}} || %{$self->{MAN3PODS}}) {
