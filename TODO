@@ -42,3 +42,7 @@ Consider if VMS->find_perl needs to have pieces put into maybe_command()
 Consider if shell escaping all macro data is a good idea.
 
 Have 'make distdir' spit out a META.yml file.
+
+Merge dist_core() methods.
+
+Merge libscan() methods.
