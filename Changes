@@ -2,6 +2,10 @@
     * Added NO_META WriteMakefile() option to suppress generation of
       META.yml. (Spoon, rt.cpan.org 2359)
     - Spurious linebreak in uninstall_from_sitedirs on VMS (Craig Berry)
+    * A bit after 6.05 man page names would come out as lib::Foo::Bar
+      if the module name didn't contain a ::.  Found with podulators.
+      Fixed.
+    * Skipping installation of RCS ,v files.
 
 6.10_02 Mon Apr  7 00:57:15 PDT 2003
     * Removed 2>&1 experiment introduced in 6.10_01 for all non-Unixen

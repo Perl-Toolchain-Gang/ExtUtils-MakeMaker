@@ -1507,6 +1507,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
             }
             return if /\#/;
             return if /~$/;    # emacs temp files
+            return if /,v$/;   # RCS files
 
 	    my $path   = $File::Find::name;
             my $prefix = $self->{INST_LIBDIR};
@@ -1608,7 +1609,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    my($manpagename) = $name;
 	    $manpagename =~ s/\.p(od|m|l)\z//;
            # everything below lib is ok
-	    if($self->{PARENT_NAME} && $manpagename !~ s!^\W*lib\W+!!s) {
+	    unless($manpagename =~ s!^\W*lib\W+!!s) {
 		$manpagename = $self->catfile(
                                 split(/::/,$self->{PARENT_NAME}),$manpagename
                                );
