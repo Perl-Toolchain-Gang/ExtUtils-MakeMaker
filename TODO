@@ -14,8 +14,6 @@ Move instmodsh to utils/ in the core.
 Handle config files (ie. /etc) and their special PREFIX needs
 (ie. PREFIX=/usr, INSTALLCONFIGDIR=/etc).
 
-Fix Win32 when perl is installed in C:\Program Files
-
 Make sure PDL builds
 
 Fix find_perl on Amiga trg@privat.utfors.se
