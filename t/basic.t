@@ -21,7 +21,27 @@ use TieOut;
 
 my $perl = which_perl();
 
-chdir 't';
+my $root_dir = 't';
+
+if( $^O eq 'VMS' ) {
+    # On older systems we might exceed the 8-level directory depth limit
+    # imposed by RMS.  We get around this with a rooted logical, but we
+    # can't create logical names with attributes in Perl, so we do it
+    # in a DCL subprocess and put it in the job table so the parent sees it.
+    open( BFDTMP, '>bfdtesttmp.com' ) || die "Error creating command file; $!";
+    print BFDTMP <<'COMMAND';
+$ BFD_TEST_ROOT = F$PARSE("[.t]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
+$ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED BFD_TEST_ROOT 'BFD_TEST_ROOT'
+COMMAND
+    close BFDTMP;
+
+    system '@bfdtesttmp.com';
+    END { 1 while unlink 'bfdtesttmp.com' }
+    $root_dir = 'BFD_TEST_ROOT:[000000]';
+}
+
+chdir $root_dir;
+
 
 perl_lib;
 
