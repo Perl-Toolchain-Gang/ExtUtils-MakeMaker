@@ -16,7 +16,7 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 75;
+use Test::More tests => 73;
 use MakeMaker::Test::Utils;
 use File::Find;
 use File::Spec;
