@@ -1,3 +1,7 @@
+6.27
+    * Added _darcs to the list of revision control administrative 
+      directories skipped both in libscan and in MANIFEST.SKIP.
+
 6.26_01 Mon Mar 28 21:34:39 PST 2005
     * PL_FILES was broken in the last release.  The .PL files were not being
       passed the file they were to generate.

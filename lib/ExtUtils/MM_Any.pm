@@ -1635,7 +1635,7 @@ Takes a path to a file or dir and returns an empty string if we don't
 want to include this file in the library.  Otherwise it returns the
 the $path unchanged.
 
-Mainly used to exclude RCS, CVS, and SCCS directories from
+Mainly used to exclude version control administrative directories from
 installation.
 
 =cut
@@ -1643,7 +1643,7 @@ installation.
 sub libscan {
     my($self,$path) = @_;
     my($dirs,$file) = ($self->splitpath($path))[1,2];
-    return '' if grep /^(?:RCS|CVS|SCCS|\.svn)$/, 
+    return '' if grep /^(?:RCS|CVS|SCCS|\.svn|_darcs)$/, 
                      $self->splitdir($dirs), $file;
 
     return $path;
