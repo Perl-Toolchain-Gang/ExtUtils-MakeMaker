@@ -1,4 +1,4 @@
-6.18 Sun Nov  2 16:14:17 PST 2003
+6.18
     - parse_version() was blowing over $_ (Ilya Zakharevich)
     - 5.6.2 has the same Cygwin shared lib name fix as 5.7.0. (Gerrit Haase)
     * When $Config{install(site|vendor)man*dir} aren't set it will now
@@ -28,6 +28,9 @@
       (Thanks to Tim Bunce for this idea)
     * Fixed 'make uninstall' which looks like its been broken since last
       November and nobody noticed.
+    - Fixing minor bug in VMS prefixification logic when PREFIX was not set
+      by the user.
+    - Fixing potential bug in prefixification for relative directories
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
