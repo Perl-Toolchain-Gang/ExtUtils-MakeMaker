@@ -20,7 +20,7 @@ $Config{PREFIX}/man.  Debian puts stuff in /usr/share/{perl,man}
 
 Investigate one method per make target.
 
-Merge 15187, 15023, 14902, 14688, 14677, 14655, 14645, 14641, 14622
+Merge 15187, 15023, 14902
 
 Handle config files (ie. /etc) and their special PREFIX needs
 (ie. PREFIX=/usr, INSTALLCONFIGDIR=/etc).
