@@ -392,12 +392,16 @@ clean :: clean_subdirs
 
     # Normally these are all under blib but they might have been
     # redefined.
-    push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
-                   $(INST_BIN) $(INST_SCRIPT)
-                   $(INST_MAN1DIR) $(INST_MAN3DIR)
-                   $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
-                   $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
-                );
+    # XXX normally this would be a good idea, but the Perl core sets
+    # INST_LIB = ../../lib rather than actually installing the files.
+    # So a "make clean" in an ext/ directory would blow away lib.
+    # Until the core is adjusted let's leave this out.
+#     push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
+#                    $(INST_BIN) $(INST_SCRIPT)
+#                    $(INST_MAN1DIR) $(INST_MAN3DIR)
+#                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
+#                    $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
+#                 );
                   
 
     if( $attribs{FILES} ) {
