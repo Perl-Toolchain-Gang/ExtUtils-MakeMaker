@@ -2474,16 +2474,22 @@ sub install {
 
     push @m, q{
 install :: all pure_install doc_install
+	$(NOECHO) $(NOOP)
 
 install_perl :: all pure_perl_install doc_perl_install
+	$(NOECHO) $(NOOP)
 
 install_site :: all pure_site_install doc_site_install
+	$(NOECHO) $(NOOP)
 
 install_vendor :: all pure_vendor_install doc_vendor_install
+	$(NOECHO) $(NOOP)
 
 pure_install :: pure_$(INSTALLDIRS)_install
+	$(NOECHO) $(NOOP)
 
 doc_install :: doc_$(INSTALLDIRS)_install
+	$(NOECHO) $(NOOP)
 
 pure__install : pure_site_install
 	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
@@ -2566,6 +2572,7 @@ doc_vendor_install ::
 
     push @m, q{
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs
+	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
 	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{
