@@ -175,26 +175,31 @@ Key/value pairs are extra information about the module.  Fields include:
 sub perllocal_install {
     my($type, $name) = splice(@ARGV, 0, 2);
 
-    printf <<POD, scalar localtime;
-=head2 %s: C<$type> L<$name|$name>
-
-=over 4
-
+    my $pod;
+    $pod = sprintf <<POD, scalar localtime;
+ =head2 %s: C<$type> L<$name|$name>
+ 
+ =over 4
+ 
 POD
 
     do {
         my($key, $val) = splice(@ARGV, 0, 2);
 
-        print <<POD
-=item *
-
-C<$key: $val>
-
+        $pod = <<POD
+ =item *
+ 
+ C<$key: $val>
+ 
 POD
 
     } while(@ARGV);
 
-    print "=back\n\n";
+    $pod = "=back\n\n";
+    $pod =~ s/^ //g;
+    print $pod;
+
+    return 1;
 }
 
 =item B<uninstall>
