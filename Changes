@@ -1,4 +1,4 @@
-6.25_06
+6.25_06  Sun Dec 26 17:21:37 EST 2004
     - Forgot to define BOOTDEP macro.
     - .exists files are back.  Directories cannot be used directly as 
       targets as their mod time changes too frequently.
