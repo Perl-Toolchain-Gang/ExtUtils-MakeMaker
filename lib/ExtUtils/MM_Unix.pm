@@ -1522,7 +1522,8 @@ sub init_main {
 	foreach $dir ($Updir,
                       File::Spec->catdir($Updir,$Updir),
                       File::Spec->catdir($Updir,$Updir,$Updir),
-                      File::Spec->catdir($Updir,$Updir,$Updir,$Updir))
+                      File::Spec->catdir($Updir,$Updir,$Updir,$Updir),
+                      File::Spec->catdir($Updir,$Updir,$Updir,$Updir,$Updir)))
         {
 	    if (
 		-f File::Spec->catfile($dir,"config_h.SH")
