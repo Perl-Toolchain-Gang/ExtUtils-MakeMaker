@@ -20,8 +20,8 @@ BEGIN {
 
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
-($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.88 $, 10)) =~ s/\s+$//;
+($VERSION) = '5.67';
+($Revision = substr(q$Revision: 1.89 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
