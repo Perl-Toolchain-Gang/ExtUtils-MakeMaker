@@ -999,7 +999,7 @@ sub xs_o {	# many makes are too dumb to use xs_c then c_o
 
 =item top_targets (override)
 
-Use VMS quoting on command line for Version_check.
+Path seperator differences.
 
 =cut
 
@@ -1049,12 +1049,6 @@ $(O_FILES) : $(H_FILES)
     push @m, q{
 help :
 	perldoc ExtUtils::MakeMaker
-};
-
-    push @m, q{
-Version_check :
-	$(NOECHO) $(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -
-	"-MExtUtils::MakeMaker=Version_check" -e "&Version_check('$(MM_VERSION)')"
 };
 
     join('',@m);
