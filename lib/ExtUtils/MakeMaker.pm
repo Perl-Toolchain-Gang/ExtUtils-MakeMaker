@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.72 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.73 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -207,7 +207,8 @@ sub full_setup {
     PERL_LIB        PERL_ARCHLIB 
     SITELIBEXP      SITEARCHEXP 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS
-    LINKTYPE MAKEAPERL MAKEFILE MAN1PODS MAN3PODS MAP_TARGET MYEXTLIB
+    LINKTYPE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET 
+    MYEXTLIB
     PERL_MALLOC_OK
     NAME NEEDS_LINKING NOECHO NORECURS NO_VC OBJECT OPTIMIZE PERL PERLMAINCC
     PERLRUN PERLRUNINST PERL_CORE
@@ -563,12 +564,12 @@ sub WriteEmptyMakefile {
 
     my %att = @_;
     my $self = MM->new(\%att);
-    if (-f "$self->{MAKEFILE}.old") {
-      chmod 0666, "$self->{MAKEFILE}.old";
-      unlink "$self->{MAKEFILE}.old" or warn "unlink $self->{MAKEFILE}.old: $!";
+    if (-f $self->{MAKEFILE_OLD}) {
+      chmod 0666, $self->{MAKEFILE_OLD};
+      unlink $self->{MAKEFILE_OLD} or warn "unlink $self->{MAKEFILE_OLD}: $!";
     }
-    rename $self->{MAKEFILE}, "$self->{MAKEFILE}.old"
-      or warn "rename $self->{MAKEFILE} $self->{MAKEFILE}.old: $!"
+    rename $self->{MAKEFILE}, $self->{MAKEFILE_OLD}
+      or warn "rename $self->{MAKEFILE} $self->{MAKEFILE_OLD}: $!"
         if -f $self->{MAKEFILE};
     open MF, '>'.$self->{MAKEFILE} or die "open $self->{MAKEFILE} for write: $!";
     print MF <<'EOP';
@@ -1575,6 +1576,15 @@ MakeMaker. The user normally does not need it.
 
 The name of the Makefile to be produced.
 
+Defaults to 'Makefile' or 'Descrip.MMS' on VMS.
+
+=item MAKEFILE_OLD
+
+When 'make clean' or similar is run, the $(MAKEFILE) will be backed up
+at this location.
+
+Defaults to $(MAKEFILE).old or $(MAKEFILE)_old on VMS.
+
 =item MAN1PODS
 
 Hashref of pod-containing files. MakeMaker will default this to all
@@ -1912,7 +1922,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.72 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.73 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

@@ -419,8 +419,6 @@ sub init_main {
 	push @defpath, $component if defined $component;
     }
     $self->{PERL} = "$self->{PERL_SRC}miniperl";
-    $self->{FULLPERL} = "$self->{PERL_SRC}perl";
-    $self->{MAKEFILE} = "Makefile.mk";
 }
 
 =item init_others
@@ -456,6 +454,9 @@ sub init_others {	# --- Initialize Other Attributes
 	}
     }
     $self->{SOURCE} = $src;
+    $self->{FULLPERL} = "$self->{PERL_SRC}perl";
+    $self->{MAKEFILE} = "Makefile.mk";
+    $self->{MAKEFILE_OLD} = $self->{MAKEFILE}.'.old';
 }
 
 
@@ -592,7 +593,7 @@ sub constants {
 	      NAME DISTNAME NAME_SYM VERSION VERSION_SYM XS_VERSION
 	      INST_LIB INST_ARCHLIB PERL_LIB PERL_SRC MACPERL_SRC MACPERL_LIB PERL FULLPERL
 	      XSPROTOARG MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED SOURCE TYPEMAPS
-          FIRST_MAKEFILE MAKEFILE
+          FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD
 	      / ) {
 	next unless defined $self->{$tmp};
 	if ($tmp eq 'TYPEMAPS' && ref $self->{$tmp}) {
@@ -770,7 +771,7 @@ clean ::
     push @m, "\t\$(RM_RF) @otherfiles\n";
     # See realclean and ext/utils/make_ext for usage of Makefile.old
     push(@m,
-	 "\t\$(MV) \$(MAKEFILE) \$(MAKEFILE).old\n");
+	 "\t\$(MV) \$(MAKEFILE) \$(MAKEFILE_OLD)\n");
     push(@m,
 	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
     join("", @m);
@@ -800,11 +801,11 @@ realclean purge ::  clean
 	Set Echo \{OldEcho\}
 	";
     foreach(@{$self->{DIR}}){
-	push(@m, sprintf($sub,$_,'$(MAKEFILE).old','-f $(MAKEFILE).old"));
+	push(@m, sprintf($sub,$_,'$(MAKEFILE_OLD)','-f $(MAKEFILE_OLD)"));
 	push(@m, sprintf($sub,$_,'$(MAKEFILE)',''));
     }
     my(@otherfiles) = ('$(MAKEFILE),
-		       '$(MAKEFILE).old'); # Makefiles last
+		       '$(MAKEFILE_OLD)'); # Makefiles last
     push(@otherfiles, patternify($attribs{FILES})) if $attribs{FILES};
     push(@m, "\t\$(RM_RF) @otherfiles\n") if @otherfiles;
     push(@m, "\t$attribs{POSTOP}\n")       if $attribs{POSTOP};

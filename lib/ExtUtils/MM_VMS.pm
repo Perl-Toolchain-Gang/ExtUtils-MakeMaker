@@ -323,7 +323,8 @@ sub init_others {
     $self->{NOOP} = 'Continue';
     $self->{FIRST_MAKEFILE} ||= 'Descrip.MMS';
     $self->{MAKE_APERL_FILE} ||= 'Makeaperl.MMS';
-    $self->{MAKEFILE} ||= $self->{FIRST_MAKEFILE};
+    $self->{MAKEFILE}     ||= $self->{FIRST_MAKEFILE};
+    $self->{MAKEFILE_OLD} ||= $self->{MAKEFILE}.'_old';
     $self->{NOECHO} ||= '@ ';
     $self->{RM_F} = '$(PERL) -e "foreach (@ARGV) { 1 while ( -d $_ ? rmdir $_ : unlink $_)}"';
     $self->{RM_RF} = '$(PERLRUN) -e "use File::Path; @dirs = map(VMS::Filespec::unixify($_),@ARGV); rmtree(\@dirs,0,0)"';
@@ -402,7 +403,9 @@ sub constants {
 	if ($self->{PERL_SRC});
 
     # Fix up file specs
-    foreach $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKE_APERL_FILE MYEXTLIB] ) {
+    foreach $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD 
+                        MAKE_APERL_FILE MYEXTLIB] ) 
+    {
 	next unless defined $self->{$macro};
 	$self->{$macro} = $self->fixpath($self->{$macro},0);
     }
@@ -419,7 +422,8 @@ sub constants {
 	      PERL_LIB PERL_ARCHLIB 
               SITELIBEXP SITEARCHEXP 
               LIBPERL_A MYEXTLIB
-	      FIRST_MAKEFILE MAKEFILE MAKE_APERL_FILE PERLMAINCC PERL_SRC 
+	      FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE 
+              PERLMAINCC PERL_SRC 
               PERL_VMS PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN 
               PERLRUNINST FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
               PERL_CORE NOECHO NOOP
@@ -905,7 +909,6 @@ sub tools_other {
 USEMAKEFILE = /Descrip=
 USEMACROS = /Macro=(
 MACROEND = )
-MAKEFILE = Descrip.MMS
 SHELL = Posix
 TOUCH = $self->{TOUCH}
 CHMOD = $self->{CHMOD}
@@ -1437,7 +1440,7 @@ realclean :: clean
     # combination of macros).  In order to stay below DCL's 255 char limit,
     # we put only 2 on a line.
     my($file,$line,$fcnt);
-    my(@files) = qw{ $(MAKEFILE) $(MAKEFILE)_old };
+    my(@files) = qw{ $(MAKEFILE) $(MAKEFILE_OLD) };
     if ($self->has_link_code) {
 	push(@files,qw{ $(INST_DYNAMIC) $(INST_STATIC) $(INST_BOOT) $(OBJECT) });
     }
@@ -1769,7 +1772,7 @@ $(MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(NOECHO) $(SAY) "$(MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
 	$(NOECHO) $(SAY) "Cleaning current config before rebuilding $(MAKEFILE) ..."
 	- $(MV) $(MAKEFILE) $(MAKEFILE)_old
-	- $(MMS)$(MMSQUALIFIERS) $(USEMAKEFILE)$(MAKEFILE)_old clean
+	- $(MMS)$(MMSQUALIFIERS) $(USEMAKEFILE)$(MAKEFILE_OLD) clean
 	$(PERLRUN) Makefile.PL ],join(' ',map(qq["$_"],@ARGV)),q[
 	$(NOECHO) $(SAY) "$(MAKEFILE) has been rebuilt."
 	$(NOECHO) $(SAY) "Please run $(MMS) to build the extension."

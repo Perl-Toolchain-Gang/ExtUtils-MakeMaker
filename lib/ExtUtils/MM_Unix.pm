@@ -304,7 +304,7 @@ EOT
     push @m, "\t-$self->{RM_RF} @otherfiles\n";
     # See realclean and ext/utils/make_ext for usage of Makefile.old
     push(@m,
-	 "\t-\$(MV) \$(MAKEFILE) \$(MAKEFILE).old \$(DEV_NULL)\n");
+	 "\t-\$(MV) \$(MAKEFILE) \$(MAKEFILE_OLD) \$(DEV_NULL)\n");
     push(@m,
 	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
     join("", @m);
@@ -402,7 +402,8 @@ sub constants {
               PERL_LIB        PERL_ARCHLIB    VENDORLIBEXP
               SITELIBEXP      SITEARCHEXP     VENDORARCHEXP
               LIBPERL_A MYEXTLIB
-	      FIRST_MAKEFILE MAKEFILE MAKE_APERL_FILE PERLMAINCC PERL_SRC
+	      FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE 
+              PERLMAINCC PERL_SRC
 	      PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
               FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
               FULL_AR PERL_CORE NOOP NOECHO
@@ -1681,7 +1682,8 @@ usually solves this kind of problem.
 
 Initializes EXTRALIBS, BSLOADLIBS, LDLOADLIBS, LIBS, LD_RUN_PATH,
 OBJECT, BOOTDEP, PERLMAINCC, LDFROM, LINKTYPE, NOOP, FIRST_MAKEFILE,
-MAKEFILE, NOECHO, RM_F, RM_RF, TEST_F, TOUCH, CP, MV, CHMOD, UMASK_NULL
+MAKEFILE, MAKEFILE_OLD, NOECHO, RM_F, RM_RF, TEST_F, TOUCH, CP, MV,
+CHMOD, UMASK_NULL
 
 =cut
 
@@ -1734,7 +1736,8 @@ sub init_others {	# --- Initialize Other Attributes
     # These get overridden for VMS and maybe some other systems
     $self->{NOOP}  ||= '$(SHELL) -c true';
     $self->{FIRST_MAKEFILE} ||= "Makefile";
-    $self->{MAKEFILE} ||= $self->{FIRST_MAKEFILE};
+    $self->{MAKEFILE}     ||= $self->{FIRST_MAKEFILE};
+    $self->{MAKEFILE_OLD} ||= $self->{MAKEFILE}.'.old';
     $self->{MAKE_APERL_FILE} ||= "Makefile.aperl";
     $self->{NOECHO} = '@' unless defined $self->{NOECHO};
     $self->{RM_F}  ||= "rm -f";
@@ -2633,9 +2636,9 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 $(MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(NOECHO) echo "Makefile out-of-date with respect to $?"
 	$(NOECHO) echo "Cleaning current config before rebuilding Makefile..."
-	$(NOECHO) $(RM_F) $(MAKEFILE).old
-	$(NOECHO) $(MV)   $(MAKEFILE) $(MAKEFILE).old
-	-$(MAKE) -f $(MAKEFILE).old clean $(DEV_NULL) || $(NOOP)
+	$(NOECHO) $(RM_F) $(MAKEFILE_OLD)
+	$(NOECHO) $(MV)   $(MAKEFILE) $(MAKEFILE_OLD)
+	-$(MAKE) -f $(MAKEFILE_OLD) clean $(DEV_NULL) || $(NOOP)
 	$(PERLRUN) Makefile.PL }.join(" ",map(qq["$_"],@ARGV)).q{
 	$(NOECHO) echo "==> Your Makefile has been rebuilt. <=="
 	$(NOECHO) echo "==> Please rerun the make command.  <=="
@@ -3210,7 +3213,7 @@ REALCLEAN
     }
 
     foreach(@{$self->{DIR}}){
-	push(@m, sprintf($sub,$_,'$(MAKEFILE).old','-f $(MAKEFILE).old'));
+	push(@m, sprintf($sub,$_,'$(MAKEFILE_OLD)','-f $(MAKEFILE_OLD)'));
 	push(@m, sprintf($sub,$_,'$(MAKEFILE)',''));
     }
     push(@m, "	\$(RM_RF) \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n");
@@ -3236,7 +3239,7 @@ REALCLEAN
         push @m, "\t\$(RM_F) $line\n" if $line;
     }
     my(@otherfiles) = ('$(MAKEFILE)',
-		       '$(MAKEFILE).old'); # Makefiles last
+		       '$(MAKEFILE_OLD)'); # Makefiles last
     push(@otherfiles, $attribs{FILES})    if $attribs{FILES};
     push(@m, "	\$(RM_RF) @otherfiles\n") if @otherfiles;
     push(@m, "	$attribs{POSTOP}\n")      if $attribs{POSTOP};
