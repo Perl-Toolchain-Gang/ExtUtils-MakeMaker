@@ -94,10 +94,6 @@ sub maybe_command {
     return;
 }
 
-sub file_name_is_absolute {
-    shift;
-    return File::Spec->file_name_is_absolute(@_);
-}
 
 sub find_perl {
     my($self, $ver, $names, $dirs, $trace) = @_;
@@ -136,23 +132,6 @@ in these dirs:
     }
     print STDOUT "Unable to find a perl $ver (by these names: @$names, in these dirs: @$dirs)\n";
     0; # false and not empty
-}
-
-sub catdir {
-    shift;
-    return File::Spec->catdir(@_);
-}
-
-=item catfile
-
-Concatenate one or more directory names and a filename to form a
-complete path ending with a filename
-
-=cut
-
-sub catfile {
-    shift;
-    return File::Spec->catfile(@_);
 }
 
 sub init_others
@@ -341,10 +320,6 @@ PM_TO_BLIB = }.join(" \\\n\t", %{$self->{PM}}).q{
     join('',@m);
 }
 
-
-sub path {
-    return File::Spec->path();
-}
 
 =item static_lib (o)
 
@@ -568,17 +543,6 @@ $(PM_TO_BLIB)
 <<
 	} : '') . $self->{NOECHO}.q{$(TOUCH) $@
 };
-}
-
-=item test_via_harness (o)
-
-Helper method to write the test targets
-
-=cut
-
-sub test_via_harness {
-    my($self, $perl, $tests) = @_;
-    "\t$perl".q! -Mblib -I$(PERL_ARCHLIB) -I$(PERL_LIB) -e "use Test::Harness qw(&runtests $$verbose); $$verbose=$(TEST_VERBOSE); runtests @ARGV;" !."$tests\n";
 }
 
 
