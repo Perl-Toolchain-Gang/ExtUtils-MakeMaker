@@ -3183,6 +3183,7 @@ pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});
+
     $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
     $r .= q{	$(NOECHO) $(TOUCH) $@};
 

@@ -165,6 +165,10 @@ pairs of arguments.  This makes things like this safe:
 sub split_command {
     my($self, $cmd, @args) = @_;
 
+    # If the command was given as a here-doc, there's probably a trailing
+    # newline.
+    chomp $cmd;
+
     my $len_left = $self->max_exec_len - length $cmd;
     $len_left = int($len_left * 0.80);  # set aside 20% for macro expansion.
 
@@ -174,7 +178,7 @@ sub split_command {
         my $arg_str = '';
         while( @args && $len_left > length $arg_str ) {
             # Two at a time to preserve pairs.
-            $arg_str .= "\t". join ' ', splice(@args, 0, 2), "\n";
+            $arg_str .= "\t  ". join ' ', splice(@args, 0, 2), "\n";
         }
         chop $arg_str;
 
@@ -318,21 +322,29 @@ sub manifypods_target {
     my $dependencies  = '';
 
     # populate manXpods & dependencies:
-    foreach my $name (keys %{$self->{MAN1PODS}}) {
-        $man1pods     .= " \\\n\t  $name \\\n\t    $self->{MAN1PODS}->{$name}";
+    foreach my $name (keys %{$self->{MAN1PODS}}, keys %{$self->{MAN3PODS}}) {
         $dependencies .= " \\\n\t$name";
     }
 
     foreach my $name (keys %{$self->{MAN3PODS}}) {
-        $man3pods     .= " \\\n\t  $name \\\n\t    $self->{MAN3PODS}->{$name}";
         $dependencies .= " \\\n\t$name"
     }
 
-    return <<END_OF_TARGET;
+    my $manify = <<END;
 manifypods : pure_all $dependencies
-	\$(NOECHO) \$(POD2MAN_EXE) --section=1 --perm_rw=\$(PERM_RW) $man1pods
-	\$(NOECHO) \$(POD2MAN_EXE) --section=3 --perm_rw=\$(PERM_RW) $man3pods
-END_OF_TARGET
+END
+
+    my @man1_cmds = $self->split_command(<<'CMD', %{$self->{MAN1PODS}});
+	$(NOECHO) $(POD2MAN_EXE) --section=1 --perm_rw=$(PERM_RW)
+CMD
+
+    my @man3_cmds = $self->split_command(<<'CMD', %{$self->{MAN3PODS}});
+	$(NOECHO) $(POD2MAN_EXE) --section=3 --perm_rw=$(PERM_RW)
+CMD
+
+    $manify .= join '', map { "$_\n" } @man1_cmds, @man3_cmds;
+
+    return $manify;
 }
 
 
