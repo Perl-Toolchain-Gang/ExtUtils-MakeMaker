@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.70 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.71 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -688,11 +688,11 @@ sub check_hints {
 
     # Also try without trailing minor version numbers.
     while (1) {
-        last if -f File::Spec->catdir($hint_dir, "$hint.pl");  # found
+        last if -f File::Spec->catfile($hint_dir, "$hint.pl");  # found
     } continue {
         last unless $hint =~ s/_[^_]*$//; # nothing to cut off
     }
-    my $hint_file = File::Spec->catdir($hint_dir, "$hint.pl");
+    my $hint_file = File::Spec->catfile($hint_dir, "$hint.pl");
 
     return unless -f $hint_file;    # really there
 
@@ -1912,7 +1912,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.70 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.71 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
