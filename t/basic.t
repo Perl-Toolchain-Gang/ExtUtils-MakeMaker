@@ -178,13 +178,14 @@ SKIP: {
     }
     close PERLLOCAL;
 
-    ok( open(PACKLIST, $files{'.packlist'} ) ) || 
-        diag("Can't open $files{'.packlist'}: $!");
-    { local $/;
-      local $TODO = 'DESTDIR still in .packlist';
-      unlike(<PACKLIST>, qr/other/, 'DESTDIR should not appear in .packlist');
-    }
-    close PACKLIST;
+# TODO not available in the min version of Test::Harness we require
+#    ok( open(PACKLIST, $files{'.packlist'} ) ) || 
+#        diag("Can't open $files{'.packlist'}: $!");
+#    { local $/;
+#      local $TODO = 'DESTDIR still in .packlist';
+#      unlike(<PACKLIST>, qr/other/, 'DESTDIR should not appear in .packlist');
+#    }
+#    close PACKLIST;
 
     rmtree('other');
 }
