@@ -1,3 +1,14 @@
+6.06_05
+    - Syncing into bleadperl.  Minor nits revealed...
+    - AutoSplit open filehandle bug was fixed in bleadperl.  Averted a
+      warning because of this.
+    - hint files were only being loaded if . happened to be in @INC.
+      A bug/feature of File::Spec was stripping off the current dir from
+      the front of hintfile paths causing Perl to look for them in @INC.
+      Worked around.
+    - Now checking $! for errors if a hint file returns undef
+    - compile test was testing all of perl!  Scaling back to just ExtUtils/
+
 6.06_04 Sun Mar 30 20:34:39 PST 2003
     - Now looking for ExtUtils::xsubpp through @INC rather than just
       the perl core directories.  This helps ExtUtils::ParseXS.
