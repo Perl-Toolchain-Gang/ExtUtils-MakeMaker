@@ -1669,7 +1669,7 @@ sub init_DIRFILESEP {
 
 Initializes AR, AR_STATIC_ARGS, BASEEXT, CONFIG, DISTNAME, DLBASE,
 EXE_EXT, FULLEXT, FULLPERL, FULLPERLRUN, FULLPERLRUNINST, INST_*,
-INSTALL*, INSTALLDIRS, LD, LIB_EXT, LIBPERL_A, MAP_TARGET, NAME,
+INSTALL*, INSTALLDIRS, LIB_EXT, LIBPERL_A, MAP_TARGET, NAME,
 OBJ_EXT, PARENT_NAME, PERL, PERL_ARCHLIB, PERL_INC, PERL_LIB,
 PERL_SRC, PERLRUN, PERLRUNINST, PREFIX, VERSION,
 VERSION_SYM, XS_VERSION.
@@ -1870,7 +1870,6 @@ usually solves this kind of problem.
     $self->{AR_STATIC_ARGS} ||= "cr";
 
     # These should never be needed
-    $self->{LD} ||= 'ld';
     $self->{OBJ_EXT} ||= '.o';
     $self->{LIB_EXT} ||= '.a';
 
@@ -1887,7 +1886,7 @@ usually solves this kind of problem.
 
 =item init_others
 
-Initializes EXTRALIBS, BSLOADLIBS, LDLOADLIBS, LIBS, LD_RUN_PATH,
+Initializes EXTRALIBS, BSLOADLIBS, LDLOADLIBS, LIBS, LD_RUN_PATH, LD,
 OBJECT, BOOTDEP, PERLMAINCC, LDFROM, LINKTYPE, SHELL, NOOP,
 FIRST_MAKEFILE, MAKEFILE_OLD, NOECHO, RM_F, RM_RF, TEST_F,
 TOUCH, CP, MV, CHMOD, UMASK_NULL, ECHO, ECHO_N
@@ -1896,6 +1895,8 @@ TOUCH, CP, MV, CHMOD, UMASK_NULL, ECHO, ECHO_N
 
 sub init_others {	# --- Initialize Other Attributes
     my($self) = shift;
+
+    $self->{LD} ||= 'ld';
 
     # Compute EXTRALIBS, BSLOADLIBS and LDLOADLIBS from $self->{LIBS}
     # Lets look at $self->{LIBS} carefully: It may be an anon array, a string or

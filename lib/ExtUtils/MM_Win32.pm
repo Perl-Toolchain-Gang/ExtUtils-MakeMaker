@@ -181,7 +181,6 @@ sub init_others {
     $self->{TEST_F}   ||= '$(PERLRUN) -MExtUtils::Command -e test_f';
     $self->{DEV_NULL} ||= '> NUL';
 
-    # technically speaking, these should be in init_main()
     $self->{LD}     ||= $Config{ld} || 'link';
     $self->{AR}     ||= $Config{ar} || 'lib';
 
