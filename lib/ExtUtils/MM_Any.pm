@@ -671,9 +671,9 @@ CMD
 
 Generate the metafile target.
 
-Writes the file META.yml, YAML encoded meta-data about the module.  The
-format follows Module::Build's as closely as possible.  Additionally, we
-include:
+Writes the file META.yml YAML encoded meta-data about the module in
+the distdir.  The format follows Module::Build's as closely as
+possible.  Additionally, we include:
 
     version_from
     installdirs
@@ -710,7 +710,7 @@ YAML
     my @write_meta = $self->echo($meta, 'META_new.yml');
 
     return sprintf <<'MAKE_FRAG', join("\n\t", @write_meta);
-metafile :
+metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
 	%s
 	$(IGNORE)$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
@@ -740,7 +740,7 @@ CODE
 
     return sprintf <<'MAKE', $add_meta_to_distdir;
 # Copy, do not move.  We don't know if one was already here.
-distmeta : metafile
+distmeta : create_distdir metafile
 	$(NOECHO) %s
 
 MAKE
@@ -877,7 +877,7 @@ CODE
     my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $add_sign );
 
     return sprintf <<'MAKE', $add_sign_to_dist, $touch_sig, $sign_dist
-distsign :
+distsign : create_distdir
 	$(NOECHO) %s
 	$(NOECHO) %s
 	%s
