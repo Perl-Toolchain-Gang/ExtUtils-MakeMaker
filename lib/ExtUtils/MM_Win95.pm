@@ -26,11 +26,11 @@ sub dist_test {
     my($self) = shift;
     return q{
 disttest : distdir
-        cd $(DISTVNAME)
-        $(ABSPERLRUN) Makefile.PL
-        $(MAKE) $(PASTHRU)
-        $(MAKE) test $(PASTHRU)
-        cd ..
+	cd $(DISTVNAME)
+	$(ABSPERLRUN) Makefile.PL
+	$(MAKE) $(PASTHRU)
+	$(MAKE) test $(PASTHRU)
+	cd ..
 };
 }
 
