@@ -162,6 +162,20 @@ MAKE_FRAG
     return $clean;
 }
     
+=back
+
+
+=head1 AUTHOR
+
+Code originally inside MM_Win32.  Original author unknown.  
+
+Currently maintained by Michael G Schwern <schwern@pobox.com>.
+
+Send patches and ideas to <F<makemaker@perl.org>>.
+
+See http://www.makemaker.org.
+
+=cut
 
 
 1;
