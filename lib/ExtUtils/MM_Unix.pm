@@ -3138,12 +3138,12 @@ pm_to_blib: $(TO_INST_PM)
 	my $la = length $pm;
 	my $lb = length $blib;
 	if ($l + $la + $lb + @a / 2 > 200) { # limit line length
-	    _pm_to_blib_flush($self, $autodir, \$r, \@a, \$l);
+	    $self->_pm_to_blib_flush($autodir, \$r, \@a, \$l);
         }
         push @a, $pm, $blib;
 	$l += $la + $lb;
     }
-    _pm_to_blib_flush($self, $autodir, \$r, \@a, \$l);
+    $self->_pm_to_blib_flush($autodir, \$r, \@a, \$l);
     return $r.q{	}.$self->{NOECHO}.q{$(TOUCH) $@};
 }
 
