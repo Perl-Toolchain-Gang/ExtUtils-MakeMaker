@@ -12,7 +12,7 @@ require Exporter;
 $VERSION = 0.02;
 
 @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
-             make make_run make_macro calibrate_mtime
+             make make_run run make_macro calibrate_mtime
             );
 
 my $Is_VMS   = $^O eq 'VMS';
@@ -38,6 +38,8 @@ MakeMaker::Test::Utils - Utility routines for testing MakeMaker
   make_macro($make, $targ, %macros);
 
   my $mtime         = calibrate_mtime;
+
+  my $out           = run($cmd);
 
 =head1 DESCRIPTION
 
@@ -229,6 +231,35 @@ sub calibrate_mtime {
     unlink 'calibrate_mtime.tmp';
     return $mtime;
 }
+
+=item B<run>
+
+  my $out = run($command);
+  my @out = run($command);
+
+Runs the given $command as an external program returning at least STDOUT
+as $out.  If possible it will return STDOUT and STDERR combined as you
+would expect to see on a screen.
+
+=cut
+
+sub run {
+    my $cmd = shift;
+
+    require ExtUtils::MM;
+
+    # Unix can handle 2>&1 and from 5.8 on `` emulates 2>&1 except
+    # MacPerl.
+    if( MM->os_flavor_is('Unix') or
+        ($] >= 5.008 and !MM->os_flavor_is('MacOS Classic'))
+      ) 
+    {
+        return `$cmd 2>&1`;
+    }
+    else {
+        return `$cmd`;
+    }
+}    
 
 =back
 
