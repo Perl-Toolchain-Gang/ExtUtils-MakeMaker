@@ -29,11 +29,11 @@ $stdout = tie *STDOUT, 'TieOut' or die;
 {
     my $warning = '';
     local $SIG{__WARN__} = sub { $warning = join '', @_ };
-    $MM->eval_in_subdirs;
+    eval { $MM->eval_in_subdirs; };
 
     is( $stdout->read, qq{\@INC has .\n}, 'cwd in @INC' );
-    like( $warning, 
-          qr{^WARNING from evaluation of .*subdir.*Makefile.PL: YYYAaaaakkk},
+    like( $@, 
+          qr{^ERROR from evaluation of .*subdir.*Makefile.PL: YYYAaaaakkk},
           'Makefile.PL death in subdir warns' );
 
     untie *STDOUT;
