@@ -34,12 +34,26 @@ WriteMakefile(
                          DirHandle          => 0,
                        },
     INSTALLDIRS     => 'perl',
-    EXE_FILES       => [qw(bin/instmodsh bin/xsubpp)]
+    EXE_FILES       => [qw(bin/instmodsh)],
 );
 
 
 {
     package MY;
+
+    use File::Spec;
+
+    my $lib;
+    BEGIN { $lib = File::Spec->rel2abs('lib'); }
+
+    # Make sure PERLRUN uses the MakeMaker about to be installed
+    # and not the currently installed one.
+    sub constants {
+        my($self) = shift;
+        $self->{PERLRUN} .= qq{ "-I$lib"};
+        $self->{PERLRUNINST} .= qq{ "-I$lib"};
+        $self->SUPER::constants;
+    }
 
     sub test_via_harness {
         my($self, $orig_perl, $tests) = @_;
