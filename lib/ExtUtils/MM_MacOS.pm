@@ -577,21 +577,6 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     }
 }
 
-=item libscan (o)
-
-Takes a path to a file that is found by init_dirscan and returns false
-if we don't want to include this file in the library. Mainly used to
-exclude RCS, CVS, and SCCS directories from installation.
-
-=cut
-
-# ';
-
-sub libscan {
-    my($self,$path) = @_;
-    return '' if $path =~ m/:(RCS|CVS|SCCS):/ ;
-    $path;
-}
 
 =item constants (o)
 

@@ -257,6 +257,27 @@ sub test_via_script {
     return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" $script\n};
 }
 
+=item libscan
+
+  my $wanted = $self->libscan($path);
+
+Takes a path to a file or dir and returns an empty string if we don't
+want to include this file in the library.  Otherwise it returns the
+the $path unchanged.
+
+Mainly used to exclude RCS, CVS, and SCCS directories from
+installation.
+
+=cut
+
+sub libscan {
+    my($self,$path) = @_;
+    my($dirs,$file) = (File::Spec->splitpath($path))[1,2];
+    return '' if grep /^RCS|CVS|SCCS$/, File::Spec->splitdir($dirs), $file;
+    
+    return $path;
+}
+
 =back
 
 =head1 Abstract methods
