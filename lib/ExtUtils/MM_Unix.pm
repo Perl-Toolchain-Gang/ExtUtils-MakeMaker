@@ -1237,7 +1237,7 @@ WARNING
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace >= 2);
 
-            my $version_check = qq{$abs -e "require $ver; print qq{VER_OK\n}"};
+            my $version_check = qq{$abs -le "require $ver; print qq{VER_OK}"};
             # To avoid using the unportable 2>&1 to supress STDERR,
             # we close it before running the command.
             # However, thanks to a thread library bug in many BSDs
