@@ -82,7 +82,10 @@ sub _write_os2 {
     }
     my $distname = $data->{DISTNAME} || $data->{NAME};
     $distname = "Distribution $distname";
-    my $comment = "Perl (v$Config::Config{version}$threaded) module $data->{NAME}";
+    my $patchlevel = " pl$Config{perl_patchlevel}" || '';
+    my $comment = sprintf "Perl (v%s%s%s) module %s", 
+      $Config::Config{version}, $threaded, $patchlevel, $data->{NAME};
+    chomp $comment;
     if ($data->{INSTALLDIRS} and $data->{INSTALLDIRS} eq 'perl') {
 	$distname = 'perl5-porters@perl.org';
 	$comment = "Core $comment";
