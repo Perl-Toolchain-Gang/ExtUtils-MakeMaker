@@ -1261,9 +1261,10 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     @ignore{qw(Makefile.PL test.pl t)} = (1,1,1);
 
     # ignore the distdir
-    $ignore{$self->{DISTVNAME}} = 1;
+    $Is_VMS ? $ignore{"$self->{DISTVNAME}.dir"} = 1
+            : $ignore{$self->{DISTVNAME}} = 1;
 
-    $ignore{'makefile.pl'} = 1 if $Is_VMS;
+    @ignore{map lc, keys %ignore} = values %ignore if $Is_VMS;
 
     foreach $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
@@ -2499,7 +2500,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
     push @m, q{
 # We take a very conservative approach here, but it\'s worth it.
 # We move Makefile to Makefile.old here to avoid gnu make looping.
-}.$self->{MAKEFILE}.q{ : Makefile.PL $(CONFIGDEP)
+}.$self->{MAKEFILE}.q{ :: Makefile.PL $(CONFIGDEP)
 	}.$self->{NOECHO}.q{echo "Makefile out-of-date with respect to $?"
 	}.$self->{NOECHO}.q{echo "Cleaning current config before rebuilding Makefile..."
 	-}.$self->{NOECHO}.q{$(RM_F) }."$self->{MAKEFILE}.old".q{
@@ -2510,10 +2511,6 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 	}.$self->{NOECHO}.q{echo "==> Please rerun the make command.  <=="
 	false
 
-# To change behavior to :: would be nice, but would break Tk b9.02
-# so you find such a warning below the dist target.
-#}.$self->{MAKEFILE}.q{ :: $(VERSION_FROM)
-#	}.$self->{NOECHO}.q{echo "Warning: Makefile possibly out of date with $(VERSION_FROM)"
 };
 
     join "", @m;
