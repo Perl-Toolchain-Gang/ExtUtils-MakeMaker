@@ -13,6 +13,10 @@ use lib qw(lib);    # build ourself with ourself
 use ExtUtils::MakeMaker;
 use File::Spec;
 
+die "You have File::Spec version $File::Spec::VERSION\n".
+    "ExtUtils::MakeMaker requires File::Spec >= 0.8 to build at all.\n"
+  if $File::Spec::VERSION < 0.8;
+
 $PACKAGE = 'ExtUtils::MakeMaker';
 ($PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
 $LAST_API_CHANGE = 5.50;
@@ -35,10 +39,7 @@ CHANGE_WARN
 # Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
 # when a test had -T.  This made it too long.  So we need a Test::Harness
 # > 2.00 on VMS for t/testlib.t
-my %prereq = ( File::Spec         => 0.8,
-               File::Basename     => 0,
-               DirHandle          => 0,
-             );
+my %prereq = ( );
 $prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 
 
@@ -47,8 +48,14 @@ my $MM = WriteMakefile(
     VERSION_FROM    => "lib/$PACKAGE_FILE.pm", # finds $VERSION
     PREREQ_PM       => { %prereq,
 
+                         # splitpath(), rel2abs()
+                         File::Spec         => 0.8,
+
                          # manifypods needs Pod::Man
                          Pod::Man   => 0,
+
+                         File::Basename     => 0,
+                         DirHandle          => 0,
                        },
     INSTALLDIRS     => 'perl',
     EXE_FILES       => [qw(bin/instmodsh)],
