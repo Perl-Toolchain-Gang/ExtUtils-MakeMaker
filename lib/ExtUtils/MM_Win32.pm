@@ -1,6 +1,6 @@
 package ExtUtils::MM_Win32;
 
-our $VERSION = '1.00';
+our $VERSION = '1.00_01';
 
 =head1 NAME
 
@@ -144,6 +144,8 @@ sub file_name_is_absolute {
 
 sub find_perl {
     my($self, $ver, $names, $dirs, $trace) = @_;
+    $trace ||= 0;
+
     my($name, $dir);
     if ($trace >= 2){
 	print "Looking for perl $ver by these names:
