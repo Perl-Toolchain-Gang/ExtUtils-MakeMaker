@@ -2508,8 +2508,8 @@ doc_site_install ::
 		>> }.$self->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
 
 doc_vendor_install ::
-	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLVENDORLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(INSTALLVENDORLIB)
+	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLVENDORARCH)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(INSTALLVENDORARCH)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLVENDORLIB)" \
