@@ -628,7 +628,7 @@ YAML
 
     my @write_meta = $self->echo($meta, 'META_new.yml');
     my $move = $self->oneliner(<<'CODE', ['-MExtUtils::Command', '-MFile::Compare']);
-compare(@ARGV) != 0 ? (mv or warn "Cannot move @ARGV: $!\n") : unlink(shift);
+compare(@ARGV) != 0 ? (mv or warn "Cannot move @ARGV: $$!\n") : unlink(shift);
 CODE
 
     return sprintf <<'MAKE_FRAG', join("\n\t", @write_meta), $move;
