@@ -1,3 +1,7 @@
+6.15 Sun Aug  3 16:41:05 PDT 2003
+    - Make FIXIN on Win32 use the new pl2bat rather than an already
+      installed one when building the core (Mattia Barbon)
+
 6.14 Sun Aug  3 16:23:27 PDT 2003
     - Adding a reference to the Module::Build META.yml spec in the META.yml
       itself and the metafile documentation.
