@@ -1990,9 +1990,17 @@ sub init_PERL {
     ($self->{FULLPERL} = $self->{PERL}) =~ s/miniperl/perl/i
 	unless $self->{FULLPERL};
 
-    $self->{ABSPERL} = File::Spec->file_name_is_absolute($self->{PERL})
-                                    ? '$(PERL)'
-                                    : File::Spec->rel2abs($self->{PERL});
+    if( File::Spec->file_name_is_absolute($self->{PERL}) ) {
+        $self->{ABSPERL} = '$(PERL)';
+    }
+    else {
+        # Little hack to get around VMS's find_perl putting "MCR" in front
+        # sometimes.
+        $self->{ABSPERL} = $self->{PERL};
+        my $has_mcr = $self->{ABSPERL} =~ s/^MCR\s*//;
+        File::Spec->rel2abs($self->{ABSPERL});
+        $self->{ABSPERL} = 'MCR '.$self->{ABSPERL} if $has_mcr;
+    }
 
     # Are we building the core?
     $self->{PERL_CORE} = 0 unless exists $self->{PERL_CORE};
