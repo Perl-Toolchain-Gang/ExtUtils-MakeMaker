@@ -432,19 +432,23 @@ sub constants {
     my($self) = @_;
     my @m = ();
 
-    for my $macro (qw/
+    for my $macro (qw(
 
               AR_STATIC_ARGS DIRFILESEP
               NAME NAME_SYM 
               VERSION    VERSION_MACRO    VERSION_SYM DEFINE_VERSION
               XS_VERSION XS_VERSION_MACRO             XS_DEFINE_VERSION
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
+              INST_MAN1DIR INST_MAN3DIR
+              MAN1EXT      MAN3EXT
               INSTALLDIRS
               DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
-              INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
-              INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
-              INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
+                   ),
+                   (map { ("INSTALL".$_,
+                          "DESTINSTALL".$_)
+                        } $self->installvars),
+                   qw(
               PERL_LIB    
               PERL_ARCHLIB
               LIBPERL_A MYEXTLIB
@@ -456,7 +460,7 @@ sub constants {
               PERL_CORE
               PERM_RW PERM_RWX
 
-	      / ) 
+	      ) ) 
     {
 	next unless defined $self->{$macro};
 
@@ -497,17 +501,6 @@ H_FILES  = ".$self->wraplist(@{$self->{H}})."
 MAN1PODS = ".$self->wraplist(sort keys %{$self->{MAN1PODS}})."
 MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS}})."
 ";
-
-    for my $macro (qw/
-	      INST_MAN1DIR  MAN1EXT
-              INSTALLMAN1DIR INSTALLSITEMAN1DIR INSTALLVENDORMAN1DIR
-	      INST_MAN3DIR  MAN3EXT
-              INSTALLMAN3DIR INSTALLSITEMAN3DIR INSTALLVENDORMAN3DIR
-	      /) 
-    {
-	next unless defined $self->{$macro};
-	push @m, "$macro = $self->{$macro}\n";
-    }
 
 
     push @m, q{
@@ -607,6 +600,28 @@ $targ :: $src
     }
     join "", @m;
 }
+
+=item init_DEST
+
+  $mm->init_DEST
+
+Defines the DESTDIR and DEST* variables paralleling the INSTALL*.
+
+=cut
+
+sub init_DEST {
+    my $self = shift;
+
+    # Initialize DESTDIR
+    $self->{DESTDIR} ||= '';
+
+    # Make DEST variables.
+    foreach my $var ($self->installvars) {
+        my $destvar = 'DESTINSTALL'.$var;
+        $self->{$destvar} ||= '$(DESTDIR)'.'$(INSTALL'.$var.')';
+    }
+}
+
 
 =item init_dist
 
@@ -2080,7 +2095,6 @@ sub init_INSTALL {
     }
 
     # Add DESTDIR.
-    $self->{DESTDIR} ||= '';
     foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
         $self->{$prefix} = '$(DESTDIR)'.$self->{$prefix};
     }

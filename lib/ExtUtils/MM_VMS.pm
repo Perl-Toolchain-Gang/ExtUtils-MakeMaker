@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.68';
-($Revision) = q$Revision: 1.101 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.102 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -301,6 +301,26 @@ sub replace_manpage_separator {
     $man =~ s#/+#__#g;
     $man;
 }
+
+=item init_DEST
+
+(override) Because of the difficulty concatenating VMS filepaths we
+must pre-expand the DEST* variables.
+
+=cut
+
+sub init_DEST {
+    my $self = shift;
+
+    $self->SUPER::init_DEST;
+
+    # Expand DEST variables.
+    foreach my $var ($self->installvars) {
+        my $destvar = 'DESTINSTALL'.$var;
+        $self->{$destvar} = File::Spec->eliminate_macros($self->{$destvar});
+    }
+}
+
 
 =item init_DIRFILESEP
 
