@@ -23,7 +23,7 @@ use strict;
 
 $VERSION = '6.26_01';
 ($Revision  # can't put this all on one line or SVN/K gets confused about
-            # $Revision$
+            # $Revision
    = $Revision$) =~ /Revision:\s+(\S+)/;
 
 @ISA = qw(Exporter);
