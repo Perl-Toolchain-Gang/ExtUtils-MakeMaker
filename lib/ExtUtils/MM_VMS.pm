@@ -430,7 +430,7 @@ sub constants {
 	      PERL_ARCHLIB SITELIBEXP SITEARCHEXP LIBPERL_A MYEXTLIB
 	      FIRST_MAKEFILE MAKE_APERL_FILE PERLMAINCC PERL_SRC PERL_VMS
 	      PERL_INC PERL FULLPERL PERLRUN PERLRUNINST TEST_LIBS 
-	      PERL_CORE
+	      PERL_CORE NOECHO NOOP
 	      / ) {
 	next unless defined $self->{$macro};
 	push @m, "$macro = $self->{$macro}\n";
@@ -508,6 +508,7 @@ MAN3PODS = ',$self->wraplist(sort keys %{$self->{MAN3PODS}}),'
 
 push @m,"
 makemakerdflt : all
+	\$(NOECHO) \$(NOOP)
 
 .SUFFIXES :
 .SUFFIXES : \$(OBJ_EXT) .c .cpp .cxx .xs
@@ -907,8 +908,6 @@ RM_F  = $self->{RM_F}
 RM_RF = $self->{RM_RF}
 SAY = Write Sys\$Output
 UMASK_NULL = $self->{UMASK_NULL}
-NOOP = $self->{NOOP}
-NOECHO = $self->{NOECHO}
 MKPATH = Create/Directory
 EQUALIZE_TIMESTAMP = \$(PERL) -we "open F,qq{>\$ARGV[1]};close F;utime(0,(stat(\$ARGV[0]))[9]+1,\$ARGV[1])"
 !. ($self->{PARENT} ? '' : 
@@ -1347,9 +1346,6 @@ sub installbin {
     @to = values %fromto;
     push @m, "
 EXE_FILES = @exefiles
-
-all :: @to
-	\$(NOECHO) \$(NOOP)
 
 realclean ::
 ";
