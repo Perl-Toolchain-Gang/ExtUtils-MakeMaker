@@ -45,8 +45,8 @@ my $mm = WriteMakefile(
 like( $stdout->read, qr{
                         Writing\ $Makefile\ for\ Big::Fat::Liar\n
                         Big::Fat::Liar's\ vars\n
-                        INST_LIB\ =.*\n
-                        INST_ARCH\ =.*\n
+                        INST_LIB\ =\ \S+\n
+                        INST_ARCHLIB\ =\ \S+\n
                         Writing\ $Makefile\ for\ Big::Fat::Dummy\n
 }x );
 undef $stdout;
