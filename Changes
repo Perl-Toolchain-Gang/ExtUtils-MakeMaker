@@ -1,6 +1,7 @@
-6.25_12
+6.25_12 Fri Mar 18 16:15:35 PST 2005
     - Use the generic dmake search.cpan.org URL in the README so the newest
       version is found.
+    - Fixed pm_to_blib trouble on VMS introduced in 6.25_10.
 
 6.25_11 Tue Mar 15 02:00:20 PST 2005
     - Fixed minor parent class dependency loop in ExtUtils::MM_Any.
