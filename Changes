@@ -9,6 +9,8 @@
     - [rt.cpan.org 2591] some LD_RUN_PATH thing (Marek Rouchal)
     - Added core.\d+ files to 'make clean' [rt.cpan.org 2543] (Slaven Rezic)
     - INST_* targets were expanded too early (Stas Bekman)
+    - Adding ExtUtils::MakeMaker::bytes (bytes.pm backwards compat wrapper)
+    - Fixing MM_MacOS so it will compile on 5.5.x machines (use bytes wrapper)
 
 6.10_03 Fri Apr 11 00:21:25 PDT 2003
     * Added NO_META WriteMakefile() option to suppress generation of

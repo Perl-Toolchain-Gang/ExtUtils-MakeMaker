@@ -8,6 +8,7 @@ lib/ExtUtils/Installed.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
 lib/ExtUtils/MakeMaker.pm
+lib/ExtUtils/MakeMaker/bytes.pm
 lib/ExtUtils/MakeMaker/FAQ.pod
 lib/ExtUtils/MakeMaker/Tutorial.pod
 lib/ExtUtils/MakeMaker/vmsish.pm
@@ -42,6 +43,7 @@ t/00compile.t
 t/00setup_dummy.t
 t/backwards.t
 t/basic.t
+t/bytes.t
 t/Command.t
 t/hints.t
 t/INST.t
@@ -73,6 +75,7 @@ t/prompt.t
 t/split_command.t
 t/testlib.t
 t/VERSION_FROM.t
+t/vmsish.t
 t/writemakefile_args.t
 t/zz_cleanup_dummy.t
 TODO
