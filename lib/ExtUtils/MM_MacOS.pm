@@ -61,7 +61,8 @@ sub new {
 	if (ref $self->{CONFIGURE} eq 'CODE') {
 	    $self = { %$self, %{&{$self->{CONFIGURE}}}};
 	} else {
-	    Carp::croak "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
+            require Carp;
+	    Carp::croak("Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n");
 	}
     }
 
