@@ -321,18 +321,21 @@ $self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
 These are methods which produce make targets.
 
 
-=head3 dir_target B<DEPRECATED>
+=head3 all_target
 
-    my $make_frag = $mm->dir_target(@directories);
-
-I<This function is deprecated> its use is no longer necessary and is
-I<only provided for backwards compatibility>.  It is now a no-op.
-blibdirs_target provides a much simpler mechanism and pm_to_blib() can
-create its own directories anyway.
+Generate the default target 'all'.
 
 =cut
 
-sub dir_target {}
+sub all_target {
+    my $self = shift;
+
+    return <<'MAKE_EXT';
+all :: pure_all
+	$(NOECHO) $(NOOP)
+MAKE_EXT
+
+}
 
 
 =head3 blibdirs_target
@@ -363,6 +366,40 @@ sub blibdirs_target {
 MAKE
 
     return $make;
+}
+
+
+=head3 dir_target B<DEPRECATED>
+
+    my $make_frag = $mm->dir_target(@directories);
+
+I<This function is deprecated> its use is no longer necessary and is
+I<only provided for backwards compatibility>.  It is now a no-op.
+blibdirs_target provides a much simpler mechanism and pm_to_blib() can
+create its own directories anyway.
+
+=cut
+
+sub dir_target {}
+
+
+=head3 makemakerdflt_target
+
+  my $make_frag = $mm->makemakerdflt_target
+
+Returns a make fragment with the makemakerdeflt_target specified.
+This target is the first target in the Makefile, is the default target
+and simply points off to 'all' just in case any make variant gets
+confused or something gets snuck in before the real 'all' target.
+
+=cut
+
+sub makemakerdflt_target {
+    return <<'MAKE_FRAG';
+makemakerdflt: all
+	$(NOECHO) $(NOOP)
+MAKE_FRAG
+
 }
 
 
@@ -407,69 +444,6 @@ CMD
     $manify .= join '', map { "$_\n" } @man_cmds;
 
     return $manify;
-}
-
-
-=head3 makemakerdflt_target
-
-  my $make_frag = $mm->makemakerdflt_target
-
-Returns a make fragment with the makemakerdeflt_target specified.
-This target is the first target in the Makefile, is the default target
-and simply points off to 'all' just in case any make variant gets
-confused or something gets snuck in before the real 'all' target.
-
-=cut
-
-sub makemakerdflt_target {
-    return <<'MAKE_FRAG';
-makemakerdflt: all
-	$(NOECHO) $(NOOP)
-MAKE_FRAG
-
-}
-
-
-=head3 special_targets
-
-  my $make_frag = $mm->special_targets
-
-Returns a make fragment containing any targets which have special
-meaning to make.  For example, .SUFFIXES and .PHONY.
-
-=cut
-
-sub special_targets {
-    my $make_frag = <<'MAKE_FRAG';
-.SUFFIXES: .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
-
-.PHONY: all config static dynamic test linkext manifest
-
-MAKE_FRAG
-
-    $make_frag .= <<'MAKE_FRAG' if $ENV{CLEARCASE_ROOT};
-.NO_CONFIG_REC: Makefile
-
-MAKE_FRAG
-
-    return $make_frag;
-}
-
-
-=head3 all_target
-
-Generate the default target 'all'.
-
-=cut
-
-sub all_target {
-    my $self = shift;
-
-    return <<'MAKE_EXT';
-all :: pure_all
-	$(NOECHO) $(NOOP)
-MAKE_EXT
-
 }
 
 
@@ -530,27 +504,6 @@ MAKE_FRAG
 }
 
 
-=head3 signature_target
-
-    my $target = $mm->signature_target;
-
-Generate the signature target.
-
-Writes the file SIGNATURE with "cpansign -s".
-
-=cut
-
-sub signature_target {
-    my $self = shift;
-
-    return <<'MAKE_FRAG';
-signature : signature_addtomanifest
-	cpansign -s
-MAKE_FRAG
-
-}
-
-
 =head3 metafile_addtomanifest_target
 
   my $target = $mm->metafile_addtomanifest_target
@@ -576,6 +529,27 @@ CODE
 metafile_addtomanifest:
 	$(NOECHO) $(ECHO) Adding META.yml to MANIFEST
 	$(NOECHO) %s
+MAKE_FRAG
+
+}
+
+
+=head3 signature_target
+
+    my $target = $mm->signature_target;
+
+Generate the signature target.
+
+Writes the file SIGNATURE with "cpansign -s".
+
+=cut
+
+sub signature_target {
+    my $self = shift;
+
+    return <<'MAKE_FRAG';
+signature : signature_addtomanifest
+	cpansign -s
 MAKE_FRAG
 
 }
@@ -611,13 +585,37 @@ MAKE_FRAG
 }
 
 
+=head3 special_targets
+
+  my $make_frag = $mm->special_targets
+
+Returns a make fragment containing any targets which have special
+meaning to make.  For example, .SUFFIXES and .PHONY.
+
+=cut
+
+sub special_targets {
+    my $make_frag = <<'MAKE_FRAG';
+.SUFFIXES: .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
+
+.PHONY: all config static dynamic test linkext manifest
+
+MAKE_FRAG
+
+    $make_frag .= <<'MAKE_FRAG' if $ENV{CLEARCASE_ROOT};
+.NO_CONFIG_REC: Makefile
+
+MAKE_FRAG
+
+    return $make_frag;
+}
+
+
 
 
 =head2 Init methods
 
 Methods which help initialize the MakeMaker object and macros.
-
-
 
 
 =head3 init_VERSION  I<Abstract>
