@@ -57,6 +57,7 @@ sub expand_wildcards
  @ARGV = map(/[$wild_regex]/o ? glob($_) : $_,@ARGV);
 }
 
+
 =item cat 
 
 Concatenates all files mentioned on command line to STDOUT.
@@ -78,8 +79,7 @@ Sets modified time of dst to that of src
 sub eqtime
 {
  my ($src,$dst) = @ARGV;
- open(F,">$dst");
- close(F);
+ local @ARGV = ($dst);  touch();  # in case $dst doesn't exist
  utime((stat($src))[8,9],$dst);
 }
 
@@ -120,17 +120,14 @@ Makes files exist, with current timestamp
 
 =cut 
 
-sub touch
-{
- my $t    = time;
- expand_wildcards();
- while (@ARGV)
-  {
-   my $file = shift(@ARGV);
-   open(FILE,">>$file") || die "Cannot write $file:$!";
-   close(FILE);
-   utime($t,$t,$file);
-  }
+sub touch {
+    my $t    = time;
+    expand_wildcards();
+    foreach my $file (@ARGV) {
+        open(FILE,">>$file") || die "Cannot write $file:$!";
+        close(FILE);
+        utime($t,$t,$file);
+    }
 }
 
 =item mv source... destination
@@ -140,16 +137,13 @@ Multiple sources are allowed if destination is an existing directory.
 
 =cut 
 
-sub mv
-{
- my $dst = pop(@ARGV);
- expand_wildcards();
- croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
- while (@ARGV)
-  {
-   my $src = shift(@ARGV);
-   move($src,$dst);
-  }
+sub mv {
+    my $dst = pop(@ARGV);
+    expand_wildcards();
+    croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
+    foreach my $src (@ARGV) {
+        move($src,$dst);
+    }
 }
 
 =item cp source... destination
@@ -159,16 +153,13 @@ Multiple sources are allowed if destination is an existing directory.
 
 =cut
 
-sub cp
-{
- my $dst = pop(@ARGV);
- expand_wildcards();
- croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
- while (@ARGV)
-  {
-   my $src = shift(@ARGV);
-   copy($src,$dst);
-  }
+sub cp {
+    my $dst = pop(@ARGV);
+    expand_wildcards();
+    croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
+    foreach my $src (@ARGV) {
+        copy($src,$dst);
+    }
 }
 
 =item chmod mode files...
@@ -177,11 +168,10 @@ Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 
 =cut 
 
-sub chmod
-{
- my $mode = shift(@ARGV);
- expand_wildcards();
- chmod(oct $mode,@ARGV) || die "Cannot chmod ".join(' ',$mode,@ARGV).":$!";
+sub chmod {
+    my $mode = shift(@ARGV);
+    expand_wildcards();
+    chmod(oct $mode,@ARGV) || die "Cannot chmod ".join(' ',$mode,@ARGV).":$!";
 }
 
 =item mkpath directory...
