@@ -22,9 +22,7 @@ use vars qw($Revision);
 use strict;
 
 $VERSION = '6.27';
-($Revision  # can't put this all on one line or SVN/K gets confused about
-            # $Revision
-   = q$Revision$) =~ /Revision:\s+(\S+)/;
+($Revision = q$Revision$) =~ /Revision:\s+(\S+)/;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
