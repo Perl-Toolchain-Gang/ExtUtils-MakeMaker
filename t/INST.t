@@ -66,7 +66,7 @@ is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );
 
 my($perl_src, $mm_perl_src);
 if( $ENV{PERL_CORE} ) {
-    $perl_src = File::Spec->catdir($Updir, $Updir, $Updir);
+    $perl_src = File::Spec->catdir($Updir, $Updir, $Updir, $Updir);
     $perl_src = File::Spec->canonpath($perl_src);
     $mm_perl_src = File::Spec->canonpath($mm->{PERL_SRC});
 }
@@ -83,7 +83,9 @@ is( $mm->{PERM_RWX}, 755,    'PERM_RWX' );
 
 
 # INST_*
-is( $mm->{INST_ARCHLIB}, File::Spec->catdir($Curdir, 'blib', 'arch'),
+is( $mm->{INST_ARCHLIB}, 
+    $mm->{PERL_CORE} ? $mm->{PERL_ARCHLIB}
+                     : File::Spec->catdir($Curdir, 'blib', 'arch'),
                                      'INST_ARCHLIB');
 is( $mm->{INST_BIN},     File::Spec->catdir($Curdir, 'blib', 'bin'),
                                      'INST_BIN' );
@@ -91,14 +93,17 @@ is( $mm->{INST_BIN},     File::Spec->catdir($Curdir, 'blib', 'bin'),
 is( keys %{$mm->{CHILDREN}}, 1 );
 my($child_pack) = keys %{$mm->{CHILDREN}};
 my $c_mm = $mm->{CHILDREN}{$child_pack};
-is( $c_mm->{INST_ARCHLIB}, File::Spec->catdir($Updir, 'blib', 'arch'),
+is( $c_mm->{INST_ARCHLIB}, 
+    $c_mm->{PERL_CORE} ? $c_mm->{PERL_ARCHLIB}
+                       : File::Spec->catdir($Updir, 'blib', 'arch'),
                                      'CHILD INST_ARCHLIB');
 is( $c_mm->{INST_BIN},     File::Spec->catdir($Updir, 'blib', 'bin'),
                                      'CHILD INST_BIN' );
 
 
 my $inst_lib = File::Spec->catdir($Curdir, 'blib', 'lib');
-is( $mm->{INST_LIB}, $inst_lib,     'INST_LIB' );
+is( $mm->{INST_LIB}, 
+    $mm->{PERL_CORE} ? $mm->{PERL_LIB} : $inst_lib,     'INST_LIB' );
 
 
 # INSTALL*
