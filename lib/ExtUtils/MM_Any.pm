@@ -133,9 +133,98 @@ sub updir {
 =head1 Thought To Be Cross-Platform Methods
 
 These are methods which are thought to be cross-platform by virtue of
-having been written in a way to avoid incompatibilities.
+having been written in a way to avoid incompatibilities.  They may
+require partial overrides.
 
 =over 4
+
+=item init_VERSION
+
+    $mm->init_VERSION
+
+Initialize macros representing versions of MakeMaker and other tools
+
+MAKEMAKER: path to the MakeMaker module.
+
+MM_VERSION: ExtUtils::MakeMaker Version
+
+MM_REVISION: ExtUtils::MakeMaker version control revision (for backwards 
+             compat)
+
+VERSION: version of your module
+
+VERSION_MACRO: which macro represents the version (usually 'VERSION')
+
+VERSION_SYM: like version but safe for use as an RCS revision number
+
+DEFINE_VERSION: -D line to set the module version when compiling
+
+XS_VERSION: version in your .xs file.  Defaults to $(VERSION)
+
+XS_VERSION_MACRO: which macro represents the XS version.
+
+XS_DEFINE_VERSION: -D line to set the xs version when compiling.
+
+Called by init_main.
+
+=cut
+
+sub init_VERSION {
+    my($self) = shift;
+
+    $self->{MAKEMAKER}  = $INC{'ExtUtils/MakeMaker.pm'};
+    $self->{MM_VERSION} = $ExtUtils::MakeMaker::VERSION;
+    $self->{MM_REVISION}= $ExtUtils::MakeMaker::Revision;
+
+    if ($self->{VERSION_FROM}){
+        $self->{VERSION} = $self->parse_version($self->{VERSION_FROM});
+        if( $self->{VERSION} eq 'undef' ) {
+            require Carp;
+            Carp::carp("WARNING: Setting VERSION via file ".
+                       "'$self->{VERSION_FROM}' failed\n");
+        }
+    }
+
+    # strip blanks
+    if (defined $self->{VERSION}) {
+        $self->{VERSION} =~ s/^\s+//;
+        $self->{VERSION} =~ s/\s+$//;
+    }
+    else {
+        $self->{VERSION} = '';
+    }
+
+
+    $self->{VERSION_MACRO}  = 'VERSION';
+    ($self->{VERSION_SYM} = $self->{VERSION}) =~ s/\W/_/g;
+    $self->{DEFINE_VERSION} = '-D$(VERSION_MACRO)=\"$(VERSION)\"';
+
+
+    # Graham Barr and Paul Marquess had some ideas how to ensure
+    # version compatibility between the *.pm file and the
+    # corresponding *.xs file. The bottomline was, that we need an
+    # XS_VERSION macro that defaults to VERSION:
+    $self->{XS_VERSION} ||= $self->{VERSION};
+
+    $self->{XS_VERSION_MACRO}  = 'XS_VERSION';
+    $self->{XS_DEFINE_VERSION} = '-D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"';
+    
+}
+
+=item wraplist
+
+Takes an array of items and turns them into a well-formatted list of
+arguments.  In most cases this is simply something like:
+
+    FOO \
+    BAR \
+    BAZ
+
+=cut
+
+sub wraplist {
+    return join " \\\n\t", @_;
+}
 
 =item manifypods
 
@@ -196,6 +285,52 @@ manifypods : pure_all $dependencies
 	\$(NOECHO) \$(POD2MAN_EXE) --section=1 --perm_rw=\$(PERM_RW) $man1pods
 	\$(NOECHO) \$(POD2MAN_EXE) --section=3 --perm_rw=\$(PERM_RW) $man3pods
 END_OF_TARGET
+}
+
+
+=item makemakerdflt_target
+
+  my $make_frag = $mm->makemakerdflt_target
+
+Returns a make fragment with the makemakerdeflt_target specified.
+This target is the first target in the Makefile, is the default target
+and simply points off to 'all' just in case any make variant gets
+confused or something gets snuck in before the real 'all' target.
+
+=cut
+
+sub makemakerdflt_target {
+    return <<'MAKE_FRAG';
+makemakerdflt: all
+	$(NOECHO) $(NOOP)
+MAKE_FRAG
+
+}
+
+
+=item special_targets
+
+  my $make_frag = $mm->special_targets
+
+Returns a make fragment containing any targets which have special
+meaning to make.  For example, .SUFFIXES and .PHONY.
+
+=cut
+
+sub special_targets {
+    my $make_frag = <<'MAKE_FRAG';
+.SUFFIXES: .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
+
+.PHONY: all config static dynamic test linkext manifest
+
+MAKE_FRAG
+
+    $make_frag .= <<'MAKE_FRAG' if $ENV{CLEARCASE_ROOT};
+.NO_CONFIG_REC: Makefile
+
+MAKE_FRAG
+
+    return $make_frag;
 }
 
 =item POD2MAN_EXE_macro
@@ -364,22 +499,80 @@ Defines at least these macros.
   UMASK_NULL        Nullify umask
   DEV_NULL          Supress all command output
 
-=item init_EXISTS_EXT
+=item init_DIRFILESEP
 
-  $MM->init_EXISTS_EXT;
+  $MM->init_DIRFILESEP;
+  my $dirfilesep = $MM->{DIRFILESEP};
 
-Initializes the EXISTS_EXT macro which is simply a path fragment to tack
-onto a filepath to turn it into a .exists file.
+Initializes the DIRFILESEP macro which is the seperator between the
+directory and filename in a filepath.  ie. / on Unix, \ on Win32 and
+nothing on VMS.
 
-Something of a hack, but it works.
+For example:
 
+    # instead of $(INST_ARCHAUTODIR)/extralibs.ld
+    $(INST_ARCHAUTODIR)$(DIRFILESEP)extralibs.ld
+
+Something of a hack but it prevents a lot of code duplication between
+MM_* variants.
+
+Do not use this as a seperator between directories.  Some operating
+systems use different seperators between subdirectories as between
+directories and filenames (for example:  VOLUME:[dir1.dir2]file on VMS).
+
+=item init_linker
+
+    $mm->init_linker;
+
+Initialize macros which have to do with linking.
+
+PERL_ARCHIVE: path to libperl.a equivalent to be linked to dynamic
+extensions.
+
+PERL_ARCHIVE_AFTER: path to a library which should be put on the
+linker command line I<after> the external libraries to be linked to
+dynamic extensions.  This may be needed if the linker is one-pass, and
+Perl includes some overrides for C RTL functions, such as malloc().
+
+EXPORT_LIST: name of a file that is passed to linker to define symbols
+to be exported.
+
+Some OSes do not need these in which case leave it blank.
+
+
+=item init_platform
+
+    $mm->init_platform
+
+Initialize any macros which are for platform specific use only.
+
+A typical one is the version number of your OS specific mocule.
+(ie. MM_Unix_VERSION or MM_VMS_VERSION).
+
+=item platform_constants
+
+    my $make_frag = $mm->platform_constants
+
+Returns a make fragment defining all the macros initialized in
+init_platform() rather than put them in constants().
+
+=cut
+
+sub init_platform {
+    return '';
+}
+
+sub platform_constants {
+    return '';
+}
 
 =back
 
 =head1 AUTHOR
 
-Michael G Schwern <schwern@pobox.com> with code from ExtUtils::MM_Unix
-and ExtUtils::MM_Win32.
+Michael G Schwern <schwern@pobox.com> and the denizens of
+makemaker@perl.org with code from ExtUtils::MM_Unix and
+ExtUtils::MM_Win32.
 
 
 =cut
