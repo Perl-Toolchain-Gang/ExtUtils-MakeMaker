@@ -37,8 +37,8 @@ the semantics.
 sub dist {
     my($self, %attribs) = @_;
 
-    $attribs{TO_UNIX} ||= sprintf <<'MAKE_TEXT', $self->{NOECHO};
-%s$(TEST_F) tmp.zip && $(RM) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM) tmp.zip
+    $attribs{TO_UNIX} ||= <<'MAKE_TEXT';
+$(NOECHO) $(TEST_F) tmp.zip && $(RM) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM) tmp.zip
 MAKE_TEXT
 
     return $self->SUPER::dist(%attribs);
