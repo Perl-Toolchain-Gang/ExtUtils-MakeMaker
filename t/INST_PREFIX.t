@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 30;
+use Test::More tests => 38;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -38,9 +38,37 @@ my $Updir  = File::Spec->updir;
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my $PREFIX = File::Spec->catdir('foo', 'bar');
 my $stdout = tie *STDOUT, 'TieOut' or die;
+
 my $mm = WriteMakefile(
+    NAME          => 'Big::Dummy',
+    VERSION_FROM  => 'lib/Big/Dummy.pm',
+    PREREQ_PM     => {},
+    PERL_CORE     => $ENV{PERL_CORE},
+);
+
+like( $stdout->read, qr{
+                        Writing\ $Makefile\ for\ Big::Liar\n
+                        Big::Liar's\ vars\n
+                        INST_LIB\ =\ \S+\n
+                        INST_ARCHLIB\ =\ \S+\n
+                        Writing\ $Makefile\ for\ Big::Dummy\n
+}x );
+
+isa_ok( $mm, 'ExtUtils::MakeMaker' );
+
+is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
+is( $mm->{VERSION}, 0.01,            'VERSION' );
+
+foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
+    unlike( $mm->{$prefix}, qr/\$\(PREFIX\)/ );
+    like( $mm->{$prefix}, qr/^\$\(DESTDIR\)/, 
+                                   "\$(DESTDIR) prepended to $prefix" );
+}
+
+
+my $PREFIX = File::Spec->catdir('foo', 'bar');
+$mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => {},
@@ -57,15 +85,11 @@ like( $stdout->read, qr{
 undef $stdout;
 untie *STDOUT;
 
-isa_ok( $mm, 'ExtUtils::MakeMaker' );
-
-is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
-is( $mm->{VERSION}, 0.01,            'VERSION' );
-
 is( $mm->{PREFIX}, '$(DESTDIR)'.$PREFIX,   'PREFIX' );
 
-foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
-    like( $mm->{$prefix}, qr/^\$\(DESTDIR\)/, "$prefix & \$(DESTDIR)" );
+foreach my $prefix (qw(PERLPREFIX SITEPREFIX VENDORPREFIX)) {
+    is( $mm->{$prefix}, '$(DESTDIR)$(PREFIX)', 
+                                       "\$(PREFIX) overrides $prefix" );
 }
 
 is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );

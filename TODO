@@ -48,8 +48,6 @@ Figure out and document the 4th arg to ExtUtils::Install::install()
 Consider if adding a nativize() routine to replace macify() and
 fixpath() is useful.
 
-Fix 'make install PREFIX=foo' problem.
-
 Add "MAXCMDLEN" variable to set how long shell commands can be.
 
 Adapt code like manifypods and pm_to_blib to use "MAXCMDLEN".

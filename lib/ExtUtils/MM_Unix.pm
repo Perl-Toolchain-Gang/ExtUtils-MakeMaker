@@ -2022,14 +2022,17 @@ sub init_INSTALL {
           File::Spec->catdir($sprefix, 'bin');
     }
 
-    my $u_prefix  = $self->{PERLPREFIX}       || '';
-    my $u_sprefix = $self->{SITEPREFIX}   || $u_prefix;
-    my $u_vprefix = $self->{VENDORPREFIX} || $u_prefix;
-
     $self->{PREFIX}       ||= '';
-    $self->{PERLPREFIX}   ||= $u_prefix  || $iprefix;
-    $self->{SITEPREFIX}   ||= $u_sprefix || $sprefix;
-    $self->{VENDORPREFIX} ||= $u_vprefix || $vprefix;
+
+    if( $self->{PREFIX} ) {
+        @{$self}{qw(PERLPREFIX SITEPREFIX VENDORPREFIX)} =
+          ('$(PREFIX)') x 3;
+    }
+    else {
+        $self->{PERLPREFIX}   ||= $iprefix;
+        $self->{SITEPREFIX}   ||= $sprefix;
+        $self->{VENDORPREFIX} ||= $vprefix;
+    }
 
     # Add DESTDIR.
     $self->{DESTDIR} ||= '';
