@@ -9,6 +9,8 @@
     * 'make ci' was busted between 6.05 and 6.06_01.  Fixed. (Andreas)
     - 'make test' was broken when there's no tests.  Introduced in 6.06_03.
       (Stas Bekman)
+    - Solving some directory depth problems in tests on oldish VMS systems.
+      (Craig Berry)
 
 6.10_02 Mon Apr  7 00:57:15 PDT 2003
     * Removed 2>&1 experiment introduced in 6.10_01 for all non-Unixen
