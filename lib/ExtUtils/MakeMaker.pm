@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.05";
-($Revision = substr(q$Revision: 1.88 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.89 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -1991,7 +1991,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.88 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.89 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2373,5 +2373,13 @@ Send bug reports via http://rt.cpan.org/.  Please send your
 generated Makefile along with your report.
 
 For more up-to-date information, see http://www.makemaker.org.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See F<http://www.perl.com/perl/misc/Artistic.html>
+
 
 =cut

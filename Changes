@@ -139,6 +139,7 @@
     - Default MANIFEST.SKIP not catching files in subdirs.  Fixed by Ilya.
     - Ilya fixed ExtUtils::Liblist->ext when called outside MakeMaker.
     - realclean was duplicating work already done by clean
+    - Adding an explicit LICENSE
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
