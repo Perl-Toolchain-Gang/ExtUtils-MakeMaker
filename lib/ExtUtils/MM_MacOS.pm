@@ -14,9 +14,10 @@ use Config;
 use Cwd 'cwd';
 require Exporter;
 use File::Basename;
+use File::Spec;
 use vars qw(%make_data);
 
-Exporter::import('ExtUtils::MakeMaker', '$Verbose', '&neatvalue');
+use ExtUtils::MakeMaker qw($Verbose &neatvalue);
 
 =head1 NAME
 
@@ -71,8 +72,8 @@ sub new {
 	for $key (keys %Prepend_dot_dot) {
 	    next unless defined $self->{PARENT}{$key};
 	    $self->{$key} = $self->{PARENT}{$key};
-	    $self->{$key} = $self->catdir("::",$self->{$key})
-		unless $self->file_name_is_absolute($self->{$key});
+	    $self->{$key} = File::Spec->catdir("::",$self->{$key})
+		unless File::Spec->file_name_is_absolute($self->{$key});
 	}
 	$self->{PARENT}->{CHILDREN}->{$class} = $self if $self->{PARENT};
     } else {
@@ -307,9 +308,9 @@ sub init_main {
 	}
     }
     if ($self->{PERL_SRC}){
-	$self->{MACPERL_SRC}  = $self->catdir("$self->{PERL_SRC}","macos:");
-	$self->{MACPERL_LIB}     ||= $self->catdir("$self->{MACPERL_SRC}","lib");
-	$self->{PERL_LIB}     ||= $self->catdir("$self->{PERL_SRC}","lib");
+	$self->{MACPERL_SRC}  = File::Spec->catdir("$self->{PERL_SRC}","macos:");
+	$self->{MACPERL_LIB}  ||= File::Spec->catdir("$self->{MACPERL_SRC}","lib");
+	$self->{PERL_LIB}     ||= File::Spec->catdir("$self->{PERL_SRC}","lib");
 	$self->{PERL_ARCHLIB} = $self->{PERL_LIB};
 	$self->{PERL_INC}     = $self->{PERL_SRC};
 	$self->{MACPERL_INC}  = $self->{MACPERL_SRC};
@@ -336,7 +337,7 @@ sub init_main {
     # hm ... do we really care?  at all?
 #    warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
 #        (Exporter.pm not found)"
-#	unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
+#	unless -f File::Spec->catfile("$self->{PERL_LIB}","Exporter.pm") ||
 #        $self->{NAME} eq "ExtUtils::MakeMaker";
 
     # Determine VERSION and VERSION_FROM
@@ -384,7 +385,7 @@ sub init_main {
     # will be working versions of perl 5. miniperl has priority over perl
     # for PERL to ensure that $(PERL) is usable while building ./ext/*
     my ($component,@defpath);
-    foreach $component ($self->{PERL_SRC}, $self->path(), $Config::Config{binexp}) {
+    foreach $component ($self->{PERL_SRC}, File::Spec->path(), $Config::Config{binexp}) {
 	push @defpath, $component if defined $component;
     }
     $self->{PERL} = "$self->{PERL_SRC}miniperl";
@@ -450,7 +451,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     # in case we don't find it below!
     if ($self->{VERSION_FROM}) {
         my $version_from = macify($self->{VERSION_FROM});
-        $pm{$version_from} = $self->catfile('$(INST_LIBDIR)',
+        $pm{$version_from} = File::Spec->catfile('$(INST_LIBDIR)',
             $version_from);
     }
 
@@ -470,7 +471,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	} elsif ($name =~ /\.h$/i){
 	    $h{$name} = 1;
 	} elsif ($name =~ /\.(p[ml]|pod)$/){
-	    $pm{$name} = $self->catfile('$(INST_LIBDIR)',$name);
+	    $pm{$name} = File::Spec->catfile('$(INST_LIBDIR)',$name);
 	} elsif ($name =~ /\.PL$/ && $name ne "Makefile.PL") {
 	    ($pl_files{$name} = $name) =~ s/\.PL$// ;
 	}
@@ -529,7 +530,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    my($striplibpath,$striplibname);
 	    $prefix =  '$(INST_LIB)' if (($striplibpath = $path) =~ s:^(\W*)lib\W:$1:);
 	    ($striplibname,$striplibpath) = fileparse($striplibpath);
-	    my($inst) = $self->catfile($prefix,$striplibpath,$striplibname);
+	    my($inst) = File::Spec->catfile($prefix,$striplibpath,$striplibname);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
