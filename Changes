@@ -1,3 +1,9 @@
+6.14
+    - Adding a reference to the Module::Build META.yml spec in the META.yml
+      itself and the metafile documentation.
+    - Removed Begin/End comments from manifypods that were getting in the
+      way of users adding code to the manifypods target.
+
 6.13 Thu Jul 31 16:48:01 PDT 2003
     - Generated META.yml now has the prereqs in sorted order (Andy Lester)
     - Arguments to child Makefile.PLs were still having .. prepended.  This
