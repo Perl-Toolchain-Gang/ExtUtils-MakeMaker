@@ -121,8 +121,7 @@ sub install {
     $packlist->read($tmpfile) if (-f $tmpfile);
     my $cwd = cwd();
 
-    my($source);
-    MOD_INSTALL: foreach $source (sort keys %hash) {
+    MOD_INSTALL: foreach my $source (sort keys %hash) {
 	#copy the tree to the target directory without altering
 	#timestamp and permission and remember for the .packlist
 	#file. The packlist file contains the absolute paths of the
@@ -141,20 +140,27 @@ sub install {
 	    $targetroot = install_rooted_dir($hash{"blib/arch"});
             print "Files found in blib/arch: installing files in blib/lib into architecture dependent library tree\n";
 	}
-	chdir($source) or next;
+
+        chdir $source or next;
 	find(sub {
 	    my ($mode,$size,$atime,$mtime) = (stat)[2,7,8,9];
 	    return unless -f _;
 	    return if $_ eq ".exists";
 	    my $targetdir  = File::Spec->catdir($targetroot, $File::Find::dir);
 	    my $targetfile = File::Spec->catfile($targetdir, $_);
+            my $sourcedir  = File::Spec->catdir($source, $File::Find::dir);
+            my $sourcefile = File::Spec->catfile($sourcedir, $_);
+
+            my $save_cwd = cwd;
+            chdir $cwd;  # in case the target is relative
+                         # 5.5.3's File::Find missing no_chdir option.
 
 	    my $diff = 0;
 	    if ( -f $targetfile && -s _ == $size) {
 		# We have a good chance, we can skip this one
-		$diff = compare($_,$targetfile);
+		$diff = compare($sourcefile, $targetfile);
 	    } else {
-		print "$_ differs\n" if $verbose>1;
+		print "$sourcefile differs\n" if $verbose>1;
 		$diff++;
 	    }
 
@@ -165,7 +171,7 @@ sub install {
 		    mkpath($targetdir,0,0755) unless $nonono;
 		    print "mkpath($targetdir,0,0755)\n" if $verbose>1;
 		}
-		copy($_,$targetfile) unless $nonono;
+		copy($sourcefile, $targetfile) unless $nonono;
 		print "Installing $targetfile\n";
 		utime($atime,$mtime + $Is_VMS,$targetfile) unless $nonono>1;
 		print "utime($atime,$mtime,$targetfile)\n" if $verbose>1;
@@ -176,15 +182,16 @@ sub install {
 		print "Skipping $targetfile (unchanged)\n" if $verbose;
 	    }
 
-	    if (! defined $inc_uninstall) { # it's called 
-	    } elsif ($inc_uninstall == 0){
-		inc_uninstall($_,$File::Find::dir,$verbose,1); # nonono set to 1
-	    } else {
-		inc_uninstall($_,$File::Find::dir,$verbose,0); # nonono set to 0
+	    if (defined $inc_uninstall) {
+		inc_uninstall($sourcefile,$File::Find::dir,$verbose, 
+                              $inc_uninstall ? 0 : 1);
 	    }
+
 	    # Record the full pathname.
 	    $packlist->{$targetfile}++;
 
+            # File::Find can get confused if you chdir in here.
+            chdir $save_cwd;
 	}, File::Spec->curdir);
 	chdir($cwd) or Carp::croak("Couldn't chdir to $cwd: $!");
     }

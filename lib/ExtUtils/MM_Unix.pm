@@ -3837,7 +3837,7 @@ EQUALIZE_TIMESTAMP = $(PERLRUN) "-MExtUtils::Command" -e eqtime
 
     return join "", @m if $self->{PARENT};
 
-    my $mod_install = $self->oneliner(<<'CODE', ['-I$(INST_LIB)', '-I$(PERL_LIB)', '-MExtUtils::Install']);
+    my $mod_install = $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
 install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
 CODE
 

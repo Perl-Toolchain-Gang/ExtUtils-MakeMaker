@@ -16,8 +16,9 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 30;
+use Test::More tests => 38;
 use MakeMaker::Test::Utils;
+use File::Find;
 use File::Spec;
 
 my $perl = which_perl();
@@ -133,6 +134,21 @@ like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
 like( $test_out, qr/All tests successful/,  '  successful' );
 is( $?, 0,                                  '  exited normally' );
 
+
+my $install_out = `$make install`;
+is( $?, 0, 'install' ) || diag $install_out;
+like( $install_out, qr/^Installing /m );
+like( $install_out, qr/^Writing /m );
+
+ok( -r 'dummy-install',     '  install dir created' );
+my %files = ();
+find( sub { $files{$_} = $File::Find::name; }, 'dummy-install' );
+ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
+ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
+ok( $files{'.packlist'},    '  packlist created'   );
+ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+
+
 my $dist_test_out = `$make disttest`;
 is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
@@ -143,8 +159,7 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
-ok( grep(/^Writing $makefile for Big::Dummy/, 
-         @mpl_out) == 1,
+ok( grep(/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
                                 'init_dirscan skipped distdir') || 
   diag(@mpl_out);
 
