@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 20;
+use Test::More tests => 24;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -76,11 +76,24 @@ else {
 is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 
-# Every INSTALL* variable must start with the PREFIX.
-foreach my $var (qw(bin vendorbin sitebin script
-                    man1dir man3dir
-                    privlib vendorlib sitelib vendorarch archlib sitearch
-                   ))
-{
-    like( $mm->{uc "install$var"}, qr/^$mm->{PREFIX}/, "PREFIX + $var" );
+# Every INSTALL* variable must start with some PREFIX.
+my @Perl_Install = qw(archlib    privlib   bin     script 
+                      man1dir       man3dir);
+my @Site_Install = qw(sitearch   sitelib   sitebin        
+                      siteman1dir siteman3dir);
+my @Vend_Install = qw(vendorarch vendorlib vendorbin 
+                      vendorman1dir vendorman3dir);
+
+foreach my $var (@Perl_Install) {
+    like( $mm->{uc "install$var"}, qr/^\$\(PREFIX\)/, "PREFIX + $var" );
+}
+
+foreach my $var (@Site_Install) {
+    like( $mm->{uc "install$var"}, qr/^\$\(SITEPREFIX\)/, 
+                                                    "SITEPREFIX + $var" );
+}
+
+foreach my $var (@Vend_Install) {
+    like( $mm->{uc "install$var"}, qr/^\$\(VENDORPREFIX\)/,
+                                                    "VENDORPREFIX + $var" );
 }
