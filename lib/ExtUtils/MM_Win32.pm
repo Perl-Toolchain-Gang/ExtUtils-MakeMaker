@@ -38,6 +38,15 @@ $GCC     = 1 if $Config{'cc'} =~ /^gcc/i;
 $DMAKE = 1 if $Config{'make'} =~ /^dmake/i;
 $NMAKE = 1 if $Config{'make'} =~ /^nmake/i;
 
+
+=head2 Overridden methods
+
+=over 4
+
+=item B<dlsyms>
+
+=cut
+
 sub dlsyms {
     my($self,%attribs) = @_;
 
@@ -46,7 +55,6 @@ sub dlsyms {
     my($funclist) = $attribs{FUNCLIST} || $self->{FUNCLIST} || [];
     my($imports)  = $attribs{IMPORTS} || $self->{IMPORTS} || {};
     my(@m);
-    (my $boot = $self->{NAME}) =~ s/:/_/g;
 
     if (not $self->{SKIPHASH}{'dynamic'}) {
 	push(@m,"
@@ -68,11 +76,29 @@ $self->{BASEEXT}.def: Makefile.PL
     join('',@m);
 }
 
+=item replace_manpage_separator
+
+Changes the path separator with .
+
+=cut
+
 sub replace_manpage_separator {
     my($self,$man) = @_;
     $man =~ s,/+,.,g;
     $man;
 }
+
+
+=item B<maybe_command>
+
+Since Windows has nothing as simple as an executable bit, we check the
+file extension.
+
+The PATHEXT env variable will be used to get a list of extensions that
+might indicate a command, otherwise .com, .exe, .bat and .cmd will be
+used by default.
+
+=cut
 
 sub maybe_command {
     my($self,$file) = @_;
@@ -95,41 +121,65 @@ sub maybe_command {
 }
 
 
-# This code was taken out of MM_Unix to avoid loading File::Glob
-# unless necessary.
+=item B<find_tests>
+
+The Win9x shell does not expand globs and I'll play it safe and assume
+other Windows variants don't either.
+
+So we do it for them.
+
+=cut
+
 sub find_tests {
     return join(' ', <t\\*.t>);
 }
 
+=item B<init_others>
 
-sub init_others
-{
- my ($self) = @_;
- $self->SUPER::init_others;
- $self->{'TOUCH'}  = '$(PERLRUN) -MExtUtils::Command -e touch';
- $self->{'CHMOD'}  = '$(PERLRUN) -MExtUtils::Command -e chmod'; 
- $self->{'CP'}     = '$(PERLRUN) -MExtUtils::Command -e cp';
- $self->{'RM_F'}   = '$(PERLRUN) -MExtUtils::Command -e rm_f';
- $self->{'RM_RF'}  = '$(PERLRUN) -MExtUtils::Command -e rm_rf';
- $self->{'MV'}     = '$(PERLRUN) -MExtUtils::Command -e mv';
- $self->{'NOOP'}   = 'rem';
- $self->{'TEST_F'} = '$(PERLRUN) -MExtUtils::Command -e test_f';
- $self->{'LD'}     = $Config{'ld'} || 'link';
- $self->{'AR'}     = $Config{'ar'} || 'lib';
- $self->{'LDLOADLIBS'} ||= $Config{'libs'};
- # -Lfoo must come first for Borland, so we put it in LDDLFLAGS
- if ($BORLAND) {
-     my $libs = $self->{'LDLOADLIBS'};
-     my $libpath = '';
-     while ($libs =~ s/(?:^|\s)(("?)-L.+?\2)(?:\s|$)/ /) {
-         $libpath .= ' ' if length $libpath;
-         $libpath .= $1;
-     }
-     $self->{'LDLOADLIBS'} = $libs;
-     $self->{'LDDLFLAGS'} ||= $Config{'lddlflags'};
-     $self->{'LDDLFLAGS'} .= " $libpath";
- }
- $self->{'DEV_NULL'} = '> NUL';
+Override some of the Unix specific commands with portable
+ExtUtils::Command ones.
+
+Also provide defaults for LD and AR in case the %Config values aren't
+set.
+
+LDLOADLIBS's default is changed to $Config{libs}.
+
+Adjustments are made for Borland's quirks needing -L to come first.
+
+=cut
+
+sub init_others {
+    my ($self) = @_;
+
+    $self->SUPER::init_others;
+
+    $self->{'TOUCH'}  = '$(PERLRUN) -MExtUtils::Command -e touch';
+    $self->{'CHMOD'}  = '$(PERLRUN) -MExtUtils::Command -e chmod'; 
+    $self->{'CP'}     = '$(PERLRUN) -MExtUtils::Command -e cp';
+    $self->{'RM_F'}   = '$(PERLRUN) -MExtUtils::Command -e rm_f';
+    $self->{'RM_RF'}  = '$(PERLRUN) -MExtUtils::Command -e rm_rf';
+    $self->{'MV'}     = '$(PERLRUN) -MExtUtils::Command -e mv';
+    $self->{'NOOP'}   = 'rem';
+    $self->{'TEST_F'} = '$(PERLRUN) -MExtUtils::Command -e test_f';
+    $self->{'DEV_NULL'} = '> NUL';
+
+    # technically speaking, these should be in init_main()
+    $self->{'LD'}     = $Config{'ld'} || 'link';
+    $self->{'AR'}     = $Config{'ar'} || 'lib';
+
+    $self->{'LDLOADLIBS'} ||= $Config{'libs'};
+    # -Lfoo must come first for Borland, so we put it in LDDLFLAGS
+    if ($BORLAND) {
+        my $libs = $self->{'LDLOADLIBS'};
+        my $libpath = '';
+        while ($libs =~ s/(?:^|\s)(("?)-L.+?\2)(?:\s|$)/ /) {
+            $libpath .= ' ' if length $libpath;
+            $libpath .= $1;
+        }
+        $self->{'LDLOADLIBS'} = $libs;
+        $self->{'LDDLFLAGS'} ||= $Config{'lddlflags'};
+        $self->{'LDDLFLAGS'} .= " $libpath";
+    }
 }
 
 
@@ -503,71 +553,6 @@ AUTOSPLITFILE = $(PERLRUN) -MAutoSplit }.$asl.q{ -e "autosplit($$ARGV[0], $$ARGV
 };
 }
 
-=item tools_other (o)
-
-Win32 overrides.
-
-Defines SHELL, LD, TOUCH, CP, MV, RM_F, RM_RF, CHMOD, UMASK_NULL in
-the Makefile. Also defines the perl programs MKPATH,
-WARN_IF_OLD_PACKLIST, MOD_INSTALL. DOC_INSTALL, and UNINSTALL.
-
-=cut
-
-sub tools_other {
-    my($self) = shift;
-    my @m;
-    my $bin_sh = $Config{sh} || 'cmd /c';
-    push @m, qq{
-SHELL = $bin_sh
-} unless $DMAKE;  # dmake determines its own shell 
-
-    for (qw/ CHMOD CP LD MV NOOP RM_F RM_RF TEST_F TOUCH UMASK_NULL DEV_NULL/ ) {
-	push @m, "$_ = $self->{$_}\n";
-    }
-
-    push @m, q{
-# The following is a portable way to say mkdir -p
-# To see which directories are created, change the if 0 to if 1
-MKPATH = $(PERLRUN) -MExtUtils::Command -e mkpath
-
-# This helps us to minimize the effect of the .exists files A yet
-# better solution would be to have a stable file in the perl
-# distribution with a timestamp of zero. But this solution doesn't
-# need any changes to the core distribution and works with older perls
-EQUALIZE_TIMESTAMP = $(PERLRUN) -MExtUtils::Command -e eqtime
-};
-
-
-    return join "", @m if $self->{PARENT};
-
-    push @m, q{
-# Here we warn users that an old packlist file was found somewhere,
-# and that they should call some uninstall routine
-WARN_IF_OLD_PACKLIST = $(PERL) -lwe "exit unless -f $$ARGV[0];" \\
--e "print 'WARNING: I have found an old package in';" \\
--e "print '	', $$ARGV[0], '.';" \\
--e "print 'Please make sure the two installations are not conflicting';"
-
-UNINST=0
-VERBINST=1
-
-MOD_INSTALL = $(PERL) -I$(INST_LIB) -I$(PERL_LIB) -MExtUtils::Install \
--e "install({ @ARGV },'$(VERBINST)',0,'$(UNINST)');"
-
-DOC_INSTALL = $(PERL) -e "$$\=\"\n\n\";" \
--e "print '=head2 ', scalar(localtime), ': C<', shift, '>', ' L<', $$arg=shift, '|', $$arg, '>';" \
--e "print '=over 4';" \
--e "while (defined($$key = shift) and defined($$val = shift)) { print '=item *';print 'C<', \"$$key: $$val\", '>'; }" \
--e "print '=back';"
-
-UNINSTALL =   $(PERL) -MExtUtils::Install \
--e "uninstall($$ARGV[0],1,1); print \"\nUninstall is deprecated. Please check the";" \
--e "print \" packlist above carefully.\n  There may be errors. Remove the\";" \
--e "print \" appropriate files manually.\n  Sorry for the inconveniences.\n\""
-};
-
-    return join "", @m;
-}
 
 =item xs_o (o)
 
@@ -663,6 +648,9 @@ sub pasthru {
 
 =item perl_oneliner (o)
 
+These are based on what command.com does on Win98.  They may be wrong
+for other Windows shells, I don't know.
+
 =cut
 
 sub perl_oneliner {
@@ -679,6 +667,11 @@ sub perl_oneliner {
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
     $cmd =~ s{"}{\\"}g;
+
+    # Backwacks are normally literal but \" is an escaped quote and
+    # \\ is an escaped backwack.
+    $cmd =~ s{\\\\}{\\\\\\\\}g;
+    $cmd =~ s{\\"}{\\\\"}g;
 
     $switches = join ' ', @$switches;    
 
