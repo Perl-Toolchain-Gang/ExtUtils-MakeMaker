@@ -65,6 +65,8 @@ sub test_harness {
            ...
          );
 
+  # or args on @ARGV
+
 pod2man() is a function performing most of the duties of the pod2man
 program.  Its arguments are exactly the same as pod2man as of 5.8.0
 with the addition of:
@@ -76,6 +78,8 @@ And the removal of:
     --verbose/-v
     --help/-h
 
+If no arguments are given to pod2man it will read from @ARGV.
+
 =cut
 
 sub pod2man {
@@ -86,7 +90,7 @@ sub pod2man {
 
     # We will cheat and just use Getopt::Long.  We fool it by putting
     # our arguments into @ARGV.  Should be safe.
-    local @ARGV = @_;
+    local @ARGV = @_ ? @_ : @ARGV;
     Getopt::Long::config ('bundling_override');
     Getopt::Long::GetOptions (\%options, 
                 'section|s=s', 'release|r=s', 'center|c=s',
