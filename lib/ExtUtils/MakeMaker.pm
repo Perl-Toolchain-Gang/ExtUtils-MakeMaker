@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.06_06";
-($Revision = substr(q$Revision: 1.104 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.105 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -602,12 +602,12 @@ sub WriteEmptyMakefile {
     my %att = @_;
     my $self = MM->new(\%att);
     if (-f $self->{MAKEFILE_OLD}) {
-      chmod 0666, $self->{MAKEFILE_OLD};
-      unlink $self->{MAKEFILE_OLD} or warn "unlink $self->{MAKEFILE_OLD}: $!";
+      _unlink($self->{MAKEFILE_OLD}) or 
+        warn "unlink $self->{MAKEFILE_OLD}: $!";
     }
     if ( -f $self->{MAKEFILE} ) {
-        _rename($self->{MAKEFILE}, $self->{MAKEFILE_OLD})
-          or warn "rename $self->{MAKEFILE} => $self->{MAKEFILE_OLD}: $!"
+        _rename($self->{MAKEFILE}, $self->{MAKEFILE_OLD}) or
+          warn "rename $self->{MAKEFILE} => $self->{MAKEFILE_OLD}: $!"
     }
     open MF, '>'.$self->{MAKEFILE} or die "open $self->{MAKEFILE} for write: $!";
     print MF <<'EOP';
@@ -881,6 +881,13 @@ sub _rename {
     chmod 0666, $dest;
     unlink $dest;
     return rename $src, $dest;
+}
+
+# This is an unlink for OS's where the target must be writable first.
+sub _unlink {
+    my @files = @_;
+    chmod 0666, @files;
+    return unlink @files;
 }
 
 
@@ -2004,7 +2011,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.104 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.105 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
