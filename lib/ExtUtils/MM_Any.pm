@@ -913,7 +913,7 @@ sub special_targets {
     my $make_frag = <<'MAKE_FRAG';
 .SUFFIXES : .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
 
-.PHONY :: all config static dynamic test linkext manifest
+.PHONY : all config static dynamic test linkext manifest
 
 MAKE_FRAG
 
