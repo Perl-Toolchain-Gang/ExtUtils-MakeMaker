@@ -470,6 +470,7 @@ have to do their own implementation.
 
 =item oneliner
 
+  my $oneliner = $MM->oneliner($perl_code);
   my $oneliner = $MM->oneliner($perl_code, \@switches);
 
 This will generate a perl one-liner safe for the particular platform
