@@ -19,7 +19,7 @@ BEGIN {
 }
 
 BEGIN {
-    use Test::More tests => 27;
+    use Test::More tests => 26;
     use File::Spec;
 }
 
@@ -31,38 +31,6 @@ BEGIN {
 }
 
 {
-    # get a file in the MM test directory, replace last char with wildcard 
-    my $file;
-    {
-        local *DIR;
-        my $mmtestdir = $ENV{PERL_CORE}
-          ? File::Spec->catdir(File::Spec->updir, 'lib', 'ExtUtils', 't')
-          : File::Spec->curdir;
-        opendir(DIR, $mmtestdir);
-        while ($file = readdir(DIR)) {
-            $file =~ s/\.\z// if $^O eq 'VMS';
-            last if $file =~ /^\w/;
-        }
-        closedir DIR;
-    }
-
-
-    # % means 'match one character' on VMS.  Everything else is ?
-    my $match_char = $^O eq 'VMS' ? '%' : '?';
-    ($ARGV[0] = $file) =~ s/.\z/$match_char/;
-
-    # this should find the file
-    ExtUtils::Command::expand_wildcards();
-
-    is( scalar @ARGV, 1, 'found one file' );
-    like( $ARGV[0], qr/$file/, 'expanded wildcard ? successfully' );
-
-    # try it with the asterisk now
-    ($ARGV[0] = $file) =~ s/.{3}\z/\*/;
-    ExtUtils::Command::expand_wildcards();
-
-    ok( (grep { qr/$file/ } @ARGV), 'expanded wildcard * successfully' );
-
     # concatenate this file with itself
     # be extra careful the regex doesn't match itself
     use TieOut;
@@ -198,6 +166,30 @@ BEGIN {
 
     eval { mv() };
     like( $@, qr/Too many arguments/, 'mv croaks on error' );
+
+    # Test expand_wildcards()
+    {
+        my $file = "ecmdfile";
+        @ARGV = ();
+        chdir 'ecmddir';
+
+        # % means 'match one character' on VMS.  Everything else is ?
+        my $match_char = $^O eq 'VMS' ? '%' : '?';
+        ($ARGV[0] = $file) =~ s/.\z/$match_char/;
+
+        # this should find the file
+        ExtUtils::Command::expand_wildcards();
+
+        is_deeply( \@ARGV, [$file], 'expanded wildcard ? successfully' );
+
+        # try it with the asterisk now
+        ($ARGV[0] = $file) =~ s/.{3}\z/\*/;
+        ExtUtils::Command::expand_wildcards();
+
+        is_deeply( \@ARGV, [$file], 'expanded wildcard * successfully' );
+
+        chdir File::Spec->updir;
+    }
 
     # remove some files
     my @files = @ARGV = ( File::Spec->catfile( 'ecmddir', 'ecmdfile' ),
