@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.83 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.84 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2226,7 +2226,7 @@ sub init_linker {
     $self->{EXPORT_LIST} ||= '$(BASEEXT).opt';
 
     my $shr = $Config{dbgprefix} . 'PERLSHR';
-    $self->{PERL_ARCHIVE} ||=  $ENV{$shr} ? $ENV{$shr} : "Sys\$Share:$shr.$Config{'dlext'}";
+    $self->{PERL_ARCHIVE} ||=  $self->catfile($self->{PERL_SRC}, "$shr.$Config{'dlext'}");
 
     $self->{PERL_ARCHIVE_AFTER} ||= '';
 }

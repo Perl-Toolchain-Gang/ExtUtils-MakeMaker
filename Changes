@@ -15,6 +15,8 @@
     - Removing $(VERSION_FROM) from Makefile dependency.  It was too
       annoying to rebuild the Makefile every time the module changed.
       Mentioned it in the FAQ instead.
+    - Fixing PERL_ARCHIVE macro on VMS.  Apparently it never appeared
+      properly before. (Craig Berry)
 
 # There was no 6.06, I jumped straight to 6.10_XX because there's been
 # so much change between 6.05 and now.
