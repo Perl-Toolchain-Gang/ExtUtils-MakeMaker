@@ -169,6 +169,7 @@ sub init_others {
 
     # Used in favor of echo because echo won't strip quotes. :(
     $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
+    $self->{ECHO_N}   ||= $self->oneliner('print qq{@ARGV}');
 
     $self->{TOUCH}    ||= '$(PERLRUN) -MExtUtils::Command -e touch';
     $self->{CHMOD}    ||= '$(PERLRUN) -MExtUtils::Command -e chmod'; 
