@@ -340,7 +340,7 @@ sub _win32_ext {
 
 	# give up
 	warn "Note (probably harmless): "
-		     ."No library found for '$thislib'\n"
+		     ."No library found for $thislib\n"
 	    unless $found_lib>0;
 
     }
