@@ -23,6 +23,7 @@
     - Systems configured to not have man pages now honored thanks to
       Paul Green
     - Hack to allow 5.6.X versions of ExtUtils::Embed use MY implicitly.
+    - Moved use of glob out of MM_Unix so MacPerl could build
 
     [[ Test Changes ]]
     - Shortening directory levels to accomodate old VMS's

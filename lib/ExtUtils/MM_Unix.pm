@@ -1098,6 +1098,20 @@ in these dirs:
     0; # false and not empty
 }
 
+=item find_tests
+
+  my $test = $mm->find_tests;
+
+Returns a string suitable for feeding to the shell to return all
+tests in t/*.t.
+
+=cut
+
+sub find_tests {
+    my($self) = shift;
+    return 't/*.t';
+}
+
 =back
 
 =head2 Methods to actually produce chunks of text for the Makefile
@@ -3531,7 +3545,7 @@ sub test {
     my($self, %attribs) = @_;
     my $tests = $attribs{TESTS} || '';
     if (!$tests && -d 't') {
-	$tests = $Is_Win32 ? join(' ', <t\\*.t>) : 't/*.t';
+        $tests = $self->find_tests;
     }
     # note: 'test.pl' name is also hardcoded in init_dirscan()
     my(@m);

@@ -1857,6 +1857,15 @@ $(MAKEFILE) : Makefile.PL $(CONFIGDEP)
     join('',@m);
 }
 
+=item find_tests (override)
+
+=cut
+
+sub find_tests {
+    my $self = shift;
+    return -d 't' ? 't/*.t' : '';
+}
+
 =item test (override)
 
 Use VMS commands for handling subdirectories.
@@ -1865,7 +1874,7 @@ Use VMS commands for handling subdirectories.
 
 sub test {
     my($self, %attribs) = @_;
-    my($tests) = $attribs{TESTS} || ( -d 't' ? 't/*.t' : '');
+    my($tests) = $attribs{TESTS} || $self->find_tests;
     my(@m);
     push @m,"
 TEST_VERBOSE = 0

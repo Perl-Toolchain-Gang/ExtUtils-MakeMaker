@@ -140,6 +140,14 @@ in these dirs:
     0; # false and not empty
 }
 
+
+# This code was taken out of MM_Unix to avoid loading File::Glob
+# unless necessary.
+sub find_tests {
+    return join(' ', <t\\*.t>);
+}
+
+
 sub init_others
 {
  my ($self) = @_;
