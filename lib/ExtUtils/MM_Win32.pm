@@ -352,9 +352,10 @@ PM_TO_BLIB = }.join(" \\\n\t", %{$self->{PM}}).q{
 
 =item static_lib (o)
 
-Defines how to produce the *.a (or equivalent) files.
+Changes how to run the linker.
 
-Most of this is copied from MM_Unix except for the AR bits.
+The rest is duplicate code from MM_Unix.  Should move the linker code
+to its own method.
 
 =cut
 
@@ -394,7 +395,7 @@ MAKE_FRAG
 
 =item dynamic_lib (o)
 
-Defines how to produce the *.so (or equivalent) files.
+Complicated stuff for Win32 that I don't understand. :(
 
 =cut
 
