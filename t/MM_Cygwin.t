@@ -45,7 +45,10 @@ is( $args->cflags(), 'fakeflags',
 delete $args->{CFLAGS};
 
 # ExtUtils::MM_Cygwin::cflags() calls this, fake the output
-*ExtUtils::MM_Unix::cflags = sub { return $_[1] };
+{
+    no warnings 'redefine';
+    sub ExtUtils::MM_Unix::cflags { return $_[1] };
+}
 
 # respects the config setting, should ignore whitespace around equal sign
 my $ccflags = $Config{useshrplib} eq 'true' ? ' -DUSEIMPORTLIB' : '';
@@ -75,6 +78,7 @@ like( $args->manifypods(), qr/pure_all\n\tnoecho/,
 $args->{MAN3PODS} = { foo => 1 };
 my $out = tie *STDOUT, 'FakeOut';
 {
+    no warnings 'once';
     local *MM::perl_script = sub { return };
     my $res = $args->manifypods();
     like( $$out, qr/could not locate your pod2man/,
