@@ -454,6 +454,71 @@ MAKE_EXT
 
 }
 
+
+=item metayaml_target
+
+    my $target = $mm->metayaml_target;
+
+Generate the metayaml target.
+
+Writes the file Meta.yml, YAML encoded meta-data about the module
+including:
+
+    Name
+    Version
+    Prereq
+    Installdirs
+
+=cut
+
+sub metayaml_target {
+    my $self = shift;
+
+    my $prereq_pm = '';
+    while( my($mod, $ver) = each %{$self->{PREREQ_PM}} ) {
+        $prereq_pm .= "    $mod:  $ver\n";
+    }
+    
+    my $meta = <<YAML;
+Name:         $self->{NAME}
+Distname:     $self->{DISTNAME}
+Version:      $self->{VERSION}
+Version_From: $self->{VERSION_FROM}
+Installdirs:  $self->{INSTALLDIRS}
+Prereq_pm:
+$prereq_pm
+YAML
+
+    $meta =~ s/\n/\\n/g;
+
+    my $write_meta = $self->oneliner(qq{print qq{$meta}});
+    return sprintf <<'MAKE_FRAG', $write_meta;
+metayaml :
+	$(NOECHO) %s > Meta.yml
+MAKE_FRAG
+
+}
+
+
+=item metayaml_addtomanifest_target
+
+  my $target = $mm->metayaml_addtomanifest_target
+
+Adds the Meta.yml file to the MANIFEST.
+
+=cut
+
+sub metayaml_addtomanifest_target {
+    my $self = shift;
+
+    return <<'MAKE_FRAG';
+metayaml_addtomanifest:
+	$(NOECHO) $(NOOP)
+MAKE_FRAG
+
+}
+
+
 =back
 
 =head2 Abstract methods

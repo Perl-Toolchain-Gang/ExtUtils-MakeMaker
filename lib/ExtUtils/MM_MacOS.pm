@@ -158,7 +158,7 @@ END
 	    pasthru c_o xs_c xs_o top_targets linkext 
 	    dynamic_bs dynamic_lib static_lib manifypods
 	    installbin subdirs dist_basics dist_core
-	    dist_dir dist_test dist_ci install force perldepend makefile
+	    distdir dist_test dist_ci install force perldepend makefile
 	    staticmake test pm_to_blib selfdocument
 	    const_loadlibs const_cccmd
     /)
@@ -169,7 +169,7 @@ END
     	unless grep /rulez/, @ExtUtils::MakeMaker::MM_Sections;
 
     if ($self->{PARENT}) {
-	for (qw/install dist dist_basics dist_core dist_dir dist_test dist_ci/) {
+	for (qw/install dist dist_basics dist_core distdir dist_test dist_ci/) {
 	    $self->{SKIPHASH}{$_} = 1;
 	}
     }

@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.06_02";
-($Revision = substr(q$Revision: 1.95 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.96 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -257,7 +257,8 @@ sub full_setup {
  dynamic_lib static static_lib manifypods processPL
  installbin subdirs
  clean_subdirs clean realclean_subdirs realclean 
- dist_basics dist_core dist_dir dist_test dist_ci
+ metayaml metayaml_addtomanifest
+ dist_basics dist_core distdir dist_test dist_ci
  install force perldepend makefile staticmake test ppd
 
           ); # loses section ordering
@@ -546,7 +547,7 @@ END
     delete $self->{SKIP}; # free memory
 
     if ($self->{PARENT}) {
-        for (qw/install dist dist_basics dist_core dist_dir dist_test dist_ci/) {
+        for (qw/install dist dist_basics dist_core distdir dist_test dist_ci/) {
             $self->{SKIPHASH}{$_} = 1;
         }
     }
@@ -950,24 +951,7 @@ Makefiles with a single invocation of WriteMakefile().
 
 =head2 How To Write A Makefile.PL
 
-The short answer is: Don't.
-
-        Always begin with h2xs.
-        Always begin with h2xs!
-        ALWAYS BEGIN WITH H2XS!
-
-even if you're not building around a header file, and even if you
-don't have an XS component.
-
-Run h2xs(1) before you start thinking about writing a module. For so
-called pm-only modules that consist of C<*.pm> files only, h2xs has
-the C<-X> switch. This will generate dummy files of all kinds that are
-useful for the module developer.
-
-The medium answer is:
-
-    use ExtUtils::MakeMaker;
-    WriteMakefile( NAME => "Foo::Bar" );
+See ExtUtils::MakeMaker::Tutorial.
 
 The long answer is the rest of the manpage :-)
 
@@ -1996,7 +1980,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.95 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.96 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
