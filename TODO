@@ -19,3 +19,6 @@ Don't assume everything is in $Config{PREFIX}/lib and
 $Config{PREFIX}/man.  Debian puts stuff in /usr/share/{perl,man}
 
 Investigate one method per make target.
+
+Merge 14902, 14690, 14688, 14680, 14677, 14658, 14655, 14648,
+14645, 14641, 14635, 14622, 14619, 14612, 14611, 14583, 14453, 14441
