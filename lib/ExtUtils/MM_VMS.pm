@@ -2186,10 +2186,12 @@ sub max_exec_len {
 
 sub init_linker {
     my $self = shift;
-    $self->{EXPORT_LIST} = '$(BASEEXT).opt';
+    $self->{EXPORT_LIST} ||= '$(BASEEXT).opt';
 
     my $shr = $Config{dbgprefix} . 'PERLSHR';
-    $self->{PERL_ARCHIVE} =  $ENV{$shr} ? $ENV{$shr} : "Sys\$Share:$shr.$Config{'dlext'}";
+    $self->{PERL_ARCHIVE} ||=  $ENV{$shr} ? $ENV{$shr} : "Sys\$Share:$shr.$Config{'dlext'}";
+
+    $self->{PERL_ARCHIVE_AFTER} ||= '';
 }
 
 =back

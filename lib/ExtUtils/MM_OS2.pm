@@ -121,38 +121,23 @@ sub maybe_command {
     return;
 }
 
-sub perl_archive {
-    return "\$(PERL_INC)/libperl\$(LIB_EXT)";
+=item init_linker
+
+=cut
+
+sub init_linker {
+    my $self = shift;
+
+    $self->{PERL_ARCHIVE} = "\$(PERL_INC)/libperl\$(LIB_EXT)";
+
+    $self->{PERL_ARCHIVE_AFTER} = !$OS2::is_aout 
+      ? "\$(PERL_INC)/libperl_override\$(LIB_EXT)"
+      : '';
+    $self->{EXPORT_LIST} = '$(BASEEXT).def';
 }
-
-=item perl_archive_after
-
-This is an internal method that returns path to a library which
-should be put on the linker command line I<after> the external libraries
-to be linked to dynamic extensions.  This may be needed if the linker
-is one-pass, and Perl includes some overrides for C RTL functions,
-such as malloc().
-
-=cut 
-
-sub perl_archive_after
-{
- return "\$(PERL_INC)/libperl_override\$(LIB_EXT)" unless $OS2::is_aout;
- return "";
-}
-
-sub export_list
-{
- my ($self) = @_;
- return "$self->{BASEEXT}.def";
-}
-
-1;
-
-__END__
-
-=pod
 
 =back
 
 =cut
+
+1;

@@ -65,22 +65,28 @@ sub replace_manpage_separator {
     return $man;
 }
 
-=item perl_archive (o)
+=item init_linker
 
 points to libperl.a
 
 =cut
 
-sub perl_archive {
+sub init_linker {
+    my $self = shift;
+
     if ($Config{useshrplib} eq 'true') {
         my $libperl = '$(PERL_INC)' .'/'. "$Config{libperl}";
         if( $] >= 5.007 ) {
             $libperl =~ s/a$/dll.a/;
         }
-        return $libperl;
+        $self->{PERL_ARCHVE} = $libperl;
     } else {
-        return '$(PERL_INC)' .'/'. ("$Config{libperl}" or "libperl.a");
+        $self->{PERL_ARCHIVE} = 
+          '$(PERL_INC)' .'/'. ("$Config{libperl}" or "libperl.a");
     }
+
+    $self->{PERL_ARCHIVE_AFTER} ||= '';
+    $self->{EXPORT_LIST}  ||= '';
 }
 
 =back
