@@ -25,6 +25,8 @@ $ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
 
 perl_lib;
 
+my $Touch_Time = calibrate_mtime();
+
 $| = 1;
 
 ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
@@ -56,14 +58,9 @@ ok( grep(/^Current package is: main$/,
 
 ok( -e $makefile,       'Makefile exists' );
 
-# -M is flakey on VMS, flat out broken on Tru64 5.6.0
-SKIP: {
-    skip "stat a/mtime broken on Tru64 5.6.0", 1 if $^O eq 'dec_osf' and
-                                                    $] >= 5.006;
-
-    my $mtime = (stat($makefile))[9];
-    cmp_ok( $^T, '<=', $mtime,  '  its been touched' );
-}
+# -M is flakey on VMS
+my $mtime = (stat($makefile))[9];
+cmp_ok( $Touch_Time, '<=', $mtime,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
 

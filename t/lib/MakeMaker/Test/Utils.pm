@@ -12,7 +12,7 @@ require Exporter;
 $VERSION = 0.01;
 
 @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
-             make make_run make_macro
+             make make_run make_macro calibrate_mtime
             );
 
 my $Is_VMS = $^O eq 'VMS';
@@ -35,6 +35,8 @@ MakeMaker::Test::Utils - Utility routines for testing MakeMaker
   my $make          = make;
   my $make_run      = make_run;
   make_macro($make, $targ, %macros);
+
+  my $mtime         = calibrate_mtime;
 
 =head1 DESCRIPTION
 
@@ -202,6 +204,25 @@ sub make_macro {
     }
 
     return $is_mms ? "$make$macros $target" : "$make $target $macros";
+}
+
+=item B<calibrate_mtime>
+
+  my $mtime = calibrate_mtime;
+
+When building on NFS, file modification times can often lose touch
+with reality.  This returns the mtime of a file which has just been
+touched.
+
+=cut
+
+sub calibrate_mtime {
+    open(FILE, ">calibrate_mtime.tmp") || die $!;
+    print FILE "foo";
+    close FILE;
+    my($mtime) = (stat('calibrate_mtime.tmp'))[9];
+    unlink 'calibrate_mtime.tmp';
+    return $mtime;
 }
 
 =back
