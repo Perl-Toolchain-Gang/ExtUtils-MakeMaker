@@ -1,4 +1,4 @@
-6.06_04
+6.06_04 Sun Mar 30 20:34:39 PST 2003
     - Now looking for ExtUtils::xsubpp through @INC rather than just
       the perl core directories.  This helps ExtUtils::ParseXS.
     - Systems which don't put their libraries under their $Config{prefix}
