@@ -48,7 +48,7 @@ sub os_flavor {
     return ($self->SUPER::os_flavor, 'Netware');
 }
 
-=item init_platform (o)
+=item init_platform
 
 Add Netware macros.
 
@@ -125,7 +125,7 @@ sub platform_constants {
 }
 
 
-=item const_cccmd (o)
+=item const_cccmd
 
 =cut
 
@@ -142,7 +142,7 @@ MAKE_FRAG
 }
 
 
-=item static_lib (o)
+=item static_lib
 
 =cut
 
@@ -187,7 +187,7 @@ END
     return $m;
 }
 
-=item dynamic_lib (o)
+=item dynamic_lib
 
 Defines how to produce the *.so (or equivalent) files.
 

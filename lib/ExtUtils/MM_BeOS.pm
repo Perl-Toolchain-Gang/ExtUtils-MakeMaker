@@ -28,7 +28,7 @@ use vars qw(@ISA $VERSION);
 $VERSION = 1.04;
 
 
-=item os_flavor (o)
+=item os_flavor
 
 BeOS is BeOS.
 

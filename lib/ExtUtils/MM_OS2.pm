@@ -32,7 +32,7 @@ the semantics.
 
 =over 4
 
-=item init_dist (o)
+=item init_dist
 
 Define TO_UNIX to convert OS2 linefeeds to Unix style.
 

@@ -193,11 +193,11 @@ sub init_others {
 }
 
 
-=item init_platform (o)
+=item init_platform
 
 Add MM_Win32_VERSION.
 
-=item platform_constants (o)
+=item platform_constants
 
 =cut
 
@@ -221,7 +221,7 @@ sub platform_constants {
 }
 
 
-=item special_targets (o)
+=item special_targets
 
 Add .USESHELL target for dmake.
 
@@ -240,7 +240,7 @@ MAKE_FRAG
 }
 
 
-=item static_lib (o)
+=item static_lib
 
 Changes how to run the linker.
 
@@ -282,7 +282,7 @@ MAKE_FRAG
 }
 
 
-=item dynamic_lib (o)
+=item dynamic_lib
 
 Complicated stuff for Win32 that I don't understand. :(
 
@@ -386,7 +386,7 @@ sub perl_script {
 }
 
 
-=item xs_o (o)
+=item xs_o
 
 This target is stubbed out.  Not sure why.
 
@@ -397,7 +397,7 @@ sub xs_o {
 }
 
 
-=item pasthru (o)
+=item pasthru
 
 All we send is -nologo to nmake to prevent it from printing its damned
 banner.
@@ -410,7 +410,7 @@ sub pasthru {
 }
 
 
-=item oneliner (o)
+=item oneliner
 
 These are based on what command.com does on Win98.  They may be wrong
 for other Windows shells, I don't know.

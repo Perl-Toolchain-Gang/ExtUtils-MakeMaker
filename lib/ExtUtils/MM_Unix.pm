@@ -107,7 +107,7 @@ my $Updir   = __PACKAGE__->updir;
 
 =over 4
 
-=item os_flavor (o)
+=item os_flavor
 
 Simply says that we're Unix.
 
@@ -1394,7 +1394,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 
 =item force (o)
 
-Just writes FORCE:
+Writes an empty FORCE: target.
 
 =cut
 
@@ -2413,11 +2413,11 @@ sub init_PERL {
 }
 
 
-=item init_platform (o)
+=item init_platform
+
+=item platform_constants
 
 Add MM_Unix_VERSION.
-
-=item platform_constants (o)
 
 =cut
 
@@ -3677,7 +3677,7 @@ sub replace_manpage_separator {
 }
 
 
-=item cd (o)
+=item cd
 
 =cut
 
@@ -3690,7 +3690,7 @@ sub cd {
     return $make_frag;
 }
 
-=item oneliner (o)
+=item oneliner
 
 =cut
 

@@ -1021,11 +1021,11 @@ sub extra_clean_files {
 }
 
 
-=item zipfile_target (o)
+=item zipfile_target
 
-=item tarfile_target (o)
+=item tarfile_target
 
-=item shdist_target (o)
+=item shdist_target
 
 Syntax for invoking shar, tar and zip differs from that for Unix.
 
@@ -1643,7 +1643,7 @@ sub _catprefix {
 }
 
 
-=item cd (o)
+=item cd
 
 =cut
 
@@ -1668,7 +1668,7 @@ MAKE_FRAG
     return $make_frag;
 }
 
-=item oneliner (o)
+=item oneliner
 
 =cut
 
@@ -1690,7 +1690,7 @@ sub oneliner {
 }
 
 
-=item B<echo> (o)
+=item B<echo>
 
 perl trips up on "<foo>" thinking it's an input redirect.  So we use the
 native Write command instead.  Besides, its faster.
@@ -1748,7 +1748,7 @@ sub max_exec_len {
     return $self->{_MAX_EXEC_LEN} ||= 256;
 }
 
-=item init_linker (o)
+=item init_linker
 
 =cut
 
