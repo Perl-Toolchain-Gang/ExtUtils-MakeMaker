@@ -1844,9 +1844,9 @@ sub init_others {	# --- Initialize Other Attributes
     # undefined. In any case we turn it into an anon array:
 
     # May check $Config{libs} too, thus not empty.
-    $self->{LIBS}=[''] unless $self->{LIBS};
+    $self->{LIBS} = [$self->{LIBS}] unless ref $self->{LIBS};
 
-    $self->{LIBS}=[$self->{LIBS}] if ref \$self->{LIBS} eq 'SCALAR';
+    $self->{LIBS} = [''] unless @{$self->{LIBS}} && defined $self->{LIBS}[0];
     $self->{LD_RUN_PATH} = "";
     my($libs);
     foreach $libs ( @{$self->{LIBS}} ){

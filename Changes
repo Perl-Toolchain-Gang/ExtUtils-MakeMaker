@@ -119,6 +119,8 @@
     - Craig Berry found some typos in ExtUtils::Liblist::Kid's VMS part
     * ExtUtils::Install did not work on MacPerl due to a hardcoded '.'
     * prompt() will now read from STDIN.
+    - Craig Berry made sure extliblist() is always called even if LIBS
+      is explicitly set to empty.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
