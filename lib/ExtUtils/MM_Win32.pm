@@ -151,21 +151,21 @@ Adjustments are made for Borland's quirks needing -L to come first.
 sub init_others {
     my ($self) = @_;
 
-    $self->SUPER::init_others;
-
-    $self->{'TOUCH'}  = '$(PERLRUN) -MExtUtils::Command -e touch';
-    $self->{'CHMOD'}  = '$(PERLRUN) -MExtUtils::Command -e chmod'; 
-    $self->{'CP'}     = '$(PERLRUN) -MExtUtils::Command -e cp';
-    $self->{'RM_F'}   = '$(PERLRUN) -MExtUtils::Command -e rm_f';
-    $self->{'RM_RF'}  = '$(PERLRUN) -MExtUtils::Command -e rm_rf';
-    $self->{'MV'}     = '$(PERLRUN) -MExtUtils::Command -e mv';
-    $self->{'NOOP'}   = 'rem';
-    $self->{'TEST_F'} = '$(PERLRUN) -MExtUtils::Command -e test_f';
-    $self->{'DEV_NULL'} = '> NUL';
+    $self->{'TOUCH'}    ||= '$(PERLRUN) -MExtUtils::Command -e touch';
+    $self->{'CHMOD'}    ||= '$(PERLRUN) -MExtUtils::Command -e chmod'; 
+    $self->{'CP'}       ||= '$(PERLRUN) -MExtUtils::Command -e cp';
+    $self->{'RM_F'}     ||= '$(PERLRUN) -MExtUtils::Command -e rm_f';
+    $self->{'RM_RF'}    ||= '$(PERLRUN) -MExtUtils::Command -e rm_rf';
+    $self->{'MV'}       ||= '$(PERLRUN) -MExtUtils::Command -e mv';
+    $self->{'NOOP'}     ||= 'rem';
+    $self->{'TEST_F'}   ||= '$(PERLRUN) -MExtUtils::Command -e test_f';
+    $self->{'DEV_NULL'} ||= '> NUL';
 
     # technically speaking, these should be in init_main()
-    $self->{'LD'}     = $Config{'ld'} || 'link';
-    $self->{'AR'}     = $Config{'ar'} || 'lib';
+    $self->{'LD'}     ||= $Config{'ld'} || 'link';
+    $self->{'AR'}     ||= $Config{'ar'} || 'lib';
+
+    $self->SUPER::init_others;
 
     $self->{'LDLOADLIBS'} ||= $Config{'libs'};
     # -Lfoo must come first for Borland, so we put it in LDDLFLAGS
@@ -180,6 +180,8 @@ sub init_others {
         $self->{'LDDLFLAGS'} ||= $Config{'lddlflags'};
         $self->{'LDDLFLAGS'} .= " $libpath";
     }
+
+    return 1;
 }
 
 
