@@ -6,11 +6,11 @@ use strict;
 
 use Exporter ();
 use Carp;
-use Config;
+use Config         qw(%Config);
 use File::Basename qw(basename dirname fileparse);
 use File::Spec;
 use DirHandle;
-use strict;
+
 use vars qw($VERSION @ISA
             $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos $Is_VOS
             $Verbose %pm %static $Xsubpp_Version
@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.34';
+$VERSION = '1.35';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -119,7 +119,6 @@ sub lsdir;
 sub macro;
 sub makeaperl;
 sub makefile;
-sub manifypods;
 sub maybe_command;
 sub maybe_command_in_dirs;
 sub needs_linking;
@@ -2738,58 +2737,6 @@ $(OBJECT) : $(FIRST_MAKEFILE)
     join "", @m;
 }
 
-=item manifypods (o)
-
-Defines targets and routines to translate the pods into manpages and
-put them into the INST_* directories.
-
-=cut
-
-sub manifypods {
-    my($self, %attribs) = @_;
-    return "\nmanifypods : pure_all\n\t$self->{NOECHO}\$(NOOP)\n" unless
-	%{$self->{MAN3PODS}} or %{$self->{MAN1PODS}};
-    my($dist);
-    my($pod2man_exe);
-    if (defined $self->{PERL_SRC}) {
-	$pod2man_exe = $self->catfile($self->{PERL_SRC},'pod','pod2man');
-    } else {
-	$pod2man_exe = $self->catfile($Config{scriptdirexp},'pod2man');
-    }
-    unless ($pod2man_exe = $self->perl_script($pod2man_exe)) {
-      # Maybe a build by uninstalled Perl?
-      $pod2man_exe = $self->catfile($self->{PERL_INC}, "pod", "pod2man");
-    }
-    unless ($pod2man_exe = $self->perl_script($pod2man_exe)) {
-	# No pod2man but some MAN3PODS to be installed
-	print <<END;
-
-Warning: I could not locate your pod2man program. Please make sure,
-         your pod2man program is in your PATH before you execute 'make'
-
-END
-        $pod2man_exe = "-S pod2man";
-    }
-    my(@m);
-    push @m,
-qq[POD2MAN_EXE = $pod2man_exe\n],
-qq[POD2MAN = \$(PERL) -we '%m=\@ARGV;for (keys %m){' \\\n],
-q[-e 'next if -e $$m{$$_} && -M $$m{$$_} < -M $$_ && -M $$m{$$_} < -M "],
- $self->{MAKEFILE}, q[";' \\
--e 'print "Manifying $$m{$$_}\n";' \\
--e 'system(q[$(PERLRUN) $(POD2MAN_EXE) ].qq[$$_>$$m{$$_}])==0 or warn "Couldn\\047t install $$m{$$_}\n";' \\
--e 'chmod(oct($(PERM_RW)), $$m{$$_}) or warn "chmod $(PERM_RW) $$m{$$_}: $$!\n";}'
-];
-    push @m, "\nmanifypods : pure_all ";
-    push @m, join " \\\n\t", keys %{$self->{MAN1PODS}}, keys %{$self->{MAN3PODS}};
-
-    push(@m,"\n");
-    if (%{$self->{MAN1PODS}} || %{$self->{MAN3PODS}}) {
-	push @m, "\t$self->{NOECHO}\$(POD2MAN) \\\n\t";
-	push @m, join " \\\n\t", %{$self->{MAN1PODS}}, %{$self->{MAN3PODS}};
-    }
-    join('', @m);
-}
 
 =item maybe_command
 
