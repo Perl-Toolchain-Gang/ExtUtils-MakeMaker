@@ -16,7 +16,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71_09';
-($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 3933 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -306,7 +306,7 @@ sub pm_to_blib {
 
     my $make = $self->SUPER::pm_to_blib;
 
-    $make =~ s{^pm_to_blib :}{pm_to_blib.ts :};
+    $make =~ s{^pm_to_blib :}{pm_to_blib.ts :}m;
     $make =~ s{\$\(TOUCH\) pm_to_blib}{\$(TOUCH) pm_to_blib.ts};
 
     $make = <<'MAKE' . $make;
