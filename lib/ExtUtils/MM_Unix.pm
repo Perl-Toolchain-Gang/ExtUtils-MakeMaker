@@ -1987,7 +1987,7 @@ sub init_INSTALL {
     foreach my $num (1, 3) {
         my $k = 'installsiteman'.$num.'dir';
 
-        $Config_Override{$k} = $Config{"installman${num}dir"}
+        $self->{uc $k} ||= uc "\$(installman${num}dir)"
           unless $Config{$k};
     }
 
@@ -1995,19 +1995,19 @@ sub init_INSTALL {
         my $k = 'installvendorman'.$num.'dir';
 
         unless( $Config{$k} ) {
-            $Config_Override{$k} = $Config{usevendorprefix}
-                                   ? $Config{"installman${num}dir"}
-                                   : '';
+            $self->{uc $k}  ||= $Config{usevendorprefix}
+                              ? uc "\$(installman${num}dir)"
+                              : '';
         }
     }
 
-    $Config_Override{installsitebin} = $Config{installbin}
+    $self->{INSTALLSITEBIN} ||= '$(INSTALLBIN)'
       unless $Config{installsitebin};
 
     unless( $Config{installvendorbin} ) {
-        $Config_Override{installvendorbin} = $Config{usevendorprefix} 
-                                           ? $Config{installbin}
-                                           : '';
+        $self->{INSTALLVENDORBIN} ||= $Config{usevendorprefix} 
+                                    ? $Config{installbin}
+                                    : '';
     }
 
 
