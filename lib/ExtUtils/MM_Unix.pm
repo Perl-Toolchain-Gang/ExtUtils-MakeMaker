@@ -2349,8 +2349,15 @@ sub init_PERL {
     # don't check if perl is executable, maybe they have decided to
     # supply switches with perl
 
+    # When built for debugging, VMS doesn't create perl.exe but ndbgperl.exe.
+    my $perl_name = 'perl';
+    $perl_name = 'ndbgperl' if $Is_VMS && 
+      defined $Config{usevmsdebug} && $Config{usevmsdebug} eq 'define';
+
+    # XXX This logic is flawed.  If "miniperl" is anywhere in the path
+    # it will get confused.  It should be fixed to work only on the filename.
     # Define 'FULLPERL' to be a non-miniperl (used in test: target)
-    ($self->{FULLPERL} = $self->{PERL}) =~ s/miniperl/perl/i
+    ($self->{FULLPERL} = $self->{PERL}) =~ s/miniperl/$perl_name/i
 	unless $self->{FULLPERL};
 
     # Little hack to get around VMS's find_perl putting "MCR" in front
