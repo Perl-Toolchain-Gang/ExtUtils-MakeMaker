@@ -364,6 +364,15 @@ Defines at least these macros.
   UMASK_NULL        Nullify umask
   DEV_NULL          Supress all command output
 
+=item init_EXISTS_EXT
+
+  $MM->init_EXISTS_EXT;
+
+Initializes the EXISTS_EXT macro which is simply a path fragment to tack
+onto a filepath to turn it into a .exists file.
+
+Something of a hack, but it works.
+
 
 =back
 
