@@ -2045,16 +2045,34 @@ sub init_INSTALL {
 
     $self->init_lib2arch;
 
-    # Initialize installvendorman*dir if necessary
+    # There are often no Config.pm defaults for these new man variables so 
+    # we fall back to the old behavior which is to use installman*dir
+    foreach my $num (1, 3) {
+        my $k = 'installsiteman'.$num.'dir';
+
+        $Config_Override{$k} = $Config{"installman${num}dir"}
+          unless $Config{$k};
+    }
+
     foreach my $num (1, 3) {
         my $k = 'installvendorman'.$num.'dir';
 
-        unless ($Config{$k}) {
-            $Config_Override{$k} = $Config{usevendorprefix} ?
-                  $self->catdir($Config{vendorprefixexp}, 'man', "man$num") :
-                  '';
+        unless( $Config{$k} ) {
+            $Config_Override{$k} = $Config{usevendorprefix}
+                                   ? $Config{"installman${num}dir"}
+                                   : '';
         }
     }
+
+    $Config_Override{installsitebin} = $Config{installbin}
+      unless $Config{installsitebin};
+
+    unless( $Config{installvendorbin} ) {
+        $Config_Override{installvendorbin} = $Config{usevendorprefix} 
+                                           ? $Config{installbin}
+                                           : '';
+    }
+
 
     my $iprefix = $Config{installprefixexp} || $Config{installprefix} || 
                   $Config{prefixexp}        || $Config{prefix} || '';
@@ -2064,22 +2082,6 @@ sub init_INSTALL {
     # 5.005_03 doesn't have a siteprefix.
     $sprefix = $iprefix unless $sprefix;
 
-    # There are often no Config.pm defaults for these, but we can make
-    # it up.
-    unless( $Config{installsiteman1dir} ) {
-        $Config_Override{installsiteman1dir} = 
-          $self->catdir($sprefix, 'man', 'man1');
-    }
-
-    unless( $Config{installsiteman3dir} ) {
-        $Config_Override{installsiteman3dir} = 
-          $self->catdir($sprefix, 'man', 'man3');
-    }
-
-    unless( $Config{installsitebin} ) {
-        $Config_Override{installsitebin} =
-          $self->catdir($sprefix, 'bin');
-    }
 
     $self->{PREFIX}       ||= '';
 

@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 36;
+use Test::More tests => 48;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -185,4 +185,75 @@ while( my($type, $vars) = each %Install_Vars) {
                       'installvendorman1dir (in %Config) not modified' );
     isnt( $mm->{INSTALLVENDORMAN3DIR}, '', 
                       'installvendorman3dir (not in %Config) set'  );
+}
+
+# Check that when installsiteman*dir isn't set in Config it falls back
+# to installman*dir
+{
+    undef *ExtUtils::MM_Unix::Config;
+    undef *ExtUtils::MM_Unix::Config_Override;
+    %ExtUtils::MM_Unix::Config = %Config;
+    *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
+
+    $ExtUtils::MM_Unix::Config{installman1dir} = 
+      File::Spec->catdir('foo', 'bar');
+    $ExtUtils::MM_Unix::Config{installman3dir} = 
+      File::Spec->catdir('foo', 'baz');
+    $ExtUtils::MM_Unix::Config{installsiteman1dir} = '';
+    $ExtUtils::MM_Unix::Config{installsiteman3dir} = '';
+    $ExtUtils::MM_Unix::Config{installvendorman1dir} = '';
+    $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
+    $ExtUtils::MM_Unix::Config{usevendorprefix} = 'define';
+    $ExtUtils::MM_Unix::Config{vendorprefixexp} = 'something';
+
+    my $wibble = File::Spec->catdir(qw(wibble and such));
+    my $stdout = tie *STDOUT, 'TieOut' or die;
+    my $mm = WriteMakefile(
+                           NAME          => 'Big::Dummy',
+                           VERSION_FROM  => 'lib/Big/Dummy.pm',
+                           PERL_CORE     => $ENV{PERL_CORE},
+                          );
+
+    is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
+    is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') );
+    is( $mm->{INSTALLSITEMAN1DIR},   $mm->{INSTALLMAN1DIR} );
+    is( $mm->{INSTALLSITEMAN3DIR},   $mm->{INSTALLMAN3DIR} );
+    is( $mm->{INSTALLVENDORMAN1DIR}, $mm->{INSTALLMAN1DIR} );
+    is( $mm->{INSTALLVENDORMAN3DIR}, $mm->{INSTALLMAN3DIR} );
+}
+
+
+# Check that when usevendoprefix and installvendorman*dir aren't set in 
+# Config it leaves them unset.
+{
+    undef *ExtUtils::MM_Unix::Config;
+    undef *ExtUtils::MM_Unix::Config_Override;
+    %ExtUtils::MM_Unix::Config = %Config;
+    *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
+
+    $ExtUtils::MM_Unix::Config{installman1dir} = 
+      File::Spec->catdir('foo', 'bar');
+    $ExtUtils::MM_Unix::Config{installman3dir} = 
+      File::Spec->catdir('foo', 'baz');
+    $ExtUtils::MM_Unix::Config{installsiteman1dir} = '';
+    $ExtUtils::MM_Unix::Config{installsiteman3dir} = '';
+    $ExtUtils::MM_Unix::Config{installvendorman1dir} = '';
+    $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
+    $ExtUtils::MM_Unix::Config{usevendorprefix} = '';
+    $ExtUtils::MM_Unix::Config{vendorprefixexp} = '';
+
+    my $wibble = File::Spec->catdir(qw(wibble and such));
+    my $stdout = tie *STDOUT, 'TieOut' or die;
+    my $mm = WriteMakefile(
+                           NAME          => 'Big::Dummy',
+                           VERSION_FROM  => 'lib/Big/Dummy.pm',
+                           PERL_CORE     => $ENV{PERL_CORE},
+                          );
+
+    is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
+    is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') );
+    is( $mm->{INSTALLSITEMAN1DIR},   $mm->{INSTALLMAN1DIR} );
+    is( $mm->{INSTALLSITEMAN3DIR},   $mm->{INSTALLMAN3DIR} );
+    is( $mm->{INSTALLVENDORMAN1DIR}, '' );
+    is( $mm->{INSTALLVENDORMAN3DIR}, '' );
 }
