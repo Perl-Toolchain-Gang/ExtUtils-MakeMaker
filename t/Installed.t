@@ -15,17 +15,13 @@ chdir 't';
 use strict;
 use warnings;
 
-# for _is_type() tests
 use Config;
-
-# for new() tests
 use Cwd;
 use File::Path;
-
-# for directories() tests
 use File::Basename;
+use File::Spec;
 
-use Test::More tests => 43;
+use Test::More tests => 42;
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
@@ -54,8 +50,10 @@ SKIP: {
     }
 }
 
-is( $ei->_is_type($Config{prefixexp} . '/bar', 'prog'), 1, 
-	"... should find prog file under $Config{prefixexp}" );
+# VMS 5.6.1 doesn't seem to have $Config{prefixexp}
+my $prefix = $Config{prefixexp} || $Config{prefix};
+is( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'), 1, 
+	"... should find prog file under $prefix" );
 
 SKIP: {
 	skip('no man directories on this system', 1) unless $mandirs;
@@ -75,15 +73,7 @@ is( $ei->_is_under('foo', @under), 0, '... should find no file not under dirs');
 is( $ei->_is_under('baz', @under), 1, '... should find file under dir' );
 
 # new
-my $realei;
-{
-    # We're going to get warnings about not being able to find install
-    # directories if we're not installed.
-    local $SIG{__WARN__} = sub {
-        warn @_ unless $ENV{PERL_CORE} && $_[0] =~ /^Can't stat/;
-    };
-    $realei = ExtUtils::Installed->new();
-}
+my $realei = ExtUtils::Installed->new();
 
 isa_ok( $realei, 'ExtUtils::Installed' );
 isa_ok( $realei->{Perl}{packlist}, 'ExtUtils::Packlist' );
@@ -111,11 +101,7 @@ FAKE
 
 
 SKIP: {
-    TODO: {
 	skip("could not write packlist: $!", 3 ) unless $wrotelist;
-
-       local $TODO = "new() attempts to derive package name from filename"
-           if $^O eq 'VMS';
 
 	# avoid warning and death by localizing glob
 	local *ExtUtils::Installed::Config;
@@ -133,7 +119,6 @@ SKIP: {
 	isa_ok( $realei->{FakeMod}{packlist}, 'ExtUtils::Packlist' );
 	is( $realei->{FakeMod}{version}, '1.1.1', 
 		'... should find version in modules' );
-    }
 }
 
 # modules
@@ -150,7 +135,7 @@ $ei->{goodmod} = {
                 ($Config{man3direxp} ? 
                     (File::Spec->catdir($Config{man3direxp}, 'bar') => 1) : 
                         ()),
-                File::Spec->catdir($Config{prefixexp}, 'foobar') => 1,
+                File::Spec->catdir($prefix, 'foobar') => 1,
 		foobaz	=> 1,
 	},
 };
@@ -235,9 +220,6 @@ is( ${ $ei->packlist('yesmod') }, 102,
 # version
 is( $ei->version('yesmod'), 101, 
 	'version() should report installed mod version' );
-
-# needs a DESTROY, for some reason
-can_ok( $ei, 'DESTROY' );
 
 END {
 	if ($wrotelist) {
