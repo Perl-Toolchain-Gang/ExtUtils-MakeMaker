@@ -2529,7 +2529,7 @@ doc_perl_install ::
 
 doc_site_install ::
 	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(INSTALLSITEARCH)
+	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLSITELIB)" \
@@ -2540,7 +2540,7 @@ doc_site_install ::
 
 doc_vendor_install ::
 	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(INSTALLVENDORARCH)
+	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLVENDORLIB)" \

@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.68';
-($Revision) = q$Revision: 1.100 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.101 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1581,7 +1581,7 @@ q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self
 # And again
 doc_site_install ::
 	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{INSTALLARCHLIB}, 'perllocal.pod').q["
-	$(NOECHO) $(MKPATH) $(INSTALLSITEARCH)
+	$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLSITELIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
 ],@exe_files,
@@ -1590,7 +1590,7 @@ q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self
 
 doc_vendor_install ::
 	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{INSTALLARCHLIB}, 'perllocal.pod').q["
-	$(NOECHO) $(MKPATH) $(INSTALLVENDORARCH)
+	$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLVENDORLIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
 ],@exe_files,
@@ -2013,6 +2013,7 @@ MAKE_FRAG
     push @m, q[
 # Still more from the 255-char line length limit
 doc_inst_perl :
+	$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
 	$(NOECHO) $(ECHO) "Perl binary $(MAP_TARGET)|" >.MM_tmp
 	$(NOECHO) $(ECHO) "MAP_STATIC|$(MAP_STATIC)|" >>.MM_tmp
 	$(NOECHO) $(PERL) -pl040 -e " " ].$self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'),q[ >>.MM_tmp
