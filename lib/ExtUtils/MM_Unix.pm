@@ -1523,7 +1523,7 @@ sub init_main {
                       File::Spec->catdir($Updir,$Updir),
                       File::Spec->catdir($Updir,$Updir,$Updir),
                       File::Spec->catdir($Updir,$Updir,$Updir,$Updir),
-                      File::Spec->catdir($Updir,$Updir,$Updir,$Updir,$Updir)))
+                      File::Spec->catdir($Updir,$Updir,$Updir,$Updir,$Updir))
         {
 	    if (
 		-f File::Spec->catfile($dir,"config_h.SH")
