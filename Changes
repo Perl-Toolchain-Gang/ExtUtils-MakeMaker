@@ -1,4 +1,4 @@
-6.06_03
+6.06_03 Sat Mar 29 19:44:53 PST 2003
     - Added AUTHOR and ABSTRACT_FROM info for ppd generation.
     - Added echo() method to portably echo text to a file.
     - Worked around 5.8.0 eval 'require Foo::Bar' bug causing MakeMaker
