@@ -14,15 +14,16 @@ BEGIN {
 }
 
 use File::Basename;
-use vars qw($Revision$VERSION);
-($VERSION) = '5.72';
-($Revision$Revision: 4259 $ =~ /Revision:\s+(\S+)/;
+use vars qw($Revision);
+use vars qw($VERSION);
+$VERSION = '5.72';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
+$Revision$ExtUtils::MakeMaker::Revision;
 
 
 =head1 NAME
