@@ -1864,7 +1864,7 @@ usually solves this kind of problem.
     $self->{PERLRUN} .= qq{ "-I\$(PERL_LIB)"} if $self->{UNINSTALLED_PERL};
 
     # How do we run perl when installing libraries?
-    $self->{PERLRUNINST} .= qq{$self->{PERLRUN} "-I\$(INST_ARCHLIB)" "-I\$(INST_LIB)"};
+    $self->{PERLRUNINST} = qq{$self->{PERLRUN} "-I\$(INST_ARCHLIB)" "-I\$(INST_LIB)"};
 
     # What extra library dirs do we need when running the tests?
     # Make sure these are absolute paths in case the test chdirs.
@@ -3418,7 +3418,7 @@ DOC_INSTALL = $(PERL) -e '$$\="\n\n";' \
 -e 'while (defined($$key = shift) and defined($$val = shift)){print "=item *";print "C<$$key: $$val>";}' \
 -e 'print "=back";'
 
-UNINSTALL =   $(PERL) -MExtUtils::Install \
+UNINSTALL =   $(PERLRUN) -MExtUtils::Install \
 -e 'uninstall($$ARGV[0],1,1); print "\nUninstall is deprecated. Please check the";' \
 -e 'print " packlist above carefully.\n  There may be errors. Remove the";' \
 -e 'print " appropriate files manually.\n  Sorry for the inconveniences.\n"'
