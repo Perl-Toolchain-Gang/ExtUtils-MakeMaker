@@ -408,6 +408,9 @@ sub init_others {
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
     $self->{MAKEFILE_OLD}       ||= '$(FIRST_MAKEFILE)_old';
 
+    $self->{MACROSTART}         ||= '/Macro=(';
+    $self->{MACROEND}           ||= ')';
+
     $self->{ECHO}     ||= '$(ABSPERLRUN) -le "print qq{@ARGV}"';
     $self->{ECHO_N}   ||= '$(ABSPERLRUN) -e  "print qq{@ARGV}"';
     $self->{TOUCH}    ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e touch';
@@ -562,6 +565,9 @@ sub constants {
         }
         $self->{$macro} = \@tmp;
     }
+
+    # mms/k does not define a $(MAKE) macro.
+    $self->{MAKE} = '$(MMS)$(MMSQUALIFIERS)';
 
     return $self->SUPER::constants;
 }
@@ -799,10 +805,9 @@ sub tools_other {
 # (It is assumed in some cases later that the default makefile name
 # (Descrip.MMS for MM[SK]) is used.)
 USEMAKEFILE = /Descrip=
-USEMACROS = /Macro=(
-MACROEND = )
 
 # Just in case anyone is using the old macro.
+USEMACROS = $(MACROSTART)
 SAY = $(ECHO)
 
 EXTRA_TOOLS
@@ -1193,7 +1198,7 @@ sub subdir_x {
 subdirs ::
 	olddef = F$Environment("Default")
 	Set Default ',$subdir,'
-	- $(MMS)$(MMSQUALIFIERS) all $(USEMACROS)$(PASTHRU)$(MACROEND)
+	- $(MAKE) all $(USEMACROS)$(PASTHRU)$(MACROEND)
 	Set Default \'olddef\'
 ';
     join('',@m);
@@ -1258,38 +1263,6 @@ clean :: clean_subdirs
 }
 
 
-=item clean_subdirs_target
-
-  my $make_frag = $MM->clean_subdirs_target;
-
-VMS semantics for changing directories and rerunning make very different.
-
-=cut
-
-sub clean_subdirs_target {
-    my($self) = shift;
-
-    # No subdirectories, no cleaning.
-    return <<'NOOP_FRAG' unless @{$self->{DIR}};
-clean_subdirs :
-	$(NOECHO) $(NOOP)
-NOOP_FRAG
-
-
-    my $clean = "clean_subdirs :\n";
-
-    foreach my $dir (@{$self->{DIR}}) { # clean subdirectories first
-	$dir = $self->fixpath($dir,1);
-
-        $clean .= sprintf <<'MAKE_FRAG', $dir, $dir;
-	If F$Search("%s$(FIRST_MAKEFILE)").nes."" Then $(PERLRUN) -e "chdir '%s'; print `$(MMS)$(MMSQUALIFIERS) clean`;"
-MAKE_FRAG
-    }
-
-    return $clean;
-}
-
-
 =item realclean (override)
 
 Guess what we're working around?  Also, use MM[SK] for subdirectories.
@@ -1306,7 +1279,7 @@ realclean :: clean
     foreach(@{$self->{DIR}}){
 	my($vmsdir) = $self->fixpath($_,1);
 	push(@m, '	If F$Search("'."$vmsdir".'$(FIRST_MAKEFILE)").nes."" Then \\',"\n\t",
-	      '$(PERL) -e "chdir ',"'$vmsdir'",'; print `$(MMS)$(MMSQUALIFIERS) realclean`;"',"\n");
+	      '$(PERL) -e "chdir ',"'$vmsdir'",'; print `$(MAKE) realclean`;"',"\n");
     }
     push @m, "	\$(RM_RF) \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n";
     push @m, "	\$(RM_RF) \$(DISTVNAME)\n";
@@ -1422,8 +1395,8 @@ q{
 disttest : distdir
 	startdir = F$Environment("Default")
 	Set Default [.$(DISTVNAME)]
-	$(MMS)$(MMSQUALIFIERS)
-	$(MMS)$(MMSQUALIFIERS) test
+	$(MAKE)
+	$(MAKE) test
 	Set Default 'startdir'
 };
 }
@@ -1658,7 +1631,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(NOECHO) $(ECHO) "$(FIRST_MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
 	$(NOECHO) $(ECHO) "Cleaning current config before rebuilding $(FIRST_MAKEFILE) ..."
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
-	- $(MMS)$(MMSQUALIFIERS) $(USEMAKEFILE)$(MAKEFILE_OLD) clean
+	- $(MAKE) $(USEMAKEFILE)$(MAKEFILE_OLD) clean
 	$(PERLRUN) Makefile.PL ],join(' ',map(qq["$_"],@ARGV)),q[
 	$(NOECHO) $(ECHO) "$(FIRST_MAKEFILE) has been rebuilt."
 	$(NOECHO) $(ECHO) "Please run $(MMS) to build the extension."
@@ -1702,7 +1675,7 @@ testdb :: testdb_\$(LINKTYPE)
     foreach(@{$self->{DIR}}){
       my($vmsdir) = $self->fixpath($_,1);
       push(@m, '	If F$Search("',$vmsdir,'$(FIRST_MAKEFILE)").nes."" Then $(PERL) -e "chdir ',"'$vmsdir'",
-           '; print `$(MMS)$(MMSQUALIFIERS) $(PASTHRU2) test`'."\n");
+           '; print `$(MAKE) $(PASTHRU) test`'."\n");
     }
     push(@m, "\t\$(NOECHO) \$(ECHO) \"No tests defined for \$(NAME) extension.\"\n")
         unless $tests or -f "test.pl" or @{$self->{DIR}};
@@ -1774,7 +1747,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
 	push @m, map(q[ \\\n\t\t"$_"], @ARGV),q{
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
-	$(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(MAKE_APERL_FILE) static $(MMS$TARGET)
+	$(MAKE)$(USEMAKEFILE)$(MAKE_APERL_FILE) static $(MMS$TARGET)
 };
 	push @m, "\n";
 
@@ -1942,9 +1915,9 @@ $(MAP_SHRTARGET) : $(MAP_LIBPERL) Makeaperl.Opt ',"${libperldir}Perlshr_Attr.Opt
 $(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmpdir}perlmain\$(OBJ_EXT) ${tmpdir}PerlShr.Opt",'
 	$(MAP_LINKCMD) ',"${tmpdir}perlmain\$(OBJ_EXT)",', PerlShr.Opt/Option
 	$(NOECHO) $(ECHO) "To install the new ""$(MAP_TARGET)"" binary, say"
-	$(NOECHO) $(ECHO) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
+	$(NOECHO) $(ECHO) "    $(MAKE)$(USEMAKEFILE)$(FIRST_MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
 	$(NOECHO) $(ECHO) "To remove the intermediate files, say
-	$(NOECHO) $(ECHO) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) map_clean"
+	$(NOECHO) $(ECHO) "    $(MAKE)$(USEMAKEFILE)$(FIRST_MAKEFILE) map_clean"
 ';
     push @m,"\n${tmpdir}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmpdir}Writemain.tmp\n";
     push @m, "# More from the 255-char line length limit\n";

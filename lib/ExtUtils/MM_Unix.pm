@@ -343,11 +343,11 @@ NOOP_FRAG
     my $clean = "clean_subdirs :\n";
 
     for my $dir (@{$self->{DIR}}) {
-        $clean .= "\t".
-                  $self->cd($dir,
-                            '$(TEST_F) $(FIRST_MAKEFILE) && $(MAKE) clean'
-                  ).
-                  "\n";
+        my $subclean = $self->oneliner(sprintf <<'CODE', $dir);
+if( -f '$(FIRST_MAKEFILE)' ) { chdir '%s'; system '$(MAKE) clean' }
+CODE
+
+        $clean .= "\t$subclean\n";
     }
 
     return $clean;
@@ -494,6 +494,7 @@ MM_REVISION = $self->{MM_REVISION}
 };
 
     for my $macro (qw/
+              MAKE
 	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
 	      LDFROM LINKTYPE PM_FILTER
 	      /	) 
@@ -920,10 +921,10 @@ sub distdir {
 
     my $mpl_args = join " ", map(qq["$_"], @ARGV);
     my $metafile = $self->cd('$(DISTVNAME)', 
-                             '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
-                             '$(MAKE) metafile  $(PASTHRU)',
-                             '$(MAKE) metafile_addtomanifest $(PASTHRU)'
-                            );
+            '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
+            '$(MAKE) metafile $(MACROSTART)$(PASTHRU)$(MACROEND)',
+            '$(MAKE) metafile_addtomanifest $(MACROSTART)$(PASTHRU)$(MACROEND)'
+    );
 
     my $distdir = sprintf <<'MAKE_FRAG', $metafile;
 distdir :
@@ -934,7 +935,9 @@ distdir :
 MAKE_FRAG
 
     if( $self->{SIGN} ) {
-	my $sign = $self->cd('$(DISTVNAME)', '$(MAKE) signature $(PASTHRU)');
+	my $sign = $self->cd('$(DISTVNAME)', 
+                     '$(MAKE) signature $(MACROSTART)$(PASTHRU)$(MACROEND)'
+                   );
 
 	$distdir .= sprintf <<'MAKE_FRAG', $sign;
 	%s
@@ -958,8 +961,8 @@ sub dist_test {
     my($self) = shift;
 
     my $test = $self->cd('$(DISTVNAME)',
-                         '$(MAKE) $(PASTHRU)',
-                         '$(MAKE) test $(PASTHRU)'
+                         '$(MAKE) $(MACROSTART)$(PASTHRU)$(MACROEND)',
+                         '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)'
                         );
 
     return sprintf <<'MAKE_FRAG', $test;
@@ -1922,6 +1925,9 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE};
     $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
     $self->{MAKE_APERL_FILE}    ||= $self->{MAKEFILE}.'.aperl';
+
+    $self->{MACROSTART}         ||= '';
+    $self->{MACROEND}           ||= '';
 
     $self->{SHELL}              ||= $Config{sh} || '/bin/sh';
 
@@ -3550,18 +3556,16 @@ NOOP_FRAG
     my $rclean = "realclean_subdirs :\n";
 
     foreach my $dir (@{$self->{DIR}}) {
-        my $cmd1 = $self->cd($dir, 
-                             '$(TEST_F) $(MAKEFILE_OLD) && '.
-                             '$(MAKE) -f $(MAKEFILE_OLD) realclean');
-        my $cmd2 = $self->cd($dir, 
-                             '$(TEST_F) $(FIRST_MAKEFILE) && '.
-                             '$(MAKE) realclean');
+        foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
+            my $rclean .= $self->oneliner(sprintf <<'CODE', $makefile, $dir, $makefile);
+if( -f '%s' ) { chdir '%s'; system '$(MAKE) -f %s realclean' }
+CODE
 
-        $rclean .= sprintf <<'RCLEAN', $cmd1, $cmd2;
-	-%s
+            $rclean .= sprintf <<'RCLEAN', $rclean;
 	-%s
 RCLEAN
 
+        }
     }
 
     return $rclean;
@@ -3785,8 +3789,8 @@ sub subdir_x {
     my($self, $subdir) = @_;
 
     my $subdir_cmd = $self->cd($subdir, 
-                               '$(MAKE) -f $(FIRST_MAKEFILE) all $(PASTHRU)'
-                              );
+      '$(MAKE) -f $(FIRST_MAKEFILE) all $(MACROSTART)$(PASTHRU)$(MACROEND)'
+    );
     return sprintf <<'EOT', $subdir_cmd;
 
 subdirs ::
@@ -3853,10 +3857,13 @@ test :: \$(TEST_TYPE)
 ");
 
     foreach my $dir (@{ $self->{DIR} }) {
-        my $cmd = $self->cd($dir, 
-                    '$(TEST_F) $(FIRST_MAKEFILE) && $(MAKE) test $(PASTHRU)'
-                  );
-        push(@m, "\t\$(NOECHO) $cmd\n");
+        my $test = $self->oneliner(sprintf <<'CODE');
+if( -f '$(FIRST_MAKEFILE)' ) { 
+    system '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)' 
+}
+CODE
+
+        push(@m, "\t\$(NOECHO) $test\n");
     }
 
     push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
@@ -3926,7 +3933,7 @@ Returns a make fragment containing definitions for:
 SHELL, CHMOD, CP, MV, NOOP, NOECHO, RM_F, RM_RF, TEST_F, TOUCH,
 DEV_NULL, UMASK_NULL, MKPATH, EQUALIZE_TIMESTAMP,
 WARN_IF_OLD_PACKLIST, UNINST, VERBINST, MOD_INSTALL, DOC_INSTALL and
-UNINSTALL
+UNINSTALL, MACROSTART, MACROEND
 
 init_others() initializes all these values.
 
@@ -3942,6 +3949,7 @@ sub tools_other {
                       UNINST VERBINST
                       MOD_INSTALL DOC_INSTALL UNINSTALL
                       WARN_IF_OLD_PACKLIST
+                      MACROSTART MACROEND
                     } ) 
     {
         next unless defined $self->{$tool};
