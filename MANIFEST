@@ -58,4 +58,5 @@ t/prefixify.t
 t/problems.t
 t/testlib.t
 t/VERSION_FROM.t
+t/writemakefile_args.t
 t/zz_cleanup_dummy.t
