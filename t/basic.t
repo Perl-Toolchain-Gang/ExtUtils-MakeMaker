@@ -108,14 +108,15 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
 
 # Make sure init_dirscan doesn't go into the distdir
-@mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
+@mpl_out = `$perl Makefile.PL "PREFIX=dummy-install"`;
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
 ok( grep(/^Writing $makefile for Big::Fat::Dummy/, 
          @mpl_out) == 1,
-                                'init_dirscan skipped distdir');
+                                'init_dirscan skipped distdir') || 
+  diag(@mpl_out);
 
 # I know we'll get ignored errors from make here, that's ok.
 # Send STDERR off to oblivion.
