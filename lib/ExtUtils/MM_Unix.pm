@@ -1875,13 +1875,16 @@ sub init_INSTALL {
         "$Config{siteprefixexp}/man/man\$(MAN1EXT)";
     $Config_Override{installsiteman3dir} = 
         "$Config{siteprefixexp}/man/man\$(MAN3EXT)";
-    $Config_Override{installvendorman1dir} =
-        "$Config{vendorprefixexp}/man/man\$(MAN1EXT)";
-    $Config_Override{installvendorman3dir} =
-        "$Config{vendorprefixexp}/man/man\$(MAN3EXT)";
+
+    if( $Config{usevendorprefix} ) {
+        $Config_Override{installvendorman1dir} =
+          "$Config{vendorprefixexp}/man/man\$(MAN1EXT)";
+        $Config_Override{installvendorman3dir} =
+          "$Config{vendorprefixexp}/man/man\$(MAN3EXT)";
+    }
 
     my $iprefix = $Config{installprefixexp} || '';
-    my $vprefix = $Config{vendorprefixexp}  || $iprefix;
+    my $vprefix = $Config{usevendorprefix}  ? $Config{vendorprefixexp} : '';
     my $sprefix = $Config{siteprefixexp}    || '';
 
     my $u_prefix  = $self->{PREFIX}       || '';
