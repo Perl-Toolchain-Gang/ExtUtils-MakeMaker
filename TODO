@@ -50,6 +50,3 @@ Merge libscan() methods.
 Move Win32->init_others() ExtUtils::Command overrides into MM_Any.
 
 Figure out and document the 4th arg to ExtUtils::Install::install()
-
-Move WARN_IF_OLD_PACKLIST, MOD_INSTALL, DOC_INSTALL and UNINSTALL code
-to ExtUtils::Command::MM.

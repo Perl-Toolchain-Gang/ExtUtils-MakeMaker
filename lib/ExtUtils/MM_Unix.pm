@@ -3753,50 +3753,24 @@ EQUALIZE_TIMESTAMP = $(PERLRUN) "-MExtUtils::Command" -e eqtime
 
     return join "", @m if $self->{PARENT};
 
-    my $old_packlist = $self->perl_oneliner(<<'CODE', ['-w']);
-exit unless -f $$ARGV[0];
-print "WARNING: I have found an old package in\n";
-print "\t$$ARGV[0].\n";
-print "Please make sure the two installations are not conflicting\n";
-CODE
-
     my $mod_install = $self->perl_oneliner(<<'CODE', ['-I$(INST_LIB)', '-I$(PERL_LIB)', '-MExtUtils::Install']);
 install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
 CODE
 
-    my $doc_install = $self->perl_oneliner(<<'CODE');
-$$\ = "\n\n";
-print "=head2 ", scalar(localtime), ": C<", shift, ">", " L<", $$arg=shift, 
-      "|", $$arg, ">";
-print "=over 4";
-while (defined($$key = shift) and defined($$val = shift)){
-    print "=item *";print "C<$$key: $$val>";
-}
-print "=back";
-CODE
-
-    my $uninstall = $self->perl_oneliner(<<'CODE', ['-l','-MExtUtils::Install']);
-uninstall($$ARGV[0],1,1); 
-print "\nUninstall is deprecated. Please check the packlist above carefully.";
-print 'There may be errors. Remove the  appropriate files manually.';
-print 'Sorry for the inconveniences.';
-CODE
-
-
-    push @m, sprintf <<MAKE_FRAG, $old_packlist, $mod_install, $doc_install, $uninstall;
+    push @m, sprintf <<'MAKE_FRAG', $mod_install;
 
 # Here we warn users that an old packlist file was found somewhere,
 # and that they should call some uninstall routine
-WARN_IF_OLD_PACKLIST = %s
+WARN_IF_OLD_PACKLIST = $(PERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist
 
 UNINST=0
 VERBINST=0
 
 MOD_INSTALL = %s
 
-DOC_INSTALL = %s
+DOC_INSTALL = $(PERLRUN) "-MExtUtils::Command::MM" -e perllocal_install
 
-UNINSTALL = %s
+UNINSTALL = $(PERLRUN) "-MExtUtils::Command::MM" -e uninstall
 MAKE_FRAG
 
     return join "", @m;

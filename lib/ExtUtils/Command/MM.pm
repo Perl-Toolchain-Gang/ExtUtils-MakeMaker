@@ -16,7 +16,7 @@ ExtUtils::Command::MM - Commands for the MM's to use in Makefiles
 
 =head1 SYNOPSIS
 
-  perl -MExtUtils::Command::MM -e "function" -- arguments...
+  perl "-MExtUtils::Command::MM" -e "function" "--" arguments...
 
 
 =head1 DESCRIPTION
@@ -25,8 +25,6 @@ B<FOR INTERNAL USE ONLY!>  The interface is not stable.
 
 ExtUtils::Command::MM encapsulates code which would otherwise have to
 be done with large "one" liners.
-
-They all read their input from @ARGV unless otherwise noted.
 
 Any $(FOO) used in the examples are make variables, not Perl.
 
@@ -129,6 +127,110 @@ sub pod2man {
     return 1;
 }
 
+
+=item B<warn_if_old_packlist>
+
+  perl "-MExtUtils::Command::MM" -e warn_if_old_packlist <somefile>
+
+Displays a warning that an old packlist file was found.  Reads the
+filename from @ARGV.
+
+=cut
+
+sub warn_if_old_packlist {
+    my $packlist = $ARGV[0];
+
+    return unless -f $packlist;
+    print <<"PACKLIST_WARNING";
+WARNING: I have found an old package in
+    $packlist.
+Please make sure the two installations are not conflicting
+PACKLIST_WARNING
+
+}
+
+
+=item B<perllocal_install>
+
+    perl "-MExtUtils::Command::MM" -e perllocal_install 
+        <type> <module name> <key> <value> ...
+
+Generates a fragment of POD suitable for appending to perllocal.pod.
+Arguments are read from @ARGV.
+
+'type' is the type of what you're installing.  Usually 'Module'.
+
+'module name' is simply the name of your module.  (Foo::Bar)
+
+Key/value pairs are extra information about the module.  Fields include:
+
+    installed into      which directory your module was out into
+    LINKTYPE            dynamic or static linking
+    VERSION             module version number
+    EXE_FILES           any executables installed in a space seperated 
+                        list
+
+=cut
+
+sub perllocal_install {
+    my($type, $name) = splice(@ARGV, 0, 2);
+
+    printf <<POD, scalar localtime;
+=head2 %s: C<$type> L<$name|$name>
+
+=over 4
+
+POD
+
+    do {
+        my($key, $val) = splice(@ARGV, 0, 2);
+
+        print <<POD
+=item *
+
+C<$key: $val>
+
+POD
+
+    } while(@ARGV);
+
+    print "=back\n\n";
+}
+
+=item B<uninstall>
+
+    perl "-MExtUtils::Command::MM" -e uninstall <packlist>
+
+A wrapper around ExtUtils::Install::uninstall().  Warns that
+uninstallation is deprecated and doesn't actually perform the
+uninstallation.
+
+=cut
+
+sub uninstall {
+    my($packlist) = shift;
+
+    require ExtUtils::Install;
+
+    print <<'WARNING';
+
+Uninstall is unsafe and deprecated, the uninstallation was not performed.
+We will show what would have been done.
+
+WARNING
+
+    ExtUtils::Install::uninstall($packlist, 1, 1);
+
+    print <<'WARNING';
+
+Uninstall is unsafe and deprecated, the uninstallation was not performed.
+Please check the list above carefully, there may be errors.
+Remove the appropriate files manually.
+Sorry for the inconvenience.
+
+WARNING
+
+}
 
 =back
 
