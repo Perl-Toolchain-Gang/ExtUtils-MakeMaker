@@ -426,8 +426,8 @@ sub constants {
               XS_VERSION XS_VERSION_MACRO             XS_DEFINE_VERSION
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
               INSTALLDIRS
-              DESTDIR
-              PREFIX          SITEPREFIX      VENDORPREFIX
+              DESTDIR PREFIX
+              PERLPREFIX      SITEPREFIX      VENDORPREFIX
               INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
               INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
               INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
@@ -2022,17 +2022,18 @@ sub init_INSTALL {
           File::Spec->catdir($sprefix, 'bin');
     }
 
-    my $u_prefix  = $self->{PREFIX}       || '';
+    my $u_prefix  = $self->{PERLPREFIX}       || '';
     my $u_sprefix = $self->{SITEPREFIX}   || $u_prefix;
     my $u_vprefix = $self->{VENDORPREFIX} || $u_prefix;
 
-    $self->{PREFIX}       ||= $u_prefix  || $iprefix;
+    $self->{PREFIX}       ||= '';
+    $self->{PERLPREFIX}   ||= $u_prefix  || $iprefix;
     $self->{SITEPREFIX}   ||= $u_sprefix || $sprefix;
     $self->{VENDORPREFIX} ||= $u_vprefix || $vprefix;
 
     # Add DESTDIR.
-    $self->{DESTDIR} = '' unless defined $self->{DESTDIR};
-    foreach my $prefix (qw(PREFIX SITEPREFIX VENDORPREFIX)) {
+    $self->{DESTDIR} ||= '';
+    foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
         $self->{$prefix} = '$(DESTDIR)'.$self->{$prefix};
     }
 
@@ -2145,7 +2146,7 @@ sub init_INSTALL {
         }
     }
 
-    my %type2prefix = ( perl    => 'PREFIX',
+    my %type2prefix = ( perl    => 'PERLPREFIX',
                         site    => 'SITEPREFIX',
                         vendor  => 'VENDORPREFIX'
                       );

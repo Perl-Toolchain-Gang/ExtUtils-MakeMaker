@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.05";
-($Revision = substr(q$Revision: 1.85 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.86 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -199,7 +199,8 @@ sub full_setup {
     FUNCLIST H IMPORTS
     INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB INST_MAN1DIR INST_MAN3DIR
     INSTALLDIRS
-    PREFIX          SITEPREFIX      VENDORPREFIX
+    DESTDIR PREFIX
+    PERLPREFIX      SITEPREFIX      VENDORPREFIX
     INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
     INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
     INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN
@@ -1019,7 +1020,7 @@ INSTALLDIRS according to the following table:
                                  INSTALLDIRS set to
                            perl        site          vendor
 
-                 PREFIX          SITEPREFIX          VENDORPREFIX
+                 PERLPREFIX      SITEPREFIX          VENDORPREFIX
   INST_ARCHLIB   INSTALLARCHLIB  INSTALLSITEARCH     INSTALLVENDORARCH
   INST_LIB       INSTALLPRIVLIB  INSTALLSITELIB      INSTALLVENDORLIB
   INST_BIN       INSTALLBIN      INSTALLSITEBIN      INSTALLVENDORBIN
@@ -1754,6 +1755,16 @@ nullifies many advantages of Perl's malloc(), such as better usage of
 system resources, error detection, memory usage reporting, catchable failure
 of memory allocations, etc.
 
+=item PERLPREFIX
+
+Directory under which core modules are to be installed.
+
+Defaults to $Config{installprefixexp} falling back to
+$Config{installprefix}, $Config{prefixexp} or $Config{prefix} should
+$Config{installprefixexp} not exist.
+
+Overridden by PREFIX.
+
 =item PERLRUN
 
 Use this instead of $(PERL) when you wish to run perl.  It will set up
@@ -1870,8 +1881,6 @@ which should be sensible for your platform.
 If you specify LIB or any INSTALL* variables they will not be effected
 by the PREFIX.
 
-Defaults to $Config{installprefixexp}.
-
 =item PREREQ_FATAL
 
 Bool. If this parameter is true, failing to have the required modules
@@ -1912,11 +1921,13 @@ RedHatism for C<PREREQ_PRINT>.  The output format is different, though:
 
 =item SITEPREFIX
 
-Like PREFIX, but only for the site install locations.
+Like PERLPREFIX, but only for the site install locations.
 
-Defaults to PREFIX (if set) or $Config{siteprefixexp}.  Perls prior to
-5.6.0 didn't have an explicit siteprefix in the Config.  In those
-cases $Config{installprefix} will be used.
+Defaults to $Config{siteprefixexp}.  Perls prior to 5.6.0 didn't have
+an explicit siteprefix in the Config.  In those cases
+$Config{installprefix} will be used.
+
+Overridable by PREFIX
 
 =item SKIP
 
@@ -1936,9 +1947,11 @@ typemap has lowest precedence.
 
 =item VENDORPREFIX
 
-Like PREFIX, but only for the vendor install locations.
+Like PERLPREFIX, but only for the vendor install locations.
 
-Defaults to PREFIX (if set) or $Config{vendorprefixexp}
+Defaults to $Config{vendorprefixexp}.
+
+Overridable by PREFIX
 
 =item VERBINST
 
@@ -1965,7 +1978,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.85 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.86 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
