@@ -1,4 +1,4 @@
-6.21
+6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl isntead of 
       PERL_ARCHLIB/CORE.  Would cause problems if INSTALLARCHLIB was changed
       (ie. LIB or PREFIX used). [Jochen Eisinger]
