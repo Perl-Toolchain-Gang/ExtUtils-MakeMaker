@@ -9,6 +9,8 @@ Do not delete your old ExtUtils/ directory.
 
 Known Problems:
 
+(See http://rt.cpan.org for a full list of open problems.)
+
 ActivePerl likely broken if installed in C:\Program Files or other
 prefix with a space in the name.
 
