@@ -253,7 +253,7 @@ sub run {
     # is perl, not for other commands).
     if( MM->os_flavor_is('Unix') or
         ($] >= 5.008 and 
-         !MM->os_flavor_is('MacOS Classic', 'VMS')
+         !MM->os_flavor_is('MacOS Classic', 'VMS'))
       ) 
     {
         return `$cmd 2>&1`;
