@@ -1251,7 +1251,7 @@ tests in t/*.t.
 
 sub find_tests {
     my($self) = shift;
-    return 't/*.t';
+    return -d 't' ? 't/*.t' : '';
 }
 
 =back
