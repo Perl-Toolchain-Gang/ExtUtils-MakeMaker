@@ -1014,10 +1014,10 @@ a lot of commands.
 =cut
 
 sub extra_clean_files {
-    my @files = qw(
-                   *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) $(BASEEXT).bso
-                   .MM_Tmp
-                  );
+    return qw(
+              *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) $(BASEEXT).bso
+              .MM_Tmp
+             );
 }
 
 
