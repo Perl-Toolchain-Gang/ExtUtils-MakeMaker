@@ -52,9 +52,8 @@ Converts a list into a string wrapped at approximately 80 columns.
 sub wraplist {
     my($self) = shift;
     my($line,$hlen) = ('',0);
-    my($word);
 
-    foreach $word (@_) {
+    foreach my $word (@_) {
       # Perl bug -- seems to occasionally insert extra elements when
       # traversing array (scalar(@array) doesn't show them, but
       # foreach(@array) does) (5.00307)
@@ -296,16 +295,16 @@ sub replace_manpage_separator {
     $man;
 }
 
-=item init_EXISTS_EXT
+=item init_DIRFILESEP
 
-Using .exists.
+No seperator between a directory path and a filename on VMS.
 
 =cut
 
-sub init_EXISTS_EXT {
+sub init_DIRFILESEP {
     my($self) = shift;
 
-    $self->{EXISTS_EXT} = '.exists';
+    $self->{DIRFILESEP} = '';
     return 1;
 }
 
@@ -322,6 +321,34 @@ sub init_main {
 
     $self->SUPER::init_main;
     $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION_SYM}";
+
+    $self->{DEFINE} ||= '';
+    if ($self->{DEFINE} ne '') {
+        my(@terms) = split(/\s+/,$self->{DEFINE});
+        my(@defs,@udefs);
+        foreach $def (@terms) {
+            next unless $def;
+            my $targ = \@defs;
+            if ($def =~ s/^-([DU])//) {    # If it was a Unix-style definition
+                $tar = \@udefs if $1 eq 'U';
+                $def =~ s/='(.*)'$/=$1/;  # then remove shell-protection ''
+                $def =~ s/^'(.*)'$/$1/;   # from entire term or argument
+            }
+            if ($def =~ /=/) {
+                $def =~ s/"/""/g;  # Protect existing " from DCL
+                $def = qq["$def"]; # and quote to prevent parsing of =
+            }
+            push @$targ, $def;
+        }
+
+        $self->{DEFINE} = '';
+        if (@defs)  { 
+            $self->{DEFINE}  = '/Define=(' . join(',',@defs)  . ')'; 
+        }
+        if (@udefs) { 
+            $self->{DEFINE} .= '/Undef=('  . join(',',@udefs) . ')'; 
+        }
+    }
 }
 
 =item init_others (override)
@@ -353,222 +380,168 @@ sub init_others {
     $self->{CP} = 'Copy/NoConfirm';
     $self->{MV} = 'Rename/NoConfirm';
     $self->{UMASK_NULL} = '! ';  
+
+    if ($self->{OBJECT} =~ /\s/) {
+        $self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
+        $self->{OBJECT} = $self->wraplist(
+            map $self->fixpath($_,0), split /,?\s+/, $self->{OBJECT}
+        );
+    }
+
+    $self->{LDFROM} = $self->wraplist(
+        map $self->fixpath($_,0), split /,?\s+/, $self->{LDFROM}
+    );
     
     $self->SUPER::init_others;
 }
 
+
+=item init_platform (override)
+
+Add PERL_VMS, MM_VMS_REVISION and MM_VMS_VERSION.
+
+MM_VMS_REVISION is for backwards compatibility before MM_VMS had a
+$VERSION.
+
+=cut
+
+sub init_platform {
+    my($self) = shift;
+
+    $self->{MM_VMS_REVISION} = $Revision;
+    $self->{MM_VMS_VERSION}  = $Version;
+    $self->{PERL_VMS} = File::Spec->catdir($self->{PERL_SRC}, 'VMS')
+      if $self->{PERL_SRC};
+}
+
+=cut
+
+=item platform_constants
+
+=cut
+
+sub platform_constants {
+    my($self) = shift;
+    my $make_frag = '';
+
+    foreach my $macro (qw(PERL_VMS MM_VMS_REVISION MM_VMS_VERSION))
+    {
+        next unless defined $self->{$macro};
+        $make_frag .= "$macro = $self->{$macro}\n";
+    }
+
+    return $make_frag;
+}
+
+
+=item init_VERSION (override)
+
+Override the *DEFINE_VERSION macros with VMS semantics.  Translate the
+MAKEMAKER filepath to VMS style.
+
+=cut
+
+sub init_VERSION {
+    my $self = shift;
+
+    $self->SUPER::init_VERSION;
+
+    $self->{DEFINE_VERSION}   = '"$(VERSION_MACRO)=""$(VERSION)"""';
+    $self->{XS_DEFINE_VERSION = '"$(XS_VERSION_MACRO)=""$(XS_VERSION)"""';
+    $self->{MAKEMAKER} = vmsify($INC{'ExtUtils/MakeMaker.pm'});
+}
+
+
 =item constants (override)
 
 Fixes up numerous file and directory macros to insure VMS syntax
-regardless of input syntax.  Also adds a few VMS-specific macros
-and makes lists of files comma-separated.
+regardless of input syntax.  Also makes lists of files
+comma-separated.
 
 =cut
 
 sub constants {
     my($self) = @_;
-    my(@m,$def,$macro);
 
     # Be kind about case for pollution
     for (@ARGV) { $_ = uc($_) if /POLLUTE/i; }
 
-    $self->{DEFINE} ||= '';
-    if ($self->{DEFINE} ne '') {
-	my(@terms) = split(/\s+/,$self->{DEFINE});
-	my(@defs,@udefs);
-	foreach $def (@terms) {
-	    next unless $def;
-	    my $targ = \@defs;
-	    if ($def =~ s/^-([DU])//) {       # If it was a Unix-style definition
-		if ($1 eq 'U') { $targ = \@udefs; }
-		$def =~ s/='(.*)'$/=$1/;  # then remove shell-protection ''
-		$def =~ s/^'(.*)'$/$1/;   # from entire term or argument
-	    }
-	    if ($def =~ /=/) {
-		$def =~ s/"/""/g;  # Protect existing " from DCL
-		$def = qq["$def"]; # and quote to prevent parsing of =
-	    }
-	    push @$targ, $def;
-	}
-	$self->{DEFINE} = '';
-	if (@defs)  { 
-            $self->{DEFINE}  = '/Define=(' . join(',',@defs)  . ')'; 
-        }
-	if (@udefs) { 
-            $self->{DEFINE} .= '/Undef=('  . join(',',@udefs) . ')'; 
-        }
-    }
-
-    if ($self->{OBJECT} =~ /\s/) {
-	$self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
-	$self->{OBJECT} = $self->wraplist(map($self->fixpath($_,0),split(/,?\s+/,$self->{OBJECT})));
-    }
-    $self->{LDFROM} = $self->wraplist(map($self->fixpath($_,0),split(/,?\s+/,$self->{LDFROM})));
-
-
+    # Cleanup paths for directories in MMS macros.
     foreach $macro ( qw [
             INST_BIN INST_SCRIPT INST_LIB INST_ARCHLIB 
             INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
-	    INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
+            INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
             INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
             INSTALLMAN1DIR INSTALLSITEMAN1DIR INSTALLVENDORMAN1DIR
             INSTALLMAN3DIR INSTALLSITEMAN3DIR INSTALLVENDORMAN3DIR
             PERL_LIB PERL_ARCHLIB
-            PERL_INC PERL_SRC FULLEXT ] ) {
-	next unless defined $self->{$macro};
+            PERL_INC PERL_SRC FULLEXT ] ) 
+    {
+        next unless defined $self->{$macro};
         next if $macro =~ /MAN/ && $self->{$macro} eq 'none';
-	$self->{$macro} = $self->fixpath($self->{$macro},1);
+        $self->{$macro} = $self->fixpath($self->{$macro},1);
     }
-    $self->{PERL_VMS} = File::Spec->catdir($self->{PERL_SRC},q(VMS))
-	if ($self->{PERL_SRC});
 
-    # Fix up file specs
+    # Cleanup paths for files in MMS macros.
     foreach $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD 
                         MAKE_APERL_FILE MYEXTLIB] ) 
     {
-	next unless defined $self->{$macro};
-	$self->{$macro} = $self->fixpath($self->{$macro},0);
+        next unless defined $self->{$macro};
+        $self->{$macro} = $self->fixpath($self->{$macro},0);
     }
 
-    foreach $macro (qw/
-	      AR_STATIC_ARGS NAME DISTNAME NAME_SYM VERSION VERSION_SYM 
-              XS_VERSION EXISTS_EXT
-	      INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT 
-              INSTALLDIRS
-              PREFIX          SITEPREFIX      VENDORPREFIX
-	      INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
-	      INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
-              INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
-	      PERL_LIB PERL_ARCHLIB 
-              SITELIBEXP SITEARCHEXP 
-              LIBPERL_A MYEXTLIB
-	      FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE 
-              PERLMAINCC PERL_SRC 
-              PERL_VMS PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN 
-              PERLRUNINST FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
-              PERL_CORE NOECHO NOOP
-	      / ) {
-	next unless defined $self->{$macro};
-	push @m, "$macro = $self->{$macro}\n";
-    }
-
-
-    push @m, q[
-VERSION_MACRO = VERSION
-DEFINE_VERSION = "$(VERSION_MACRO)=""$(VERSION)"""
-XS_VERSION_MACRO = XS_VERSION
-XS_DEFINE_VERSION = "$(XS_VERSION_MACRO)=""$(XS_VERSION)"""
-
-MAKEMAKER = ],$self->catfile($self->{PERL_LIB},'ExtUtils','MakeMaker.pm'),qq[
-MM_VERSION = $ExtUtils::MakeMaker::VERSION
-MM_REVISION = $ExtUtils::MakeMaker::Revision
-MM_VMS_REVISION = $ExtUtils::MM_VMS::Revision
-
-# FULLEXT = Pathname for extension directory (eg DBD/Oracle).
-# BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT.
-# PARENT_NAME = NAME without BASEEXT and no trailing :: (eg Foo::Bar)
-# DLBASE  = Basename part of dynamic library. May be just equal BASEEXT.
-];
-
-    for my $tmp (qw/
-	      FULLEXT VERSION_FROM OBJECT LDFROM
+    # Fixup files for MMS macros
+    # XXX is this list complete?
+    for my $macro (qw/
+                   FULLEXT VERSION_FROM OBJECT LDFROM
 	      /	) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = ",$self->fixpath($self->{$tmp},0),"\n";
+        next unless defined $self->{$macro};
+        $self->{$macro} = $self->fixpath($self->{$macro},0),"\n";
     }
 
-    for my $tmp (qw/
-	      BASEEXT PARENT_NAME DLBASE INC DEFINE LINKTYPE
-	      /	) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
+
+    for my $macro (qw/ XS MAN1PODS MAN3PODS PM /) {
+        # Where is the space coming from? --jhi
+        next unless $self ne " " && defined $self->{$macro};
+        my %tmp = ();
+        for my $key (keys %{$self->{$macro}}) {
+            $tmp{$self->fixpath($key,0)} = 
+                                     $self->fixpath($self->{$macro}{$key},0);
+        }
+        $self->{$macro} = \%tmp;
     }
 
-    for my $tmp (qw/ XS MAN1PODS MAN3PODS PM /) {
-	# Where is the space coming from? --jhi
-	next unless $self ne " " && defined $self->{$tmp};
-	my(%tmp,$key);
-	for $key (keys %{$self->{$tmp}}) {
-	    $tmp{$self->fixpath($key,0)} = $self->fixpath($self->{$tmp}{$key},0);
-	}
-	$self->{$tmp} = \%tmp;
+    for my $macro (qw/ C O_FILES H /) {
+        next unless defined $self->{$macro};
+        my @tmp = ();
+        for my $val (@{$self->{$macro}}) {
+            push(@tmp,$self->fixpath($val,0));
+        }
+        $self->{$macro} = \@tmp;
     }
 
-    for my $tmp (qw/ C O_FILES H /) {
-	next unless defined $self->{$tmp};
-	my(@tmp,$val);
-	for $val (@{$self->{$tmp}}) {
-	    push(@tmp,$self->fixpath($val,0));
-	}
-	$self->{$tmp} = \@tmp;
-    }
+    return $self->SUPER::constants;
+}
 
-    push @m,'
 
-# Handy lists of source code files:
-XS_FILES = ',$self->wraplist(sort keys %{$self->{XS}}),'
-C_FILES  = ',$self->wraplist(@{$self->{C}}),'
-O_FILES  = ',$self->wraplist(@{$self->{O_FILES}} ),'
-H_FILES  = ',$self->wraplist(@{$self->{H}}),'
-MAN1PODS = ',$self->wraplist(sort keys %{$self->{MAN1PODS}}),'
-MAN3PODS = ',$self->wraplist(sort keys %{$self->{MAN3PODS}}),'
+=item special_targets
 
-';
+Clear the default .SUFFIXES and put in our own list.
 
-    for my $tmp (qw/
-	      INST_MAN1DIR  MAN1EXT 
-              INSTALLMAN1DIR INSTALLSITEMAN1DIR INSTALLVENDORMAN1DIR
-	      INST_MAN3DIR  MAN3EXT
-              INSTALLMAN3DIR INSTALLSITEMAN3DIR INSTALLVENDORMAN3DIR
-	      /) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
-    }
+=cut
 
-push @m,"
-makemakerdflt : all
-	\$(NOECHO) \$(NOOP)
+sub special_targets {
+    my $self = shift;
 
+    my $make_frag = $self->SUPER::special_targets;
+
+    $make_frag .= <<'MAKE_FRAG';
 .SUFFIXES :
 .SUFFIXES : \$(OBJ_EXT) .c .cpp .cxx .xs
 
-# Here is the Config.pm that we are using/depend on
-CONFIGDEP = \$(PERL_ARCHLIB)Config.pm, \$(PERL_INC)config.h \$(VERSION_FROM)
+MAKE_FRAG
 
-# Where to put things:
-INST_LIBDIR      = $self->{INST_LIBDIR}
-INST_ARCHLIBDIR  = $self->{INST_ARCHLIBDIR}
-
-INST_AUTODIR     = $self->{INST_AUTODIR}
-INST_ARCHAUTODIR = $self->{INST_ARCHAUTODIR}
-";
-
-    if ($self->has_link_code()) {
-	push @m,'
-INST_STATIC = $(INST_ARCHAUTODIR)$(BASEEXT)$(LIB_EXT)
-INST_DYNAMIC = $(INST_ARCHAUTODIR)$(DLBASE).$(DLEXT)
-INST_BOOT = $(INST_ARCHAUTODIR)$(BASEEXT).bs
-';
-    } else {
-	my $shr = $Config{'dbgprefix'} . 'PERLSHR';
-	push @m,'
-INST_STATIC =
-INST_DYNAMIC =
-INST_BOOT =
-EXPORT_LIST = $(BASEEXT).opt
-PERL_ARCHIVE = ',($ENV{$shr} ? $ENV{$shr} : "Sys\$Share:$shr.$Config{'dlext'}"),'
-';
-    }
-
-    $self->{TO_INST_PM} = [ sort keys %{$self->{PM}} ];
-    $self->{PM_TO_BLIB} = [ %{$self->{PM}} ];
-    push @m,'
-TO_INST_PM = ',$self->wraplist(@{$self->{TO_INST_PM}}),'
-
-PM_TO_BLIB = ',$self->wraplist(@{$self->{PM_TO_BLIB}}),'
-';
-
-    join('',@m);
+    return $make_frag;
 }
 
 =item cflags (override)
@@ -721,7 +694,7 @@ command line to find args.
 sub pm_to_blib {
     my($self) = @_;
     my($autodir) = File::Spec->catdir($self->{INST_LIB},'auto');
-    my(%files) = @{$self->{PM_TO_BLIB}};
+    my(%files) = %{$self->{PM}};
 
     my $m = <<'MAKE_FRAG';
 
@@ -1052,27 +1025,27 @@ pure_all :: config pm_to_blib subdirs linkext
 subdirs :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
-config :: $(MAKEFILE) $(INST_LIBDIR)$(EXISTS_EXT)
+config :: $(MAKEFILE) $(INST_LIBDIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 
-config :: $(INST_ARCHAUTODIR)$(EXISTS_EXT)
+config :: $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 
-config :: $(INST_AUTODIR)$(EXISTS_EXT)
+config :: $(INST_AUTODIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 ';
 
     push @m, $self->dir_target(qw[$(INST_AUTODIR) $(INST_LIBDIR) $(INST_ARCHAUTODIR)]);
     if (%{$self->{MAN1PODS}}) {
 	push @m, q[
-config :: $(INST_MAN1DIR)$(EXISTS_EXT)
+config :: $(INST_MAN1DIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 ];
 	push @m, $self->dir_target(qw[$(INST_MAN1DIR)]);
     }
     if (%{$self->{MAN3PODS}}) {
 	push @m, q[
-config :: $(INST_MAN3DIR)$(EXISTS_EXT)
+config :: $(INST_MAN3DIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 ];
 	push @m, $self->dir_target(qw[$(INST_MAN3DIR)]);
@@ -1195,7 +1168,7 @@ INST_DYNAMIC_DEP = $inst_dynamic_dep
 
 ";
     push @m, '
-$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt $(INST_ARCHAUTODIR)$(EXISTS_EXT) $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt $(INST_ARCHAUTODIR)$(DIRFILESEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
 	If F$TrnLNm("',$shr,'").eqs."" Then Define/NoLog/User ',"$shr Sys\$Share:$shr.$Config{'dlext'}",'
 	Link $(LDFLAGS) /Shareable=$(MMS$TARGET)$(OTHERLDFLAGS) $(BASEEXT).opt/Option,$(PERL_INC)perlshr_attr.opt/Option
@@ -1222,13 +1195,13 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # As MakeMaker mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR)$(EXISTS_EXT)
+$(BOOTSTRAP) : $(MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 	$(NOECHO) $(SAY) "Running mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) -
 	-e "use ExtUtils::Mkbootstrap; Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
 	$(NOECHO) $(TOUCH) $(MMS$TARGET)
 
-$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_EXT)
+$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 	$(NOECHO) $(RM_RF) $(INST_BOOT)
 	- $(CP) $(BOOTSTRAP) $(INST_BOOT)
 ';
@@ -1252,7 +1225,7 @@ $(INST_STATIC) :
     my(@m,$lib);
     push @m,'
 # Rely on suffix rule for update action
-$(OBJECT) : $(INST_ARCHAUTODIR)$(EXISTS_EXT)
+$(OBJECT) : $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 
 $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
 ';
@@ -1354,7 +1327,7 @@ realclean ::
 	else                   { ($todir = $to) =~ s/[^\)]+$//; }
 	$todir = $self->fixpath($todir,1);
 	push @m, "
-$to : $from \$(MAKEFILE) ${todir}\$(EXISTS_EXT)
+$to : $from \$(MAKEFILE) ${todir}\$(DIRFILESEP).exists
 	\$(CP) $from $to
 
 ", $self->dir_target($todir);
@@ -2293,6 +2266,18 @@ sub perl_oneliner {
     $switches = join ' ', map { qq{"$_"} } @$switches;
 
     return qq{\$(PERLRUN) $switches -e "$cmd"};
+}
+
+=item init_linker (o)
+
+=cut
+
+sub init_linker {
+    my $self = shift;
+    $self->{EXPORT_LIST} = '$(BASEEXT).opt';
+
+    my $shr = $Config{dbgprefix} . 'PERLSHR';
+    $self->{PERL_ARCHIVE} =  $ENV{$shr} ? $ENV{$shr} : "Sys\$Share:$shr.$Config{'dlext'}";
 }
 
 =back
