@@ -3746,25 +3746,6 @@ sub test_via_script {
     return $self->SUPER::test_via_script("PERL_DL_NONLAZY=1 $perl", $script);
 }
 
-=item tool_autosplit (o)
-
-Defines a simple perl call that runs autosplit. May be deprecated by
-pm_to_blib soon.
-
-=cut
-
-sub tool_autosplit {
-    my($self, %attribs) = @_;
-    my($asl) = "";
-    $asl = "\$\$AutoSplit::Maxlen=$attribs{MAXLEN};" if $attribs{MAXLEN};
-
-    return sprintf <<'MAKE_FRAG', $asl;
-# Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = $(PERLRUN) -e 'use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1) ;'
-
-MAKE_FRAG
-
-}
 
 =item tools_other (o)
 
