@@ -15,7 +15,7 @@ use Test::More;
 
 BEGIN {
 	if ($^O =~ /cygwin/i) {
-		plan tests => 13;
+		plan tests => 11;
 	} else {
 		plan skip_all => "This is not cygwin";
 	}
@@ -47,10 +47,9 @@ delete $args->{CFLAGS};
 # ExtUtils::MM_Cygwin::cflags() calls this, fake the output
 {
     local $SIG{__WARN__} = sub { 
-        # no warnings 'redefine';
         warn @_ unless $_[0] =~ /^Subroutine .* redefined/;
     };
-    sub ExtUtils::MM_Unix::cflags { return $_[1] };
+    *ExtUtils::MM_Unix::cflags = sub { return $_[1] };
 }
 
 # respects the config setting, should ignore whitespace around equal sign
@@ -74,12 +73,12 @@ $args = bless({
 	MAN1PODS => {},
     MAKEFILE => 'Makefile',
 }, 'MM');
-like( $args->manifypods(), qr/pure_all\n\tnoecho/,
+unlike( $args->manifypods(), qr/foo/,
 	'manifypods() should return without PODS values set' );
 
-$args->{MAN3PODS} = { foo => 1 };
+$args->{MAN3PODS} = { foo => 'foo.1' };
 my $res = $args->manifypods();
-like( $res, qr/pure_all.+foo/, '... should add MAN3PODS targets' );
+like( $res, qr/pure_all.*foo.*foo.1/s, '... should add MAN3PODS targets' );
 
 
 SKIP: {
