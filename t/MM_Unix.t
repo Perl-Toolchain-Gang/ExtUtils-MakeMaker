@@ -5,6 +5,9 @@ BEGIN {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
+    else {
+        unshift @INC, 't/lib';
+    }
 }
 chdir 't';
 
@@ -180,7 +183,8 @@ is ($t->nicetext('LOTR'),'LOTR','nicetext');
 ###############################################################################
 # parse_version
 
-my $self_name = 'MM_Unix.t';
+my $self_name = $ENV{PERL_CORE} ? '../lib/ExtUtils/t/MM_Unix.t' 
+                                : 'MM_Unix.t';
 
 is ($t->parse_version($self_name),'0.02',
   'parse_version on ourself');
