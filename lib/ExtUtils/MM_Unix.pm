@@ -731,10 +731,16 @@ Defines the targets dist, tardist, zipdist, uutardist, shdist
 
 sub dist_core {
     my($self) = shift;
-    my @m;
-    push @m, q{
+
+    my $date_check = $self->perl_oneliner(<<'CODE', ['-l']);
+print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
+  if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(MAKEFILE)';
+CODE
+
+    return sprintf <<'MAKE_FRAG', $date_check;
+
 dist : $(DIST_DEFAULT)
-	$(NOECHO) $(PERL) -le "print 'Warning: Makefile possibly out of date with $(VERSION_FROM)' if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(MAKEFILE)';"
+	$(NOECHO) %s
 
 tardist : $(DISTVNAME).tar$(SUFFIX)
 
@@ -764,8 +770,8 @@ shdist : distdir
 	$(SHAR) $(DISTVNAME) > $(DISTVNAME).shar
 	$(RM_RF) $(DISTVNAME)
 	$(POSTOP)
-};
-    join "", @m;
+MAKE_FRAG
+
 }
 
 =item dist_dir
@@ -3302,15 +3308,23 @@ sub replace_manpage_separator {
 =cut
 
 sub perl_oneliner {
-    my($self,$cmd) = @_;
+    my($self, $cmd, $switches) = @_;
+    $switches = [] unless defined $switches;
+
+    # Strip leading and trailing newlines
+    $cmd =~ s{^\n+}{};
+    $cmd =~ s{\n+$}{};
+
+    # Escape newlines
+    $cmd =~ s{\n}{\\\n}g;
 
     # I think all we have to quote is single quotes and I think
     # this is a safe way to do it.
     $cmd =~ s{'}{'\\''}g;
 
-    # And, of course, what if there's a space in the path to perl?
-    # So we quote that.
-    return qq{\$(PERLRUN) -e '$cmd'};   
+    $switches = join ' ', @$switches;
+
+    return qq{\$(PERLRUN) $switches -e '$cmd'};   
 }
 
 

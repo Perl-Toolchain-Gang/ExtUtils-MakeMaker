@@ -292,13 +292,22 @@ have to do their own implementation.
 
 =item perl_oneliner
 
-  my $oneliner = $MM->perl_oneliner($perl_code);
+  my $oneliner = $MM->perl_oneliner($perl_code, \@switches);
 
 This will generate a perl one-liner safe for the particular platform
-you're on based on the given $perl_code and suitable for using in a
-make target.  It will use the proper shell quoting and escapes.
+you're on based on the given $perl_code and @switches (a -e is
+assumed) suitable for using in a make target.  It will use the proper
+shell quoting and escapes.
 
 $(PERLRUN) will be used as perl.
+
+Any newlines in $perl_code will be escaped.  Leading and trailing
+newlines will be stripped.  Makes this idiom much easier:
+
+    my $code = $MM->perl_oneliner(<<'CODE', [...switches...]);
+some code here
+another line here
+CODE
 
 Usage might be something like:
 

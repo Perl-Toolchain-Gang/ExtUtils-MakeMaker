@@ -2214,14 +2214,23 @@ sub _catprefix {
 =cut
 
 sub perl_oneliner {
-    my($self,$cmd) = @_;
+    my($self, $cmd, $switches) = @_;
+    $switches = [] unless defined $switches;
+
+    # Strip leading and trailing newlines
+    $cmd =~ s{^\n+}{};
+    $cmd =~ s{\n+$}{};
+
+    # Escape newlines.
+    $cmd =~ s{\n}{-\n}g;
 
     # I believe this is all we should need.
     $cmd =~ s{"}{""}g;
 
-    # And, of course, what if there's a space in the path to perl?
-    # So we quote that, too.
-    return qq{\$(PERLRUN) -e "$cmd"};
+    # Switches must be quoted else they will be lowercased.
+    $switches = join ' ', map { qq{"$_"} } @$switches;
+
+    return qq{\$(PERLRUN) $switches -e "$cmd"};
 }
 
 =back

@@ -666,15 +666,23 @@ sub pasthru {
 =cut
 
 sub perl_oneliner {
-    my($self,$cmd) = @_;
+    my($self, $cmd, $switches) = @_;
+    $switches = [] unless defined $switches;
+
+    # Strip leading and trailing newlines
+    $cmd =~ s{^\n+}{};
+    $cmd =~ s{\n+$}{};
+
+    # Escape newlines
+    $cmd =~ s{\n}{\\\n}g;
 
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
     $cmd =~ s{"}{\\"}g;
 
-    # And, of course, what if there's a space in the path to perl?
-    # So we quote that, too.
-    return qq{\$(PERLRUN) -e "$cmd"};
+    $switches = join ' ', @$switches;    
+
+    return qq{\$(PERLRUN) $switches -e "$cmd"};
 }
 
 
