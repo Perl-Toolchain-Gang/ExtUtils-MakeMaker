@@ -18,6 +18,7 @@
     * Fixed PREFIXification so it works on Win32.
     * Fixed PREFIXification so it works on VMS.
     - Fixed INSTALLMAN*DIR=none on VMS.
+    * NetWare fixes (bleadperl@16076)
 
     [[ Test Changes ]]
     - Shortening directory levels to accomodate old VMS's

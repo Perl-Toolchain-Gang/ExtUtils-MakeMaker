@@ -26,7 +26,7 @@ require ExtUtils::MM_Any;
 
 $Is_OS2   = $^O eq 'os2';
 $Is_Mac   = $^O eq 'MacOS';
-$Is_Win32 = $^O eq 'MSWin32';
+$Is_Win32 = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
 $Is_Dos   = $^O eq 'dos';
 $Is_VOS   = $^O eq 'vos';
 
