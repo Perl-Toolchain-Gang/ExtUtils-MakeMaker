@@ -189,7 +189,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.35 $ based $VERSIONs.
+    - Stripped out $Revision: 1.36 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
@@ -210,7 +210,7 @@
 5.48_02 Wed Jan 16 19:11:26 EST 2002
     - Fixed some Win32 warnings.  Needs more work.
 
-5.48_01 Wed Jan 16 15:10:28 EST 200
+5.48_01 Wed Jan 16 15:10:28 EST 2002
     * Adapted from bleadperl@14303
     * Backported to 5.6.1
     - inst and xsubpp moved out of lib/ and into bin/
