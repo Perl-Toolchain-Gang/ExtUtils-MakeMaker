@@ -1719,9 +1719,12 @@ usually solves this kind of problem.
     }
 
     # strip blanks
-    if ($self->{VERSION}) {
+    if (defined $self->{VERSION}) {
 	$self->{VERSION} =~ s/^\s+//;
 	$self->{VERSION} =~ s/\s+$//;
+    }
+    else {
+        $self->{VERSION} = '';
     }
     ($self->{VERSION_SYM} = $self->{VERSION}) =~ s/\W/_/g;
 
