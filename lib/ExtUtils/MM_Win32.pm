@@ -24,7 +24,7 @@ use File::Basename;
 use File::Spec;
 use ExtUtils::MakeMaker qw( neatvalue );
 
-use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE $PERLMAKE);
+use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE);
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -37,7 +37,6 @@ $BORLAND = 1 if $Config{'cc'} =~ /^bcc/i;
 $GCC     = 1 if $Config{'cc'} =~ /^gcc/i;
 $DMAKE = 1 if $Config{'make'} =~ /^dmake/i;
 $NMAKE = 1 if $Config{'make'} =~ /^nmake/i;
-$PERLMAKE = 1 if $Config{'make'} =~ /^pmake/i;
 
 sub dlsyms {
     my($self,%attribs) = @_;
