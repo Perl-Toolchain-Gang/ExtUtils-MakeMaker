@@ -4,8 +4,6 @@ Move instmodsh to utils/ in the core.
 
 Document prompt()
 
-Fix Win32 & VMS bugs.
-
 MakeMaker's warnhandler has to go away.
 
 Fix INSTALLMAN*DIR to honor PREFIX.
@@ -26,3 +24,12 @@ Handle config files (ie. /etc) and their special PREFIX needs
 Add SITEPREFIX
 
 Add INSTALLDIRS=vendor (see Debian patch)
+
+Shorten manifypods so it fits in < 200 character command line (like
+pm_to_blib).
+
+Cleanup manifypods so it uses Pod::Man instead of pod2man.
+
+Rethink MM_Win32 tests.
+
+Test MM_Any and pull some redundant tests out of MM_*.t
