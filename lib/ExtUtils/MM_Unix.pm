@@ -1883,6 +1883,13 @@ sub init_INSTALL {
         $manstyle = $self->{LIBSTYLE} eq 'lib/perl5' ? 'lib/perl5' : '';
     }
 
+    # Some systems, like VOS, set installman*dir to '' if they can't
+    # read man pages.
+    for my $num (1, 3) {
+        $self->{'INSTALLMAN'.$num.'DIR'} ||= 'none'
+          unless $Config{'installman'.$num.'dir'};
+    }
+
     my %bin_layouts = 
     (
         bin         => { s => $iprefix,

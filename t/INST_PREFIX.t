@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 24;
+use Test::More tests => 26;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -101,4 +101,27 @@ foreach my $var (@Vend_Install) {
     my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
     like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/,
                                                     "VENDORPREFIX + $var" );
+}
+
+
+# Check that when installman*dir isn't set in Config no man pages
+# are generated.
+{
+    undef *ExtUtils::MM_Unix::Config;
+    %ExtUtils::MM_Unix::Config = %Config;
+    $ExtUtils::MM_Unix::Config{installman1dir} = '';
+    $ExtUtils::MM_Unix::Config{installman3dir} = '';
+
+    my $stdout = tie *STDOUT, 'TieOut' or die;
+    my $mm = WriteMakefile(
+                           NAME          => 'Big::Dummy',
+                           VERSION_FROM  => 'lib/Big/Dummy.pm',
+                           PREREQ_PM     => {},
+                           PERL_CORE     => $ENV{PERL_CORE},
+                           PREFIX        => 'foo/bar/',
+                           INSTALLMAN1DIR=> 'wibble/and/such'
+                          );
+
+    is( $mm->{INSTALLMAN1DIR}, 'wibble/and/such' );
+    is( $mm->{INSTALLMAN3DIR}, 'none'            );
 }
