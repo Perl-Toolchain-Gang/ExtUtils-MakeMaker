@@ -13,9 +13,11 @@ use lib qw(lib);    # build ourself with ourself
 use ExtUtils::MakeMaker;
 use File::Spec;
 
-die "You have File::Spec version $File::Spec::VERSION\n".
-    "ExtUtils::MakeMaker requires File::Spec >= 0.8 to build at all.\n"
-  if $File::Spec::VERSION < 0.8;
+BEGIN {
+    die "You have File::Spec version $File::Spec::VERSION\n".
+      "ExtUtils::MakeMaker requires File::Spec >= 0.8 to build at all.\n"
+        if $File::Spec::VERSION < 0.8;
+}
 
 $PACKAGE = 'ExtUtils::MakeMaker';
 my $version = ${$PACKAGE.'::VERSION'};
