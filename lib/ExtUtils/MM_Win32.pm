@@ -467,7 +467,7 @@ sub oneliner {
     $cmd = $self->quote_literal($cmd);
     $cmd = $self->escape_newlines($cmd);
 
-    $switches = join ' ', @$switches;    
+    $switches = join ' ', @$switches;
 
     return qq{\$(PERLRUN) $switches -e $cmd};
 }
