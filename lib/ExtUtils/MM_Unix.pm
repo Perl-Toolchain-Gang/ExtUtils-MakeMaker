@@ -374,7 +374,7 @@ sub const_config {
     my(%once_only);
     foreach $m (@{$self->{CONFIG}}){
 	# SITE*EXP macros are defined in &constants; avoid duplicates here
-	next if $once_only{$m} or $m eq 'sitelibexp' or $m eq 'sitearchexp';
+	next if $once_only{$m};
 	$self->{uc $m} = quote_paren($self->{uc $m});
 	push @m, uc($m) , ' = ' , $self->{uc $m}, "\n";
 	$once_only{$m} = 1;
@@ -431,8 +431,8 @@ sub constants {
               INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
               INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
               INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
-              PERL_LIB        PERL_ARCHLIB    VENDORLIBEXP
-              SITELIBEXP      SITEARCHEXP     VENDORARCHEXP
+              PERL_LIB    
+              PERL_ARCHLIB
               LIBPERL_A MYEXTLIB
               FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE 
               PERLMAINCC PERL_SRC PERL_INC 
@@ -1774,9 +1774,6 @@ usually solves this kind of problem.
     # MakeMaker.
     $self->{INSTALLDIRS} ||= "site";
 
-    $self->init_INST;
-    $self->init_INSTALL;
-
     $self->{MAN1EXT} ||= $Config{man1ext};
     $self->{MAN3EXT} ||= $Config{man3ext};
 
@@ -1786,14 +1783,18 @@ usually solves this kind of problem.
     $self->{CONFIG} = [] unless (ref $self->{CONFIG});
     push(@{$self->{CONFIG}}, @ExtUtils::MakeMaker::Get_from_Config);
     push(@{$self->{CONFIG}}, 'shellflags') if $Config{shellflags};
-    my(%once_only,$m);
-    foreach $m (@{$self->{CONFIG}}){
+    my(%once_only);
+    foreach my $m (@{$self->{CONFIG}}){
 	next if $once_only{$m};
 	print STDOUT "CONFIG key '$m' does not exist in Config.pm\n"
 		unless exists $Config{$m};
 	$self->{uc $m} ||= $Config{$m};
 	$once_only{$m} = 1;
     }
+
+    $self->init_INST;
+    $self->init_INSTALL;
+
 
 # This is too dangerous:
 #    if ($^O eq "next") {
@@ -2057,44 +2058,44 @@ sub init_INSTALL {
     my %bin_layouts = 
     (
         bin         => { s => $iprefix,
-                         r => $u_prefix,
+                         t => 'perl',
                          d => 'bin' },
         vendorbin   => { s => $vprefix,
-                         r => $u_vprefix,
+                         t => 'vendor',
                          d => 'bin' },
         sitebin     => { s => $sprefix,
-                         r => $u_sprefix,
+                         t => 'site',
                          d => 'bin' },
         script      => { s => $iprefix,
-                         r => $u_prefix,
+                         t => 'perl',
                          d => 'bin' },
     );
     
     my %man_layouts =
     (
         man1dir         => { s => $iprefix,
-                             r => $u_prefix,
+                             t => 'perl',
                              d => 'man/man1',
                              style => $manstyle, },
         siteman1dir     => { s => $sprefix,
-                             r => $u_sprefix,
+                             t => 'site',
                              d => 'man/man1',
                              style => $manstyle, },
         vendorman1dir   => { s => $vprefix,
-                             r => $u_vprefix,
+                             t => 'vendor',
                              d => 'man/man1',
                              style => $manstyle, },
 
         man3dir         => { s => $iprefix,
-                             r => $u_prefix,
+                             t => 'perl',
                              d => 'man/man3',
                              style => $manstyle, },
         siteman3dir     => { s => $sprefix,
-                             r => $u_sprefix,
+                             t => 'site',
                              d => 'man/man3',
                              style => $manstyle, },
         vendorman3dir   => { s => $vprefix,
-                             r => $u_vprefix,
+                             t => 'vendor',
                              d => 'man/man3',
                              style => $manstyle, },
     );
@@ -2102,28 +2103,28 @@ sub init_INSTALL {
     my %lib_layouts =
     (
         privlib     => { s => $iprefix,
-                         r => $u_prefix,
+                         t => 'perl',
                          d => '',
                          style => $libstyle, },
         vendorlib   => { s => $vprefix,
-                         r => $u_vprefix,
+                         t => 'vendor',
                          d => '',
                          style => $libstyle, },
         sitelib     => { s => $sprefix,
-                         r => $u_sprefix,
+                         t => 'site',
                          d => 'site_perl',
                          style => $libstyle, },
         
         archlib     => { s => $iprefix,
-                         r => $u_prefix,
+                         t => 'perl',
                          d => "$version/$arch",
                          style => $libstyle },
         vendorarch  => { s => $vprefix,
-                         r => $u_vprefix,
+                         t => 'vendor',
                          d => "$version/$arch",
                          style => $libstyle },
         sitearch    => { s => $sprefix,
-                         r => $u_sprefix,
+                         t => 'site',
                          d => "site_perl/$version/$arch",
                          style => $libstyle },
     );
@@ -2144,10 +2145,15 @@ sub init_INSTALL {
         }
     }
 
+    my %type2prefix = ( perl    => 'PREFIX',
+                        site    => 'SITEPREFIX',
+                        vendor  => 'VENDORPREFIX'
+                      );
 
     my %layouts = (%bin_layouts, %man_layouts, %lib_layouts);
     while( my($var, $layout) = each(%layouts) ) {
-        my($s, $r, $d, $style) = @{$layout}{qw(s r d style)};
+        my($s, $t, $d, $style) = @{$layout}{qw(s t d style)};
+        my $r = '$('.$type2prefix{$t}.')';
 
         print STDERR "Prefixing $var\n" if $Verbose >= 2;
 
@@ -2155,14 +2161,8 @@ sub init_INSTALL {
         my $Installvar = uc $installvar;
         next if $self->{$Installvar};
 
-        if( $r ) {
-            $d = "$style/$d" if $style;
-            $self->prefixify($installvar, $s, $r, $d);
-        }
-        else {
-            $self->{$Installvar} = $Config_Override{$installvar} || 
-                                   $Config{$installvar};
-        }
+        $d = "$style/$d" if $style;
+        $self->prefixify($installvar, $s, $r, $d);
 
         print STDERR "  $Installvar == $self->{$Installvar}\n" 
           if $Verbose >= 2;

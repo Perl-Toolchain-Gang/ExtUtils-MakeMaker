@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.82 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.83 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -285,7 +285,7 @@ sub full_setup {
         qw(
            ar cc cccdlflags ccdlflags dlext dlsrc ld lddlflags ldflags libc
            lib_ext obj_ext osname osvers ranlib sitelibexp sitearchexp so
-           exe_ext full_ar
+           exe_ext full_ar vendorarchexp vendorlibexp
           );
 
     foreach my $item (@attrib_help){
@@ -1970,7 +1970,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.82 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.83 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
