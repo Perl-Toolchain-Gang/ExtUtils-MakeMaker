@@ -18,6 +18,9 @@
     * ExtUtils::MM_Win95 didn't return a true value
     - Fixing disttest when perl is a relative path.
     * Fixed disttest & tests in subdirs on Win95
+    - Fixed recursive Makefile.PL scan on VMS so it skips the distdir
+    - Fixed a bug when an alternative MAKEFILE is specified and you're
+      using something other than a Makefile.PL (RT 444)
 
     [[ Doc Fixes ]]
     - Documented INSTALLMAN*DIR == 'none' feature.
@@ -25,6 +28,8 @@
     [[ Test Fixes ]]
     - Paul Green's which_perl patch to build a proper Perl on systems
       that use command extensions.
+    - basic.t's Makefile.PL PREFIX call wasn't properly quoted for VMS
+      (Craig Berry)
 
     [[ Internals ]]
     - INST_* constants moved to init_INST
@@ -199,7 +204,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.42 $ based $VERSIONs.
+    - Stripped out $Revision: 1.43 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
