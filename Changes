@@ -1,3 +1,6 @@
+6.25_11
+    - Fixed minor parent class dependency loop in ExtUtils::MM_Any.
+
 6.25_10 Sun Mar 13 16:14:04 PST 2005
     - pm_to_blib.ts is gone, back to pm_to_blib (except on VMS).  I 
       couldn't make it work and still retain backwards compatibility.

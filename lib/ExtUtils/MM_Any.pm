@@ -3,13 +3,14 @@ package ExtUtils::MM_Any;
 use strict;
 use vars qw($VERSION @ISA);
 $VERSION = '0.10_10';
-@ISA = qw(File::Spec);
+
+use File::Spec;
+BEGIN { @ISA = qw(File::Spec); }
 
 # We need $Verbose
 use ExtUtils::MakeMaker qw($Verbose);
 
 use ExtUtils::MakeMaker::Config;
-use File::Spec;
 
 
 # So we don't have to keep calling the methods over and over again,
