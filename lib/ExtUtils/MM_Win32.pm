@@ -458,11 +458,6 @@ sub quote_literal {
     # Win98's command.com
     $text =~ s{"}{\\"}g;
 
-    # Backwacks are normally literal but \" is an escaped quote and
-    # \\ is an escaped backwack.
-    $text =~ s{\\\\}{\\\\\\\\}g;
-    $text =~ s{\\"}{\\\\"}g;
-
     return qq{"$text"};
 }
 
