@@ -18,7 +18,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 111;
+        plan tests => 110;
     }
 }
 
@@ -72,7 +72,6 @@ foreach ( qw /
   const_loadlibs
   constants
   depend
-  dir_target
   dist
   dist_basics
   dist_ci
