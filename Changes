@@ -1,3 +1,5 @@
+6.26  Mon Mar 21 20:36:22 PST 2005
+
 6.25_12 Fri Mar 18 16:15:35 PST 2005
     - Use the generic dmake search.cpan.org URL in the README so the newest
       version is found.
