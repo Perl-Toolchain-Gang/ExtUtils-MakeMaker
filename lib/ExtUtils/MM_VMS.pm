@@ -374,11 +374,14 @@ sub init_others {
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
     $self->{MAKEFILE_OLD}       ||= '$(FIRST_MAKEFILE)_old';
 
-    $self->{'TOUCH'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e touch';
-    $self->{'CHMOD'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e chmod'; 
-    $self->{'RM_F'}     ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_f';
-    $self->{'RM_RF'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_rf';
-    $self->{'TEST_F'}   ||= '$(PERLRUN) "-MExtUtils::Command" -e test_f';
+    $self->{ECHO}     ||= 'Write Sys\\$Output';
+    $self->{TOUCH}    ||= '$(PERLRUN) "-MExtUtils::Command" -e touch';
+    $self->{CHMOD}    ||= '$(PERLRUN) "-MExtUtils::Command" -e chmod'; 
+    $self->{RM_F}     ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_f';
+    $self->{RM_RF}    ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_rf';
+    $self->{TEST_F}   ||= '$(PERLRUN) "-MExtUtils::Command" -e test_f';
+
+    $self->{SHELL}    ||= 'Posix';
 
     $self->{CP} = 'Copy/NoConfirm';
     $self->{MV} = 'Rename/NoConfirm';
@@ -823,30 +826,24 @@ to be updated.
 
 sub tools_other {
     my($self) = @_;
-    qq!
+
+    # XXX Are these necessary?  Does anyone override them?  They're longer
+    # than just typing the literal string.
+    my $extra_tools = <<'EXTRA_TOOLS';
+
 # Assumes \$(MMS) invokes MMS or MMK
 # (It is assumed in some cases later that the default makefile name
 # (Descrip.MMS for MM[SK]) is used.)
 USEMAKEFILE = /Descrip=
 USEMACROS = /Macro=(
 MACROEND = )
-SHELL = Posix
-TOUCH = $self->{TOUCH}
-CHMOD = $self->{CHMOD}
-CP = $self->{CP}
-MV = $self->{MV}
-RM_F  = $self->{RM_F}
-RM_RF = $self->{RM_RF}
-SAY = Write Sys\$Output
-UMASK_NULL = $self->{UMASK_NULL}
-MKPATH = Create/Directory
-EQUALIZE_TIMESTAMP = \$(PERL) -we "open F,qq{>\$ARGV[1]};close F;utime(0,(stat(\$ARGV[0]))[9]+1,\$ARGV[1])"
-!. ($self->{PARENT} ? '' : 
-qq!WARN_IF_OLD_PACKLIST = \$(PERL) -e "if (-f \$ARGV[0]){print qq[WARNING: Old package found (\$ARGV[0]); please check for collisions\\n]}"
-MOD_INSTALL = \$(PERLRUN) "-MExtUtils::Install" -e "install({split(' ',<STDIN>)},1);"
-DOC_INSTALL = \$(PERL) -e "\@ARGV=split(/\\|/,<STDIN>);print '=head2 ',scalar(localtime),': C<',shift,qq[>\\n\\n=over 4\\n\\n];while(\$key=shift && \$val=shift){print qq[=item *\\n\\nC<\$key: \$val>\\n\\n];}print qq[=back\\n\\n]"
-UNINSTALL = \$(PERLRUN) "-MExtUtils::Install" -e "uninstall(\$ARGV[0],1,1);"
-!);
+
+# Just in case anyone is using the old macro.
+SAY = $ECHO
+
+EXTRA_TOOLS
+
+    return $self->SUPER::tools_other . $extra_tools;
 }
 
 =item init_dist (override)
@@ -1073,7 +1070,7 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
 $(BOOTSTRAP) : $(FIRST_MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
-	$(NOECHO) $(SAY) "Running mkbootstrap for $(NAME) ($(BSLOADLIBS))"
+	$(NOECHO) $(ECHO) "Running mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) -
 	-e "use ExtUtils::Mkbootstrap; Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
 	$(NOECHO) $(TOUCH) $(MMS$TARGET)
@@ -1305,7 +1302,7 @@ sub clean_subdirs_target {
     # No subdirectories, no cleaning.
     return <<'NOOP_FRAG' unless @{$self->{DIR}};
 clean_subdirs :
-	$(NOECHO)$(NOOP)
+	$(NOECHO) $(NOOP)
 NOOP_FRAG
 
 
@@ -1502,13 +1499,13 @@ pure_install :: pure_$(INSTALLDIRS)_install
 	$(NOECHO) $(NOOP)
 
 doc_install :: doc_$(INSTALLDIRS)_install
-	$(NOECHO) $(SAY) "Appending installation info to $(INSTALLARCHLIB)perllocal.pod"
+	$(NOECHO) $(ECHO) "Appending installation info to $(INSTALLARCHLIB)perllocal.pod"
 
 pure__install : pure_site_install
-	$(NOECHO) $(SAY) "INSTALLDIRS not defined, defaulting to INSTALLDIRS=site"
+	$(NOECHO) $(ECHO) "INSTALLDIRS not defined, defaulting to INSTALLDIRS=site"
 
 doc__install : doc_site_install
-	$(NOECHO) $(SAY) "INSTALLDIRS not defined, defaulting to INSTALLDIRS=site"
+	$(NOECHO) $(ECHO) "INSTALLDIRS not defined, defaulting to INSTALLDIRS=site"
 
 # This hack brought to you by DCL's 255-character command line limit
 pure_perl_install ::
@@ -1582,15 +1579,15 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 
 uninstall_from_perldirs ::
 	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
-	$(NOECHO) $(SAY) "Uninstall is now deprecated and makes no actual changes."
-	$(NOECHO) $(SAY) "Please check the list above carefully for errors, and manually remove"
-	$(NOECHO) $(SAY) "the appropriate files.  Sorry for the inconvenience."
+	$(NOECHO) $(ECHO) "Uninstall is now deprecated and makes no actual changes."
+	$(NOECHO) $(ECHO) "Please check the list above carefully for errors, and manually remove"
+	$(NOECHO) $(ECHO) "the appropriate files.  Sorry for the inconvenience."
 
 uninstall_from_sitedirs ::
 	$(NOECHO) $(UNINSTALL) ],$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist'),"\n",q[
-	$(NOECHO) $(SAY) "Uninstall is now deprecated and makes no actual changes."
-	$(NOECHO) $(SAY) "Please check the list above carefully for errors, and manually remove"
-	$(NOECHO) $(SAY) "the appropriate files.  Sorry for the inconvenience."
+	$(NOECHO) $(ECHO) "Uninstall is now deprecated and makes no actual changes."
+	$(NOECHO) $(ECHO) "Please check the list above carefully for errors, and manually remove"
+	$(NOECHO) $(ECHO) "the appropriate files.  Sorry for the inconvenience."
 ];
 
     join('',@m);
@@ -1685,13 +1682,13 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 # We take a very conservative approach here, but it\'s worth it.
 # We move $(FIRST_MAKEFILE) to $(MAKEFILE_OLD) here to avoid gnu make looping.
 $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
-	$(NOECHO) $(SAY) "$(FIRST_MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
-	$(NOECHO) $(SAY) "Cleaning current config before rebuilding $(FIRST_MAKEFILE) ..."
+	$(NOECHO) $(ECHO) "$(FIRST_MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
+	$(NOECHO) $(ECHO) "Cleaning current config before rebuilding $(FIRST_MAKEFILE) ..."
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
 	- $(MMS)$(MMSQUALIFIERS) $(USEMAKEFILE)$(MAKEFILE_OLD) clean
 	$(PERLRUN) Makefile.PL ],join(' ',map(qq["$_"],@ARGV)),q[
-	$(NOECHO) $(SAY) "$(FIRST_MAKEFILE) has been rebuilt."
-	$(NOECHO) $(SAY) "Please run $(MMS) to build the extension."
+	$(NOECHO) $(ECHO) "$(FIRST_MAKEFILE) has been rebuilt."
+	$(NOECHO) $(ECHO) "Please run $(MMS) to build the extension."
 ];
 
     join('',@m);
@@ -1734,7 +1731,7 @@ testdb :: testdb_\$(LINKTYPE)
       push(@m, '	If F$Search("',$vmsdir,'$(FIRST_MAKEFILE)").nes."" Then $(PERL) -e "chdir ',"'$vmsdir'",
            '; print `$(MMS)$(MMSQUALIFIERS) $(PASTHRU2) test`'."\n");
     }
-    push(@m, "\t\$(NOECHO) \$(SAY) \"No tests defined for \$(NAME) extension.\"\n")
+    push(@m, "\t\$(NOECHO) \$(ECHO) \"No tests defined for \$(NAME) extension.\"\n")
         unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 
@@ -1795,7 +1792,7 @@ MAP_TARGET    = $target
     unless ($self->{MAKEAPERL}) {
 	push @m, q{
 $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
-	$(NOECHO) $(SAY) "Writing ""$(MMS$TARGET)"" for this $(MAP_TARGET)"
+	$(NOECHO) $(ECHO) "Writing ""$(MMS$TARGET)"" for this $(MAP_TARGET)"
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR=}, $dir, q{ \
 		FIRST_MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
@@ -1971,10 +1968,10 @@ $(MAP_SHRTARGET) : $(MAP_LIBPERL) Makeaperl.Opt ',"${libperldir}Perlshr_Attr.Opt
 	$(MAP_LINKCMD)/Shareable=$(MMS$TARGET) $(MAP_LIBPERL), Makeaperl.Opt/Option ',"${libperldir}Perlshr_Attr.Opt/Option",'
 $(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmp}perlmain\$(OBJ_EXT) ${tmp}PerlShr.Opt",'
 	$(MAP_LINKCMD) ',"${tmp}perlmain\$(OBJ_EXT)",', PerlShr.Opt/Option
-	$(NOECHO) $(SAY) "To install the new ""$(MAP_TARGET)"" binary, say"
-	$(NOECHO) $(SAY) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
-	$(NOECHO) $(SAY) "To remove the intermediate files, say
-	$(NOECHO) $(SAY) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) map_clean"
+	$(NOECHO) $(ECHO) "To install the new ""$(MAP_TARGET)"" binary, say"
+	$(NOECHO) $(ECHO) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
+	$(NOECHO) $(ECHO) "To remove the intermediate files, say
+	$(NOECHO) $(ECHO) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) map_clean"
 ';
     push @m,"\n${tmp}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmp}Writemain.tmp\n";
     push @m, "# More from the 255-char line length limit\n";
