@@ -4,10 +4,10 @@ version:      6.10_01
 version_from: lib/ExtUtils/MakeMaker.pm
 installdirs:  perl
 requires:
-    File::Basename:                0
-    File::Spec:                    0.8
-    DirHandle:                     0
     Pod::Man:                      0
+    File::Spec:                    0.8
+    File::Basename:                0
+    DirHandle:                     0
 
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.10_01
