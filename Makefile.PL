@@ -5,7 +5,7 @@
 # - Fill in your dependencies in PREREQ_PM
 # Alternatively, you can say the hell with this and use h2xs.
 
-use 5.006001;
+use 5.006000;
 
 use lib qw(lib);    # build ourself with ourself
 use ExtUtils::MakeMaker;

@@ -1,6 +1,6 @@
 package ExtUtils::Command;
 
-use 5.006_001;
+use 5.006;
 use strict;
 # use AutoLoader;
 use Carp;
