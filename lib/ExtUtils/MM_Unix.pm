@@ -3268,14 +3268,14 @@ sub ppd {
     $author =~ s/@/\\@/g;
 
     my $ppd_xml = sprintf <<'PPD_HTML', $pack_ver, $abstract, $author;
-<SOFTPKG NAME="$(DISTNAME)" VERSION="%s">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>%s</ABSTRACT>\n\t<AUTHOR>%s</AUTHOR>
+<SOFTPKG NAME="$(DISTNAME)" VERSION="%s">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>%s</ABSTRACT>\n\t<AUTHOR>%s</AUTHOR>\n
 PPD_HTML
 
     # strip off that trailing newline.
     chomp $ppd_xml;
 
     my @ppd_oneliners = (); 
-    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}."\\n"});
+    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}});
 
     $ppd_xml = '\t<IMPLEMENTATION>\n';
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
