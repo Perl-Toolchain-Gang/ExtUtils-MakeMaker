@@ -22,7 +22,7 @@ use Config;
 use File::Basename;
 
 use vars qw(@ISA $VERSION);
-$VERSION = '2.00_01';
+$VERSION = '2.01_01';
 
 require ExtUtils::MM_Win32;
 @ISA = qw(ExtUtils::MM_Win32);
@@ -166,17 +166,11 @@ XS_FILES= ".join(" \\\n\t", sort keys %{$self->{XS}})."
 C_FILES = ".join(" \\\n\t", @{$self->{C}})."
 O_FILES = ".join(" \\\n\t", @{$self->{O_FILES}})."
 H_FILES = ".join(" \\\n\t", @{$self->{H}})."
-HTMLLIBPODS    = ".join(" \\\n\t", sort keys %{$self->{HTMLLIBPODS}})."
-HTMLSCRIPTPODS = ".join(" \\\n\t", sort keys %{$self->{HTMLSCRIPTPODS}})."
 MAN1PODS = ".join(" \\\n\t", sort keys %{$self->{MAN1PODS}})."
 MAN3PODS = ".join(" \\\n\t", sort keys %{$self->{MAN3PODS}})."
 ";
 
     for $tmp (qw/
-	      INST_HTMLPRIVLIBDIR INSTALLHTMLPRIVLIBDIR
-	      INST_HTMLSITELIBDIR INSTALLHTMLSITELIBDIR
-	      INST_HTMLSCRIPTDIR  INSTALLHTMLSCRIPTDIR
-	      INST_HTMLLIBDIR                    HTMLEXT
 	      INST_MAN1DIR        INSTALLMAN1DIR MAN1EXT
 	      INST_MAN3DIR        INSTALLMAN3DIR MAN3EXT
 	      /) {
