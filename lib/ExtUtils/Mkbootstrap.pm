@@ -1,7 +1,6 @@
 package ExtUtils::Mkbootstrap;
 
-$VERSION = substr q$Revision: 1.1 $, 10;
-# $Date: 2002/01/16 19:27:19 $
+$VERSION = 1.14_01;
 
 use Config;
 use Exporter;
@@ -75,7 +74,7 @@ ExtUtils::Mkbootstrap - make a bootstrap file for use by DynaLoader
 
 =head1 SYNOPSIS
 
-C<mkbootstrap>
+C<Mkbootstrap>
 
 =head1 DESCRIPTION
 
