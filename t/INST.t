@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 17;
+use Test::More tests => 25;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -109,3 +109,35 @@ is( $mm->{INST_LIB},
 
 # INSTALL*
 is( $mm->{INSTALLDIRS}, 'site',     'INSTALLDIRS' );
+
+
+
+# Make sure the INSTALL*MAN*DIR variables work.  We forgot them
+# at one point.
+$stdout = tie *STDOUT, 'TieOut' or die;
+$mm = WriteMakefile(
+    NAME          => 'Big::Dummy',
+    VERSION_FROM  => 'lib/Big/Dummy.pm',
+    PERL_CORE     => $ENV{PERL_CORE},
+    INSTALLMAN1DIR       => 'none',
+    INSTALLSITEMAN3DIR   => 'none',
+    INSTALLVENDORMAN1DIR => 'none',
+);
+like( $stdout->read, qr{
+                        Writing\ $Makefile\ for\ Big::Liar\n
+                        Big::Liar's\ vars\n
+                        INST_LIB\ =\ \S+\n
+                        INST_ARCHLIB\ =\ \S+\n
+                        Writing\ $Makefile\ for\ Big::Dummy\n
+}x );
+undef $stdout;
+untie *STDOUT;
+
+isa_ok( $mm, 'ExtUtils::MakeMaker' );
+
+is  ( $mm->{INSTALLMAN1DIR},        'none' );
+isnt( $mm->{INSTALLMAN3DIR},        'none' );
+isnt( $mm->{INSTALLSITEMAN1DIR},    'none' );
+is  ( $mm->{INSTALLSITEMAN3DIR},    'none' );
+is  ( $mm->{INSTALLVENDORMAN1DIR},  'none' );
+isnt( $mm->{INSTALLVENDORMAN3DIR},  'none' );
