@@ -8,6 +8,9 @@
     - manifypods target was empty if there are no pods to manify.  Put in
       at least $(NOECHO) $(NOOP)
 
+# There was no 6.06, I jumped straight to 6.10_XX because there's been
+# so much change between 6.05 and now.
+
 6.06_05 Mon Mar 31 02:44:11 PST 2003
     - Syncing into bleadperl.  Minor nits revealed...
     - AutoSplit open filehandle bug was fixed in bleadperl.  Averted a
