@@ -35,3 +35,13 @@ Handle config files (ie. /etc) and their special PREFIX needs
 (ie. PREFIX=/usr, INSTALLCONFIGDIR=/etc).
 
 Fix Win32 when perl is installed in C:\Program Files
+
+Make sure PDL builds
+
+Test that bogus Makefile.PL's cause warnings.
+
+Test that bogus hint files cause warnings.
+
+Test that Makefile.PL's are run in package main.
+
+Test that @INC contains the cwd in recursive Makefile.PL's.
