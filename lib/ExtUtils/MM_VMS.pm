@@ -2213,7 +2213,7 @@ sub perl_oneliner {
 
     # And, of course, what if there's a space in the path to perl?
     # So we quote that, too.
-    return qq{"\$(PERLRUN)" -e "$cmd"};
+    return qq{\$(PERLRUN) -e "$cmd"};
 }
 
 =back

@@ -3055,40 +3055,37 @@ PPD_HTML
     # strip off that trailing newline.
     chomp $ppd_xml;
 
-    my $ppd_oneliner = $self->perl_oneliner(qq{print q{$ppd_xml}."\\n"});
+    my @ppd_oneliners = (); 
+    push @ppd_oneliners, $self->perl_oneliner(qq{print qq{$ppd_xml}."\\n"});
 
-    my $make_ppd = <<"PPD_OUT";
-# Creates a PPD (Perl Package Description) for a binary distribution.
-ppd:
-	$(NOECHO) $ppd_oneliner > \$(DISTNAME).ppd
-PPD_OUT
-
-
-    $make_ppd .= '	$(NOECHO) $(PERL) -e "print qq{\t<IMPLEMENTATION>\n';
+    $ppd_xml = '\t<IMPLEMENTATION>\n';
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
         my ($dep_ver) = join ",", (split (/\./, $self->{PREREQ_PM}{$prereq}), 
                                   (0) x 4) [0 .. 3];
-        $make_ppd .= sprintf q{\t\t<DEPENDENCY NAME=\"%s\" VERSION=\"%s\" />\n}, $pre_req, $dep_ver;
-    }
-    $make_ppd .= qq[}" >> \$(DISTNAME).ppd\n];
-
-
-    $make_ppd .= sprintf <<'PPD_OUT', $Config{archname};
-	$(NOECHO) $(PERL) -e "print qq{\t\t<OS NAME=\"$(OSNAME)\" />\n\t\t<ARCHITECTURE NAME=\"%s\" />\n
+        $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
+\t\t<DEPENDENCY NAME="%s" VERSION="%s" />\n
 PPD_OUT
 
-    chomp $make_ppd;
+        chomp $ppd_xml;
+    }
 
+    push @ppd_oneliners, $self->perl_oneliner(qq{print qq{$ppd_xml}});
+
+    $ppd_xml = sprintf <<'PPD_OUT', $Config{archname};
+\t\t<OS NAME="$(OSNAME)" />\n\t\t<ARCHITECTURE NAME="%s" />\n
+PPD_OUT
+
+    chomp $ppd_xml;
 
     if ($self->{PPM_INSTALL_SCRIPT}) {
         if ($self->{PPM_INSTALL_EXEC}) {
-            $make_ppd .= sprintf q{\t\t<INSTALL EXEC=\"%s\">%s</INSTALL>\n},
+            $ppd_xml .= sprintf q{\t\t<INSTALL EXEC="%s">%s</INSTALL>\n},
                   $self->{PPM_INSTALL_EXEC}, $self->{PPM_INSTALL_SCRIPT};
         }
         else {
-            $make_ppd .= sprintf q{\t\t<INSTALL>%s</INSTALL>\n}, 
+            $ppd_xml .= sprintf q{\t\t<INSTALL>%s</INSTALL>\n}, 
                   $self->{PPM_INSTALL_SCRIPT};
         }
     }
@@ -3096,13 +3093,22 @@ PPD_OUT
     my ($bin_location) = $self->{BINARY_LOCATION} || '';
     $bin_location =~ s/\\/\\\\/g;
 
-    $make_ppd .= sprintf q{\t\t<CODEBASE HREF=\"%s\" />\n}, $bin_location;
-    $make_ppd .= q{\t</IMPLEMENTATION>\n};
-    $make_ppd .= q{</SOFTPKG>\n};
+    $ppd_xml .= sprintf <<'PPD_XML', $bin_location;
+\t\t<CODEBASE HREF=\"%s\" />\n\t</IMPLEMENTATION>\n</SOFTPKG>\n
+PPD_XML
 
-    $make_ppd .= '}" >> $(DISTNAME).ppd';
+    chomp $ppd_xml;
 
-    return $make_ppd;
+    push @ppd_oneliners, $self->perl_oneliner(qq{print qq{$ppd_xml}});
+
+    return sprintf <<'PPD_OUT', @ppd_oneliners;
+# Creates a PPD (Perl Package Description) for a binary distribution.
+ppd:
+	$(NOECHO) %s >  $(DISTNAME).ppd
+	$(NOECHO) %s >> $(DISTNAME).ppd
+	$(NOECHO) %s >> $(DISTNAME).ppd
+PPD_OUT
+
 }
 
 =item prefixify
@@ -3287,7 +3293,7 @@ sub perl_oneliner {
 
     # And, of course, what if there's a space in the path to perl?
     # So we quote that.
-    return qq{'\$(PERLRUN)' -e '$cmd'};   
+    return qq{\$(PERLRUN) -e '$cmd'};   
 }
 
 
