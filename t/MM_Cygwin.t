@@ -15,7 +15,7 @@ use Test::More;
 
 BEGIN {
 	if ($^O =~ /cygwin/i) {
-		plan tests => 15;
+		plan tests => 13;
 	} else {
 		plan skip_all => "This is not cygwin";
 	}
