@@ -109,61 +109,69 @@ sub manifind {
 }
 
 sub fullcheck {
-    _manicheck({check_files => 1, check_MANIFEST => 1});
+    return [_check_files()], [_check_manifest()];
 }
 
 sub manicheck {
-    return @{(_manicheck({check_files => 1}))[0]};
+    return _check_files();
 }
 
 sub filecheck {
-    return @{(_manicheck({check_MANIFEST => 1}))[1]};
+    return _check_manifest();
 }
 
 sub skipcheck {
-    _manicheck({check_MANIFEST => 1, warn_on_skip => 1});
+    _check_manifest({warn_on_skip => 1});
 }
 
-sub _manicheck {
-    my($p) = @_;
-    my $read = maniread();
+
+sub _check_files {
+    my $p = shift;
+    my $dosnames=(defined(&Dos::UseLFN) && Dos::UseLFN()==0);
+    my $read = maniread() || {};
     my $found = manifind($p);
 
-    my $file;
-    my $dosnames=(defined(&Dos::UseLFN) && Dos::UseLFN()==0);
-    my(@missfile,@missentry);
-    if ($p->{check_files}){
-	foreach $file (sort keys %$read){
-	    warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
-            if ($dosnames){
-                $file = lc $file;
-                $file =~ s=(\.(\w|-)+)=substr ($1,0,4)=ge;
-                $file =~ s=((\w|-)+)=substr ($1,0,8)=ge;
-            }
-	    unless ( exists $found->{$file} ) {
-		warn "No such file: $file\n" unless $Quiet;
-		push @missfile, $file;
-	    }
-	}
+    my(@missfile) = ();
+    foreach my $file (sort keys %$read){
+        warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
+        if ($dosnames){
+            $file = lc $file;
+            $file =~ s=(\.(\w|-)+)=substr ($1,0,4)=ge;
+            $file =~ s=((\w|-)+)=substr ($1,0,8)=ge;
+        }
+        unless ( exists $found->{$file} ) {
+            warn "No such file: $file\n" unless $Quiet;
+            push @missfile, $file;
+        }
     }
-    if ($p->{check_MANIFEST}){
-	$read ||= {};
-	my $matches = _maniskip();
-	foreach $file (sort keys %$found){
-	    if (&$matches($file)){
-		warn "Skipping $file\n" if $p->{warn_on_skip};
-		next;
-	    }
-	    warn "Debug: manicheck checking from disk $file\n" if $Debug;
-	    unless ( exists $read->{$file} ) {
-		my $canon = $Is_MacOS ? "\t" . _unmacify($file) : '';
-		warn "Not in $MANIFEST: $file$canon\n" unless $Quiet;
-		push @missentry, $file;
-	    }
-	}
-    }
-    (\@missfile,\@missentry);
+
+    return @missfile;
 }
+
+
+sub _check_manifest {
+    my($p) = @_;
+    my $read = maniread() || {};
+    my $found = manifind($p);
+
+    my $matches = _maniskip();
+    my @missentry = ();
+    foreach my $file (sort keys %$found){
+        if (&$matches($file)){
+            warn "Skipping $file\n" if $p->{warn_on_skip};
+            next;
+        }
+        warn "Debug: manicheck checking from disk $file\n" if $Debug;
+        unless ( exists $read->{$file} ) {
+            my $canon = $Is_MacOS ? "\t" . _unmacify($file) : '';
+            warn "Not in $MANIFEST: $file$canon\n" unless $Quiet;
+            push @missentry, $file;
+        }
+    }
+
+    return @missentry;
+}
+
 
 sub maniread {
     my ($mfile) = @_;
@@ -294,7 +302,8 @@ sub cp {
     copy($srcFile,$dstFile);
     utime $access, $mod + ($Is_VMS ? 1 : 0), $dstFile;
     # chmod a+rX-w,go-w
-    chmod(  0444 | ( $perm & 0111 ? 0111 : 0 ),  $dstFile ) unless ($^O eq 'MacOS');
+    chmod(  0444 | ( $perm & 0111 ? 0111 : 0 ),  $dstFile ) 
+      unless ($^O eq 'MacOS');
 }
 
 sub ln {
