@@ -37,7 +37,7 @@ my $Touch_Time = calibrate_mtime();
 
 $| = 1;
 
-ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
+ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
 my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
