@@ -80,35 +80,23 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 
 # Every INSTALL* variable must start with some PREFIX.
-my @Perl_Install = qw(archlib    privlib   bin     script 
-                      man1dir       man3dir);
-my @Site_Install = qw(sitearch   sitelib   sitebin        
-                      siteman1dir siteman3dir);
-my @Vend_Install = qw(vendorarch vendorlib vendorbin 
-                      vendorman1dir vendorman3dir);
+my %Install_Vars = (
+ PERL   => [qw(archlib    privlib   bin       man1dir       man3dir   script)],
+ SITE   => [qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)],
+ VENDOR => [qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)]
+);
 
-foreach my $var (@Perl_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : File::Spec->catdir(qw(foo bar));
+while( my($type, $vars) = each %Install_Vars) {
+    foreach my $var (@$vars) {
+        my $prefix = $type eq 'PERL' ? '$(PREFIX)' : '$('.$type.'PREFIX)';
 
-    # support for man page skipping
-    $prefix = 'none' if $var =~ /man/ && !$Config{"install$var"};
-    like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, "PREFIX + $var" );
+        # support for man page skipping
+        $prefix = 'none' if $type eq 'PERL' && 
+                            $var =~ /man/ && 
+                            !$Config{"install$var"};
+        like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, "$prefix + $var" );
+    }
 }
-
-foreach my $var (@Site_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : File::Spec->catdir(qw(foo bar));
-
-    like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, 
-                                                    "SITEPREFIX + $var" );
-}
-
-foreach my $var (@Vend_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : File::Spec->catdir(qw(foo bar));
-
-    like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/,
-                                                    "VENDORPREFIX + $var" );
-}
-
 
 # Check that when installman*dir isn't set in Config no man pages
 # are generated.
