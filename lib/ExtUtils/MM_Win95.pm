@@ -15,8 +15,8 @@ sub dist_test {
 disttest : distdir
         cd $(DISTVNAME)
         $(ABSPERLRUN) Makefile.PL
-        $(MAKE)
-        $(MAKE) test
+        $(MAKE) $(PASTHRU)
+        $(MAKE) test $(PASTHRU)
         cd ..
 };
 }
