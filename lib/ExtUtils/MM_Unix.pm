@@ -161,14 +161,14 @@ sub xs_cpp;
 sub xs_o;
 sub xsubpp_version;
 
-use SelfLoader;
+#use SelfLoader;
 
 # SelfLoader not smart enough to avoid autoloading DESTROY
 sub DESTROY { }
 
-1;
+#1;
 
-__DATA__
+#__DATA__
 
 =head2 SelfLoaded methods
 
