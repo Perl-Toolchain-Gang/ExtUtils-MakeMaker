@@ -523,9 +523,6 @@ sub dir_target {
     my $make = '';
     foreach my $dir (@dirs) {
         $make .= sprintf <<'MAKE', ($dir) x 7;
-%s : %s$(DFSEP).exists
-	$(NOECHO) $(NOOP)
-
 %s$(DFSEP).exists :
 	$(NOECHO) $(MKPATH) %s
 	$(NOECHO) $(CHMOD) 755 %s

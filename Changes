@@ -9,6 +9,7 @@
       .exists files everywhere.
     - Restore missing *.Opt clean on VMS.
     - Fix .exists files accidentally getting caught in static builds.
+    - Older versions of MMS cannot handle directory targets at all.
 
 6.25_07  Fri Dec 31 03:47:20 EST 2004
     - perllocal on VMS was inserting executables twice.
