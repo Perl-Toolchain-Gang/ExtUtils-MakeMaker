@@ -23,7 +23,7 @@ BEGIN {
 }
 
 BEGIN {
-    use Test::More tests => 27;
+    use Test::More tests => 29;
     use File::Spec;
 }
 
@@ -211,8 +211,14 @@ BEGIN {
 {
     mkdir 'd2utest';
     open(FILE, '>d2utest/foo');
-    print FILE "stuff\015\012";
-    print FILE "and thing\015\012";
+    print FILE "stuff\015\012and thing\015\012";
+    close FILE;
+
+    open(FILE, '>d2utest/bar');
+    binmode(FILE);
+    my $bin = "\c@\c@\c@\c@\c@\c@\cA\c@\c@\c@\015\012".
+              "\@\c@\cA\c@\c@\c@8__LIN\015\012";
+    print FILE $bin;
     close FILE;
 
     local @ARGV = 'd2utest';
@@ -220,6 +226,12 @@ BEGIN {
 
     open(FILE, 'd2utest/foo');
     is( join('', <FILE>), "stuff\012and thing\012", 'dos2unix' );
+    close FILE;
+
+    open(FILE, 'd2utest/bar');
+    binmode(FILE);
+    ok( -B 'd2utest/bar' );
+    is( join('', <FILE>), $bin, 'dos2unix preserves binaries');
     close FILE;
 }
 
