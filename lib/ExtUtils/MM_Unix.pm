@@ -1871,20 +1871,22 @@ sub init_INSTALL {
     }
 
     # There are no Config.pm defaults for these.
-    $Config_Override{installsiteman1dir} = "$Config{siteprefixexp}/man/man1";
-    $Config_Override{installsiteman3dir} = "$Config{siteprefixexp}/man/man3";
-    $Config_Override{installvendorman1dir}="$Config{vendorprefixexp}/man/man1";
-    $Config_Override{installvendorman3dir}="$Config{vendorprefixexp}/man/man3";
+    $Config_Override{installsiteman1dir} = 
+        "$Config{siteprefixexp}/man/man\$(MAN1EXT)";
+    $Config_Override{installsiteman3dir} = 
+        "$Config{siteprefixexp}/man/man\$(MAN3EXT)";
+    $Config_Override{installvendorman1dir} =
+        "$Config{vendorprefixexp}/man/man\$(MAN1EXT)";
+    $Config_Override{installvendorman3dir} =
+        "$Config{vendorprefixexp}/man/man\$(MAN3EXT)";
 
     my $iprefix = $Config{installprefixexp} || '';
     my $vprefix = $Config{vendorprefixexp}  || $iprefix;
     my $sprefix = $Config{siteprefixexp}    || '';
 
-    my $u_prefix  = $self->{PREFIX} || '';
+    my $u_prefix  = $self->{PREFIX}       || '';
     my $u_sprefix = $self->{SITEPREFIX}   || $u_prefix;
     my $u_vprefix = $self->{VENDORPREFIX} || $u_prefix;
-    my $u_mprefix = $self->{MANPREFIX};
-    my $u_lprefix = $self->{LIBPREFIX} || $self->{LIB};
 
     $self->{PREFIX}       ||= $u_prefix  || $iprefix;
     $self->{SITEPREFIX}   ||= $u_sprefix || $sprefix;
@@ -1905,73 +1907,73 @@ sub init_INSTALL {
     my %bin_layouts = 
     (
         bin         => { s => $iprefix,
-                         r => $u_prefix,
+                         r => '$(PREFIX)',
                          d => 'bin' },
         vendorbin   => { s => $vprefix,
-                         r => $u_vprefix,
+                         r => '$(VENDORPREFIX)',
                          d => 'bin' },
         sitebin     => { s => $sprefix,
-                         r => $u_sprefix,
+                         r => '$(SITEPREFIX)',
                          d => 'bin' },
         script      => { s => $iprefix,
-                         r => $u_prefix,
+                         r => '$(PREFIX)',
                          d => 'bin' },
     );
     
     my %man_layouts =
     (
         man1dir         => { s => $iprefix,
-                             r => $u_mprefix || $u_prefix,
-                             d => "man/man1",
+                             r => '$(PREFIX)',
+                             d => 'man/man$(MAN1EXT)',
                              style => $manstyle, },
         siteman1dir     => { s => $sprefix,
-                             r => $u_mprefix || $u_sprefix,
-                             d => "man/man1",
+                             r => '$(SITEPREFIX)',
+                             d => 'man/man$(MAN1EXT)',
                              style => $manstyle, },
         vendorman1dir   => { s => $vprefix,
-                             r => $u_mprefix || $u_vprefix,
-                             d => "man/man1",
+                             r => '$(VENDORPREFIX)',
+                             d => 'man/man$(MAN1EXT)',
                              style => $manstyle, },
 
         man3dir         => { s => $iprefix,
-                             r => $u_mprefix || $u_prefix,
-                             d => "man/man3",
+                             r => '$(PREFIX)',
+                             d => 'man/man$(MAN3EXT)',
                              style => $manstyle, },
         siteman3dir     => { s => $sprefix,
-                             r => $u_mprefix || $u_sprefix,
-                             d => "man/man3",
+                             r => '$(SITEPREFIX)',
+                             d => 'man/man$(MAN3EXT)',
                              style => $manstyle, },
         vendorman3dir   => { s => $vprefix,
-                             r => $u_mprefix || $u_vprefix,
-                             d => "man/man3",
+                             r => '$(VENDORPREFIX)',
+                             d => 'man/man$(MAN3EXT)',
                              style => $manstyle, },
     );
 
     my %lib_layouts =
     (
         privlib     => { s => $iprefix,
-                         r => $u_lprefix || $u_prefix,
+                         r => '$(PREFIX)',
                          d => '',
                          style => $libstyle, },
         vendorlib   => { s => $vprefix,
-                         r => $u_lprefix || $u_vprefix,
+                         r => '$(VENDORPREFIX)',
                          d => '',
                          style => $libstyle, },
         sitelib     => { s => $sprefix,
-                         r => $u_lprefix || $u_sprefix,
+                         r => '$(SITEPREFIX)',
                          d => 'site_perl',
                          style => $libstyle, },
         
         archlib     => { s => $iprefix,
-                         r => $u_lprefix || $u_prefix,
+                         r => '$(PREFIX)',
                          d => "$version/$arch",
                          style => $libstyle },
         vendorarch  => { s => $vprefix,
-                         r => $u_lprefix || $u_vprefix,
+                         r => '$(VENDORPREFIX)',
                          d => "$version/$arch",
                          style => $libstyle },
         sitearch    => { s => $sprefix,
-                         r => $u_lprefix || $u_sprefix,
+                         r => '$(SITEPREFIX)',
                          d => "site_perl/$version/$arch",
                          style => $libstyle },
     );
