@@ -1,7 +1,9 @@
-6.25_05
+6.25_05  Wed Dec 22 07:59:02 EST 2004
     - One of the 6.25 alphas broke BSD make.  It doesn't like "- @ command".
       Fixed by adding an $(IGNORE) macro.
     - 6.25 alphas caused a Makefile to be added to the dist.  Fixed.
+    - The new cd() code needed to be dependent on dmake or nmake for
+      Windows.  Not Win9x vs WinNT/XP.
 
 6.25_04  Tue Dec 21 00:53:06 EST 2004
     - 6.25_03 was always rebuilding XS modules.
