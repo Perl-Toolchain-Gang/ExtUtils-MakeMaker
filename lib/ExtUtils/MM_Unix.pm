@@ -5,7 +5,7 @@ require 5.005_03;  # Maybe further back, dunno
 use strict;
 
 use Exporter ();
-use Carp ();
+use Carp;
 use Config;
 use File::Basename qw(basename dirname fileparse);
 use File::Spec;
@@ -1126,7 +1126,7 @@ sub fixin { # stolen from the pink Camel book, more or less
     for my $file (@files) {
 	local(*FIXIN);
 	local(*FIXOUT);
-	open(FIXIN, $file) or Carp::croak "Can't process '$file': $!";
+	open(FIXIN, $file) or croak "Can't process '$file': $!";
 	local $/ = "\n";
 	chomp(my $line = <FIXIN>);
 	next unless $line =~ s/^\s*\#!\s*//;     # Not a shbang file.
@@ -1691,8 +1691,11 @@ usually solves this kind of problem.
     # Determine VERSION and VERSION_FROM
     ($self->{DISTNAME}=$self->{NAME}) =~ s#(::)#-#g unless $self->{DISTNAME};
     if ($self->{VERSION_FROM}){
-	$self->{VERSION} = $self->parse_version($self->{VERSION_FROM}) or
-	    Carp::carp "WARNING: Setting VERSION via file '$self->{VERSION_FROM}' failed\n"
+	$self->{VERSION} = $self->parse_version($self->{VERSION_FROM});
+        if( $self->{VERSION} eq 'undef' ) {
+	    carp "WARNING: Setting VERSION via file ".
+                 "'$self->{VERSION_FROM}' failed\n";
+        }
     }
 
     # strip blanks
@@ -1700,8 +1703,6 @@ usually solves this kind of problem.
 	$self->{VERSION} =~ s/^\s+//;
 	$self->{VERSION} =~ s/\s+$//;
     }
-
-    $self->{VERSION} ||= "0.10";
     ($self->{VERSION_SYM} = $self->{VERSION}) =~ s/\W/_/g;
 
     $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION}";
@@ -1887,7 +1888,8 @@ sub init_INSTALL {
         $Config_Override{installvendorman3dir} = '';
     }
 
-    my $iprefix = $Config{installprefixexp} || '';
+    my $iprefix = $Config{installprefixexp} || $Config{installprefix} || 
+                  $Config{prefixexp}        || $Config{prefix} || '';
     my $vprefix = $Config{usevendorprefix}  ? $Config{vendorprefixexp} : '';
     my $sprefix = $Config{siteprefixexp}    || '';
 
@@ -2752,7 +2754,8 @@ sub needs_linking {
     my($self) = shift;
     my($child,$caller);
     $caller = (caller(0))[3];
-    Carp::confess("Needs_linking called too early") if $caller =~ /^ExtUtils::MakeMaker::/;
+    confess("Needs_linking called too early") if 
+      $caller =~ /^ExtUtils::MakeMaker::/;
     return $self->{NEEDS_LINKING} if defined $self->{NEEDS_LINKING};
     if ($self->has_link_code or $self->{MAKEAPERL}){
 	$self->{NEEDS_LINKING} = 1;
@@ -2845,10 +2848,11 @@ sub parse_version {
 	no warnings;
 	$result = eval($eval);
 	warn "Could not eval '$eval' in $parsefile: $@" if $@;
-	$result = "undef" unless defined $result;
 	last;
     }
     close FH;
+
+    $result = "undef" unless defined $result;
     return $result;
 }
 
@@ -3092,8 +3096,8 @@ sub ppd {
 
     if ($self->{ABSTRACT_FROM}){
         $self->{ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
-            Carp::carp "WARNING: Setting ABSTRACT via file ".
-                       "'$self->{ABSTRACT_FROM}' failed\n";
+            carp "WARNING: Setting ABSTRACT via file ".
+                 "'$self->{ABSTRACT_FROM}' failed\n";
     }
 
     my ($pack_ver) = join ",", (split (/\./, $self->{VERSION}), (0)x4)[0..3];
@@ -3184,11 +3188,8 @@ sub prefixify {
     my $path = $self->{uc $var} || 
                $Config_Override{lc $var} || $Config{lc $var};
 
-    print STDERR "  prefixify $var=$path\n" if $Verbose >= 2;
-    print STDERR "    from $sprefix to $rprefix\n" 
-      if $Verbose >= 2;
-
-    $path = VMS::Filespec::unixpath($path) if $Is_VMS;
+    print STDERR "  prefixify $var => $path\n" if $Verbose >= 2;
+    print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
 
     unless( $path =~ s{^\Q$sprefix\E\b}{$rprefix}s ) {
 
