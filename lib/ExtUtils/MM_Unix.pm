@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.14_01';
+$VERSION = '1.15_01';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -714,34 +714,25 @@ Defines the targets distclean, distcheck, skipcheck, manifest, veryclean.
 
 sub dist_basics {
     my($self) = shift;
-    my @m;
-    push @m, q{
+
+    return <<'MAKE_FRAG';
 distclean :: realclean distcheck
-};
+	$(NOECHO) $(NOOP)
 
-    push @m, q{
 distcheck :
-	$(PERLRUN) -MExtUtils::Manifest=fullcheck \\
-		-e fullcheck
-};
+	$(PERLRUN) -MExtUtils::Manifest=fullcheck -e fullcheck
 
-    push @m, q{
 skipcheck :
-	$(PERLRUN) -MExtUtils::Manifest=skipcheck \\
-		-e skipcheck
-};
+	$(PERLRUN) -MExtUtils::Manifest=skipcheck -e skipcheck
 
-    push @m, q{
 manifest :
-	$(PERLRUN) -MExtUtils::Manifest=mkmanifest \\
-		-e mkmanifest
-};
+	$(PERLRUN) -MExtUtils::Manifest=mkmanifest -e mkmanifest
 
-    push @m, q{
 veryclean : realclean
 	$(RM_F) *~ *.orig */*~ */*.orig
-};
-    join "", @m;
+
+MAKE_FRAG
+
 }
 
 =item dist_ci (o)
@@ -809,7 +800,7 @@ shdist : distdir
     join "", @m;
 }
 
-=item dist_dir (o)
+=item dist_dir
 
 Defines the scratch directory target that will hold the distribution
 before tar-ing (or shar-ing).
@@ -818,17 +809,18 @@ before tar-ing (or shar-ing).
 
 sub dist_dir {
     my($self) = shift;
-    my @m;
-    push @m, q{
+
+    return <<'MAKE_FRAG';
 distdir :
 	$(RM_RF) $(DISTVNAME)
 	$(PERLRUN) -MExtUtils::Manifest=manicopy,maniread \\
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
-};
-    join "", @m;
+
+MAKE_FRAG
+
 }
 
-=item dist_test (o)
+=item dist_test
 
 Defines a target that produces the distribution in the
 scratchdirectory, and runs 'perl Makefile.PL; make ;make test' in that
@@ -3359,15 +3351,16 @@ pm_to_blib soon.
 =cut
 
 sub tool_autosplit {
-# --- Tool Sections ---
-
     my($self, %attribs) = @_;
     my($asl) = "";
-    $asl = "\$AutoSplit::Maxlen=$attribs{MAXLEN};" if $attribs{MAXLEN};
-    q{
+    $asl = "\$\$AutoSplit::Maxlen=$attribs{MAXLEN};" if $attribs{MAXLEN};
+
+    return sprintf <<'MAKE_FRAG', $asl;
 # Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = $(PERLRUN) -e 'use AutoSplit;}.$asl.q{autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1) ;'
-};
+AUTOSPLITFILE = $(PERLRUN) -e 'use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1) ;'
+
+MAKE_FRAG
+
 }
 
 =item tools_other (o)
