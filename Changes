@@ -122,7 +122,8 @@
     - Craig Berry made sure extliblist() is always called even if LIBS
       is explicitly set to empty.
     * MakeMaker should now be safe even if the path to Perl contains
-      spaces such as C:\Program Files\perl\bin\perl.
+      spaces such as C:\Program Files\perl\bin\perl.  Unfortunately,
+      Test::Harness needs fixed as well.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
