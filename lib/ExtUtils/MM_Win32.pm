@@ -1,6 +1,5 @@
 package ExtUtils::MM_Win32;
 
-our $VERSION = '1.00_02';
 
 =head1 NAME
 
@@ -21,65 +20,22 @@ the semantics.
 =cut 
 
 use Config;
-#use Cwd;
 use File::Basename;
 use File::Spec;
-require Exporter;
+use ExtUtils::MakeMaker qw( neatvalue );
 
-require ExtUtils::MakeMaker;
-ExtUtils::MakeMaker->import(qw( $Verbose &neatvalue));
+use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE $PERLMAKE);
+
+$VERSION = '1.00_03';
+@ISA = qw( ExtUtils::MM_Unix );
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
-unshift @MM::ISA, 'ExtUtils::MM_Win32';
 
 $BORLAND = 1 if $Config{'cc'} =~ /^bcc/i;
 $GCC     = 1 if $Config{'cc'} =~ /^gcc/i;
 $DMAKE = 1 if $Config{'make'} =~ /^dmake/i;
 $NMAKE = 1 if $Config{'make'} =~ /^nmake/i;
 $PERLMAKE = 1 if $Config{'make'} =~ /^pmake/i;
-
-# a few workarounds for command.com (very basic)
-{
-    package ExtUtils::MM_Win95;
-
-    # the $^O test may be overkill, but we want to be sure Win32::IsWin95()
-    # exists before we try it
-
-    unshift @MM::ISA, 'ExtUtils::MM_Win95'
-	if ($^O =~ /Win32/ && Win32::IsWin95());
-
-    sub xs_c {
-	my($self) = shift;
-	return '' unless $self->needs_linking();
-	'
-.xs.c:
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) \\
-	    $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
-	'
-    }
-
-    sub xs_cpp {
-	my($self) = shift;
-	return '' unless $self->needs_linking();
-	'
-.xs.cpp:
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) \\
-	    $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.cpp
-	';
-    }
-
-    # many makes are too dumb to use xs_c then c_o
-    sub xs_o {
-	my($self) = shift;
-	return '' unless $self->needs_linking();
-	'
-.xs$(OBJ_EXT):
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) \\
-	    $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
-	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.c
-	';
-    }
-}	# end of command.com workarounds
 
 sub dlsyms {
     my($self,%attribs) = @_;
