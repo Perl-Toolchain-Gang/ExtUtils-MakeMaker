@@ -3,7 +3,7 @@ package ExtUtils::MM;
 use strict;
 use Config;
 use vars qw(@ISA $VERSION);
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 require ExtUtils::Liblist;
 require ExtUtils::MakeMaker;
@@ -69,6 +69,7 @@ my($OS) = keys %Is;
 
 
 eval "require ExtUtils::MM_$OS";
+die $@ if $@;
 unshift @ISA, "ExtUtils::MM_$OS";
 
 
