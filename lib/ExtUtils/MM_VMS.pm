@@ -211,9 +211,9 @@ sub find_perl {
             $rslt = `\@temp_mmvms.com` ;
             unlink('temp_mmvms.com');
             if ($rslt =~ /VER_OK/) {
-	    print "Using PERL=$name\n" if $trace;
-	    return $name;
-	}
+                print "Using PERL=$name\n" if $trace;
+                return $name;
+            }
         }
 	next unless $vmsfile = $self->maybe_command($name);
 	$vmsfile =~ s/;[\d\-]*$//;  # Clip off version number; we can use a newer version as well
