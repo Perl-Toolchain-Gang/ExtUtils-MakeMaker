@@ -1,4 +1,4 @@
-6.13
+6.13 Thu Jul 31 16:48:01 PDT 2003
     - Generated META.yml now has the prereqs in sorted order (Andy Lester)
     - Arguments to child Makefile.PLs were still having .. prepended.  This
       was exposed by the earlier fix of rt.perl.org 4345.
