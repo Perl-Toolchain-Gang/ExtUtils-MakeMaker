@@ -1375,7 +1375,8 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     foreach my $man (qw(MAN1 MAN3)) {
 	unless ($self->{"${man}PODS"}) {
 	    $self->{"${man}PODS"} = {};
-	    $pods{$man} = 1 unless $self->{"INST_${man}DIR"} =~ /^(none|\s*)$/;
+	    $pods{$man} = 1 unless 
+              $self->{"INSTALL${man}DIR"} =~ /^(none|\s*)$/;
 	}
     }
 
@@ -1431,7 +1432,8 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	}
 
 	# Remove "Configure.pm" and similar, if it's not the only pod listed
-	# To force inclusion, just name it "Configure.pod", or override MAN3PODS
+	# To force inclusion, just name it "Configure.pod", or override 
+        # MAN3PODS
 	foreach $name (keys %manifypods) {
            if ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) {
 		delete $manifypods{$name};
@@ -1614,137 +1616,9 @@ usually solves this kind of problem.
 
 
     $self->init_INST;
+    $self->init_INSTALL;
 
-
-    # The user who requests an installation directory explicitly
-    # should not have to tell us an architecture installation directory
-    # as well. We look if a directory exists that is named after the
-    # architecture. If not we take it as a sign that it should be the
-    # same as the requested installation directory. Otherwise we take
-    # the found one.
-    # We do the same thing twice: for privlib/archlib and for sitelib/sitearch
-    my($libpair);
-    for $libpair ({l=>"privlib", a=>"archlib"}, {l=>"sitelib", a=>"sitearch"}) {
-	my $lib = "install$libpair->{l}";
-	my $Lib = uc $lib;
-	my $Arch = uc "install$libpair->{a}";
-	if( $self->{$Lib} && ! $self->{$Arch} ){
-	    my($ilib) = $Config{$lib};
-	    $ilib = VMS::Filespec::unixify($ilib) if $Is_VMS;
-
-	    $self->prefixify($Arch,$ilib,$self->{$Lib});
-
-	    unless (-d $self->{$Arch}) {
-		print STDOUT "Directory $self->{$Arch} not found, thusly\n" if $Verbose;
-		$self->{$Arch} = $self->{$Lib};
-	    }
-	    print STDOUT "Defaulting $Arch to $self->{$Arch}\n" if $Verbose;
-	}
-    }
-
-    # we have to look at the relation between $Config{prefix} and the
-    # requested values. We're going to set the $Config{prefix} part of
-    # all the installation path variables to literally $(PREFIX), so
-    # the user can still say make PREFIX=foo
-    my($configure_prefix) = $Config{'prefix'};
-    $configure_prefix = VMS::Filespec::unixify($configure_prefix) if $Is_VMS;
-    $self->{PREFIX} ||= $configure_prefix;
-
-
-    my($install_variable,$search_prefix,$replace_prefix);
-
-    # If the prefix contains perl, Configure shapes the tree as follows:
-    #    perlprefix/lib/                INSTALLPRIVLIB
-    #    perlprefix/lib/pod/
-    #    perlprefix/lib/site_perl/	INSTALLSITELIB
-    #    perlprefix/bin/		INSTALLBIN
-    #    perlprefix/man/		INSTALLMAN1DIR
-    # else
-    #    prefix/lib/perl5/		INSTALLPRIVLIB
-    #    prefix/lib/perl5/pod/
-    #    prefix/lib/perl5/site_perl/	INSTALLSITELIB
-    #    prefix/bin/			INSTALLBIN
-    #    prefix/lib/perl5/man/		INSTALLMAN1DIR
-    #
-    # The above results in various kinds of breakage on various
-    # platforms, so we cope with it as follows: if prefix/lib/perl5
-    # or prefix/lib/perl5/man exist, we'll replace those instead
-    # of /prefix/{lib,man}
-
-    $replace_prefix = qq[\$\(PREFIX\)];
-    for $install_variable (qw/
-			   INSTALLBIN
-			   INSTALLSCRIPT
-			   /) {
-	$self->prefixify($install_variable,$configure_prefix,$replace_prefix);
-    }
-    my $funkylibdir = File::Spec->catdir($configure_prefix,"lib","perl5");
-    $funkylibdir = '' unless -d $funkylibdir;
-    $search_prefix = $funkylibdir || 
-                     File::Spec->catdir($configure_prefix,"lib");
-
-    if ($self->{LIB}) {
-	$self->{INSTALLPRIVLIB} = $self->{INSTALLSITELIB} = $self->{LIB};
-	$self->{INSTALLARCHLIB} = $self->{INSTALLSITEARCH} = 
-	    File::Spec->catdir($self->{LIB},$Config{'archname'});
-    }
-    else {
-	if (-d File::Spec->catdir($self->{PREFIX},"lib","perl5")) {
-	    $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib", 
-                                                 "perl5");
-	}
-	else {
-	    $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib");
-	}
-	for $install_variable (qw/
-			       INSTALLPRIVLIB
-			       INSTALLARCHLIB
-			       INSTALLSITELIB
-			       INSTALLSITEARCH
-			       /)
-	{
-	    $self->prefixify($install_variable,$search_prefix,$replace_prefix);
-	}
-    }
-    my $funkymandir = File::Spec->catdir($configure_prefix,"lib","perl5","man");
-    $funkymandir = '' unless -d $funkymandir;
-    $search_prefix = $funkymandir || File::Spec->catdir($configure_prefix,"man");
-    if (-d File::Spec->catdir($self->{PREFIX},"lib","perl5", "man")) {
-	$replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib", "perl5", "man");
-    }
-    else {
-	$replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"man");
-    }
-    for $install_variable (qw/
-			   INSTALLMAN1DIR
-			   INSTALLMAN3DIR
-			   /)
-    {
-	$self->prefixify($install_variable,$search_prefix,$replace_prefix);
-    }
-
-    # Now we head at the manpages. Maybe they DO NOT want manpages
-    # installed
-    $self->{INSTALLMAN1DIR} = $Config::Config{installman1dir}
-	unless defined $self->{INSTALLMAN1DIR};
-    unless (defined $self->{INST_MAN1DIR}){
-	if ($self->{INSTALLMAN1DIR} =~ /^(none|\s*)$/){
-	    $self->{INST_MAN1DIR} = $self->{INSTALLMAN1DIR};
-	} else {
-	    $self->{INST_MAN1DIR} = File::Spec->catdir($Curdir,'blib','man1');
-	}
-    }
     $self->{MAN1EXT} ||= $Config::Config{man1ext};
-
-    $self->{INSTALLMAN3DIR} = $Config::Config{installman3dir}
-	unless defined $self->{INSTALLMAN3DIR};
-    unless (defined $self->{INST_MAN3DIR}){
-	if ($self->{INSTALLMAN3DIR} =~ /^(none|\s*)$/){
-	    $self->{INST_MAN3DIR} = $self->{INSTALLMAN3DIR};
-	} else {
-	    $self->{INST_MAN3DIR} = File::Spec->catdir($Curdir,'blib','man3');
-	}
-    }
     $self->{MAN3EXT} ||= $Config::Config{man3ext};
 
     # Get some stuff out of %Config if we haven't yet done so
@@ -1921,6 +1795,9 @@ sub init_INST {
 
     $self->{INST_SCRIPT} ||= File::Spec->catdir($Curdir,'blib','script');
 
+    $self->{INST_MAN1DIR} ||= File::Spec->catdir($Curdir,'blib','man1');
+    $self->{INST_MAN3DIR} ||= File::Spec->catdir($Curdir,'blib','man3');
+
     return 1;
 }
 
@@ -1928,7 +1805,127 @@ sub init_INST {
 
     $mm->init_INSTALL;
 
-Called by init_main.  Sets up all INSTALL_* variables.
+Called by init_main.  Sets up all INSTALL_* variables (except
+INSTALLDIRS) and PREFIX.
+
+=cut
+
+sub init_INSTALL {
+    my($self) = shift;
+
+    # The user who requests an installation directory explicitly
+    # should not have to tell us an architecture installation directory
+    # as well. We look if a directory exists that is named after the
+    # architecture. If not we take it as a sign that it should be the
+    # same as the requested installation directory. Otherwise we take
+    # the found one.
+    # We do the same thing twice: for privlib/archlib and for sitelib/sitearch
+    for my $libpair ({l=>"privlib", a=>"archlib"}, 
+                     {l=>"sitelib", a=>"sitearch"}) 
+    {
+        my $lib = "install$libpair->{l}";
+        my $Lib = uc $lib;
+        my $Arch = uc "install$libpair->{a}";
+        if( $self->{$Lib} && ! $self->{$Arch} ){
+            my($ilib) = $Config{$lib};
+            $ilib = VMS::Filespec::unixify($ilib) if $Is_VMS;
+
+            $self->prefixify($Arch,$ilib,$self->{$Lib});
+
+            unless (-d $self->{$Arch}) {
+                print STDOUT "Directory $self->{$Arch} not found\n" 
+                  if $Verbose;
+                $self->{$Arch} = $self->{$Lib};
+            }
+            print STDOUT "Defaulting $Arch to $self->{$Arch}\n" if $Verbose;
+        }
+    }
+
+    # we have to look at the relation between $Config{prefix} and the
+    # requested values. We're going to set the $Config{prefix} part of
+    # all the installation path variables to literally $(PREFIX), so
+    # the user can still say make PREFIX=foo
+    my($configure_prefix) = $Config{'prefix'};
+    $configure_prefix = VMS::Filespec::unixify($configure_prefix) if $Is_VMS;
+    $self->{PREFIX} ||= $configure_prefix;
+
+
+    my($search_prefix, $replace_prefix);
+    # If the prefix contains perl, Configure shapes the tree as follows:
+    #    perlprefix/lib/                INSTALLPRIVLIB
+    #    perlprefix/lib/pod/
+    #    perlprefix/lib/site_perl/      INSTALLSITELIB
+    #    perlprefix/bin/                INSTALLBIN
+    #    perlprefix/man/                INSTALLMAN1DIR
+    # else
+    #    prefix/lib/perl5/              INSTALLPRIVLIB
+    #    prefix/lib/perl5/pod/
+    #    prefix/lib/perl5/site_perl/    INSTALLSITELIB
+    #    prefix/bin/                    INSTALLBIN
+    #    prefix/lib/perl5/man/          INSTALLMAN1DIR
+    #
+    # The above results in various kinds of breakage on various
+    # platforms, so we cope with it as follows: if prefix/lib/perl5
+    # or prefix/lib/perl5/man exist, we'll replace those instead
+    # of /prefix/{lib,man}
+
+    $replace_prefix = '$(PREFIX)';
+    for my $install_variable (qw/INSTALLBIN INSTALLSCRIPT/)
+    {
+        $self->prefixify($install_variable,$configure_prefix,$replace_prefix);
+    }
+
+    my $funkylibdir = File::Spec->catdir($configure_prefix,"lib","perl5");
+    $funkylibdir = '' unless -d $funkylibdir;
+    $search_prefix = $funkylibdir || 
+                     File::Spec->catdir($configure_prefix,"lib");
+
+    if ($self->{LIB}) {
+        $self->{INSTALLPRIVLIB} = $self->{INSTALLSITELIB} = $self->{LIB};
+        $self->{INSTALLARCHLIB} = $self->{INSTALLSITEARCH} = 
+            File::Spec->catdir($self->{LIB},$Config{'archname'});
+    }
+    else {
+        if (-d File::Spec->catdir($self->{PREFIX},"lib","perl5")) {
+            $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib", 
+                                                 "perl5");
+        }
+        else {
+            $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib");
+        }
+        for my $install_variable (qw/
+                               INSTALLPRIVLIB
+                               INSTALLARCHLIB
+                               INSTALLSITELIB
+                               INSTALLSITEARCH
+                               /)
+        {
+            $self->prefixify($install_variable,$search_prefix,$replace_prefix);
+        }
+    }
+    my $funkymandir = File::Spec->catdir($configure_prefix,"lib","perl5","man");
+    $funkymandir = '' unless -d $funkymandir;
+    $search_prefix = $funkymandir || File::Spec->catdir($configure_prefix,"man");
+    if (-d File::Spec->catdir($self->{PREFIX},"lib","perl5", "man")) {
+        $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib", "perl5", "man");
+    }
+    else {
+        $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"man");
+    }
+    for my $install_variable (qw/
+                           INSTALLMAN1DIR
+                           INSTALLMAN3DIR
+                           /)
+    {
+        $self->prefixify($install_variable,$search_prefix,$replace_prefix);
+    }
+
+    # Now we head at the manpages.
+    $self->{INSTALLMAN1DIR} ||= $Config::Config{installman1dir};
+    $self->{INSTALLMAN3DIR} ||= $Config::Config{installman3dir};
+
+    return 1;
+}
 
 =item init_PERL
 
