@@ -5,6 +5,12 @@
     * WriteMakefile argument verification should now be accurate
     - Documented the LD flag.
     * Documented prompt()
+    * vendor install was not adding to packlist or updating perllocal.
+    - Supporting $Config{vendorarchexp} and $Config{vendorlibexp}.
+    - Fixed conflict on VMS between logical names and directories 
+      (bleadperl 17488)
+    - Fixed space-vs-tab bug on Netware (bleadperl 17579)
+    - Mysterious NetWare fix from Ananth (bleadperl 17376)
 
 6.03 Wed Jun 19 17:06:14 EDT 2002
     - Documented that we're clamping down on cargo-cult MakeMaker

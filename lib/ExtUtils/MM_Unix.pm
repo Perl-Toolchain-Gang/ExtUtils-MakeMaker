@@ -484,8 +484,8 @@ sub constants {
 	      INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
 	      INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
               INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
-              PERL_LIB        PERL_ARCHLIB 
-              SITELIBEXP      SITEARCHEXP 
+              PERL_LIB        PERL_ARCHLIB    VENDORLIBEXP
+              SITELIBEXP      SITEARCHEXP     VENDORARCHEXP
               LIBPERL_A MYEXTLIB
 	      FIRST_MAKEFILE MAKE_APERL_FILE PERLMAINCC PERL_SRC
 	      PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
@@ -1349,8 +1349,15 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     # (which includes PARENT_NAME). This is a subtle distinction but one
     # that's important for nested modules.
 
-    $self->{PMLIBDIRS} = ['lib', $self->{BASEEXT}]
-	unless $self->{PMLIBDIRS};
+    unless( $self->{PMLIBDIRS} ) {
+        if( $Is_VMS ) {
+            # Avoid logical name vs directory collisions
+            $self->{PMLIBDIRS} = ['./lib', "./$self->{BASEEXT}"];
+        }
+        else {
+            $self->{PMLIBDIRS} = ['lib', $self->{BASEEXT}];
+        }
+    }
 
     #only existing directories that aren't in $dir are allowed
 
@@ -2052,6 +2059,10 @@ sub init_INSTALL {
           if $Verbose >= 2;
     }
 
+    # Generate these if they weren't figured out.
+    $self->{VENDORARCHEXP} ||= $self->{INSTALLVENDORARCH};
+    $self->{VENDORLIBEXP}  ||= $self->{INSTALLVENDORLIB};
+
     return 1;
 }
 
@@ -2260,6 +2271,8 @@ pure_site_install ::
 
 pure_vendor_install ::
 	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
+		read }.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
+		write }.File::Spec->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLVENDORLIB) \
 		$(INST_ARCHLIB) $(INSTALLVENDORARCH) \
 		$(INST_BIN) $(INSTALLVENDORBIN) \
@@ -2288,6 +2301,14 @@ doc_site_install ::
 		>> }.File::Spec->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
 
 doc_vendor_install ::
+	-}.$self->{NOECHO}.q{$(MKPATH) $(INSTALLVENDORLIB)
+	-}.$self->{NOECHO}.q{$(DOC_INSTALL) \
+		"Module" "$(NAME)" \
+		"installed into" "$(INSTALLVENDORLIB)" \
+		LINKTYPE "$(LINKTYPE)" \
+		VERSION "$(VERSION)" \
+		EXE_FILES "$(EXE_FILES)" \
+		>> }.File::Spec->catfile('$(INSTALLVENDORARCH)','perllocal.pod').q{
 
 };
 
@@ -2301,6 +2322,10 @@ uninstall_from_perldirs ::
 uninstall_from_sitedirs ::
 	}.$self->{NOECHO}.
 	q{$(UNINSTALL) }.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{
+
+uninstall_from_vendordirs ::
+	}.$self->{NOECHO}.
+        q{$(UNINSTALL) }.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{
 };
 
     join("",@m);

@@ -31,4 +31,6 @@ Fill in the IMPORTS docs.
 
 Document "make install UNINST=1"
 
-Remove tar -I Sun-ism.
+Remove tar -I Sun-ism from instmodsh.
+
+find_perl has 2>&1-ism which will fail on Win95.
