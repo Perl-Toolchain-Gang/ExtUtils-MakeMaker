@@ -20,7 +20,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -2528,7 +2528,7 @@ doc_perl_install ::
 		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
 
 doc_site_install ::
-	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLSITEARCH)/perllocal.pod
+	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
 	-$(NOECHO) $(MKPATH) $(INSTALLSITEARCH)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
@@ -2536,10 +2536,10 @@ doc_site_install ::
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
+		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
 
 doc_vendor_install ::
-	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLVENDORARCH)/perllocal.pod
+	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
 	-$(NOECHO) $(MKPATH) $(INSTALLVENDORARCH)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
@@ -2547,7 +2547,7 @@ doc_vendor_install ::
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(INSTALLVENDORARCH)','perllocal.pod').q{
+		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
 
 };
 
