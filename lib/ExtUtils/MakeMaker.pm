@@ -12,7 +12,7 @@ use File::Path;
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
-            $Revision $VERSION $Verbose %Config 
+            $Revision$VERSION $Verbose %Config 
             @Prepend_parent @Parent
             %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
             $Filename
@@ -2065,7 +2065,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.147 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
