@@ -29,7 +29,7 @@ use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE $PERLMAKE);
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
@@ -638,7 +638,7 @@ sub top_targets {
     my(@m);
 
     push @m, '
-all :: pure_all manifypods
+all :: pure_all
 	'.$self->{NOECHO}.'$(NOOP)
 ' 
 	  unless $self->{SKIPHASH}{'all'};
@@ -689,17 +689,6 @@ help:
 };
 
     join('',@m);
-}
-
-=item manifypods (o)
-
-We don't want manpage process.
-
-=cut
-
-sub manifypods {
-    my($self) = shift;
-    return "\nmanifypods :\n\t$self->{NOECHO}\$(NOOP)\n";
 }
 
 =item dist_ci (o)
