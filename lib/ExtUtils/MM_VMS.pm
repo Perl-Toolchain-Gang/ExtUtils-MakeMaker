@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.87 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.88 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -854,7 +854,7 @@ USEMACROS = /Macro=(
 MACROEND = )
 
 # Just in case anyone is using the old macro.
-SAY = $ECHO
+SAY = $(ECHO)
 
 EXTRA_TOOLS
 
@@ -2167,8 +2167,8 @@ sub oneliner {
 
 =item B<echo> (o)
 
-perl trips up on "<foo>" thinking its an input redirect.  So we use the
-native Write sys$output instead.
+perl trips up on "<foo>" thinking it's an input redirect.  So we use the
+native Write command instead.  Besides, its faster.
 
 =cut
 
@@ -2176,12 +2176,12 @@ sub echo {
     my($self, $text, $file, $appending) = @_;
     $appending ||= 0;
 
-    die "The VMS version of echo() cannot currently append" if $appending;
+    my $opencmd = $appending ? 'Open/Append' : 'Open/Write';
 
-    my @cmds = ("\$(NOECHO) Assign $file Sys\$Output");
-    push @cmds, map { '$(NOECHO) Write Sys$Output '.$self->quote_literal($_) } 
+    my @cmds = ("\$(NOECHO) $opencmd MMECHOFILE $file ");
+    push @cmds, map { '$(NOECHO) Write MMECHOFILE '.$self->quote_literal($_) } 
                 split /\n/, $text;
-    push @cmds, '$(NOECHO) Deassign Sys$Output';
+    push @cmds, '$(NOECHO) Close MMECHOFILE';
     return @cmds;
 }
 
@@ -2243,7 +2243,7 @@ Expands MM[KS]/Make macros in a text string, using the contents of
 identically named elements of C<%$self>, and returns the result
 as a file specification in Unix syntax.
 
-NOTE:  This is the cannonical version of the method.  The version in
+NOTE:  This is the canonical version of the method.  The version in
 File::Spec::VMS is deprecated.
 
 =cut
@@ -2301,7 +2301,7 @@ is a VMS-syntax file specification, and if it is not specified, fixpath()
 checks to see whether it matches the name of a directory in the current
 default directory, and returns a directory or file specification accordingly.
 
-NOTE:  This is the cannonical version of the method.  The version in
+NOTE:  This is the canonical version of the method.  The version in
 File::Spec::VMS is deprecated.
 
 =cut
@@ -2356,7 +2356,7 @@ sub fixpath {
 
 =item os_flavor
 
-VMS is, alas, VMS.
+VMS is VMS.
 
 =cut
 
