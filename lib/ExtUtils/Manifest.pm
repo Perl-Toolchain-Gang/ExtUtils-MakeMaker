@@ -65,6 +65,8 @@ exported on request
 
 =over 4
 
+
+
 =item mkmanifest
 
     mkmanifest();
@@ -80,83 +82,6 @@ All files that match any regular expression in a file F<MANIFEST.SKIP>
 Any existing F<MANIFEST> file will be saved as F<MANIFEST.bak>.  Lines
 from the old F<MANIFEST> file is preserved, including any comments
 that are found in the existing F<MANIFEST> file in the new one.
-
-
-=item manicheck
-
-    my @missing_files = manicheck();
-
-checks if all the files within a C<MANIFEST> in the current directory
-really do exist. If C<MANIFEST> and the tree below the current
-directory are in sync it exits silently, returning an empty list.
-Otherwise it returns a list of files which are listed in the
-C<MANIFEST> but missing from the directory, and by default also
-outputs these names to STDERR.
-
-
-=item filecheck
-
-    my @extra_files = filecheck();
-
-finds files below the current directory that are not mentioned in the
-C<MANIFEST> file. An optional file C<MANIFEST.SKIP> will be
-consulted. Any file matching a regular expression in such a file will
-not be reported as missing in the C<MANIFEST> file. The list of any
-extraneous files found is returned, and by default also reported to
-STDERR.
-
-
-=item fullcheck
-
-    my($missing, $extra) = fullcheck();
-
-does both a manicheck() and a filecheck(), returning then as two array
-refs.
-
-
-=item skipcheck
-
-    my @skipped = skipcheck();
-
-lists all the files that are skipped due to your C<MANIFEST.SKIP>
-file.
-
-
-=item manifind
-
-    my $found = manifind();
-
-returns a hash reference. The keys of the hash are the files found
-below the current directory.
-
-
-=item maniread
-
-    my $manifest = maniread();
-    my $manifest = maniread($manifest_file);
-
-reads a named C<MANIFEST> file (defaults to C<MANIFEST> in the current
-directory) and returns a HASH reference with files being the keys and
-comments being the values of the HASH.  Blank lines and lines which
-start with C<#> in the C<MANIFEST> file are discarded.
-
-
-=item manicopy
-
-    manicopy($src, $dest_dir);
-    manicopy($src, $dest_dir, $how);
-
-copies the files that are the keys in the HASH I<%$src> to the
-$dest_dir. The HASH reference $read is typically returned by the
-maniread() function. This function is useful for producing a directory
-tree identical to the intended distribution tree. The third parameter
-$how can be used to specify a different methods of "copying". Valid
-values are C<cp>, which actually copies the files, C<ln> which creates
-hard links, and C<best> which mostly links the files but copies any
-symbolic link to make a tree without any symbolic link. Best is the
-default.
-
-=back
 
 =cut
 
@@ -203,6 +128,16 @@ sub clean_up_filename {
   return $filename;
 }
 
+
+=item manifind
+
+    my $found = manifind();
+
+returns a hash reference. The keys of the hash are the files found
+below the current directory.
+
+=cut
+
 sub manifind {
     my $p = shift || {};
     my $found = {};
@@ -229,17 +164,65 @@ sub manifind {
     return $found;
 }
 
-sub fullcheck {
-    return [_check_files()], [_check_manifest()];
-}
+
+=item manicheck
+
+    my @missing_files = manicheck();
+
+checks if all the files within a C<MANIFEST> in the current directory
+really do exist. If C<MANIFEST> and the tree below the current
+directory are in sync it exits silently, returning an empty list.
+Otherwise it returns a list of files which are listed in the
+C<MANIFEST> but missing from the directory, and by default also
+outputs these names to STDERR.
+
+=cut
 
 sub manicheck {
     return _check_files();
 }
 
+
+=item filecheck
+
+    my @extra_files = filecheck();
+
+finds files below the current directory that are not mentioned in the
+C<MANIFEST> file. An optional file C<MANIFEST.SKIP> will be
+consulted. Any file matching a regular expression in such a file will
+not be reported as missing in the C<MANIFEST> file. The list of any
+extraneous files found is returned, and by default also reported to
+STDERR.
+
+=cut
+
 sub filecheck {
     return _check_manifest();
 }
+
+
+=item fullcheck
+
+    my($missing, $extra) = fullcheck();
+
+does both a manicheck() and a filecheck(), returning then as two array
+refs.
+
+=cut
+
+sub fullcheck {
+    return [_check_files()], [_check_manifest()];
+}
+
+
+=item skipcheck
+
+    my @skipped = skipcheck();
+
+lists all the files that are skipped due to your C<MANIFEST.SKIP>
+file.
+
+=cut
 
 sub skipcheck {
     my($p) = @_;
@@ -304,6 +287,18 @@ sub _check_manifest {
 }
 
 
+=item maniread
+
+    my $manifest = maniread();
+    my $manifest = maniread($manifest_file);
+
+reads a named C<MANIFEST> file (defaults to C<MANIFEST> in the current
+directory) and returns a HASH reference with files being the keys and
+comments being the values of the HASH.  Blank lines and lines which
+start with C<#> in the C<MANIFEST> file are discarded.
+
+=cut
+
 sub maniread {
     my ($mfile) = @_;
     $mfile ||= $MANIFEST;
@@ -364,6 +359,23 @@ sub _maniskip {
 
     return sub { $_[0] =~ qr{$opts$regex} };
 }
+
+=item manicopy
+
+    manicopy($src, $dest_dir);
+    manicopy($src, $dest_dir, $how);
+
+copies the files that are the keys in the HASH I<%$src> to the
+$dest_dir. The HASH reference $read is typically returned by the
+maniread() function. This function is useful for producing a directory
+tree identical to the intended distribution tree. The third parameter
+$how can be used to specify a different methods of "copying". Valid
+values are C<cp>, which actually copies the files, C<ln> which creates
+hard links, and C<best> which mostly links the files but copies any
+symbolic link to make a tree without any symbolic link. Best is the
+default.
+
+=cut
 
 sub manicopy {
     my($read,$target,$how)=@_;
@@ -502,6 +514,8 @@ sub _unmacify {
     
     $file;
 }
+
+=back
 
 =head2 MANIFEST
 
