@@ -15,6 +15,9 @@ $PACKAGE = 'ExtUtils::MakeMaker';
 ($PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
 $LAST_API_CHANGE = 5.50;
 
+my $Is_VMS = $^O eq 'VMS';
+
+
 eval "require $PACKAGE";
 
 unless ($@) { # Make sure we did find the module.
@@ -49,7 +52,7 @@ my $MM = WriteMakefile(
     EXE_FILES       => [qw(bin/instmodsh)],
 );
 
-if( $MM->{PERL} =~ /\S\s+\S/ ) {
+if( !$Is_VMS && $MM->{PERL} =~ /\S\s+\S/ ) {
     require Test::Harness;
     print <<SPACE_WARN if $Test::Harness::VERSION < 2.27;
 
