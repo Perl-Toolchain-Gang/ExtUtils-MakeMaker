@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.38.
+signed via the Module::Signature module, version 0.41.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,10 +15,10 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 05325a673db0a1d38bb98551c85360cbdf316b9b .patch
-SHA1 bd755cfed84d37ff00430d9048d566a2743a7c5c Changes
+SHA1 02402440e5288437787a5d794e1e2c81cdedf399 Changes
 SHA1 9a5818da277e4c4d34dbb5011d3073b495ee37e8 MANIFEST
 SHA1 001ec2e096a338ed14c59807bc4cae471c431ea2 MANIFEST.SKIP
-SHA1 86b2321ecbc3ad0ab4b9a7cbf0485645345f2170 META.yml
+SHA1 86f2301536628e1a41aa421b5bbe91b38a8498eb META.yml
 SHA1 064e6ca78be0856ffddcebf1b6e274e2bb092bbc Makefile.PL
 SHA1 2f8f45d02988e3454b6a79508e96fe8224101e0a NOTES
 SHA1 a894493ee3809cd37657385b131617ed11afb389 PATCHING
@@ -41,7 +41,7 @@ SHA1 75f1fa677a833206d2bc1cc2d51afc562dcf2348 lib/ExtUtils/MM_MacOS.pm
 SHA1 e9796190c387cf0301a8c6fac223e491c57c6841 lib/ExtUtils/MM_NW5.pm
 SHA1 441da7524783ae12ce40f26353adbf4696a8f5b4 lib/ExtUtils/MM_OS2.pm
 SHA1 02b916060571fd20ced334ba4f2d1542d1590023 lib/ExtUtils/MM_UWIN.pm
-SHA1 b53b7d992292b3708d41caef1b4d1d83b454e6c9 lib/ExtUtils/MM_Unix.pm
+SHA1 560af0d3c3b7ee3b80f824cd4bda793323dc9332 lib/ExtUtils/MM_Unix.pm
 SHA1 f2f48b698b141d7810e9b3df9b5bb78b41224a05 lib/ExtUtils/MM_VMS.pm
 SHA1 90ff9e66a8548c2638088b5b5b890e1890db26a0 lib/ExtUtils/MM_Win32.pm
 SHA1 d6e19df6cd2c21853f63354cc3018d759c21babe lib/ExtUtils/MM_Win95.pm
@@ -101,9 +101,9 @@ SHA1 0f50375db36426cfd5e9eb8526f6eac1c879f2c4 t/testlib.t
 SHA1 03f36c9b29b7fd04e70b5cdf1fa87964b83a496b t/vmsish.t
 SHA1 4a7685da6367a7a79ecfac76f96adf2aeac46514 t/writemakefile_args.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.2 (Darwin)
+Version: GnuPG v1.2.4 (Darwin)
 
-iD8DBQFAbyuMT4Li3Cw/PzQRAh5BAKCBh9faUEawuPUwZSX2w5lkcK8XFACfR2yP
-uA4BdgEKyBUT38+ZP4JzaRs=
-=+UHk
+iD8DBQFBmRy8T4Li3Cw/PzQRAiuGAJ9KEFC9sBLvlmzpEP7DtgCQyX9WwACfXslR
+3tKFUeEoB1ZyHd3YrzksvJI=
+=97l0
 -----END PGP SIGNATURE-----
