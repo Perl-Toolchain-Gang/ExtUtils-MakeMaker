@@ -33,7 +33,16 @@ ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.
 
 =head1 DESCRIPTION
 
-The module is used to replace common UNIX commands.
+The module is used to replace common UNIX commands.  In all cases the
+functions work from @ARGV rather than taking arguments.  This makes
+them easier to deal with in Makefiles.
+
+  perl -MExtUtils::Command -e some_command some files to work on
+
+I<NOT>
+
+  perl -MExtUtils::Command -e 'some_command qw(some files to work on)'
+
 
 =over 4
 
