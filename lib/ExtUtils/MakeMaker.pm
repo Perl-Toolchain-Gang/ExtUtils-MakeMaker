@@ -1369,8 +1369,8 @@ Something like C<"-DHAVE_UNISTD_H">
 
 This is the root directory into which the code will be installed.  It
 I<prepends itself to the normal prefix>.  For example, if your code
-would normally go into /usr/local/lib/perl you could set DESTDIR=~/tmp/
-and installation would go into /tmp/usr/local/lib/perl.
+would normally go into F</usr/local/lib/perl> you could set DESTDIR=~/tmp/
+and installation would go into F<~/tmp/usr/local/lib/perl>.
 
 This is primarily of use for people who repackage Perl modules.
 
