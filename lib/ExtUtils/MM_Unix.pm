@@ -300,10 +300,14 @@ clean :: clean_subdirs
       }
       push( @files, @errfiles, 'perlmain.err' );
     }
-    push(@files, $attribs{FILES}) if $attribs{FILES};
-    push(@files, qw[./blib $(MAKE_APERL_FILE) 
-                    $(INST_ARCHAUTODIR)/extralibs.all
-                    $(INST_ARCHAUTODIR)/extralibs.ld
+
+    if( $attribs{FILES} ) {
+        push @files, ref $attribs{FILES}                ?
+                         @{$attribs{FILES}}             :
+                         split /\s+/, $attribs{FILES}   ;
+    }
+
+    push(@files, qw[blib $(MAKE_APERL_FILE) 
                     perlmain.c tmon.out mon.out so_locations 
                     blibdirs.ts pm_to_blib.ts
                     *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
@@ -311,6 +315,10 @@ clean :: clean_subdirs
                     $(BASEEXT).def lib$(BASEEXT).def
                     $(BASEEXT).exp $(BASEEXT).x
                    ]);
+
+    push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
+    push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
+
     if( $Is_VOS ) {
         push(@files, qw[*.kp]);
     }
@@ -323,6 +331,9 @@ clean :: clean_subdirs
 
     # OS specific files to clean up
     push @files, $self->extra_clean_files;
+
+    # Occasionally files are repeated several times from different sources
+    { my(%f) = map { ($_ => 1) } @files; @files = keys %f; }
 
     push @m, map "\t$_\n", $self->split_command('-$(RM_RF)', @files);
 

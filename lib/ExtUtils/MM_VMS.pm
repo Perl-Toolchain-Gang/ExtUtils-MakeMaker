@@ -1006,62 +1006,18 @@ $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
 }
 
 
-=item clean (override)
+=item extra_clean_files
 
-Split potentially long list of files across multiple commands (in
-order to stay under the magic command line limit).  Also use MM[SK]
-commands for handling subdirectories.
+Clean up some OS specific files.  Plus the temp file used to shorten
+a lot of commands.
 
 =cut
 
-sub clean {
-    my($self, %attribs) = @_;
-    my(@m,$dir);
-    push @m, '
-# Delete temporary files but do not touch installed files. We don\'t delete
-# the Descrip.MMS here so that a later make realclean still has it to use.
-clean :: clean_subdirs
-';
-    push @m, '	$(RM_F) *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) *$(OBJ_EXT) *$(LIB_EXT) *.Opt $(BOOTSTRAP) $(BASEEXT).bso .MM_Tmp
-';
-
-    my(@otherfiles) = values %{$self->{XS}}; # .c files from *.xs files
-    # Unlink realclean, $attribs{FILES} is a string here; it may contain
-    # a list or a macro that expands to a list.
-    if ($attribs{FILES}) {
-        my @filelist = ref $attribs{FILES} eq 'ARRAY'
-            ? @{$attribs{FILES}}
-            : split /\s+/, $attribs{FILES};
-
-	foreach my $word (@filelist) {
-	    if ($word =~ m#^\$\((.*)\)$# and 
-                ref $self->{$1} eq 'ARRAY') 
-            {
-		push(@otherfiles, @{$self->{$1}});
-	    }
-	    else { push(@otherfiles, $word); }
-	}
-    }
-    push(@otherfiles, qw[ blib $(MAKE_APERL_FILE) 
-                          perlmain.c blibdirs.ts pm_to_blib.ts ]);
-    push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
-    push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
-
-    # Occasionally files are repeated several times from different sources
-    { my(%of) = map { ($_ => 1) } @otherfiles; @otherfiles = keys %of; }
-
-    my $line = '';
-    foreach my $file (@otherfiles) {
-	$file = $self->fixpath($file);
-	if (length($line) + length($file) > 80) {
-	    push @m, "\t\$(RM_RF) $line\n";
-	    $line = "$file";
-	}
-	else { $line .= " $file"; }
-    }
-    push @m, "\t\$(RM_RF) $line\n" if $line;
-    push(@m, "	$attribs{POSTOP}\n") if $attribs{POSTOP};
-    join('', @m);
+sub extra_clean_files {
+    my @files = qw(
+                   *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) $(BASEEXT).bso
+                   .MM_Tmp
+                  );
 }
 
 
