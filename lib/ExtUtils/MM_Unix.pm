@@ -1710,7 +1710,7 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{NOOP}               ||= '$(SHELL) -c true';
     $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
 
-    $self->{FIRST_MAKEFILE}     ||= 'Makefile';
+    $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE} || 'Makefile';
     $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE};
     $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
     $self->{MAKE_APERL_FILE}    ||= $self->{MAKEFILE}.'.aperl';
