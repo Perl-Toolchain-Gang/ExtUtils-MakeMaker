@@ -2,6 +2,7 @@
 \bRCS\b
 \bCVS\b
 ,v$
+\B\.svn\b
 
 # Avoid Makemaker generated and utility files.
 ^MANIFEST\.bak

@@ -467,6 +467,7 @@ expression to start with a sharp character. A typical example:
     \bRCS\b
     \bCVS\b
     ,v$
+    \B\.svn\b
 
     # Makemaker generated files and dirs.
     ^MANIFEST\.

@@ -27,8 +27,10 @@
     - Moved Win9x specific subdir_x() code from MM_Unix to MM_Win95
     * Craig Berry fixed hint files on VMS
     - Added the perl_onliner() method to generate portable, safe one-liners
-    * Added a MAKEFILE macro to the Makefile.  Mostly to avoid having
+    - Added a MAKEFILE macro to the Makefile.  Mostly to avoid having
       to hardcode $self->{MAKEFILE} internally
+    * Rafael Garcia-Suarez made MakeMaker ignore Subversion control files
+      by default.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
