@@ -175,7 +175,7 @@ sub manifind {
 
 checks if all the files within a C<MANIFEST> in the current directory
 really do exist. If C<MANIFEST> and the tree below the current
-directory are in sync it exits silently, returning an empty list.
+directory are in sync it silently returns an empty list.
 Otherwise it returns a list of files which are listed in the
 C<MANIFEST> but missing from the directory, and by default also
 outputs these names to STDERR.
