@@ -263,7 +263,7 @@ clean ::
     # clean subdirectories first
     for $dir (@{$self->{DIR}}) {
 	if ($Is_Win32  &&  Win32::IsWin95()) {
-	    push @m, sprintf <<EOT, $dir;
+	    push @m, sprintf <<'EOT', $dir;
 	cd %s
 	$(TEST_F) $(MAKEFILE)
 	$(MAKE) clean
@@ -271,7 +271,7 @@ clean ::
 EOT
 	}
 	else {
-	    push @m, sprintf <<EOT, $dir;
+	    push @m, sprintf <<'EOT', $dir;
 	-cd %s && $(TEST_F) $(MAKEFILE) && $(MAKE) clean
 EOT
 	}
@@ -3239,7 +3239,7 @@ PPD_OUT
     $bin_location =~ s/\\/\\\\/g;
 
     $ppd_xml .= sprintf <<'PPD_XML', $bin_location;
-\t\t<CODEBASE HREF=\"%s\" />\n\t</IMPLEMENTATION>\n</SOFTPKG>\n
+\t\t<CODEBASE HREF="%s" />\n\t</IMPLEMENTATION>\n</SOFTPKG>\n
 PPD_XML
 
     chomp $ppd_xml;
