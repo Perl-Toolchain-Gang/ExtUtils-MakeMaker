@@ -24,9 +24,9 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 
 # Make sure when Makefile.PL's break, they issue a warning.
 # Also make sure Makefile.PL's in subdirs still have '.' in @INC.
-my $stdout;
-$stdout = tie *STDOUT, 'TieOut' or die;
 {
+    my $stdout = tie *STDOUT, 'TieOut' or die;
+
     my $warning = '';
     local $SIG{__WARN__} = sub { $warning = join '', @_ };
     eval { $MM->eval_in_subdirs; };
