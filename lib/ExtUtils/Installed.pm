@@ -98,7 +98,7 @@ sub new {
     # Read the module packlists
     my $sub = sub {
         # Only process module .packlists
-        return if ($_) ne ".packlist" || $File::Find::dir eq $archlib;
+        return if $_ ne ".packlist" || $File::Find::dir eq $archlib;
 
         # Hack of the leading bits of the paths & convert to a module name
         my $module = $File::Find::name;
@@ -113,7 +113,7 @@ sub new {
         foreach my $dir (@INC) {
             my $p = File::Spec->catfile($dir, $modfile);
             if (-r $p) {
-                $module = _module_name($p) if $Is_VMS;
+                $module = _module_name($p, $module) if $Is_VMS;
 
                 require ExtUtils::MM;
                 $self->{$module}{version} = MM->parse_version($p);
@@ -135,17 +135,17 @@ sub new {
 # VMS's non-case preserving file-system means the package name can't
 # be reconstructed from the filename.
 sub _module_name {
-    my $file = shift;
+    my($file, $orig_module) = @_;
 
     my $module = '';
     if (open PACKFH, $file) {
         while (<PACKFH>) {
-            if (/package (.*:)?([^:]+);/) {
-                my $pack = $2;
+            if (/package\s+(\S+)/) {
+                my $pack = $1;
                 # Make a sanity check, that lower case $module
                 # is identical to lowercase $pack before
                 # accepting it
-                if (lc($pack) eq lc($module)) {
+                if (lc($pack) eq lc($orig_module)) {
                     $module = $pack;
                     last;
                 }
