@@ -296,38 +296,38 @@ sub pm_to_blib {
      }
 
     mkpath($autodir,0,0755);
-    foreach (keys %$fromto) {
-	my $dest = $fromto->{$_};
-	next if -f $dest && -M $dest < -M $_;
+    while(my($from, to) = each %$fromto) {
+	next if -f $to && -M $to < -M $from;
 
 	# When a pm_filter is defined, we need to pre-process the source first
 	# to determine whether it has changed or not.  Therefore, only perform
 	# the comparison check when there's no filter to be ran.
 	#    -- RAM, 03/01/2001
 
-	my $need_filtering = defined $pm_filter && length $pm_filter && /\.pm$/;
+	my $need_filtering = defined $pm_filter && length $pm_filter && 
+                             $from =~ /\.pm$/;
 
-	if (!$need_filtering && 0 == compare($_,$dest)) {
-	    print "Skip $dest (unchanged)\n";
+	if (!$need_filtering && 0 == compare($from,$to)) {
+	    print "Skip $to (unchanged)\n";
 	    next;
 	}
-	if (-f $dest){
-	    forceunlink($dest);
+	if (-f $to){
+	    forceunlink($to);
 	} else {
-	    mkpath(dirname($dest),0,0755);
+	    mkpath(dirname($to),0,0755);
 	}
 	if ($need_filtering) {
-	    run_filter($pm_filter, $_, $dest);
-	    print "$pm_filter <$_ >$dest\n";
+	    run_filter($pm_filter, $from, $to);
+	    print "$pm_filter <$from >$to\n";
 	} else {
-	    copy($_,$dest);
-	    print "cp $_ $dest\n";
+	    copy($from,$to);
+	    print "cp $from $to\n";
 	}
-	my($mode,$atime,$mtime) = (stat)[2,8,9];
-	utime($atime,$mtime+$Is_VMS,$dest);
-	chmod(0444 | ( $mode & 0111 ? 0111 : 0 ),$dest);
-	next unless /\.pm$/;
-	autosplit($dest,$autodir);
+	my($mode,$atime,$mtime) = (stat $from)[2,8,9];
+	utime($atime,$mtime+$Is_VMS,$to);
+	chmod(0444 | ( $mode & 0111 ? 0111 : 0 ),$to);
+	next unless $from =~ /\.pm$/;
+	autosplit($to,$autodir);
     }
 }
 
