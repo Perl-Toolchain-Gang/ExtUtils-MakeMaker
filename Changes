@@ -19,6 +19,7 @@
     * find_perl() can now handle filenames with spaces in them (RT448)
     * find_perl() on Win32 no longer produces spurious "File Creation error"
       messages (perlbug ID 20020709.001)
+    - Removed unfinished and unused maybe_command_in_dirs()
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in

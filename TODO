@@ -37,6 +37,4 @@ a small Makefile.PL tutorial.
 
 Unify VMS->find_perl
 
-Remove maybe_command_in_dirs().
-
 Consider if VMS->find_perl needs to have pieces put into maybe_command()
