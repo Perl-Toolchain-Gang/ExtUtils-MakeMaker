@@ -820,7 +820,7 @@ sub dist_dir {
     return <<'MAKE_FRAG';
 distdir :
 	$(RM_RF) $(DISTVNAME)
-	$(PERLRUN) -MExtUtils::Manifest=manicopy,maniread \\
+	$(PERLRUN) -MExtUtils::Manifest=manicopy,maniread \
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
 
 MAKE_FRAG
