@@ -163,7 +163,8 @@ while( my($type, $vars) = each %Install_Vars) {
     %ExtUtils::MM_Unix::Config = %Config;
     *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
 
-    $ExtUtils::MM_Unix::Config{installvendorman1dir} = 'foo/bar';
+    $ExtUtils::MM_Unix::Config{installvendorman1dir} = 
+      File::Spec->catdir('foo','bar');
     $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
     $ExtUtils::MM_Unix::Config{usevendorprefix} = 1;
     $ExtUtils::MM_Unix::Config{vendorprefixexp} = 'something';
