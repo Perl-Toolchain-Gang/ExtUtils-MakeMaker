@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.06_03";
-($Revision = substr(q$Revision: 1.98 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.99 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -257,7 +257,7 @@ sub full_setup {
  dynamic_lib static static_lib manifypods processPL
  installbin subdirs
  clean_subdirs clean realclean_subdirs realclean 
- metayaml metayaml_addtomanifest
+ metafile metafile_addtomanifest
  dist_basics dist_core distdir dist_test dist_ci
  install force perldepend makefile staticmake test ppd
 
@@ -361,7 +361,9 @@ sub new {
 
     my(%unsatisfied) = ();
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
-        eval "require $prereq";
+        # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
+        # extra statement is a workaround.
+        eval "require $prereq; 0";
 
         my $pr_version = $prereq->VERSION || 0;
 
@@ -926,7 +928,7 @@ __END__
 
 =head1 NAME
 
-ExtUtils::MakeMaker - create an extension Makefile
+ExtUtils::MakeMaker - Create a module Makefile
 
 =head1 SYNOPSIS
 
@@ -1980,7 +1982,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.98 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.99 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
