@@ -67,17 +67,25 @@ sub mkmanifest {
     close M;
 }
 
+# Geez, shouldn't this use File::Spec or File::Basename or something?  
+# Why so careful about dependencies?
+sub clean_up_filename {
+  my $filename = shift;
+  $filename =~ s|^\./||;
+  $filename =~ s/^:([^:]+)$/$1/ if $Is_MacOS;
+  return $filename;
+}
+
 sub manifind {
     my $p = shift || {};
     my $skip = _maniskip(warn => $p->{warn_on_skip});
     my $found = {};
 
     my $wanted = sub {
-	return if $skip->($_) or -d $_;
-	
-	(my $name = $File::Find::name) =~ s|^\./||;
-	$name =~ s/^:([^:]+)$/$1/ if $Is_MacOS;
+	my $name = clean_up_filename($File::Find::name);
 	warn "Debug: diskfile $name\n" if $Debug;
+	return if $skip->($name) or -d $name;
+	
         if( $Is_VMS ) {
             $name =~ s#(.*)\.$#\L$1#;
             $name = uc($name) if $name =~ /^MANIFEST(\.SKIP)?$/i;
@@ -85,8 +93,14 @@ sub manifind {
 	$found->{$name} = "";
     };
 
+    # We have to use "$File::Find::dir/$_" in preprocess, because 
+    # $File::Find::name is unavailable.
+    # Also, it's okay to use / here, because MANIFEST files use Unix-style 
+    # paths.
     find({wanted => $wanted,
-	  preprocess => sub {grep {!$skip->($_)} @_},
+	  preprocess => 
+          sub {grep {!$skip->( clean_up_filename("$File::Find::dir/$_") )} @_},
+	  no_chdir => 1,
 	 },
 	 $Is_MacOS ? ":" : ".");
 
