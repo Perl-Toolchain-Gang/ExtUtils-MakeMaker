@@ -18,7 +18,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 112;
+        plan tests => 114;
     }
 }
 
@@ -86,7 +86,6 @@ foreach ( qw /
   dynamic_bs
   dynamic_lib
   exescan
-  export_list
   extliblist
   find_perl
   fixin
@@ -233,12 +232,13 @@ foreach (qw/ post_constants postamble post_initialize/)
 is ($t->replace_manpage_separator('Foo/Bar'),'Foo::Bar','manpage_separator'); 
 
 ###############################################################################
-# export_list, perl_archive, perl_archive_after
 
-foreach (qw/ export_list perl_archive perl_archive_after/)
-  {
-  is ($t->$_(),'',"$_() is empty string on Unix"); 
-  }
+$t->init_linker;
+foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
+{
+    ok( exists $t->{$_}, "$_ was defined" );
+    is( $t->{$_}, '', "$_ is empty on Unix"); 
+}
 
 
 {
