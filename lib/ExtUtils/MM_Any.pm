@@ -599,8 +599,8 @@ generated_by: ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
 YAML
 
     my @write_meta = $self->echo($meta, 'META_new.yml');
-    my $move = $self->oneliner(<<'CODE', ['-MExtUtils::Command']);
-mv or warn "Cannot move META_new.yml to META.yml\n";
+    my $move = $self->oneliner(<<'CODE', ['-MExtUtils::Command', '-MFile::Compare']);
+compare(@ARGV) != 0 ? (mv or warn "Cannot move META_new.yml to META.yml\n") : unlink(shift);
 CODE
 
     return sprintf <<'MAKE_FRAG', join("\n\t", @write_meta), $move;
