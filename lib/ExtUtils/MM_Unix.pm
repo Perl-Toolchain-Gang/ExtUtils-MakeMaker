@@ -165,8 +165,6 @@ use SelfLoader;
 
 __DATA__
 
-=back
-
 =head2 SelfLoaded methods
 
 =over 2
@@ -369,7 +367,8 @@ EOT
       push( @otherfiles, @errfiles, 'perlmain.err' );
     }
     push(@otherfiles, $attribs{FILES}) if $attribs{FILES};
-    push(@otherfiles, qw[./blib $(MAKE_APERL_FILE) $(INST_ARCHAUTODIR)/extralibs.all
+    push(@otherfiles, qw[./blib $(MAKE_APERL_FILE) 
+                         $(INST_ARCHAUTODIR)/extralibs.all
 			 perlmain.c tmon.out mon.out core core.*perl.*.?
 			 *perl.core so_locations pm_to_blib
 			 *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
@@ -702,6 +701,9 @@ sub dist {
     $attribs{DIST_DEFAULT} ||= 'tardist';
 
     $attribs{DISTVNAME} ||= "$attribs{NAME}-$attribs{VERSION}";
+
+    # We've already printed out a VERSION variable.
+    delete $attribs{VERSION};
 
     my $make = '';
     while(my($var, $value) = each %attribs) {
@@ -1709,6 +1711,7 @@ usually solves this kind of problem.
     my $funkylibdir = $self->catdir($configure_prefix,"lib","perl5");
     $funkylibdir = '' unless -d $funkylibdir;
     $search_prefix = $funkylibdir || $self->catdir($configure_prefix,"lib");
+
     if ($self->{LIB}) {
 	$self->{INSTALLPRIVLIB} = $self->{INSTALLSITELIB} = $self->{LIB};
 	$self->{INSTALLARCHLIB} = $self->{INSTALLSITEARCH} = 
@@ -1875,21 +1878,21 @@ usually solves this kind of problem.
 
     # How do we run perl?
     $self->{PERLRUN}  = $self->{PERL};
-    $self->{PERLRUN} .= qq{ -"I\$(PERL_LIB)"} if $self->{UNINSTALLED_PERL};
+    $self->{PERLRUN} .= qq{ "-I\$(PERL_LIB)"} if $self->{UNINSTALLED_PERL};
 
     # How do we run perl when installing libraries?
-    $self->{PERLRUNINST} .= qq{$self->{PERLRUN} -"I\$(INST_ARCHLIB)" -"I\$(INST_LIB)"};
+    $self->{PERLRUNINST} .= qq{$self->{PERLRUN} "-I\$(INST_ARCHLIB)" "-I\$(INST_LIB)"};
 
     # What extra library dirs do we need when running the tests?
     # Make sure these are absolute paths in case the test chdirs.
     $self->{TEST_LIBS}   .= join '', 
-                            map { ' "I'.File::Spec->rel2abs($_).'"' } 
+                            map { ' "-I'.File::Spec->rel2abs($_).'"' } 
                                 $self->{INST_ARCHLIB}, $self->{INST_LIB};
 
     # When building the core, we need to add some helper libs since
     # perl's @INC won't work (we're not installed yet).
     foreach my $targ (qw(PERLRUN PERLRUNINST TEST_LIBS)) {
-        $self->{$targ} .= ' -"I$(PERL_ARCHLIB)" "I$(PERL_LIB)"'
+        $self->{$targ} .= ' "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)"'
           if $self->{PERL_CORE};
     }
 }
@@ -3560,9 +3563,6 @@ sub top_targets {
 
     my($self) = shift;
     my(@m);
-    push @m, '
-#all ::	config $(INST_PM) subdirs linkext manifypods
-';
 
     push @m, '
 all :: pure_all manifypods
@@ -3613,13 +3613,6 @@ $(O_FILES): $(H_FILES)
     push @m, q{
 help:
 	perldoc ExtUtils::MakeMaker
-};
-
-    push @m, q{
-Version_check:
-	}.$self->{NOECHO}.q{$(PERLRUN) \
-		-MExtUtils::MakeMaker=Version_check \
-		-e "Version_check('$(MM_VERSION)')"
 };
 
     join('',@m);
