@@ -51,7 +51,11 @@ SKIP: {
 }
 
 # VMS 5.6.1 doesn't seem to have $Config{prefixexp}
-my $prefix = $Config{prefixexp} || $Config{prefix};
+my $prefix = $Config{prefix} || $Config{prefixexp};
+
+# You can concatenate /foo but not foo:, which defaults in the current 
+# directory
+$prefix = VMS::Filespec::unixify($prefix) if $^O eq 'VMS';
 
 # ActivePerl 5.6.1/631 has $Config{prefixexp} as 'p:' for some reason
 $prefix = $Config{prefix} if $prefix eq 'p:' && $^O eq 'MSWin32';
