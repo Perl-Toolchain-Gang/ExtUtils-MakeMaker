@@ -960,34 +960,6 @@ $(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt blibdirs.ts $(EXPOR
     join('',@m);
 }
 
-=item dynamic_bs (override)
-
-Use VMS-style quoting on Mkbootstrap command line.
-
-=cut
-
-sub dynamic_bs {
-    my($self, %attribs) = @_;
-    return '
-BOOTSTRAP =
-' unless $self->has_link_code();
-    '
-BOOTSTRAP = '."$self->{BASEEXT}.bs".'
-
-# As MakeMaker mkbootstrap might not write a file (if none is required)
-# we use touch to prevent make continually trying to remake it.
-# The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(FIRST_MAKEFILE) '."$self->{BOOTDEP}".' blibdirs.ts
-	$(NOECHO) $(ECHO) "Running mkbootstrap for $(NAME) ($(BSLOADLIBS))"
-	$(NOECHO) $(PERLRUN) -
-	-e "use ExtUtils::Mkbootstrap; Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
-	$(NOECHO) $(TOUCH) $(MMS$TARGET)
-
-$(INST_BOOT) : $(BOOTSTRAP) blibdirs.ts
-	$(NOECHO) $(RM_RF) $(INST_BOOT)
-	- $(CP) $(BOOTSTRAP) $(INST_BOOT)
-';
-}
 
 =item static_lib (override)
 

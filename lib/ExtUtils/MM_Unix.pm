@@ -1040,7 +1040,9 @@ sub dynamic_bs {
 BOOTSTRAP =
 ' unless $self->has_link_code();
 
-    return <<'MAKE_FRAG';
+    my $target = $Is_VMS ? '$(MMS$TARGET)' : '$@';
+
+    return sprintf <<'MAKE_FRAG', ($target) x 5;
 BOOTSTRAP = $(BASEEXT).bs
 
 # As Mkbootstrap might not write a file (if none is required)
@@ -1051,13 +1053,13 @@ $(BOOTSTRAP): $(FIRST_MAKEFILE) $(BOOTDEP) blibdirs.ts
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
 		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
-	$(NOECHO) $(TOUCH) $@
-	$(CHMOD) $(PERM_RW) $@
+	$(NOECHO) $(TOUCH) %s
+	$(CHMOD) $(PERM_RW) %s
 
 $(INST_BOOT): $(BOOTSTRAP) blibdirs.ts
-	$(NOECHO) $(RM_RF) $@
-	-$(CP) $(BOOTSTRAP) $@
-	$(CHMOD) $(PERM_RW) $@
+	$(NOECHO) $(RM_RF) %s
+	-$(CP) $(BOOTSTRAP) %s
+	$(CHMOD) $(PERM_RW) %s
 MAKE_FRAG
 }
 
