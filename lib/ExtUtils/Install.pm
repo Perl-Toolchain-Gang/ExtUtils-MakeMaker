@@ -114,8 +114,7 @@ sub install {
 	}
 	chdir($source) or next;
 	find(sub {
-	    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-                         $atime,$mtime,$ctime,$blksize,$blocks) = stat;
+	    my ($mode,$size,$atime,$mtime) = (stat)[2,7,8,9];
 	    return unless -f _;
 	    return if $_ eq ".exists";
 	    my $targetdir  = File::Spec->catdir($targetroot, $File::Find::dir);
@@ -147,7 +146,7 @@ sub install {
 	    } else {
 		print "Skipping $targetfile (unchanged)\n" if $verbose;
 	    }
-	    
+
 	    if (! defined $inc_uninstall) { # it's called 
 	    } elsif ($inc_uninstall == 0){
 		inc_uninstall($_,$File::Find::dir,$verbose,1); # nonono set to 1
