@@ -348,9 +348,12 @@ MAKE_EXT
 }
 
 
-=head3 blibdirs_target
+=head3 blibdirs_target  B<DEPRECATED>
 
     my $make_frag = $mm->blibdirs_target;
+
+This method and the blibdirs.ts target are deprecated.  Use C<dir_target>
+instead and depend on the directory directly.
 
 Creates the blibdirs.ts target which creates all the directories we use in
 blib/.
@@ -365,15 +368,19 @@ sub blibdirs_target {
                                            bin script
                                            man1dir man3dir
                                           );
-    my @mkpath = $self->split_command('$(NOECHO) $(MKPATH)', @dirs);
-    my @chmod  = $self->split_command('$(NOECHO) $(CHMOD) 755', @dirs);
 
-    my $make = "\nblibdirs.ts :\n";
-    $make .= join "", map { "\t$_\n" } @mkpath, @chmod;
-    $make .= <<'MAKE';
-	$(NOECHO) $(TOUCH) $@
+    my $make = sprintf <<'MAKE', join(' ', @dirs);
+# Backwards compat with 6.18 through 6.25
+blibdirs : %s
+	$(NOECHO) $(NOOP)
+
+# Backwards compat with 6.18 through 6.25
+blibdirs.ts : blibdirs
+	$(NOECHO) $(NOOP)
 
 MAKE
+
+    $make .= $self->dir_target(@dirs);
 
     return $make;
 }
@@ -492,18 +499,31 @@ CODE
 }
 
 
-=head3 dir_target B<DEPRECATED>
+=head3 dir_target
 
     my $make_frag = $mm->dir_target(@directories);
 
-I<This function is deprecated> its use is no longer necessary and is
-I<only provided for backwards compatibility>.  It is now a no-op.
-blibdirs_target provides a much simpler mechanism and pm_to_blib() can
-create its own directories anyway.
+Generates targets to create the specified directories and set its
+permission to 0755.
 
 =cut
 
-sub dir_target {}
+sub dir_target {
+    my($self, @dirs) = @_;
+
+    my $make = '';
+    foreach my $dir (@dirs) {
+        $make .= sprintf <<'MAKE', $dir, $dir, $dir;
+%s :
+	$(NOECHO) $(MKPATH) %s
+	$(NOECHO) $(CHMOD) 755 %s
+
+MAKE
+
+    }
+
+    return $make;
+}
 
 
 =head3 distdir
