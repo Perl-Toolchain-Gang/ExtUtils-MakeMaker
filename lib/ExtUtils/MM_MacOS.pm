@@ -513,10 +513,6 @@ sub platform_constants {
 }
 
 
-=cut
-
-sub 
-
 =item init_dirscan
 
 Initializes DIR, XS, PM, C, O_FILES, H, PL_FILES, MAN*PODS, EXE_FILES.

@@ -417,7 +417,6 @@ sub init_platform {
       if $self->{PERL_SRC};
 }
 
-=cut
 
 =item platform_constants
 
