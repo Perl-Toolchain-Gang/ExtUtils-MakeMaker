@@ -12,7 +12,6 @@ BEGIN {
         unshift @INC, 't/lib';
     }
 }
-$ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
 
 use strict;
 use Test::More tests => 15;
@@ -21,6 +20,9 @@ use File::Spec;
 use TieOut;
 
 my $perl = which_perl;
+
+$ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
+
 perl_lib;
 
 $| = 1;
