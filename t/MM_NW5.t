@@ -172,18 +172,19 @@ delete $ENV{PATH} unless $had_path;
           'clean() Makefile target' );
 }
 
-# perl_archive()
+
+# init_linker
 {
     my $libperl = $Config{libperl} || 'libperl.a';
-    is( $MM->perl_archive(), File::Spec->catfile('$(PERL_INC)', $libperl ),
-	    'perl_archive() should respect libperl setting' );
+    my $export  = '$(BASEEXT).def';
+    my $after   = '';
+    $MM->init_linker;
+
+    is( $MM->{PERL_ARCHIVE},        $libperl,   'PERL_ARCHIVE' );
+    is( $MM->{PERL_ARCHIVE_AFTER},  $after,     'PERL_ARCHIVE_AFTER' );
+    is( $MM->{EXPORT_LIST},         $export,    'EXPORT_LIST' );
 }
 
-# export_list
-{
-    my $mm_w32 = bless { BASEEXT => 'someext' }, 'MM';
-    is( $mm_w32->export_list(), 'someext.def', 'export_list()' );
-}
 
 # canonpath()
 {

@@ -132,10 +132,10 @@ delete $ENV{PATHEXT} unless $had_pathext;
 
     # XXX Hack until we have a proper init method.
     # Flesh out some necessary keys in the MM object.
-    foreach my $key (qw(XS C O_FILES H HTMLLIBPODS HTMLSCRIPTPODS
-                        MAN1PODS MAN3PODS PARENT_NAME)) {
-        $mm_w32->{$key} = '';
-    }
+    @{$mm_w32}{qw(XS MAN1PODS MAN3PODS)} = ({}) x 3;
+    @{$mm_w32}{qw(C O_FILES H)}          = ([]) x 3;
+    @{$mm_w32}{qw(PARENT_NAME)}          = ('') x 3;
+
     my $s_PM = join( " \\\n\t", sort keys %{$mm_w32->{PM}} );
     my $k_PM = join( " \\\n\t", %{$mm_w32->{PM}} );
 
@@ -172,17 +172,16 @@ delete $ENV{PATH} unless $had_path;
           'clean() Makefile target' );
 }
 
-# perl_archive()
+# init_linker
 {
     my $libperl = $Config{libperl} || 'libperl.a';
-    is( $MM->perl_archive(), File::Spec->catfile('$(PERL_INC)', $libperl ),
-	    'perl_archive() should respect libperl setting' );
-}
+    my $export  = '$(BASEEXT).def';
+    my $after   = '';
+    $MM->init_linker;
 
-# export_list
-{
-    my $mm_w32 = bless { BASEEXT => 'someext' }, 'MM';
-    is( $mm_w32->export_list(), 'someext.def', 'export_list()' );
+    is( $MM->{PERL_ARCHIVE},        $libperl,   'PERL_ARCHIVE' );
+    is( $MM->{PERL_ARCHIVE_AFTER},  $after,     'PERL_ARCHIVE_AFTER' );
+    is( $MM->{EXPORT_LIST},         $export,    'EXPORT_LIST' );
 }
 
 # canonpath()

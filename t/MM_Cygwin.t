@@ -92,11 +92,22 @@ SKIP: {
           '... should join MAN1PODS and MAN3PODS');
 }
 
-# test perl_archive
-my $libperl = $Config{libperl} || 'libperl.a';
-$libperl =~ s/\.a/.dll.a/ if $] >= 5.007;
-is( $args->perl_archive(), "\$(PERL_INC)/$libperl",
-	'perl_archive() should respect libperl setting' );
+
+# init_linker
+{
+    my $libperl = $Config{libperl} || 'libperl.a';
+    $libperl =~ s/\.a/.dll.a/ if $] >= 5.007;
+    $libperl "\$(PERL_INC)/$libperl";
+
+    my $export  = '$(BASEEXT).def';
+    my $after   = '';
+    $MM->init_linker;
+
+    is( $MM->{PERL_ARCHIVE},        $libperl,   'PERL_ARCHIVE' );
+    is( $MM->{PERL_ARCHIVE_AFTER},  $after,     'PERL_ARCHIVE_AFTER' );
+    is( $MM->{EXPORT_LIST},         $export,    'EXPORT_LIST' );
+}
+
 
 
 package FakeOut;
