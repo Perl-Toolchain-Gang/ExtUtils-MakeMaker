@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.50_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.9 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.10 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -1753,7 +1753,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.9 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.10 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2065,8 +2065,8 @@ always return the default without waiting for user input.
 
 =head1 SEE ALSO
 
-ExtUtils::MM_Unix, ExtUtils::Manifest, ExtUtils::testlib,
-ExtUtils::Install, ExtUtils::Embed
+ExtUtils::MM_Unix, ExtUtils::Manifest ExtUtils::Install,
+ExtUtils::Embed
 
 =head1 AUTHORS
 
@@ -2075,9 +2075,8 @@ Andy Dougherty <F<doughera@lafcol.lafayette.edu>>, Andreas KE<ouml>nig
 support by Charles Bailey <F<bailey@newman.upenn.edu>>.  OS/2 support
 by Ilya Zakharevich <F<ilya@math.ohio-state.edu>>.
 
-Contact the MakeMaker mailing list <F<makemaker@perl.org>> if you have
-any questions.
+Currently maintained by Michael G Schwern <F<schwern@pobox.com>>
 
-Send patches and bug reports to <F<perlbug@perl.org>>.
+Send patches and bug reports to <F<makemaker@perl.org>>.
 
 =cut
