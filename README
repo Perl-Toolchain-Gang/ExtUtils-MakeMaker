@@ -20,7 +20,10 @@ prefix with a space in the name.
 
 manifypods target produces command lines too long for some systems
 
-See TODO for details.
+Using the MMS utility on VMS causes lots of extra newlines.  Unknown
+why this is so, might be a bug in MMS.  Problem not seen on MMK.
 
+
+See TODO for details.
 
 Please report any bugs via http://rt.cpan.org or to makemaker@perl.org.
