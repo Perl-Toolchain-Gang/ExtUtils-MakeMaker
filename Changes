@@ -1,6 +1,8 @@
 6.25_09
     - Stubbing out PASTHRU on VMS.  $(MMSQUALIFIERS) should do the equivalent
       and better.
+    - Added test to check for the existence of a compiler so XS tests are
+      now possible.
 
 6.25_08  Tue Feb  8 09:04:36 EST 2005
     - Fixing xsubpp on VMS.  Had a foo/bar path in it.

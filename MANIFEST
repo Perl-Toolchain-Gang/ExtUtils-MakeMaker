@@ -88,4 +88,5 @@ t/testlib.t
 t/VERSION_FROM.t
 t/vmsish.t
 t/writemakefile_args.t
+t/xs.t
 TODO

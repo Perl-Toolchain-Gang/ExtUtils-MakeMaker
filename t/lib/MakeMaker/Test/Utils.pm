@@ -14,6 +14,7 @@ $VERSION = 0.02;
 @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
              make make_run run make_macro calibrate_mtime
              setup_mm_test_root
+	     have_compiler
             );
 
 my $Is_VMS   = $^O eq 'VMS';
@@ -41,6 +42,9 @@ MakeMaker::Test::Utils - Utility routines for testing MakeMaker
   my $mtime         = calibrate_mtime;
 
   my $out           = run($cmd);
+
+  my $have_compiler = have_compiler();
+
 
 =head1 DESCRIPTION
 
@@ -259,7 +263,7 @@ sub run {
     else {
         return `$cmd`;
     }
-}    
+}
 
 =item B<setup_mm_test_root>
 
@@ -286,6 +290,37 @@ COMMAND
         1 while unlink 'mmtesttmp.com';
     }
 }
+
+=item have_compiler
+
+  $have_compiler = have_compiler;
+
+Returns true if there is a compiler available for XS builds.
+
+=cut
+
+sub have_compiler {
+    my $have_compiler = 0;
+
+    # ExtUtils::CBuilder prints its compilation lines to the screen.
+    # Shut it up.
+    require TieOut;
+    local *STDOUT = *STDOUT;
+    local *STDERR = *STDERR;
+
+    tie *STDOUT, 'TieOut';
+    tie *STDERR, 'TieOut';
+
+    eval {
+	require ExtUtils::CBuilder;
+	my $cb = ExtUtils::CBuilder->new;
+
+	$have_compiler = $cb->have_compiler;
+    };
+
+    return $have_compiler;
+}
+
 
 =back
 
