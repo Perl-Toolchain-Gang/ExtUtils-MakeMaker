@@ -9,6 +9,13 @@ use Config;
 use File::Spec;
 
 
+# So we don't have to keep calling the methods over and over again,
+# we have these globals to cache the values.  Faster and shrtr.
+my $Curdir  = __PACKAGE__->curdir;
+my $Rootdir = __PACKAGE__->rootdir;
+my $Updir   = __PACKAGE__->updir;
+
+
 =head1 NAME
 
 ExtUtils::MM_Any - Platform-agnostic MM methods
@@ -802,11 +809,11 @@ NOOP_FRAG
 
     foreach my $dir (@{$self->{DIR}}) {
         foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
-            my $rclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
+            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
 chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
 CODE
 
-            $rclean .= sprintf <<'RCLEAN', $rclean;
+            $rclean .= sprintf <<'RCLEAN', $subrclean;
 	-%s
 RCLEAN
 
