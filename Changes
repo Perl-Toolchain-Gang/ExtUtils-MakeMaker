@@ -14,6 +14,7 @@
     - Fixing MM_MacOS so it compiles on UTF-8 systems. (Jarkko)
     - Making find_perl() more talkative when the version check fails
       miserably.
+    - Fixing PERL_ARCHIVE on VMS so XS can compile again (Craig Berry)
 
 6.10_02 Mon Apr  7 00:57:15 PDT 2003
     * Removed 2>&1 experiment introduced in 6.10_01 for all non-Unixen
