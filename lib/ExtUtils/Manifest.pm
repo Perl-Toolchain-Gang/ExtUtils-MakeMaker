@@ -315,7 +315,7 @@ sub maniread {
     local $_;
     while (<M>){
         chomp;
-        next if /^#/;
+        next if /^\s*#/;
 
         my($file, $comment) = /^(\S+)\s*(.*)/;
         next unless $file;
