@@ -14,6 +14,7 @@
       away.  This also removes the POD2MAN macro, but noone should be
       using that.  
     - "make manifypods" now works on Win32
+    - "make manifypods" is now be faster
     - Made MM_Unix->find_perl more portable.  Eliminated MM_Win32->find_perl
       override.  MM_VMS->find_perl remains.
     * find_perl() can now handle filenames with spaces in them (RT448)
@@ -21,6 +22,7 @@
       messages (perlbug ID 20020709.001)
     - Removed unfinished and unused maybe_command_in_dirs()
     - Removed dead SelfLoader cruft from MM_Unix.
+    - Fixed PPD generation when ABSTRACT contains quotes (RT1473)
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
