@@ -326,11 +326,11 @@ sub init_main {
     if ($self->{DEFINE} ne '') {
         my(@terms) = split(/\s+/,$self->{DEFINE});
         my(@defs,@udefs);
-        foreach $def (@terms) {
+        foreach my $def (@terms) {
             next unless $def;
             my $targ = \@defs;
             if ($def =~ s/^-([DU])//) {    # If it was a Unix-style definition
-                $tar = \@udefs if $1 eq 'U';
+                $targ = \@udefs if $1 eq 'U';
                 $def =~ s/='(.*)'$/=$1/;  # then remove shell-protection ''
                 $def =~ s/^'(.*)'$/$1/;   # from entire term or argument
             }
@@ -409,7 +409,7 @@ sub init_platform {
     my($self) = shift;
 
     $self->{MM_VMS_REVISION} = $Revision;
-    $self->{MM_VMS_VERSION}  = $Version;
+    $self->{MM_VMS_VERSION}  = $VERSION;
     $self->{PERL_VMS} = File::Spec->catdir($self->{PERL_SRC}, 'VMS')
       if $self->{PERL_SRC};
 }
@@ -446,8 +446,8 @@ sub init_VERSION {
 
     $self->SUPER::init_VERSION;
 
-    $self->{DEFINE_VERSION}   = '"$(VERSION_MACRO)=""$(VERSION)"""';
-    $self->{XS_DEFINE_VERSION = '"$(XS_VERSION_MACRO)=""$(XS_VERSION)"""';
+    $self->{DEFINE_VERSION}    = '"$(VERSION_MACRO)=""$(VERSION)"""';
+    $self->{XS_DEFINE_VERSION} = '"$(XS_VERSION_MACRO)=""$(XS_VERSION)"""';
     $self->{MAKEMAKER} = vmsify($INC{'ExtUtils/MakeMaker.pm'});
 }
 
@@ -467,7 +467,7 @@ sub constants {
     for (@ARGV) { $_ = uc($_) if /POLLUTE/i; }
 
     # Cleanup paths for directories in MMS macros.
-    foreach $macro ( qw [
+    foreach my $macro ( qw [
             INST_BIN INST_SCRIPT INST_LIB INST_ARCHLIB 
             INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
             INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
@@ -483,8 +483,8 @@ sub constants {
     }
 
     # Cleanup paths for files in MMS macros.
-    foreach $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD 
-                        MAKE_APERL_FILE MYEXTLIB] ) 
+    foreach my $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD 
+                           MAKE_APERL_FILE MYEXTLIB] ) 
     {
         next unless defined $self->{$macro};
         $self->{$macro} = $self->fixpath($self->{$macro},0);
@@ -533,9 +533,7 @@ Clear the default .SUFFIXES and put in our own list.
 sub special_targets {
     my $self = shift;
 
-    my $make_frag = $self->SUPER::special_targets;
-
-    $make_frag .= <<'MAKE_FRAG';
+    my $make_frag .= <<'MAKE_FRAG';
 .SUFFIXES :
 .SUFFIXES : \$(OBJ_EXT) .c .cpp .cxx .xs
 
