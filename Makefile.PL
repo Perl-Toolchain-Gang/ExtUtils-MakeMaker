@@ -52,6 +52,9 @@ my $MM = WriteMakefile(
                        },
     INSTALLDIRS     => 'perl',
     EXE_FILES       => [qw(bin/instmodsh)],
+
+    ABSTRACT_FROM   => "lib/$PACKAGE_FILE.pm",
+    AUTHOR          => 'Michael G Schwern <schwern@pobox.com>',
 );
 
 if( !$Is_VMS && $MM->{PERL} =~ /\S\s+\S/ ) {
