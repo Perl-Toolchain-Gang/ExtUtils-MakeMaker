@@ -24,7 +24,6 @@ use strict;
 $VERSION = '6.25_10';
 ($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
 
-
 @ISA = qw(Exporter);
 @EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
 @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists);
