@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker;
 
 $PACKAGE = 'ExtUtils::MakeMaker';
 ($PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
-$LAST_API_CHANGE = 0;
+$LAST_API_CHANGE = 5.50;
 
 eval "require $PACKAGE";
 
