@@ -137,8 +137,8 @@ while( my($type, $vars) = each %Install_Vars) {
     %ExtUtils::MM_Unix::Config = %Config;
     *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
 
-    $ExtUtils::MM_Unix::Config{installman1dir} = '';
-    $ExtUtils::MM_Unix::Config{installman3dir} = '';
+    _set_config(installman1dir => '');
+    _set_config(installman3dir => '');
 
     my $wibble = File::Spec->catdir(qw(wibble and such));
     my $stdout = tie *STDOUT, 'TieOut' or die;
@@ -165,11 +165,10 @@ while( my($type, $vars) = each %Install_Vars) {
     %ExtUtils::MM_Unix::Config = %Config;
     *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
 
-    $ExtUtils::MM_Unix::Config{installvendorman1dir} = 
-      File::Spec->catdir('foo','bar');
-    $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
-    $ExtUtils::MM_Unix::Config{usevendorprefix} = 1;
-    $ExtUtils::MM_Unix::Config{vendorprefixexp} = 'something';
+    _set_config(installvendorman1dir => File::Spec->catdir('foo','bar') );
+    _set_config(installvendorman3dir => '' );
+    _set_config(usevendorprefix => 1 );
+    _set_config(vendorprefixexp => 'something' );
 
     my $stdout = tie *STDOUT, 'TieOut' or die;
     my $mm = WriteMakefile(
@@ -197,16 +196,14 @@ while( my($type, $vars) = each %Install_Vars) {
     %ExtUtils::MM_Unix::Config = %Config;
     *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
 
-    $ExtUtils::MM_Unix::Config{installman1dir} = 
-      File::Spec->catdir('foo', 'bar');
-    $ExtUtils::MM_Unix::Config{installman3dir} = 
-      File::Spec->catdir('foo', 'baz');
-    $ExtUtils::MM_Unix::Config{installsiteman1dir} = '';
-    $ExtUtils::MM_Unix::Config{installsiteman3dir} = '';
-    $ExtUtils::MM_Unix::Config{installvendorman1dir} = '';
-    $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
-    $ExtUtils::MM_Unix::Config{usevendorprefix} = 'define';
-    $ExtUtils::MM_Unix::Config{vendorprefixexp} = 'something';
+    _set_config(installman1dir => File::Spec->catdir('foo', 'bar') );
+    _set_config(installman3dir => File::Spec->catdir('foo', 'baz') );
+    _set_config(installsiteman1dir => '' );
+    _set_config(installsiteman3dir => '' );
+    _set_config(installvendorman1dir => '' );
+    _set_config(installvendorman3dir => '' );
+    _set_config(usevendorprefix => 'define' );
+    _set_config(vendorprefixexp => 'something' );
 
     my $wibble = File::Spec->catdir(qw(wibble and such));
     my $stdout = tie *STDOUT, 'TieOut' or die;
@@ -233,16 +230,14 @@ while( my($type, $vars) = each %Install_Vars) {
     %ExtUtils::MM_Unix::Config = %Config;
     *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
 
-    $ExtUtils::MM_Unix::Config{installman1dir} = 
-      File::Spec->catdir('foo', 'bar');
-    $ExtUtils::MM_Unix::Config{installman3dir} = 
-      File::Spec->catdir('foo', 'baz');
-    $ExtUtils::MM_Unix::Config{installsiteman1dir} = '';
-    $ExtUtils::MM_Unix::Config{installsiteman3dir} = '';
-    $ExtUtils::MM_Unix::Config{installvendorman1dir} = '';
-    $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
-    $ExtUtils::MM_Unix::Config{usevendorprefix} = '';
-    $ExtUtils::MM_Unix::Config{vendorprefixexp} = '';
+    _set_config(installman1dir => File::Spec->catdir('foo', 'bar') );
+    _set_config(installman3dir => File::Spec->catdir('foo', 'baz') );
+    _set_config(installsiteman1dir => '' );
+    _set_config(installsiteman3dir => '' );
+    _set_config(installvendorman1dir => '' );
+    _set_config(installvendorman3dir => '' );
+    _set_config(usevendorprefix => '' );
+    _set_config(vendorprefixexp => '' );
 
     my $wibble = File::Spec->catdir(qw(wibble and such));
     my $stdout = tie *STDOUT, 'TieOut' or die;
@@ -258,4 +253,16 @@ while( my($type, $vars) = each %Install_Vars) {
     is( $mm->{INSTALLSITEMAN3DIR},   $mm->{INSTALLMAN3DIR} );
     is( $mm->{INSTALLVENDORMAN1DIR}, '' );
     is( $mm->{INSTALLVENDORMAN3DIR}, '' );
+}
+
+
+sub _set_config {
+    my($k,$v) = @_;
+    (my $k_no_install = $k) =~ s/^install//i;
+    $ExtUtils::MM_Unix::Config{$k} = $v;
+
+    # Because VMS's config has traditionally been underpopulated, it will
+    # fall back to the install-less versions in desperation.
+    $ExtUtils::MM_Unix::Config{$k_no_install} = $v if $Is_VMS;
+    return;
 }
