@@ -43,12 +43,70 @@
       one-liners with ExtUtils::Command::MM functions
     - Replaced VMS hand-rolled perl code for TOUCH, CHMOD, RM_F and RM_RF
       with ExtUtils::Command functions.  Added TEST_F.
-    - Added $(EXISTS_EXT) macro and init_EXISTS_EXT to avoid
-      hardcoding /.exists.  Reduces code duplication in the MM_* modules.
     - Adding clean_subdirs target and clean_subdirs_target() method to
       generate same.  This allows easier overriding of an unportable part
       of the clean target.
     - Defined DEV_NULL for MacOS
+    - Removed ROOTEXT from MM_MacOS, apparently unused
+    - Added $(DIRFILESEP) macro and init_DIRFILESEP to avoid
+      hardcoding / or \.  Reduces code duplication in the MM_* modules.
+    - Added init_platform() and platform_constants() for OS specific
+      macros.  Moved OS specific macros from constants() overrides there.
+    - Added init_VERSION() to setup various *VERSION* macros.
+    - Added default wraplist() to make porting easier.
+    - Added makemakerdflt_target() to guarantee 'all' is the default
+      target.
+    - Added special_targets() to handle things like .PHONY and make sure
+      they come first.
+    - Added init_linker() to initialize linker relatied macros.
+    - MM_MacOS constants() disolves
+        Moved MACPERL_SRC, MACPERL_LIB, MACPERL_INC from init_main() to 
+          init_platform().
+        Moved DEFINE and INC tweaking from constants() to init_main()
+        Moved DEFINE_VERSION & XS_DEFINE_VERSION from constants() to
+          init_VERSION().
+        Eliminated MODULES.  Unused and its the same as TO_INST_PM
+        Moved .INCLUDE from constants() to special_targets()
+
+    - MM_NW5 constants() & init_others() disolves
+        Moved LIBPTH, BASE_IMPORT, NLM_VERSION, MPKTOOL, TOOLPATH from 
+          init_others() to init_platform()
+        Moved INCLUDE and PATH definitions from constants() to 
+          init_platform()
+        Moved BOOT_SYMBOL, NLM_SHORT_NAME, PATH and INCLUDE from
+          constants() to init_platform()
+
+    - MM_Unix constants() goes on a diet
+        Moved all macro definitions to init_* methods.
+        Added MM_REVISION for completeness
+        Using wraplist() instead of manual joining
+        Moved .NO_CONFIG_REC, .SUFFIXES and .PHONY to special_targets()
+        Moved makemakerdflt: to makemakerdeflt_target()
+        Moved INST_{STATIC,DYNAMIC,BOOT} to init_INST()
+        Moved EXPORT_LIST, PERL_ARCHIVE & PERL_ARCHIVE_AFTER to init_linker().
+        Moved PERL_MALLOC_DEF to init_platform()
+
+    - MM_VMS constants() goes on a diet
+        Moved DEFINE from constants() to init_main()
+        Moved OBJECT & LDFROM from constants() to init_others()
+        Moved MM_VMS_REVISION and PERL_VMS to init_platform
+        Added MM_VMS_VERSION
+        Moved DEFINE_VERSION, XS_DEFINE_VERSION and MAKEMAKER changes to
+            init_VERSION
+        Moved .SUFFIXES changes to special_targets() override.
+        Eliminated $self->{PM_TO_BLIB}.  Its redundant with $self->{PM}.
+        constants() now consists only of fixpath() calls.
+
+    - MM_Win32 constants() goes away
+        Moved .USESHELL to special_targets() override.
+        Everything else was redundant.
+
+    - Added $(VERSION_FROM) to $(MAKEFILE) dependencies
+    - export_list(), perl_archive() and perl_archive_after() consolodated
+      into init_linker().
+    - Added MM_NW5_VERSION, MM_Unix_VERSION, MM_Win32_VERSION, 
+      MM_VMS_VERSION.
+    - Eliminated duplicate code in constants() overrides
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
