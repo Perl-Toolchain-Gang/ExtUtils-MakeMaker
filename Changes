@@ -41,6 +41,8 @@
       of redundant code in MM_VMS.
     - Replaced WARN_IF_OLD_PACKLIST, DOC_INSTALL and UNINSTALL
       one-liners with ExtUtils::Command::MM functions
+    - Replaced VMS hand-rolled perl code for TOUCH, CHMOD, RM_F and RM_RF
+      with ExtUtils::Command functions.  Added TEST_F.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
