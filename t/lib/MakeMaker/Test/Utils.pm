@@ -85,10 +85,10 @@ Sets up environment variables so perl can find its libraries.
 my $old5lib = $ENV{PERL5LIB};
 my $had5lib = exists $ENV{PERL5LIB};
 sub perl_lib {
-                                      # perl-src/lib/ExtUtils/t/Foo
-    $ENV{PERL5LIB} = $ENV{PERL_CORE} ? qq{../../../../lib}
-                                      # ExtUtils-MakeMaker/t/Foo
-                                     : qq{-I../../blib/lib};
+                                       # perl-src/lib/ExtUtils/t/Foo
+    $ENV{PERL5LIB} .= $ENV{PERL_CORE} ? qq{../../../../lib}
+                                       # ExtUtils-MakeMaker/t/Foo
+                                      : qq{-I../../blib/lib};
 }
 
 END { $ENV{PERL5LIB} = $old5lib if $had5lib }
