@@ -29,7 +29,7 @@ END {
     ok( teardown );
 }
 
-ok chdir('PL_Files-Module');
+ok chdir('PL_FILES-Module');
 
 run(qq{$perl Makefile.PL});
 cmp_ok( $?, '==', 0 );
