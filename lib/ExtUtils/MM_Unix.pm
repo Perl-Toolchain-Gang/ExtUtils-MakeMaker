@@ -20,7 +20,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -2030,15 +2030,15 @@ sub init_INSTALL {
 
     $self->init_lib2arch;
 
-    if( $Config{usevendorprefix} ) {
-        $Config_Override{installvendorman1dir} =
-          $self->catdir($Config{vendorprefixexp}, 'man', 'man1');
-        $Config_Override{installvendorman3dir} =
-          $self->catdir($Config{vendorprefixexp}, 'man', 'man3');
-    }
-    else {
-        $Config_Override{installvendorman1dir} = '';
-        $Config_Override{installvendorman3dir} = '';
+    # Initialize installvendorman*dir if necessary
+    foreach my $num (1, 3) {
+        my $k = 'installvendorman'.$num.'dir';
+
+        unless ($Config{$k}) {
+            $Config_Override{$k} = $Config{usevendorprefix} ?
+                  $self->catdir($Config{vendorprefixexp}, 'man', "man$num") :
+                  '';
+        }
     }
 
     my $iprefix = $Config{installprefixexp} || $Config{installprefix} || 
