@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.18';
-($Revision) = q$Revision: 1.135 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.136 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -226,7 +226,7 @@ sub full_setup {
     PERL_SRC PERM_RW PERM_RWX
     PL_FILES PM PM_FILTER PMLIBDIRS POLLUTE PPM_INSTALL_EXEC
     PPM_INSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
-    SKIP TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
+    SIGN SKIP TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
     XS_VERSION clean depend dist dynamic_lib linkext macro realclean
     tool_autosplit
 
@@ -265,6 +265,7 @@ sub full_setup {
  installbin subdirs
  clean_subdirs clean realclean_subdirs realclean 
  metafile metafile_addtomanifest
+ signature signature_addtomanifest
  dist_basics dist_core distdir dist_test dist_ci
  install force perldepend makefile staticmake test ppd
 
@@ -1991,6 +1992,16 @@ $Config{installprefix} will be used.
 
 Overridable by PREFIX
 
+=item SIGN
+
+When true, perform the generation and addition to the MANIFEST of
+the SIGNATURE file during 'make distdir', via 'cpansign -s'.
+
+Note that you need to install the Module::Signature module to
+perform this operation.
+
+Defaults to false.
+
 =item SKIP
 
 Arrayref. E.g. [qw(name1 name2)] skip (do not write) sections of the
@@ -2040,7 +2051,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.135 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.136 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

@@ -584,7 +584,7 @@ MAKE_FRAG
         my $ver = $self->{PREREQ_PM}{$mod};
         $prereq_pm .= sprintf "    %-30s %s\n", "$mod:", $ver;
     }
-    
+
     my $meta = <<YAML;
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
@@ -602,6 +602,32 @@ YAML
     return sprintf <<'MAKE_FRAG', join "\n\t", @write_meta;
 metafile :
 	%s
+MAKE_FRAG
+
+}
+
+
+=item signature_target
+
+    my $target = $mm->signature_target;
+
+Generate the signature target.
+
+Writes the file SIGNATURE with "cpansign -s".
+
+=cut
+
+sub signature_target {
+    my $self = shift;
+
+    return <<'MAKE_FRAG' if !$self->{SIGN};
+signature :
+	$(NOECHO) $(NOOP)
+MAKE_FRAG
+
+    return <<'MAKE_FRAG';
+signature :  signature_addtomanifest
+	cpansign -s
 MAKE_FRAG
 
 }
@@ -630,6 +656,35 @@ CODE
 
     return sprintf <<'MAKE_FRAG', $add_meta;
 metafile_addtomanifest:
+	$(NOECHO) %s
+MAKE_FRAG
+
+}
+
+
+=item signature_addtomanifest_target
+
+  my $target = $mm->signature_addtomanifest_target
+
+Adds the META.yml file to the MANIFEST.
+
+=cut
+
+sub signature_addtomanifest_target {
+    my $self = shift;
+
+    return <<'MAKE_FRAG' if !$self->{SIGN};
+signature_addtomanifest :
+	$(NOECHO) $(NOOP)
+MAKE_FRAG
+
+    my $add_sign = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
+eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } 
+    or print "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
+CODE
+
+    return sprintf <<'MAKE_FRAG', $add_sign;
+signature_addtomanifest :
 	$(NOECHO) %s
 MAKE_FRAG
 
