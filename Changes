@@ -1,4 +1,4 @@
-6.19
+6.19 Mon Nov  3 22:53:56 PST 2003
     - Removed 00setup_dummy.t and zz_cleanup_dummy.t.  Tests now setup and
       teardown the dummy modules as needed.
     - Little test glitch on systems without $Config{usevendorprefix} set
