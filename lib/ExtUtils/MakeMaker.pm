@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.83 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.84 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -13,7 +13,7 @@ use Carp ();
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
-            $ISA_TTY $Revision $VERSION $Verbose $Version_OK %Config 
+            $Revision $VERSION $Verbose $Version_OK %Config 
             %Keep_after_flush %MM_Sections @Prepend_parent
             %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
             @Parent $PACKNAME
@@ -127,7 +127,7 @@ sub prompt ($;$) {
     Carp::confess("prompt function called without an argument") 
         unless defined $mess;
 
-    $ISA_TTY = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;   # Pipe?
+    my $isa_tty = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;
 
     my $dispdef = defined $def ? "[$def] " : " ";
     $def = defined $def ? $def : "";
@@ -137,7 +137,7 @@ sub prompt ($;$) {
     print "$mess $dispdef";
 
     my $ans;
-    if ($ENV{PERL_MM_USE_DEFAULT} || (!$ISA_TTY && eof STDIN)) {
+    if ($ENV{PERL_MM_USE_DEFAULT} || (!$isa_tty && eof STDIN)) {
         print "$def\n";
     }
     else {
@@ -1970,7 +1970,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.83 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.84 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
