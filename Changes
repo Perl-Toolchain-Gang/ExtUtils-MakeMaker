@@ -1,3 +1,11 @@
+6.06_02 Mon Dec 23 20:39:57 PST 2002
+    * Lots of Win32 fixes busted between 6.05 and 6.06_01.  
+    * split_command() tests still not happy on Win32.  Problems with
+      shell vs Makefile escaping makes testing difficult.
+    * VMS still broken.  Need to convert File::Spec method calls back to
+      object method calls so the weird FS::VMS->eliminate_macros() and 
+      fixpath() work again.
+
 6.06_01 Thu Dec 19 00:14:49 PST 2002
     - Andreas found that when building the core it is desirable for
       MakeMaker to use a relative path to perl.

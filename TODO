@@ -1,13 +1,10 @@
-Shorten manifypods so it fits in < 200 character command line (like
-pm_to_blib).
-
 Rethink MM_Win32 tests.
 
 Investigate one method per make target.
 
 Test MM_Any and pull some redundant tests out of MM_*.t
 
-Create a way to init MM objects.
+Create a way to init MM objects.  (XXX What's wrong with MakeMaker->new?)
 
 Move instmodsh to utils/ in the core.
 
@@ -48,8 +45,15 @@ Figure out and document the 4th arg to ExtUtils::Install::install()
 Consider if adding a nativize() routine to replace macify() and
 fixpath() is useful.
 
-Add "MAXCMDLEN" variable to set how long shell commands can be.
-
-Adapt code like manifypods and pm_to_blib to use "MAXCMDLEN".
-
 ExtUtils::Install is a disaster.
+
+Fix split_command() tests on Win32. (split_command() not broken, only tests)
+
+Make MakeMaker a subclass of File::Spec.
+
+Change File::Spec class method calls to object methods.
+
+Copy eliminate_macros() and fixpath() from File::Spec::VMS and into MM_VMS.
+
+Eliminate the above from inside FS::VMS->catfile and catdir.  Make into 
+MM_VMS wrappers.
