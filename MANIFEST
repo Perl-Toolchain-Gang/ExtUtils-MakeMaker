@@ -72,6 +72,7 @@ t/oneliner.t
 t/Packlist.t
 t/postamble.t
 t/prefixify.t
+t/prereq_print.t
 t/problems.t
 t/prompt.t
 t/recurs.t
