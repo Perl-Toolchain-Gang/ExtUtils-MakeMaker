@@ -343,9 +343,11 @@ NOOP_FRAG
     my $clean = "clean_subdirs :\n";
 
     for my $dir (@{$self->{DIR}}) {
-        $clean .= sprintf <<'MAKE_FRAG', $dir;
-	-cd %s && $(TEST_F) $(FIRST_MAKEFILE) && $(MAKE) clean
-MAKE_FRAG
+        $clean .= "\t".
+                  $self->cd($dir,
+                            '$(TEST_F) $(FIRST_MAKEFILE) && $(MAKE) clean'
+                  ).
+                  "\n";
     }
 
     return $clean;
@@ -916,16 +918,32 @@ before tar-ing (or shar-ing).
 sub distdir {
     my($self) = shift;
 
-    my $signature = $self->{SIGN} ? 'signature' : '';
+    my $mpl_args = join " ", map(qq["$_"], @ARGV);
+    my $metafile = $self->cd('$(DISTVNAME)', 
+                             '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
+                             '$(MAKE) metafile  $(PASTHRU)',
+                             '$(MAKE) metafile_addtomanifest $(PASTHRU)'
+                            );
 
-    return sprintf <<'MAKE_FRAG', $signature;
-distdir : metafile metafile_addtomanifest %s
+    my $distdir = sprintf <<'MAKE_FRAG', $metafile;
+distdir :
 	$(RM_RF) $(DISTVNAME)
 	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
-
+	%s
 MAKE_FRAG
 
+    if( $self->{SIGN} ) {
+	my $sign = $self->cd('$(DISTVNAME)', '$(MAKE) signature $(PASTHRU)');
+
+	$distdir .= sprintf <<'MAKE_FRAG', $sign;
+	%s
+MAKE_FRAG
+    }
+
+    $distdir .= "\n";
+
+    return $distdir;
 }
 
 =item dist_test
@@ -938,14 +956,19 @@ subdirectory.
 
 sub dist_test {
     my($self) = shift;
-    my @m;
-    push @m, q{
+
+    my $test = $self->cd('$(DISTVNAME)',
+                         '$(MAKE) $(PASTHRU)',
+                         '$(MAKE) test $(PASTHRU)'
+                        );
+
+    return sprintf <<'MAKE_FRAG', $test;
 disttest : distdir
-	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL
-	cd $(DISTVNAME) && $(MAKE) $(PASTHRU)
-	cd $(DISTVNAME) && $(MAKE) test $(PASTHRU)
-};
-    join "", @m;
+	%s
+
+MAKE_FRAG
+
+
 }
 
 =item dlsyms (o)
@@ -3552,6 +3575,18 @@ sub replace_manpage_separator {
     return $man;
 }
 
+
+=item cd (o)
+
+=cut
+
+sub cd {
+    my($self, $dir, @cmds) = @_;
+
+    my $make_frag = join "\n\t", map { "cd $dir && $_" } @cmds;
+
+    return $make_frag;
+}
 
 =item oneliner (o)
 

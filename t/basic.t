@@ -16,7 +16,7 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 79;
+use Test::More tests => 76;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -227,36 +227,29 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
 # Test META.yml generation
 use ExtUtils::Manifest qw(maniread);
-ok( -f 'META.yml',    'META.yml written' );
-my $manifest = maniread();
+
+my $distdir  = 'Big-Dummy-0.01';
+my $meta_yml = "$distdir/META.yml";
+
+ok( !-f 'META.yml',  'META.yml not written to source dir' );
+ok( -f $meta_yml,    'META.yml written to dist dir' );
+ok( !-e "$distdir/META_new.yml", 'temp META.yml file not left around' );
+
+my $manifest = maniread("$distdir/MANIFEST");
 # VMS is non-case preserving, so we can't know what the MANIFEST will
 # look like. :(
 _normalize($manifest);
 is( $manifest->{'meta.yml'}, 'Module meta-data (added by MakeMaker)' );
-my $meta_mtime = (stat('META.yml'))[9];
 
-sleep 1;
-my $metafile_out = run("$make metafile");
-is( $?, 0, 'metafile' ) || diag($metafile_out);
-is( (stat('META.yml'))[9], $meta_mtime, 'META.yml untouched if not changed' );
-ok( !-e 'META_new.yml', 'temp META.yml file not left around' );
 
 # Test NO_META META.yml suppression
-unlink 'META.yml';
-ok( !-f 'META.yml',   'META.yml deleted' );
+unlink $meta_yml;
+ok( !-f $meta_yml,   'META.yml deleted' );
 @mpl_out = run(qq{$perl Makefile.PL "NO_META=1"});
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
-$metafile_out = run("$make metafile");
-is( $?, 0, 'metafile' ) || diag($metafile_out);
-ok( !-f 'META.yml',   'META.yml generation suppressed by NO_META' );
-
-# Test if MANIFEST is read-only.
-chmod 0444, 'MANIFEST';
-@mpl_out = run(qq{$perl Makefile.PL});
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
-$metafile_out = run("$make metafile_addtomanifest");
-is( $?, 0, q{metafile_addtomanifest didn't die with locked MANIFEST} ) || 
-    diag($metafile_out);
+my $distdir_out = run("$make distdir");
+is( $?, 0, 'distdir' ) || diag($distdir_out);
+ok( !-f $meta_yml,   'META.yml generation suppressed by NO_META' );
 
 
 # Make sure init_dirscan doesn't go into the distdir

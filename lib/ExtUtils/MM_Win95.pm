@@ -192,6 +192,29 @@ RCLEAN
 }
 
 
+=item cd
+
+This cd can only go one level down.
+
+=cut
+
+sub cd {
+    my($self, $dir, @cmds) = @_;
+
+    my $cmd = join "\n\t", map "$_", @cmds;
+
+    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
+	cd %s
+	%s
+	cd ..
+MAKE_FRAG
+
+    chomp $make_frag;
+
+    return $make_frag;
+}
+
+
 =item max_exec_len
 
 Win98 chokes on things like Encode if we set the max length to nmake's max

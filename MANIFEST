@@ -34,11 +34,9 @@ lib/ExtUtils/testlib.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml
 NOTES
 PATCHING
 README
-SIGNATURE			Public-key signature (added by MakeMaker)
 t/00compile.t
 t/backwards.t
 t/basic.t

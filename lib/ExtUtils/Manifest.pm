@@ -475,9 +475,13 @@ sub _manicopy_chmod {
     chmod( $perm | ( $perm & 0100 ? 0111 : 0 ), $file );
 }
 
+# Files that are often modified in the distdir.  Don't hard link them.
+my @Exceptions = qw(MANIFEST META.yml SIGNATURE);
 sub best {
     my ($srcFile, $dstFile) = @_;
-    if (!$Config{d_link} or -l $srcFile) {
+
+    my $is_exception = grep $srcFile =~ /$_/, @Exceptions;
+    if ($is_exception or !$Config{d_link} or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
 	ln($srcFile, $dstFile) or cp($srcFile, $dstFile);

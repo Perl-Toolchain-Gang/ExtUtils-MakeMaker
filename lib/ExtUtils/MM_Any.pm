@@ -673,7 +673,7 @@ sub signature_target {
     my $self = shift;
 
     return <<'MAKE_FRAG';
-signature :  signature_addtomanifest
+signature : signature_addtomanifest
 	cpansign -s
 MAKE_FRAG
 
@@ -748,6 +748,19 @@ Methods which cannot be made cross-platform and each subclass will
 have to do their own implementation.
 
 =over 4
+
+=item cd
+
+  my $make_frag = $MM->cd($dir, @cmds);
+
+This will generate a make fragment which runs the @cmds in the given
+$dir.  The rough equivalent to this, except cross platform.
+
+  cd $dir && $cmd
+
+Currently $dir can only go down one level.  "foo" is fine.  "foo/bar" is
+not.  "../foo" is right out.
+
 
 =item oneliner
 

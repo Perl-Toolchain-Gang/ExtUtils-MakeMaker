@@ -2104,6 +2104,31 @@ sub _catprefix {
 }
 
 
+=item cd (o)
+
+=cut
+
+sub cd {
+    my($self, $dir, @cmds) = @_;
+
+    # Translate a Unix directory to a relative VMS dir.
+    $dir .= "[.$dir]" unless /^\[.*\]$/;
+
+    my $cmd = join "\n\t", map "$_", @cmds;
+
+    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
+	startdir = F$Environment("Default")
+	Set Default %s
+	%s
+	Set Default 'startdir'
+MAKE_FRAG
+
+    # No trailing newline makes this easier to embed
+    chomp $make_frag;
+
+    return $make_frag;
+}
+
 =item oneliner (o)
 
 =cut

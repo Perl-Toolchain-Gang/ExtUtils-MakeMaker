@@ -1,5 +1,10 @@
 6.26
-    - *.bak added to the default MANIFEST.SKIP.
+    * *.bak added to the default MANIFEST.SKIP.
+    * META.yml will no longer be generated in the build directory.  It will
+      only appear in the distdir.  This should make it easier on developers,
+      they don't have to worry about checking the file in all the time.
+    * Similarly, the SIGNATURE file will not be updated in the build 
+      directory.  It will only be generated in the distdir.
 
 6.25  Wed Dec 15 06:59:46 EST 2004
     - Build.PL was being considered like Module_pm.PL.  Build.PL is now 

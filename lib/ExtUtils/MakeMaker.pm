@@ -2,7 +2,7 @@ package ExtUtils::MakeMaker;
 
 BEGIN {require 5.005_03;}
 
-$VERSION = '6.25';
+$VERSION = '6.25_01';
 ($Revision) = q$Revision: 1.147 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
@@ -2007,8 +2007,9 @@ Overridable by PREFIX
 
 =item SIGN
 
-When true, perform the generation and addition to the MANIFEST of
-the SIGNATURE file during 'make distdir', via 'cpansign -s'.
+When true, perform the generation and addition to the MANIFEST of the
+SIGNATURE file in the distdir during 'make distdir', via 'cpansign
+-s'.
 
 Note that you need to install the Module::Signature module to
 perform this operation.
@@ -2309,9 +2310,9 @@ Copies all the files that are in the MANIFEST file to a newly created
 directory with the name C<$(DISTNAME)-$(VERSION)>. If that directory
 exists, it will be removed first.
 
-Additionally, it will create a META.yml module meta-data file and add
-this to your MANFIEST.  You can shut this behavior off with the NO_META
-flag.
+Additionally, it will create a META.yml module meta-data file in the
+distdir and add this to the distdir's MANFIEST.  You can shut this
+behavior off with the NO_META flag.
 
 =item   make disttest
 
