@@ -4,6 +4,8 @@
       removed dead hybrid method/function call code.
     * WriteMakefile now a bit more tolerant of wrong arguments, it will
       warn and try to soldier on rather than just vomiting.
+    - MM_NW5 whitespace nits (bleadperl@16811)
+    - OS/2 bug in TEST_F target found by John Poltorak (bleadperl@16839)
 
 6.00 Sat May 25 17:14:09 EDT 2002
     - VMS 8-level limit test tweak (bleadperl@16764)
