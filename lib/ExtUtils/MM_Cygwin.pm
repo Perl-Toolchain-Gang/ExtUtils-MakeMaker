@@ -12,6 +12,27 @@ require ExtUtils::MM_Unix;
 
 $VERSION = 1.05;
 
+
+=head1 NAME
+
+ExtUtils::MM_Cygwin - methods to override UN*X behaviour in ExtUtils::MakeMaker
+
+=head1 SYNOPSIS
+
+ use ExtUtils::MM_Cygwin; # Done internally by ExtUtils::MakeMaker if needed
+
+=head1 DESCRIPTION
+
+See ExtUtils::MM_Unix for a documentation of the methods provided there.
+
+=over 4
+
+=item cflags (o)
+
+if configured for dynamic loading, triggers #define EXT in EXTERN.h
+
+=cut
+
 sub cflags {
     my($self,$libperl)=@_;
     return $self->{CFLAGS} if $self->{CFLAGS};
@@ -32,12 +53,23 @@ PERLTYPE = $self->{PERLTYPE}
 }
 
 
-# Cygwin uses Foo.Bar.3 man page styles.
+=item replace_manpage_separator (o)
+
+replaces strings '::' with '.' in MAN*POD man page names
+
+=cut
+
 sub replace_manpage_separator {
     my($self, $man) = @_;
     $man =~ s{/+}{.}g;
     return $man;
 }
+
+=item perl_archive (o)
+
+points to libperl.a
+
+=cut
 
 sub perl_archive {
     if ($Config{useshrplib} eq 'true') {
@@ -51,36 +83,8 @@ sub perl_archive {
     }
 }
 
-1;
-__END__
-
-=head1 NAME
-
-ExtUtils::MM_Cygwin - methods to override UN*X behaviour in ExtUtils::MakeMaker
-
-=head1 SYNOPSIS
-
- use ExtUtils::MM_Cygwin; # Done internally by ExtUtils::MakeMaker if needed
-
-=head1 DESCRIPTION
-
-See ExtUtils::MM_Unix for a documentation of the methods provided there.
-
-=over 4
-
-=item cflags
-
-if configured for dynamic loading, triggers #define EXT in EXTERN.h
-
-=item init_dirscan
-
-replaces strings '::' with '.' in MAN*POD man page names
-
-=item perl_archive
-
-points to libperl.a
-
 =back
 
 =cut
 
+1;
