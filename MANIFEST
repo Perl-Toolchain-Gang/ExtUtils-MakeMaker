@@ -50,6 +50,7 @@ t/INST.t
 t/INST_PREFIX.t
 t/Install.t
 t/Installed.t
+t/lib/MakeMaker/Test/Setup/Recurs.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
@@ -72,6 +73,7 @@ t/Packlist.t
 t/prefixify.t
 t/problems.t
 t/prompt.t
+t/recurs.t
 t/split_command.t
 t/testlib.t
 t/VERSION_FROM.t
