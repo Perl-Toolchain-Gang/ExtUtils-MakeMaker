@@ -1,5 +1,3 @@
-Document prompt()
-
 Shorten manifypods so it fits in < 200 character command line (like
 pm_to_blib).
 
