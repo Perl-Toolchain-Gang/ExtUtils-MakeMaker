@@ -14,10 +14,11 @@ use VMS::Filespec;
 use File::Basename;
 use File::Spec;
 use vars qw($Revision @ISA $VERSION);
-($VERSION) = $Revision = '5.59_01';
+($VERSION) = $Revision = '5.60_01';
 
+require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw( ExtUtils::MM_Unix File::Spec );
+@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix File::Spec );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
@@ -1474,8 +1475,8 @@ realclean :: clean
 	push(@m, '	If F$Search("'."$vmsdir".'$(MAKEFILE)").nes."" Then \\',"\n\t",
 	      '$(PERL) -e "chdir ',"'$vmsdir'",'; print `$(MMS)$(MMSQUALIFIERS) realclean`;"',"\n");
     }
-    push @m,'	$(RM_RF) $(INST_AUTODIR) $(INST_ARCHAUTODIR)
-';
+    push @m, "	\$(RM_RF) \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n";
+    push @m, "	\$(RM_RF) \$(DISTVNAME)\n";
     # We can't expand several of the MMS macros here, since they don't have
     # corresponding %$self keys (i.e. they're defined in Descrip.MMS as a
     # combination of macros).  In order to stay below DCL's 255 char limit,
@@ -1846,8 +1847,8 @@ testdb :: testdb_\$(LINKTYPE)
     push(@m, "\n");
 
     push(@m, "test_dynamic :: pure_all\n");
-    push(@m, $self->test_via_harness('$(FULLPERL)', $tests)) if $tests;
-    push(@m, $self->test_via_script('$(FULLPERL)', 'test.pl')) if -f "test.pl";
+    push(@m, $self->test_via_harness('$(PERLRUN)', $tests)) if $tests;
+    push(@m, $self->test_via_script('$(PERLRUN)', 'test.pl')) if -f "test.pl";
     push(@m, "\t\$(NOECHO) \$(NOOP)\n") if (!$tests && ! -f "test.pl");
     push(@m, "\n");
 
