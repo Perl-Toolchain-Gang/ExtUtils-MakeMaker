@@ -1,4 +1,12 @@
 6.06_04
+    - Now looking for ExtUtils::xsubpp through @INC rather than just
+      the perl core directories.  This helps ExtUtils::ParseXS.
+    - Systems which don't put their libraries under their $Config{prefix}
+      (OS X, Debian) weren't putting their libraries in the spot declared
+      in Config.  It was going under $Config{prefix}.
+    - Prerequisites check now deals better with X.Y_Z style alpha versions
+    - ExtUtils::Liblist->ext() was using $Config{perllibs} which is a 5.6.1
+      thing.  Falling back to $Config{libs} if perllibs isn't there.
     - ExtUtils::Command::MM now reads from @ARGV if called with no
       args.  Makes the one liner a bit simpler.
     * Restored ExtUtils::Liblist::ext() for backwards compatibility.
