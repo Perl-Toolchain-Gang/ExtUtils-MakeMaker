@@ -3,11 +3,12 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.05";
-($Revision = substr(q$Revision: 1.86 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.87 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
 use Carp ();
+use File::Path;
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
@@ -579,8 +580,8 @@ sub WriteEmptyMakefile {
       chmod 0666, $self->{MAKEFILE_OLD};
       unlink $self->{MAKEFILE_OLD} or warn "unlink $self->{MAKEFILE_OLD}: $!";
     }
-    rename $self->{MAKEFILE}, $self->{MAKEFILE_OLD}
-      or warn "rename $self->{MAKEFILE} $self->{MAKEFILE_OLD}: $!"
+    _rename $self->{MAKEFILE}, $self->{MAKEFILE_OLD}
+      or warn "rename $self->{MAKEFILE} => $self->{MAKEFILE_OLD}: $!"
         if -f $self->{MAKEFILE};
     open MF, '>'.$self->{MAKEFILE} or die "open $self->{MAKEFILE} for write: $!";
     print MF <<'EOP';
@@ -824,7 +825,8 @@ sub flush {
 
     close FH;
     my($finalname) = $self->{MAKEFILE};
-    rename("MakeMaker.tmp", $finalname);
+    _rename("MakeMaker.tmp", $finalname) or
+      warn "rename MakeMaker.tmp => $finalname: $!";
     chmod 0644, $finalname unless $Is_VMS;
 
     my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
@@ -837,6 +839,16 @@ sub flush {
 
     system("$Config::Config{eunicefix} $finalname") unless $Config::Config{eunicefix} eq ":";
 }
+
+
+# This is a rename for OS's where the target must be unlinked first.
+sub _rename {
+    my($src, $dest) = @_;
+    chmod 0666, $dest;
+    unlink $dest;
+    return rename $src, $dest;
+}
+
 
 # The following mkbootstrap() is only for installations that are calling
 # the pre-4.1 mkbootstrap() from their old Makefiles. This MakeMaker
@@ -1978,7 +1990,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.86 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.87 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

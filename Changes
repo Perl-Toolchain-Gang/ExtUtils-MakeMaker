@@ -134,6 +134,8 @@
     - Added quote_literal() to handle some shell quoting.
     - ExtUtils::MM_VMS now compilable on non-VMS platforms.
     - J. D. Laub made MakeMaker honor $Config{installstyle}
+    - Renaming on OS/2 requires the target file to be removed.  
+      Partially fixed by Ilya, should be applied universally later.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
