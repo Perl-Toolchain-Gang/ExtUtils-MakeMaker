@@ -1,7 +1,7 @@
 package ExtUtils::testlib;
-$VERSION = 1.12;
+$VERSION = 1.12_01;
 
-use blib;
+use lib qw(blib/lib blib/arch);
 1;
 __END__
 
