@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.55_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.31 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.32 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -49,7 +49,8 @@ sub WriteMakefile {
 sub prompt ($;$) {
     my($mess,$def)=@_;
     $ISA_TTY = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;   # Pipe?
-    Carp::confess("prompt function called without an argument") unless defined $mess;
+    Carp::confess("prompt function called without an argument") 
+        unless defined $mess;
     my $dispdef = defined $def ? "[$def] " : " ";
     $def = defined $def ? $def : "";
     my $ans;
@@ -807,13 +808,9 @@ ExtUtils::MakeMaker - create an extension Makefile
 
 =head1 SYNOPSIS
 
-C<use ExtUtils::MakeMaker;>
+  use ExtUtils::MakeMaker;
 
-C<WriteMakefile( ATTRIBUTE =E<gt> VALUE [, ...] );>
-
-which is really
-
-C<MM-E<gt>new(\%att)-E<gt>flush;>
+  WriteMakefile( ATTRIBUTE => VALUE [, ...] );
 
 =head1 DESCRIPTION
 
@@ -986,7 +983,9 @@ relatives, then the defaults for INSTALLPRIVLIB, INSTALLARCHLIB,
 INSTALLSCRIPT, etc. will be appropriate, and this incantation will be
 the best:
 
-    perl Makefile.PL; make; make test
+    perl Makefile.PL; 
+    make; 
+    make test
     make install
 
 make install per default writes some documentation of what has been
@@ -1752,7 +1751,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.31 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.32 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2080,6 +2079,9 @@ Currently maintained by Michael G Schwern <F<schwern@pobox.com>>
 
 Send patches and ideas to <F<makemaker@perl.org>>.
 
-Send bug reports via http://rt.cpan.org/.
+Send bug reports via http://rt.cpan.org/.  Please send your
+generated Makefile along with your report.
+
+For more up-to-date information, see http://www.makemaker.org.
 
 =cut
