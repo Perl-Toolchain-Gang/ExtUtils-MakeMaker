@@ -1,5 +1,6 @@
 5.93_01
     - fixed basic.t for limited depth VMS systems
+    * MM_BeOS was totally hosed by a typo.
 
 5.92_01 Mon Apr 29 23:09:38 EDT 2002
     - Fixing case of modules with no .pm files on VMS.
