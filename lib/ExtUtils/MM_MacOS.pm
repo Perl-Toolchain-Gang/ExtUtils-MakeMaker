@@ -87,7 +87,7 @@ sub new {
         for $key (@ExtUtils::MakeMaker::Prepend_parent) {
             next unless defined $self->{PARENT}{$key};
             $self->{$key} = $self->{PARENT}{$key};
-            unless ($^O eq 'VMS' && $key =~ /PERL$/) {
+            if ($key !~ /PERL$/) {
                 $self->{$key} = $self->catdir("..",$self->{$key})
                   unless $self->file_name_is_absolute($self->{$key});
             } else {
@@ -457,6 +457,10 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{FULLPERL} = "$self->{PERL_SRC}perl";
     $self->{MAKEFILE} = "Makefile.mk";
     $self->{MAKEFILE_OLD} = $self->{MAKEFILE}.'.old';
+
+    $self->{'DEV_NULL'} ||= ' \xB3 Dev:Null';
+
+    return 1;
 }
 
 
@@ -873,7 +877,7 @@ sub processPL {
 	foreach $target (@$list) {
 	push @m, "
 ProcessPL :: $target
-\t$self->{NOECHO}\$(NOOP)
+\t$(NOECHO)\$(NOOP)
 
 $target :: $plfile
 \t\$(PERL) -I\$(MACPERL_LIB) -I\$(PERL_LIB) $plfile $target
