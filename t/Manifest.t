@@ -20,6 +20,8 @@ use File::Spec;
 use File::Path;
 use File::Find;
 
+my $Is_VMS = $^O eq 'VMS';
+
 # We're going to be chdir'ing and modules are sometimes loaded on the
 # fly in this test, so we need an absolute @INC.
 @INC = map { File::Spec->rel2abs($_) } @INC;
@@ -139,7 +141,10 @@ ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 manicopy( $files, 'copy', 'cp' );
 my @copies = ();
 find( sub { push @copies, $_ if -f }, 'copy' );
-is_deeply( [sort @copies], [sort keys %$files] );
+@copies = map { s/\.$//; $_ } @copies if $Is_VMS;  # VMS likes to put dots on
+                                                   # the end of files.
+# Have to compare insensitively for non-case preserving VMS
+is_deeply( [sort map { lc } @copies], [sort map { lc } keys %$files] );
 
 # cp would leave files readonly, so check permissions.
 foreach my $orig (@copies) {
