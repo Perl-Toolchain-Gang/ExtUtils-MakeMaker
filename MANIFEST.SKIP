@@ -5,3 +5,8 @@ t/lib/File/
 .gz$
 .bak$
 Makefile$
+MANIFEST.perl$
+\.old$
+merge_bleadperl$
+^blib/
+^pm_to_blib
