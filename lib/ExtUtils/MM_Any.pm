@@ -2,7 +2,7 @@ package ExtUtils::MM_Any;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.10_05';
+$VERSION = '0.10_06';
 @ISA = qw(File::Spec);
 
 # We need $Verbose
@@ -527,7 +527,7 @@ sub dir_target {
 %s$(DFSEP).exists :
 	$(NOECHO) $(MKPATH) %s
 	$(NOECHO) $(CHMOD) 755 %s
-	$(NOECHO) touch %s$(DFSEP).exists
+	$(NOECHO) $(TOUCH) %s$(DFSEP).exists
 
 MAKE
 
