@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.06_01";
-($Revision = substr(q$Revision: 1.93 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.94 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -242,13 +242,15 @@ sub full_setup {
         qw(
 
  post_initialize const_config constants platform_constants 
+
+ makemakerdflt
+
  tool_autosplit tool_xsubpp tools_other 
  dist macro depend cflags const_loadlibs const_cccmd
  post_constants
 
  pasthru
 
- makemakerdflt
  special_targets
  c_o xs_c xs_o
  top_targets linkext dlsyms dynamic dynamic_bs
@@ -1994,7 +1996,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.93 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.94 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
