@@ -213,6 +213,7 @@ is ($t->perl_script($self_name),$self_name, 'we pass as a perl_script()');
 ###############################################################################
 # perm_rw perm_rwx
 
+$t->init_PERM;
 is ($t->perm_rw(),'644', 'perm_rw() is 644');
 is ($t->perm_rwx(),'755', 'perm_rwx() is 755');
 
