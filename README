@@ -8,12 +8,12 @@ Known Good:
 Linux                   5.6.0, 5.6.1, 5.7.3
 OpenVMS                 5.6.1
 Cygwin                  5.6.1
-ActivePerl/Win32        5.6.1 build 631
+ActivePerl/Win32        5.6.1 build 631 with nmake
 
 
 Known Problems:
 
-PREFIX/LIB broken on Debian systems.
+PREFIX/LIB broken on Debian systems and many others.
 
 ActivePerl likely broken if installed in C:\Program Files or other
 prefix with a space in the name.
@@ -21,7 +21,7 @@ prefix with a space in the name.
 manifypods target produces command lines too long for some systems
 
 Using the MMS utility on VMS causes lots of extra newlines.  Unknown
-why this is so, might be a bug in MMS.  Problem not seen on MMK.
+why this is so, might be a bug in MMS.  Problem not seen with MMK.
 
 
 See TODO for details.
