@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.84 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.85 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2347,6 +2347,16 @@ sub fixpath {
     return $fixedpath;
 }
 
+
+=item os_flavor
+
+VMS is, alas, VMS.
+
+=cut
+
+sub os_flavor {
+    return('VMS');
+}
 
 =back
 

@@ -27,6 +27,16 @@ See ExtUtils::MM_Unix for a documentation of the methods provided there.
 
 =over 4
 
+=item os_flavor (o)
+
+We're Unix and Cygwin.
+
+=cut
+
+sub os_flavor {
+    return('Unix', 'Cygwin');
+}
+
 =item cflags (o)
 
 if configured for dynamic loading, triggers #define EXT in EXTERN.h

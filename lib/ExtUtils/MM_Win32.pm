@@ -168,7 +168,8 @@ sub init_others {
     my ($self) = @_;
 
     # Used in favor of echo because echo won't strip quotes. :(
-    $self->{ECHO}     ||= '$(PERLRUN) -le "print qq{@ARGV}"';
+    $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
+
     $self->{TOUCH}    ||= '$(PERLRUN) -MExtUtils::Command -e touch';
     $self->{CHMOD}    ||= '$(PERLRUN) -MExtUtils::Command -e chmod'; 
     $self->{CP}       ||= '$(PERLRUN) -MExtUtils::Command -e cp';
@@ -465,8 +466,12 @@ sub quote_literal {
 
     # dmake eats '{' inside double quotes and leaves alone { outside double
     # quotes; however it transforms {{ into { either inside and outside double
-    # quotes
-    $text =~ s/{/{{/g if $DMAKE;
+    # quotes.  It also translates }} into }.  The escaping below is not
+    # 100% correct.
+    if( $DMAKE ) {
+        $text =~ s/{/{{/g;
+        $text =~ s/}}/}}}/g;
+    }
 
     return qq{"$text"};
 }
@@ -492,6 +497,17 @@ sub max_exec_len {
     my $self = shift;
 
     return $self->{_MAX_EXEC_LEN} ||= 31 * 1024;
+}
+
+
+=item one_liner
+
+Windows is Win32.
+
+=cut
+
+sub one_liner {
+    return('Win32');
 }
 
 

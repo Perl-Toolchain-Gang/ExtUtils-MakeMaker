@@ -97,6 +97,17 @@ my $Updir   = __PACKAGE__->updir;
 
 =over 4
 
+=item os_flavor (o)
+
+Simply says that we're Unix.
+
+=cut
+
+sub os_flavor {
+    return('Unix');
+}
+
+
 =item c_o (o)
 
 Defines the suffix rules to compile different flavors of C files to

@@ -42,6 +42,34 @@ B<THIS MAY BE TEMPORARY!>
 These are methods which are by their nature cross-platform and should
 always be cross-platform.
 
+=over 4
+
+=item os_flavor_is
+
+    $mm->os_flavor_is($this_flavor);
+    $mm->os_flavor_is(@one_of_these_flavors);
+
+Checks to see if the current operating system is one of the given flavors.
+
+This is useful for code like:
+
+    if( $mm->os_flavor_is('Unix') ) {
+        $out = `foo 2>&1`;
+    }
+    else {
+        $out = `foo`;
+    }
+
+=cut
+
+sub os_flavor_is {
+    my $self = shift;
+    my %flavors = map { ($_ => 1) } $self->os_flavor;
+    return (grep { $flavors{$_} } @_) ? 1 : 0;
+}
+
+=back
+
 =head2 File::Spec wrappers
 
 ExtUtils::MM_Any is a subclass of File::Spec.  The methods noted here
@@ -666,8 +694,8 @@ Defines at least these macros.
 
   Macro             Description
 
-  NOOP              
-  NOECHO                                        
+  NOOP              Do nothing
+  NOECHO            Tell make not to display the command itself
 
   MAKEFILE
   FIRST_MAKEFILE
@@ -677,6 +705,7 @@ Defines at least these macros.
   SHELL             Program used to run
                     shell commands
 
+  ECHO              Print text adding a newline on the end
   RM_F              Remove a file 
   RM_RF             Remove a directory          
   TOUCH             Update a file's timestamp   
@@ -755,6 +784,29 @@ sub init_platform {
 sub platform_constants {
     return '';
 }
+
+=item os_flavor
+
+    my @os_flavor = $mm->os_flavor;
+
+@os_flavor is the style of operating system this is, usually
+corresponding to the MM_*.pm file we're using.  
+
+The first element of @os_flavor is the major family (ie. Unix,
+Windows, VMS, OS/2, MacOS, etc...) and the rest are sub families.
+
+Some examples:
+
+    Cygwin98       ('Unix',  'Cygwin', 'Cygwin9x')
+    Windows NT     ('Win32', 'WinNT')
+    Win98          ('Win32', 'Win9x')
+    Linux          ('Unix',  'Linux')
+    MacOS Classic  ('MacOS', 'MacOS Classic')
+    MacOS X        ('Unix',  'Darwin', 'MacOS', 'MacOS X')
+    OS/2           ('OS/2')
+
+This is used to write code for styles of operating system.  
+See os_flavor_is() for use.
 
 
 =back

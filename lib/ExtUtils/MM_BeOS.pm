@@ -28,6 +28,16 @@ use vars qw(@ISA $VERSION);
 $VERSION = 1.03;
 
 
+=item os_flavor (o)
+
+BeOS is BeOS.
+
+=cut
+
+sub os_flavor {
+    return('BeOS');
+}
+
 =item init_linker
 
 libperl.a equivalent to be linked to dynamic extensions.

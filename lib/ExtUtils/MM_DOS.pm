@@ -30,6 +30,14 @@ Unless otherwise stated, it works just like ExtUtils::MM_Unix
 
 =over 4
 
+=item os_flavor
+
+=cut
+
+sub os_flavor {
+    return('DOS');
+}
+
 =item B<replace_manpage_separator>
 
 Generates Foo__Bar.3 style man page names

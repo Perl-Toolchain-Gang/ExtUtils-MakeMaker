@@ -204,6 +204,19 @@ sub max_exec_len {
     return $self->{_MAX_EXEC_LEN} ||= 2500;
 }
 
+
+=item os_flavor
+
+Win95 and Win98 and WinME are collectively Win9x and Win32
+
+=cut
+
+sub os_flavor {
+    my $self = shift;
+    return ($self->SUPER::os_flavor, 'Win9x');
+}
+
+
 =back
 
 

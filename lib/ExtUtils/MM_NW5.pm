@@ -37,6 +37,17 @@ my $GCC      = 1 if $Config{'cc'} =~ /^gcc/i;
 my $DMAKE    = 1 if $Config{'make'} =~ /^dmake/i;
 
 
+=item os_flavor
+
+We're Netware in addition to being Windows.
+
+=cut
+
+sub os_flavor {
+    my $self = shift;
+    return ($self->SUPER::os_flavor, 'Netware');
+}
+
 =item init_platform (o)
 
 Add Netware macros.

@@ -28,6 +28,17 @@ Unless otherwise stated it works just like ExtUtils::MM_Unix
 
 =over 4
 
+=item os_flavor
+
+In addition to being Unix, we're U/WIN.
+
+=cut
+
+sub os_flavor {
+    return('Unix', 'U/WIN');
+}
+
+
 =item B<replace_manpage_separator>
 
 =cut

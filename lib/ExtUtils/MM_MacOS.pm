@@ -932,6 +932,16 @@ sub _include {  # for Unix-style includes, with -I instead of -i
 	}
 }
 
+=item os_flavor
+
+MacOS Classic is MacOS and MacOS Classic.
+
+=cut
+
+sub os_flavor {
+    return('MacOS', 'MacOS Classic');
+}
+
 =back
 
 =cut

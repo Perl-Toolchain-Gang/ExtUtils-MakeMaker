@@ -85,6 +85,10 @@ that are found in the existing F<MANIFEST> file in the new one.
 
 =cut
 
+sub _sort {
+    return sort { lc $a cmp lc $b } @_;
+}
+
 sub mkmanifest {
     my $manimiss = 0;
     my $read = (-r 'MANIFEST' && maniread()) or $manimiss++;
@@ -98,7 +102,7 @@ sub mkmanifest {
     %all = (%$found, %$read);
     $all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
-    foreach $file (sort keys %all) {
+    foreach $file (_sort keys %all) {
 	if ($skip->($file)) {
 	    # Policy: only remove files if they're listed in MANIFEST.SKIP.
 	    # Don't remove files just because they don't exist.
@@ -230,7 +234,7 @@ sub skipcheck {
     my $matches = _maniskip();
 
     my @skipped = ();
-    foreach my $file (sort keys %$found){
+    foreach my $file (_sort keys %$found){
         if (&$matches($file)){
             warn "Skipping $file\n";
             push @skipped, $file;
@@ -249,7 +253,7 @@ sub _check_files {
     my $found = manifind($p);
 
     my(@missfile) = ();
-    foreach my $file (sort keys %$read){
+    foreach my $file (_sort keys %$read){
         warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
         if ($dosnames){
             $file = lc $file;
@@ -273,7 +277,7 @@ sub _check_manifest {
     my $skip  = _maniskip();
 
     my @missentry = ();
-    foreach my $file (sort keys %$found){
+    foreach my $file (_sort keys %$found){
         next if $skip->($file);
         warn "Debug: manicheck checking from disk $file\n" if $Debug;
         unless ( exists $read->{$file} ) {
@@ -533,8 +537,8 @@ sub maniadd {
 
     my $manifest = maniread();
     open(MANIFEST, ">>$MANIFEST") or die "Could not open $MANIFEST: $!";
-    while( my($file, $comment) = each %$additions ) {
-        $comment ||= '';
+    foreach my $file (_sort keys %$additions) {
+        my $comment = $additions->{$file} || '';
         printf MANIFEST "%-40s%s\n", $file, $comment unless
           exists $manifest->{$file};
     }
