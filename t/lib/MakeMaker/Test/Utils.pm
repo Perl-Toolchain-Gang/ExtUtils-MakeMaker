@@ -1,5 +1,6 @@
 package MakeMaker::Test::Utils;
 
+use File::Spec;
 use strict;
 use Config;
 
@@ -85,13 +86,25 @@ Sets up environment variables so perl can find its libraries.
 my $old5lib = $ENV{PERL5LIB};
 my $had5lib = exists $ENV{PERL5LIB};
 sub perl_lib {
-                                       # perl-src/lib/ExtUtils/t/Foo
-    $ENV{PERL5LIB} .= $ENV{PERL_CORE} ? qq{../../../../lib}
-                                       # ExtUtils-MakeMaker/t/Foo
-                                      : qq{-I../../blib/lib};
+                               # perl-src/lib/ExtUtils/t/Foo
+    my $lib =  $ENV{PERL_CORE} ? qq{../../../lib}
+                               # ExtUtils-MakeMaker/t/Foo
+                               : qq{../blib/lib};
+    $lib = File::Spec->rel2abs($lib);
+    my @libs = ($lib);
+    push @libs, $ENV{PERL5LIB} if exists $ENV{PERL5LIB};
+    $ENV{PERL5LIB} = join($Config{path_sep}, @libs);
+    unshift @INC, $lib;
 }
 
-END { $ENV{PERL5LIB} = $old5lib if $had5lib }
+END { 
+    if( $had5lib ) {
+        $ENV{PERL5LIB} = $old5lib;
+    }
+    else {
+        delete $ENV{PERL5LIB};
+    }
+}
 
 
 =item B<makefile_name>
@@ -104,7 +117,7 @@ should generate.
 =cut
 
 sub makefile_name {
-    return $Is_VMS ? 'descrip.mms' : 'Makefile';
+    return $Is_VMS ? 'Descrip.MMS' : 'Makefile';
 }   
 
 =item B<makefile_backup>
