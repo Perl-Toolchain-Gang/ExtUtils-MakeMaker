@@ -19,7 +19,6 @@ use Config;
 use Test::More tests => 30;
 use MakeMaker::Test::Utils;
 use File::Spec;
-use TieOut;
 
 my $perl = which_perl();
 
