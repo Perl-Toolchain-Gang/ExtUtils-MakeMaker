@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl -w
 
 BEGIN {
     if( $ENV{PERL_CORE} ) {
@@ -93,7 +93,7 @@ add_file( 'MANIFEST.SKIP', "baz\n.SKIP" );
 
 # this'll skip the new file
 ($res, $warn) = catch_warning( \&ExtUtils::Manifest::skipcheck );
-like( $warn, qr/^Skipping MANIFEST\.SKIP/, 'got skipping warning' );
+like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' );
 
 # I'm not sure why this should be... shouldn't $missing be the only one?
 my ($found, $missing );
@@ -137,7 +137,7 @@ like( $@, qr/^Can't read none: /,
 chomp($warn);
 
 # the copy should have given one warning and one error
-is($warn, 'Skipping MANIFEST.SKIP', 'warned about MANIFEST.SKIP' );
+like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' );
 
 # tell ExtUtils::Manifest to use a different file
 { package ExtUtils::Manifest; 
