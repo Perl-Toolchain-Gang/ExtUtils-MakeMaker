@@ -2591,8 +2591,7 @@ EXE_FILES = @{$self->{EXE_FILES}}
 
 } . ($Is_Win32
   ? q{FIXIN = pl2bat.bat
-} : q{FIXIN = $(PERLRUN) "-MExtUtils::MY" \
-    -e "MY->fixin(shift)"
+} : q{FIXIN = $(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"
 }).qq{
 pure_all :: @to
 	\$(NOECHO) \$(NOOP)
@@ -3566,7 +3565,8 @@ sub oneliner {
     $cmd =~ s{^\n+}{};
     $cmd =~ s{\n+$}{};
 
-    $cmd = $self->quote_literal($cmd);
+    my @cmds = split /\n/, $cmd;
+    $cmd = join "\n\t-e ", map $self->quote_literal($_), @cmds;
     $cmd = $self->escape_newlines($cmd);
 
     $switches = join ' ', @$switches;
@@ -3597,7 +3597,7 @@ sub quote_literal {
 sub escape_newlines {
     my($self, $text) = @_;
 
-    $text =~ s{\n}{\\\n\t}g;
+    $text =~ s{\n}{\\\n}g;
 
     return $text;
 }
