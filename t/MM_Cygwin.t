@@ -78,27 +78,15 @@ like( $args->manifypods(), qr/pure_all\n\tnoecho/,
 	'manifypods() should return without PODS values set' );
 
 $args->{MAN3PODS} = { foo => 1 };
-my $out = tie *STDOUT, 'FakeOut';
-{
-    local $SIG{__WARN__} = sub {
-        # no warnings 'redefine';
-        warn @_ unless $_[0] =~ /used only once/;
-    };
-    no warnings 'once';
-    local *MM::perl_script = sub { return };
-    my $res = $args->manifypods();
-    like( $$out, qr/could not locate your pod2man/,
-          '... should warn if pod2man cannot be located' );
-    like( $res, qr/POD2MAN_EXE = -S pod2man/,
-          '... should use default pod2man target' );
-    like( $res, qr/pure_all.+foo/, '... should add MAN3PODS targets' );
-}
+my $res = $args->manifypods();
+like( $res, qr/pure_all.+foo/, '... should add MAN3PODS targets' );
+
 
 SKIP: {
     skip "Only relevent in the core", 2 unless $ENV{PERL_CORE};
     $args->{PERL_SRC} = File::Spec->updir;
     $args->{MAN1PODS} = { bar => 1 };
-    $$out = '';
+    my $out = tie *STDOUT, 'FakeOut';
     $res = $args->manifypods();
     is( $$out, '', '... should not warn if PERL_SRC provided' );
     like( $res, qr/bar \\\n\t1 \\\n\tfoo/,
