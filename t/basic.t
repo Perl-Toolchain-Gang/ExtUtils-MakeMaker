@@ -50,14 +50,15 @@ ok( ($^T - $mtime) <= 0,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
 
-# Supress 'make manifest' noise
-open(SAVERR, ">&STDERR") || die $!;
-close(STDERR);
 my $make = make_run();
-my $manifest_out = `$make manifest`;
-ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
-ok( -s 'MANIFEST',      '  its not empty' );
-open(STDERR, ">&SAVERR") || die $!;
+
+{
+    # Supress 'make manifest' noise
+    local $ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
+    my $manifest_out = `$make manifest`;
+    ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
+    ok( -s 'MANIFEST',      '  its not empty' );
+}
 
 END { unlink 'MANIFEST'; }
 
@@ -77,5 +78,3 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
 my $realclean_out = `$make realclean`;
 is( $?, 0, 'realclean' ) || diag($realclean_out);
-
-close SAVERR;
