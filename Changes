@@ -1,8 +1,41 @@
-5.50_01 
-    * Internal Refactorings
+5.50_01 Mon Mar  4 23:44:48 EST 2002
+    *---> **API CHANGES!** <---
+      htmlifypods and all HTML targets have been removed.  It didn't
+      work properly.  A target for HTMLifying of docs will be
+      added sometime in the future (read: send a patch).
+    - Deprecated ROOTEXT variable removed (its been deprecated for
+      more than five years).
+
+    * 5.49_01 broke anything that depended on the MM class to be loaded
+      with ExtUtils::MakeMaker, like CPAN.  Temporarily fixed.
+    * Many places wrongfully assume MM methods can be called as class
+      methods!  Inside and outside of MakeMaker.
+    * DOS now acts like Win32 instead of Unix.  This should be less wrong.
+    - Removed ExtUtils::Miniperl from the CPAN distribution.  Can't
+      see how its useful outside the core.
+    * Emacs backup files (ie. *~) are no longer copied into blib
+      (this means you won't get Foo.pm~ accidentally installed anymore).
+    - prefixify() now returns if the prefixification worked or not.
+    - Netware tweak from Ananth Kesari (perl change 14780)
+    - added the Perl patchlevel info to the description embedded in DLLs
+      (Ilya Zakharevich perl change 14810)
+    * made the docs about the behavior of PREFIX a bit more vague
+      reflecting its odd behavior.
+    - Put PREFIX before LIB in the docs.
+    - Replaced references to %Config with things people are more likely
+      to understand in PREFIX & LIB docs.
+    
+
+    *---> Internal Refactorings
     - File::Spec wrappers consolidated in MM_Any
-    - test_via_* consolidated in MM_Any
-    - htmlifypods consolidated in MM_Any
+    - test_via_harness/script consolidated in MM_Any
+    * Added ExtUtils::Command::MM to replace large -e "one-liners"
+    * Added ExtUtils::MM_UWIN, took UWIN specific code out of MM_Unix.
+    * Added ExtUtils::MM_DOS, took some DOS specific code out of MM_Unix
+    - Added a dist() override to MM_OS2.
+    - Took the OS/2 specific code out of MM_Unix's dist()
+    - Starting to quote as many command line switches as possible
+      to make VMS have to override less of MM_Unix.
 
 5.49_01 Mon Feb  4 00:42:40 EST 2002
     - Default TEST_LIBS now contains absolute paths, so tests can
@@ -44,7 +77,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.6 $ based $VERSIONs.
+    - Stripped out $Revision: 1.7 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
