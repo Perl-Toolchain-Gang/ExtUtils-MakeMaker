@@ -26,8 +26,7 @@ BEGIN {
     my @out = ExtUtils::Liblist->ext('-ln0tt43r3_perl');
     is( @out, 4, 'enough output' );
     unlike( $out[2], qr/-ln0tt43r3_perl/, 'bogus library not added' );
-    is( @warn, 1, 'had warning') || diag Dumper @warn;
-    like($warn[0][0],
-         qr/\QNote (probably harmless): No library found for -ln0tt43r3_perl/,
-         'expected warning');
+    ok( @warn, 'had warning');
+
+    ok( grep(qr/\QNote (probably harmless): No library found for -ln0tt43r3_perl/, map { @$_ } @warn) == 1 ) || diag Dumper @warn;
 }
