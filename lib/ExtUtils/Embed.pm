@@ -1,4 +1,4 @@
-# $Id: Embed.pm,v 1.5 2002/02/06 08:35:19 schwern Exp $
+# $Id: Embed.pm,v 1.6 2002/03/18 05:41:54 schwern Exp $
 require 5.006_001;
 
 package ExtUtils::Embed;
@@ -131,6 +131,29 @@ sub static_ext {
     @Extensions;
 }
 
+sub _escape {
+    my $arg = shift;
+    $$arg =~ s/([\(\)])/\\$1/g;
+}
+
+sub _ldflags {
+    my $ldflags = $Config{ldflags};
+    _escape(\$ldflags);
+    return $ldflags;
+}
+
+sub _ccflags {
+    my $ccflags = $Config{ccflags};
+    _escape(\$ccflags);
+    return $ccflags;
+}
+
+sub _ccdlflags {
+    my $ccdlflags = $Config{ccdlflags};
+    _escape(\$ccdlflags);
+    return $ccdlflags;
+}
+
 sub ldopts {
     require ExtUtils::MakeMaker;
     require ExtUtils::Liblist;
@@ -207,7 +230,9 @@ sub ldopts {
 
     my $ld_or_bs = $bsloadlibs || $ldloadlibs;
     print STDERR "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose;
-    my $linkage = "$Config{ccdlflags} $Config{ldflags} @archives $ld_or_bs";
+    my $ccdlflags = _ccdlflags();
+    my $ldflags   = _ldflags();
+    my $linkage = "$ccdlflags $ldflags @archives $ld_or_bs";
     print STDERR "ldopts: '$linkage'\n" if $Verbose;
 
     return $linkage if scalar @_;
@@ -215,11 +240,13 @@ sub ldopts {
 }
 
 sub ccflags {
-    my_return(" $Config{ccflags} ");
+    my $ccflags = _ccflags();
+    my_return(" $ccflags ");
 }
 
 sub ccdlflags {
-    my_return(" $Config{ccdlflags} ");
+    my $ccdlflags = _ccdlflags();
+    my_return(" $ccdlflags ");
 }
 
 sub perl_inc {
