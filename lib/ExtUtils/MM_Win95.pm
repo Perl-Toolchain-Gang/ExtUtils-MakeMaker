@@ -6,6 +6,9 @@ $VERSION = 0.02;
 require ExtUtils::MM_Win32;
 @ISA = qw(ExtUtils::MM_Win32);
 
+my $DMAKE = 1 if $Config{'make'} =~ /^dmake/i;
+my $NMAKE = 1 if $Config{'make'} =~ /^nmake/i;
+
 
 =head1 NAME
 
@@ -33,6 +36,35 @@ disttest : distdir
 	cd ..
 };
 }
+
+
+sub subdir_x {
+    my($self, $subdir) = @_;
+
+    # Win-9x has nasty problem in command.com that can't cope with
+    # &&.  Also, Dmake has an odd way of making a commandseries silent:
+    if ($DMAKE) {
+      return sprintf <<'EOT', $subdir;
+
+subdirs ::
+@[
+	cd %s
+	$(MAKE) all $(PASTHRU)
+	cd ..
+]
+EOT
+    }
+    else {
+        return sprintf <<'EOT', $subdir;
+
+subdirs ::
+	$(NOECHO)cd %s
+	$(NOECHO)$(MAKE) all $(PASTHRU)
+	$(NOECHO)cd ..
+EOT
+    }
+}
+
 
 sub xs_c {
     my($self) = shift;

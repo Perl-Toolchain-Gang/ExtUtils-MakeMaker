@@ -3397,34 +3397,11 @@ Helper subroutine for subdirs
 
 sub subdir_x {
     my($self, $subdir) = @_;
-    my(@m);
-    if ($Is_Win32 && Win32::IsWin95()) {
-	if ($Config{'make'} =~ /dmake/i) {
-	    # dmake-specific
-	    return <<EOT;
-subdirs ::
-@[
-	cd $subdir
-	\$(MAKE) -f \$(FIRST_MAKEFILE) all \$(PASTHRU)
-	cd ..
-]
-EOT
-        } elsif ($Config{'make'} =~ /nmake/i) {
-	    # nmake-specific
-	    return <<EOT;
-subdirs ::
-	cd $subdir
-	\$(MAKE) -f \$(FIRST_MAKEFILE) all \$(PASTHRU)
-	cd ..
-EOT
-	}
-    } else {
-	return <<EOT;
+    return sprintf <<'EOT', $subdir;
 
 subdirs ::
-	$self->{NOECHO}cd $subdir && \$(MAKE) -f \$(FIRST_MAKEFILE) all \$(PASTHRU)
+	$(NOECHO)cd %s && $(MAKE) -f $(FIRST_MAKEFILE) all $(PASTHRU)
 EOT
-    }
 }
 
 =item subdirs (o)
