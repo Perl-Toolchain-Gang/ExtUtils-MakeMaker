@@ -13,7 +13,7 @@ use DirHandle;
 use vars qw($VERSION @ISA
             $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos
             $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
-            $Is_SunOS4 $Is_Solaris $Is_SunOS
+            $Is_SunOS4 $Is_Solaris $Is_SunOS $Is_Interix
             $Verbose %pm
             %Config_Override
            );
@@ -33,10 +33,12 @@ BEGIN {
     $Is_OSF     = $^O eq 'dec_osf';
     $Is_IRIX    = $^O eq 'irix';
     $Is_NetBSD  = $^O eq 'netbsd';
+    $Is_Interix = $^O eq 'interix';
     $Is_SunOS4  = $^O eq 'sunos';
     $Is_Solaris = $^O eq 'solaris';
     $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
-    $Is_BSD     = $^O =~ /^(?:free|net|open)bsd|bsdos$/;
+    $Is_BSD     = $^O =~ /^(?:free|net|open)bsd$/ or
+                  $^O eq 'bsdos' or $^O eq 'interix';
 }
 
 BEGIN {
@@ -926,7 +928,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 
     my $libs = '$(LDLOADLIBS)';
 
-    if ($Is_NetBSD && $Config{'useshrplib'}) {
+    if (($Is_NetBSD || $Is_Interix) && $Config{'useshrplib'}) {
 	# Use nothing on static perl platforms, and to the flags needed
 	# to link against the shared libperl library on shared perl
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
