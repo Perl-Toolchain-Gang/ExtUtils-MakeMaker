@@ -2,8 +2,8 @@ package ExtUtils::MakeMaker;
 
 BEGIN {require 5.005_03;}
 
-$VERSION = '6.10_03';
-($Revision = substr(q$Revision: 1.109 $, 10)) =~ s/\s+$//;
+$VERSION = '6.10_04';
+($Revision) = q$Revision: 1.110 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -1419,6 +1419,11 @@ Ref to array of executable files. The files will be copied to the
 INST_SCRIPT directory. Make realclean will delete them from there
 again.
 
+If your executables start with something like #!perl or
+#!/usr/bin/perl MakeMaker will change this to the path of the perl
+'Makefile.PL' was invoked with so the programs will be sure to run
+properly even if perl is not in /usr/bin/perl.
+
 =item FIRST_MAKEFILE
 
 The name of the Makefile to be produced.  This is used for the second
@@ -2017,7 +2022,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.109 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.110 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
