@@ -1,4 +1,4 @@
-6.26
+6.25_02  Mon Dec 20 03:31:49 EST 2004
     - Set PM_FILTER as late as possible so it can see all the earlier
       macro definitions.  Necessary for challenged make implementations
       like nmake.  Should fix Mail::SpamAssassin installs on Win32.
