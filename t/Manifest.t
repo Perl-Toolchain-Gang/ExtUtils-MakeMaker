@@ -35,7 +35,7 @@ sub add_file {
 
 sub read_manifest {
 	open( M, 'MANIFEST' ) or return;
-	chomp( my @filees = <M> );
+	chomp( my @files = <M> );
     close M;
 	return @files;
 }
