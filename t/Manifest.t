@@ -218,6 +218,7 @@ SKIP: {
     like( $@, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
                  "maniadd() dies if it can't open the MANIFEST" );
 
+    chmod( 0600, 'MANIFEST' );
 }
     
 
@@ -227,7 +228,6 @@ END {
 
 	# now get rid of the parent directory
 	ok( chdir( $cwd ), 'return to parent directory' );
-	unlink('mantest/MANIFEST');
 	remove_dir( 'mantest' );
 }
 
