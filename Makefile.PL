@@ -46,8 +46,9 @@ WriteMakefile(
 
         my @perls = ($orig_perl);
         push @perls, map "/usr/local/bin/$_", 
-                        qw(bleadperl 
+                        qw(bleadperl
                            perl5.6.1
+                           perl5.6.0
                           )
           if $ENV{PERL_TEST_ALL};
 
