@@ -43,7 +43,7 @@ sub xs_c {
     return '' unless $self->needs_linking();
     '
 .xs.c:
-	$(PERLRUN) $(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
+	$(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
 	'
 }
 
@@ -59,7 +59,7 @@ sub xs_cpp {
     return '' unless $self->needs_linking();
     '
 .xs.cpp:
-	$(PERLRUN) $(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.cpp
+	$(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.cpp
 	';
 }
 
@@ -74,7 +74,7 @@ sub xs_o {
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT):
-	$(PERLRUN) $(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
+	$(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
 	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.c
 	';
 }
