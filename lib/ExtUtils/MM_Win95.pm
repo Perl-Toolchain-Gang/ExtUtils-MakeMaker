@@ -1,7 +1,7 @@
 package ExtUtils::MM_Win95;
 
 use vars qw($VERSION @ISA);
-$VERSION = 0.01;
+$VERSION = 0.02;
 
 require ExtUtils::MM_Win32;
 @ISA = qw(ExtUtils::MM_Win32);
@@ -40,3 +40,5 @@ sub xs_o {
 	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.c
 	';
 }
+
+1;
