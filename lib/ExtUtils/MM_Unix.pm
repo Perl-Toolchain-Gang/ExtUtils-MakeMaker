@@ -3060,11 +3060,11 @@ PPD_HTML
     my $make_ppd = <<"PPD_OUT";
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	@ $ppd_oneliner > \$(DISTNAME).ppd
+	$(NOECHO) $ppd_oneliner > \$(DISTNAME).ppd
 PPD_OUT
 
 
-    $make_ppd .= '	@$(PERL) -e "print qq{\t<IMPLEMENTATION>\n';
+    $make_ppd .= '	$(NOECHO) $(PERL) -e "print qq{\t<IMPLEMENTATION>\n';
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
@@ -3076,7 +3076,7 @@ PPD_OUT
 
 
     $make_ppd .= sprintf <<'PPD_OUT', $Config{archname};
-	@$(PERL) -e "print qq{\t\t<OS NAME=\"$(OSNAME)\" />\n\t\t<ARCHITECTURE NAME=\"%s\" />\n
+	$(NOECHO) $(PERL) -e "print qq{\t\t<OS NAME=\"$(OSNAME)\" />\n\t\t<ARCHITECTURE NAME=\"%s\" />\n
 PPD_OUT
 
     chomp $make_ppd;
