@@ -41,6 +41,7 @@ t/basic.t
 t/Command.t
 t/INST.t
 t/INST_PREFIX.t
+t/Install.t
 t/Installed.t
 t/Liblist.t
 t/MM_BeOS.t
