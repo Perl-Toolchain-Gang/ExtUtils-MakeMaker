@@ -1,4 +1,5 @@
 6.25_06
+    - Forgot to define BOOTDEP macro.
     - .exists files are back.  Directories cannot be used directly as 
       targets as their mod time changes too frequently.
     * Added INSTALLBASE as an alternative to PREFIX.
