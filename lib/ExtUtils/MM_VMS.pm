@@ -739,21 +739,6 @@ MAKE_FRAG
     return $m;
 }
 
-=item tool_autosplit (override)
-
-Use VMS-style quoting on command line.
-
-=cut
-
-sub tool_autosplit {
-    my($self, %attribs) = @_;
-    my($asl) = "";
-    $asl = "\$AutoSplit::Maxlen=$attribs{MAXLEN};" if $attribs{MAXLEN};
-    q{
-# Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = $(PERLRUN) -e "use AutoSplit;}.$asl.q{autosplit($ARGV[0], $ARGV[1], 0, 1, 1) ;"
-};
-}
 
 =item tool_sxubpp (override)
 
