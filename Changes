@@ -1,6 +1,8 @@
 6.16
     - PREREQ_PRINT is supposed to exit after dumping. (Wolfgang Friebel
       bleadperl@20530)
+    - maniadd() was trying to open the MANIFEST even if it didn't need to
+      causing unnecessary errors for read-only MANIFESTs (rt.cpan.org 3180)
 
 6.15 Sun Aug  3 16:41:05 PDT 2003
     - Make FIXIN on Win32 use the new pl2bat rather than an already
