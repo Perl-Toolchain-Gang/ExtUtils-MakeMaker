@@ -2146,7 +2146,7 @@ sub init_PERL {
     $thisperl .= $Config{exe_ext} unless $thisperl =~ m/$Config{exe_ext}$/i;
 
     # We need a relative path to perl when in the core.
-    $thisperl = File::Spec->abs2rel($thisperl) if $ENV{PERL_CORE};
+    $thisperl = File::Spec->abs2rel($thisperl) if $self->{PERL_CORE};
 
     my @perls = ($thisperl);
     push @perls, map { "$_$Config{exe_ext}" }
