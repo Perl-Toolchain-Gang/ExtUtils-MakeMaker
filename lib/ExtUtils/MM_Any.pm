@@ -138,6 +138,80 @@ require partial overrides.
 
 =over 4
 
+=item B<split_command>
+
+    my @cmds = $MM->split_command($cmd, \@args);
+    my @cmds = $MM->split_command($cmd, \%args);
+
+Most OS have a maximum command length they can execute at once.  Large
+modules can easily generate commands well past that limit.  Its
+necessary to split long commands up into a series of shorter commands.
+
+split_command() will return a series of @cmds each processing part of
+the args.  Collectively they will process all the arguments.  Each
+individual line in @cmds will not be longer than the
+$self->max_exec_len being careful to take into account macro expansion.
+
+$cmd should include any switches and repeated initial arguments.
+
+If @args is given, the argument list will be split at any point.
+
+If %args is given, the hash will be flattened into an argument list,
+but key/value pairs will not be split between arguments.  This is
+useful for things like pod2man and pm_to_blib.
+
+=cut
+
+sub split_command {
+    my($self, $cmd, $args) = @_;
+    my @args = ref $args eq 'ARRAY' ? @$args :
+               ref $args eq 'HASH'  ? %$args :
+                 die "split_command takes an array or hash ref";
+
+    my $len_left = $self->max_exec_len - length $cmd;
+    $len_left = int($len_left * 0.80);  # set aside 20% for macro expansion.
+
+    my @cmds = ();
+
+    do {
+        my $arg_str = '';
+        while( @args && $len_left > length $arg_str ) {
+            # Two at a time to preserve pairs.
+            $arg_str .= join ' ', splice(@args, 0, 2), '';
+        }
+        chop $arg_str;
+
+        push @cmds, "$cmd $arg_str";
+    } while @args;
+
+    return @cmds;
+}
+
+
+=item max_exec_len
+
+    my $max_exec_len = $MM->max_exec_len;
+
+Calculates the maximum command size the OS can exec.  Effectively,
+this is the max size of a shell command line.
+
+=cut
+
+sub max_exec_len {
+    my $self = shift;
+
+    if (!defined $self->{_MAX_EXEC_LEN}) {
+        if (my $arg_max = eval { require POSIX;  &POSIX::ARG_MAX }) {
+            $self->{_MAX_EXEC_LEN} = $arg_max;
+        }
+        else {      # POSIX minimum exec size
+            $self->{_MAX_EXEC_LEN} = 4096;
+        }
+    }
+
+    return $self->{_MAX_EXEC_LEN};
+}
+
 =item init_VERSION
 
     $mm->init_VERSION
@@ -208,7 +282,7 @@ sub init_VERSION {
 
     $self->{XS_VERSION_MACRO}  = 'XS_VERSION';
     $self->{XS_DEFINE_VERSION} = '-D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"';
-    
+
 }
 
 =item wraplist
@@ -413,7 +487,7 @@ sub libscan {
     my($dirs,$file) = (File::Spec->splitpath($path))[1,2];
     return '' if grep /^RCS|CVS|SCCS|\.svn$/, 
                      File::Spec->splitdir($dirs), $file;
-    
+
     return $path;
 }
 
@@ -505,6 +579,7 @@ bareword.  For example:
 Its currently very simple and may be expanded sometime in the figure
 to include more flexible code and switches.
 
+
 =item B<quote_literal>
 
     my $safe_text = $MM->quote_literal($text);
@@ -513,6 +588,13 @@ This will quote $text so it is interpreted literally in the shell.
 
 For example, on Unix this would escape any single-quotes in $text and
 put single-quotes around the whole thing.
+
+
+=item B<escape_newlines>
+
+    my $escaped_text = $MM->escape_newlines($text);
+
+Shell escapes newlines in $text.
 
 
 =item B<init_others>

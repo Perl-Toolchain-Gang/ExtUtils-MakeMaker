@@ -13,7 +13,7 @@ BEGIN {
 chdir 't';
 
 use MakeMaker::Test::Utils;
-use Test::More tests => 7;
+use Test::More tests => 6;
 use File::Spec;
 
 my $TB = Test::More->builder;
@@ -34,8 +34,7 @@ sub try_oneliner {
     # one already.
     $expect =~ s/([^\n])\z/$1\n/ if $^O eq 'VMS';
 
-    $TB->is_eq(`$cmd`, $expect, $name) || $TB->diag("oneliner:\n$cmd");
-        
+    $TB->is_eq(scalar `$cmd`, $expect, $name) || $TB->diag("oneliner:\n$cmd");
 }
 
 # Lets see how it deals with quotes.
@@ -47,8 +46,6 @@ try_oneliner(q{$PATH = 'foo'; print $PATH},[], q{foo},   'dollar signs' );
 # switches?
 try_oneliner(q{print 'foo'}, ['-l'],           "foo\n",       'switches' );
 
-# newlines?
-try_oneliner(<<CODE, [],    "foobar",                   'newlines' );
-print 'foo';
-print 'bar';
-CODE
+# XXX gotta rethink the newline test.  The Makefile does newline
+# escaping, then the shell.
+

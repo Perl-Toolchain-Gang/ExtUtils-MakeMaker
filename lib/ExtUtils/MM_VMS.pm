@@ -2190,6 +2190,7 @@ sub oneliner {
     $cmd =~ s{\n+$}{};
 
     $cmd = $self->quote_literal($cmd);
+    $cmd = $self->escape_newlines($cmd);
 
     # Switches must be quoted else they will be lowercased.
     $switches = join ' ', map { qq{"$_"} } @$switches;
@@ -2208,10 +2209,19 @@ sub quote_literal {
     # I believe this is all we should need.
     $text =~ s{"}{""}g;
 
-    # Escape newlines.
+    return qq{"$text"};
+}
+
+=item escape_newlines
+
+=cut
+
+sub escape_newlines {
+    my($self, $text) = @_;
+
     $text =~ s{\n}{-\n}g;
 
-    return qq{"$text"};
+    return $text;
 }
 
 =item init_linker (o)

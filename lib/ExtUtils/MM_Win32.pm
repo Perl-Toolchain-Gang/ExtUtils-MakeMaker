@@ -464,10 +464,8 @@ sub oneliner {
     $cmd =~ s{^\n+}{};
     $cmd =~ s{\n+$}{};
 
-    # Escape newlines
-    $cmd =~ s{\n}{\\\n}g;
-
     $cmd = $self->quote_literal($cmd);
+    $cmd = $self->escape_newlines($cmd);
 
     $switches = join ' ', @$switches;    
 
@@ -490,6 +488,15 @@ sub quote_literal {
     return qq{"$cmd"};
 }
 
+
+sub escape_newlines {
+    my($self, $text) = @_;
+
+    # Escape newlines
+    $text =~ s{\n}{\\\n}g;
+
+    return $text;
+}
 
 1;
 __END__

@@ -3531,6 +3531,7 @@ sub oneliner {
     $cmd =~ s{\n+$}{};
 
     $cmd = $self->quote_literal($cmd);
+    $cmd = $self->escape_newlines($cmd);
 
     $switches = join ' ', @$switches;
 
@@ -3549,10 +3550,20 @@ sub quote_literal {
     # this is a safe way to do it.
     $text =~ s{'}{'\\''}g;
 
-    # Escape newlines
+    return "'$text'";
+}
+
+
+=item escape_newlines
+
+=cut
+
+sub escape_newlines {
+    my($self, $text) = @_;
+
     $text =~ s{\n}{\\\n}g;
 
-    return "'$text'";
+    return $text;
 }
 
 
