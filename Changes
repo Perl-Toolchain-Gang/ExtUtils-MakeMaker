@@ -1,3 +1,8 @@
+6.06_06
+    - Making install "Skip ... (unchanged)" message happen consistently
+    - Checking file sizes as well as modification times when deciding
+      to skip installing a file.
+
 6.06_05 Mon Mar 31 02:44:11 PST 2003
     - Syncing into bleadperl.  Minor nits revealed...
     - AutoSplit open filehandle bug was fixed in bleadperl.  Averted a
