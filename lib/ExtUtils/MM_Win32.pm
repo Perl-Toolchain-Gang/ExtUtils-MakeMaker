@@ -144,7 +144,7 @@ Using \ for Windows.
 sub init_DIRFILESEP {
     my($self) = shift;
 
-    $self->{DIRFILESEP} = '\';
+    $self->{DIRFILESEP} = '\\';
 }
 
 =item B<init_others>
@@ -266,7 +266,7 @@ END
 
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, <<'MAKE_FRAG' if $self->{MYEXTLIB};
+    push @m, <<'MAKE_FRAG' if $self->{MYEXTLIB};
 	$(CP) $(MYEXTLIB) $@
 MAKE_FRAG
 
@@ -452,72 +452,6 @@ only intended for broken make implementations.
 sub xs_o {	# many makes are too dumb to use xs_c then c_o
     my($self) = shift;
     return ''
-}
-
-=item top_targets (o)
-
-Defines the targets all, subdirs, config, and O_FILES
-
-=cut
-
-sub top_targets {
-# --- Target Sections ---
-
-    my($self) = shift;
-    my(@m);
-
-    push @m, '
-all :: pure_all
-	'.$self->{NOECHO}.'$(NOOP)
-' 
-	  unless $self->{SKIPHASH}{'all'};
-    
-    push @m, '
-pure_all :: config pm_to_blib subdirs linkext
-	'.$self->{NOECHO}.'$(NOOP)
-
-subdirs :: $(MYEXTLIB)
-	'.$self->{NOECHO}.'$(NOOP)
-
-config :: $(MAKEFILE) $(INST_LIBDIR)$(DIRFILESEP).exists
-	'.$self->{NOECHO}.'$(NOOP)
-
-config :: $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
-	'.$self->{NOECHO}.'$(NOOP)
-
-config :: $(INST_AUTODIR)$(DIRFILESEP).exists
-	'.$self->{NOECHO}.'$(NOOP)
-';
-
-    push @m, $self->dir_target(qw[$(INST_AUTODIR) $(INST_LIBDIR) $(INST_ARCHAUTODIR)]);
-
-    if (%{$self->{MAN1PODS}}) {
-	push @m, qq[
-config :: \$(INST_MAN1DIR)\$(DIRFILESEP).exists
-	$self->{NOECHO}\$(NOOP)
-
-];
-	push @m, $self->dir_target(qw[$(INST_MAN1DIR)]);
-    }
-    if (%{$self->{MAN3PODS}}) {
-	push @m, qq[
-config :: \$(INST_MAN3DIR)\$(DIRFILESEP).exists
-	$self->{NOECHO}\$(NOOP)
-
-];
-	push @m, $self->dir_target(qw[$(INST_MAN3DIR)]);
-    }
-
-    push @m, '
-$(O_FILES): $(H_FILES)
-' if @{$self->{O_FILES} || []} && @{$self->{H} || []};
-
-    push @m, q{
-help:
-	perldoc ExtUtils::MakeMaker
-};
-
-    join('',@m);
 }
 
 
