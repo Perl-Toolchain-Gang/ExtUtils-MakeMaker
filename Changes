@@ -1,3 +1,8 @@
+6.06_04
+    - Switching to relative dirs for self-building to shorten
+      command line lengths.
+    - Fixing minor test warning on VMS when compiling ExtUtils::Manifest
+
 6.06_03 Sat Mar 29 19:44:53 PST 2003
     - Added AUTHOR and ABSTRACT_FROM info for ppd generation.
     - Added echo() method to portably echo text to a file.
