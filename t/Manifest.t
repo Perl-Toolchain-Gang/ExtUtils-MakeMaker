@@ -14,7 +14,7 @@ chdir 't';
 use strict;
 
 # these files help the test run
-use Test::More tests => 38;
+use Test::More tests => 39;
 use Cwd;
 
 # these files are needed for the module itself
@@ -127,10 +127,12 @@ ok( exists( ExtUtils::Manifest::manifind()->{'moretest/quux'} ),
                                         "manifind found moretest/quux" );
 
 # only MANIFEST and foo are in the manifest
+$_ = 'foo';
 my $files = maniread();
 is( keys %$files, 2, 'two files found' );
 is( join(' ', sort { lc($a) cmp lc($b) } keys %$files), 'foo MANIFEST', 
                                         'both files found' );
+is( $_, 'foo', q{maniread() doesn't clobber $_} );
 
 # poison the manifest, and add a comment that should be reported
 add_file( 'MANIFEST', 'none #none' );

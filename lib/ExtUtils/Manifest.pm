@@ -309,32 +309,33 @@ sub maniread {
     my $read = {};
     local *M;
     unless (open M, $mfile){
-	warn "$mfile: $!";
-	return $read;
+        warn "$mfile: $!";
+        return $read;
     }
+    local $_;
     while (<M>){
-	chomp;
-	next if /^#/;
+        chomp;
+        next if /^#/;
 
         my($file, $comment) = /^(\S+)\s*(.*)/;
         next unless $file;
 
-	if ($Is_MacOS) {
-	    $file = _macify($file);
-	    $file =~ s/\\([0-3][0-7][0-7])/sprintf("%c", oct($1))/ge;
-	}
-	elsif ($Is_VMS) {
-        require File::Basename;
-	    my($base,$dir) = File::Basename::fileparse($file);
-	    # Resolve illegal file specifications in the same way as tar
-	    $dir =~ tr/./_/;
-	    my(@pieces) = split(/\./,$base);
-	    if (@pieces > 2) { $base = shift(@pieces) . '.' . join('_',@pieces); }
-	    my $okfile = "$dir$base";
-	    warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
+        if ($Is_MacOS) {
+            $file = _macify($file);
+            $file =~ s/\\([0-3][0-7][0-7])/sprintf("%c", oct($1))/ge;
+        }
+        elsif ($Is_VMS) {
+            require File::Basename;
+            my($base,$dir) = File::Basename::fileparse($file);
+            # Resolve illegal file specifications in the same way as tar
+            $dir =~ tr/./_/;
+            my(@pieces) = split(/\./,$base);
+            if (@pieces > 2) { $base = shift(@pieces) . '.' . join('_',@pieces); }
+            my $okfile = "$dir$base";
+            warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
             $file = $okfile;
             $file = lc($file) unless $file =~ /^MANIFEST(\.SKIP)?$/;
-	}
+        }
 
         $read->{$file} = $comment;
     }
@@ -346,7 +347,7 @@ sub maniread {
 sub _maniskip {
     my @skip ;
     my $mfile = "$MANIFEST.SKIP";
-    local *M;
+    local(*M,$_);
     open M, $mfile or open M, $DEFAULT_MSKIP or return sub {0};
     while (<M>){
 	chomp;
@@ -417,6 +418,7 @@ sub cp_if_diff {
     local(*F,*T);
     open(F,"< $from\0") or die "Can't read $from: $!\n";
     if (open(T,"< $to\0")) {
+        local $_;
 	while (<F>) { $diff++,last if $_ ne <T>; }
 	$diff++ unless eof(T);
 	close T;
