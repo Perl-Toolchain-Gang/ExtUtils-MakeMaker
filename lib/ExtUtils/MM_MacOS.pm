@@ -1,5 +1,7 @@
 package ExtUtils::MM_MacOS;
 
+$VERSION = 1.08;
+
 sub new {
     die <<'UNSUPPORTED';
 MacOS Classic (MacPerl) is no longer supported by MakeMaker.
