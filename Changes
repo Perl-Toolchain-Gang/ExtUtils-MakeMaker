@@ -1,3 +1,10 @@
+5.51_01
+    - Fixing VMS so 'mmk' is always 'mmk all' (bleadperl sync)
+    - Fixed it so MakeMaker can build itself without needing an eariler
+      version installed
+    - Removing xsubpp and typemap from the distribution.  These are not
+      Perl version independent files and should not be upgraded.
+
 5.50_01 Mon Mar  4 23:44:48 EST 2002
     *---> **API CHANGES!** <---
       htmlifypods and all HTML targets have been removed.  It didn't
@@ -77,7 +84,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.7 $ based $VERSIONs.
+    - Stripped out $Revision: 1.8 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
