@@ -1,9 +1,12 @@
-#!./perl -Tw
+#!/usr/bin/perl -w
 
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
+    if( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = '../lib';
+    }
 }
+chdir 't';
 
 BEGIN {
 	1 while unlink 'ecmdfile';
@@ -18,9 +21,8 @@ BEGIN {
 }
 
 {
-	use vars qw( *CORE::GLOBAL::exit );
-
 	# bad neighbor, but test_f() uses exit()
+    *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
 	*CORE::GLOBAL::exit = sub { return @_ };
 
 	use_ok( 'ExtUtils::Command' );
