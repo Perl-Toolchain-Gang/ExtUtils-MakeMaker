@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.50_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.10 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.11 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -949,18 +949,19 @@ PREFIX and LIB can be used to set several INSTALL* attributes in one
 go. The quickest way to install a module in a non-standard place might
 be
 
+    perl Makefile.PL PREFIX=~
+
+This will install all files in the module under your home directory,
+with man pages and libraries going into an appropriate place (usually
+~/man and ~/lib).
+
+Another way to specify many INSTALL directories with a single
+parameter is LIB.
+
     perl Makefile.PL LIB=~/lib
 
 This will install the module's architecture-independent files into
 ~/lib, the architecture-dependent files into ~/lib/$archname.
-
-Another way to specify many INSTALL directories with a single
-parameter is PREFIX.
-
-    perl Makefile.PL PREFIX=~
-
-This will replace the string specified by C<$Config{prefix}> in all
-C<$Config{install*}> values.
 
 Note, that in both cases the tilde expansion is done by MakeMaker, not
 by perl by default, nor by make.
@@ -1383,11 +1384,10 @@ specify ld flags)
 =item LIB
 
 LIB should only be set at C<perl Makefile.PL> time but is allowed as a
-MakeMaker argument. It has the effect of
-setting both INSTALLPRIVLIB and INSTALLSITELIB to that value regardless any
-explicit setting of those arguments (or of PREFIX).  
-INSTALLARCHLIB and INSTALLSITEARCH are set to the corresponding 
-architecture subdirectory.
+MakeMaker argument. It has the effect of setting both INSTALLPRIVLIB
+and INSTALLSITELIB to that value regardless any explicit setting of
+those arguments (or of PREFIX).  INSTALLARCHLIB and INSTALLSITEARCH
+are set to the corresponding architecture subdirectory.
 
 =item LIBPERL_A
 
@@ -1664,12 +1664,14 @@ the installation of a package.
 
 =item PREFIX
 
-Can be used to set the three INSTALL* attributes in one go (except for
-probably INSTALLMAN1DIR, if it is not below PREFIX according to
-%Config).  They will have PREFIX as a common directory node and will
-branch from that node into lib/, lib/ARCHNAME or whatever Configure
-decided at the build time of your perl (unless you override one of
-them, of course).
+This overrides all the default install locations.  Man pages,
+libraries, scripts, etc...  MakeMaker will try to make an educated
+guess about where to place things under the new PREFIX based on your
+Config defaults.  Failing that, it will fall back to a structure
+which should be sensible for your platform.
+
+If you specify LIB or any INSTALL* variables they will not be effected
+by the PREFIX.
 
 =item PREREQ_PM
 
@@ -1753,7 +1755,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.10 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.11 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
