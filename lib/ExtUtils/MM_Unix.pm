@@ -434,9 +434,11 @@ sub constants {
               SITELIBEXP      SITEARCHEXP     VENDORARCHEXP
               LIBPERL_A MYEXTLIB
               FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE 
-              PERLMAINCC PERL_SRC
-              PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
-              FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
+              PERLMAINCC PERL_SRC PERL_INC 
+              PERL            FULLPERL          ABSPERL
+              PERLSAFE        FULLPERLSAFE      ABSPERLSAFE
+              PERLRUN         FULLPERLRUN       ABSPERLRUN
+              PERLRUNINST     FULLPERLRUNINST   ABSPERLRUNINST
               FULL_AR PERL_CORE
               PERM_RW PERM_RWX
 
@@ -2232,6 +2234,9 @@ Called by init_main.  Sets up ABSPERL, PERL, FULLPERL and all the
 
     PERL is allowed to be miniperl
     FULLPERL must be a complete perl
+
+    *PERLSAFE is *PERL safe for use in shell commands
+    
     ABSPERL is PERL converted to an absolute path
 
     *PERLRUN contains everything necessary to run perl, find it's
@@ -2299,10 +2304,14 @@ sub init_PERL {
 
     # How do we run perl?
     foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
-        $self->{$perl.'RUN'}  = "\$($perl)";
+        my $safe = $perl.'SAFE';
+        my $run  = $perl.'RUN';
+
+        $self->{$safe} = "'\$($perl)'";
+        $self->{$run}  = "\$($safe)";
 
         # Make sure perl can find itself before it's installed.
-        $self->{$perl.'RUN'} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"} 
+        $self->{$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"} 
           if $self->{UNINSTALLED_PERL} || $self->{PERL_CORE};
 
         $self->{$perl.'RUNINST'} = 
