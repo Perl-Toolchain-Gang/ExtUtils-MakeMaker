@@ -28,5 +28,5 @@ BEGIN {
     unlike( $out[2], qr/-ln0tt43r3_perl/, 'bogus library not added' );
     ok( @warn, 'had warning');
 
-    is( grep(/\QNote (probably harmless): No library found for -ln0tt43r3_perl/, map { @$_ } @warn), 1 ) || diag Dumper @warn;
+    is( grep(/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/, map { @$_ } @warn), 1 ) || diag Dumper @warn;
 }
