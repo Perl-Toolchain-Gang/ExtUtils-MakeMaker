@@ -2850,7 +2850,7 @@ CODE
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});
 
     $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
-    $r .= qq{\t\$(NOECHO)\$(TOUCH) pm_to_blib\n};
+    $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
 
     return $r;
 }
