@@ -1,4 +1,4 @@
-6.20
+6.20 Thu Nov  6 02:25:58 PST 2003
     - Fixing dos2unix on Cygwin.  In-place editing doesn't work 100% so we
       take a more conservative approach.
     - Small postamble.t test temp file cleanup fix for Cygwin and Windows.
