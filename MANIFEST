@@ -9,6 +9,7 @@ lib/ExtUtils/Embed.pm
 lib/ExtUtils/Install.pm
 lib/ExtUtils/Installed.pm
 lib/ExtUtils/Liblist.pm
+lib/ExtUtils/MANIFEST.SKIP
 lib/ExtUtils/MM_BeOS.pm
 lib/ExtUtils/MM_Cygwin.pm
 lib/ExtUtils/MM_NW5.pm
@@ -38,5 +39,8 @@ t/Manifest.t
 t/Mkbootstrap.t
 t/Packlist.t
 t/hints.t
+t/lib/Test/Builder.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm
 t/lib/TieOut.pm
 t/testlib.t
