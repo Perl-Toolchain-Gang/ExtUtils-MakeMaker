@@ -1434,6 +1434,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	next unless $self->libscan($name);
 	if (-d $name){
 	    next if -l $name; # We do not support symlinks at all
+            next if $self->{NORECURS};
 	    $dir{$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
 	} elsif ($name =~ /\.xs\z/){
 	    my($c); ($c = $name) =~ s/\.xs\z/.c/;
