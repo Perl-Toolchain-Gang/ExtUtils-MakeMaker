@@ -28,7 +28,7 @@ use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE $PERLMAKE);
 
 require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Unix );
-$VERSION = '1.00_03';
+$VERSION = '1.01_01';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
@@ -227,17 +227,11 @@ XS_FILES= ".join(" \\\n\t", sort keys %{$self->{XS}})."
 C_FILES = ".join(" \\\n\t", @{$self->{C}})."
 O_FILES = ".join(" \\\n\t", @{$self->{O_FILES}})."
 H_FILES = ".join(" \\\n\t", @{$self->{H}})."
-HTMLLIBPODS    = ".join(" \\\n\t", sort keys %{$self->{HTMLLIBPODS}})."
-HTMLSCRIPTPODS = ".join(" \\\n\t", sort keys %{$self->{HTMLSCRIPTPODS}})."
 MAN1PODS = ".join(" \\\n\t", sort keys %{$self->{MAN1PODS}})."
 MAN3PODS = ".join(" \\\n\t", sort keys %{$self->{MAN3PODS}})."
 ";
 
     for $tmp (qw/
-	      INST_HTMLPRIVLIBDIR INSTALLHTMLPRIVLIBDIR
-	      INST_HTMLSITELIBDIR INSTALLHTMLSITELIBDIR
-	      INST_HTMLSCRIPTDIR  INSTALLHTMLSCRIPTDIR
-	      INST_HTMLLIBDIR                    HTMLEXT
 	      INST_MAN1DIR        INSTALLMAN1DIR MAN1EXT
 	      INST_MAN3DIR        INSTALLMAN3DIR MAN3EXT
 	      /) {
@@ -656,7 +650,7 @@ sub top_targets {
 ';
 
     push @m, '
-all :: pure_all htmlifypods manifypods
+all :: pure_all manifypods
 	'.$self->{NOECHO}.'$(NOOP)
 ' 
 	  unless $self->{SKIPHASH}{'all'};
@@ -679,24 +673,6 @@ config :: $(INST_AUTODIR)\.exists
 ';
 
     push @m, $self->dir_target(qw[$(INST_AUTODIR) $(INST_LIBDIR) $(INST_ARCHAUTODIR)]);
-
-    if (%{$self->{HTMLLIBPODS}}) {
-	push @m, qq[
-config :: \$(INST_HTMLLIBDIR)/.exists
-	$self->{NOECHO}\$(NOOP)
-
-];
-	push @m, $self->dir_target(qw[$(INST_HTMLLIBDIR)]);
-    }
-
-    if (%{$self->{HTMLSCRIPTPODS}}) {
-	push @m, qq[
-config :: \$(INST_HTMLSCRIPTDIR)/.exists
-	$self->{NOECHO}\$(NOOP)
-
-];
-	push @m, $self->dir_target(qw[$(INST_HTMLSCRIPTDIR)]);
-    }
 
     if (%{$self->{MAN1PODS}}) {
 	push @m, qq[
