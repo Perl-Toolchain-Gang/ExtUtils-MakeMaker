@@ -3173,10 +3173,15 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 sub _pm_to_blib_flush {
     my ($self, $autodir, $rr, $ra, $rl) = @_;
-    $$rr .= 
-q[	$(NOECHO) $(PERLRUNINST) "-MExtUtils::Install" \
-	-e "pm_to_blib({qw{].qq[@$ra].q[}},'].$autodir.q{','$(PM_FILTER)')"
-};
+
+    my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
+pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)')
+CODE
+
+    $$rr .= <<MAKE_FRAG;
+	\$(NOECHO) $pm_to_blib @$ra
+MAKE_FRAG
+
     @$ra = ();
     $$rl = 0;
 }
