@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.10_04';
-($Revision) = q$Revision: 1.112 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.113 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -2029,7 +2029,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.112 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.113 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2353,7 +2353,7 @@ Module::Build developers.
 
 MakeMaker will automatically generate a F<META.yml> file for you and
 add it to your F<MANIFEST> as part of the 'distdir' target (and thus
-the 'dist' target).  This is intended to seemlessly and rapidly
+the 'dist' target).  This is intended to seamlessly and rapidly
 populate CPAN with module meta-data.  If you wish to shut this feature
 off, set the C<NO_META> C<WriteMakefile()> flag to true.
 
