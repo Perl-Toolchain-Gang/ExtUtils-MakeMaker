@@ -57,10 +57,12 @@ t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
+t/lib/TieIn.pm
 t/lib/TieOut.pm
 t/oneliner.t
 t/prefixify.t
 t/problems.t
+t/prompt.t
 t/testlib.t
 t/VERSION_FROM.t
 t/writemakefile_args.t

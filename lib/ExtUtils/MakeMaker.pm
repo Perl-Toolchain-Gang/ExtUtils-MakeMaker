@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.80 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.81 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -123,17 +123,24 @@ sub _verify_att {
 }
 
 sub prompt ($;$) {
-    my($mess,$def)=@_;
-    $ISA_TTY = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;   # Pipe?
+    my($mess, $def) = @_;
     Carp::confess("prompt function called without an argument") 
         unless defined $mess;
+
+    $ISA_TTY = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;   # Pipe?
+
     my $dispdef = defined $def ? "[$def] " : " ";
     $def = defined $def ? $def : "";
-    my $ans;
+
     local $|=1;
     local $\;
     print "$mess $dispdef";
-    if ($ISA_TTY && !$ENV{PERL_MM_USE_DEFAULT}) {
+
+    my $ans;
+    if ($ENV{PERL_MM_USE_DEFAULT} || (!$ISA_TTY && eof STDIN)) {
+        print "$def\n";
+    }
+    else {
         $ans = <STDIN>;
         if( defined $ans ) {
             chomp $ans;
@@ -142,9 +149,7 @@ sub prompt ($;$) {
             print "\n";
         }
     }
-    else {
-        print "$def\n";
-    }
+
     return (!defined $ans || $ans eq '') ? $def : $ans;
 }
 
@@ -1954,7 +1959,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.80 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.81 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2289,10 +2294,10 @@ used to write a makefile.  It displays the $message as a prompt for
 input.  If a $default is provided it will be used as a default.  The
 function returns the $value selected by the user.
 
-If C<prompt()> detects that it is not running interactively, or if the
-PERL_MM_USE_DEFAULT environment variable is set to true, the $default
-will be used without prompting.  This prevents automated processes
-from blocking on user input.
+If C<prompt()> detects that it is not running interactively and there
+is nothing on STDIN or if the PERL_MM_USE_DEFAULT environment variable
+is set to true, the $default will be used without prompting.  This
+prevents automated processes from blocking on user input. 
 
 If no $default is provided an empty string will be used instead.
 
