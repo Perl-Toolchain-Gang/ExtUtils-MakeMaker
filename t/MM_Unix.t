@@ -79,7 +79,7 @@ foreach ( qw /
   dist_basics
   dist_ci
   dist_core
-  dist_dir
+  distdir
   dist_test
   dlsyms
   dynamic

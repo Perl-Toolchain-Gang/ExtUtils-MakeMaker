@@ -48,7 +48,7 @@ BEGIN {
                    realclean
                    dist_basics
                    dist_core
-                   dist_dir
+                   distdir
                    dist_test
                    install
                    perldepend
