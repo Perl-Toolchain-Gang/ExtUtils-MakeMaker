@@ -13,7 +13,7 @@ BEGIN {
 chdir 't';
 
 use MakeMaker::Test::Utils;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use File::Spec;
 
 BEGIN { use_ok('ExtUtils::MM') }
@@ -25,17 +25,27 @@ isa_ok($mm, 'ExtUtils::MM_Any');
 
 my $command;
 
-# Lets see how it deals with quotes.
-$command = $mm->perl_oneliner(q{print "foo'o", ' bar"ar'});
-$command =~ s{\$\(PERLRUN\)}{$^X};
-is(`$command`, q{foo'o bar"ar},  'quotes');
+sub try_oneliner {
+    my($code, $switches) = @_;
+    my $cmd = $mm->perl_oneliner($code, $switches);
+    $cmd =~ s{\$\(PERLRUN\)}{$^X};
+    return `$cmd`;
+}
 
+# Lets see how it deals with quotes.
+is(try_oneliner(q{print "foo'o", ' bar"ar'}), q{foo'o bar"ar},  'quotes');
 
 # How about dollar signs?
-$command = $mm->perl_oneliner(q{$PATH = 'foo';  print $PATH});
-$command =~ s{\$\(PERLRUN\)}{$^X};
-is(`$command`, q{foo},           'dollar signs' );
+is(try_oneliner(q{$PATH = 'foo'; print $PATH}), q{foo},   'dollar signs' );
 
+# switches?
+is(try_oneliner(q{print 'foo'}, ['-l']), "foo\n",       'switches' );
+
+# newlines?
+is(try_oneliner(<<CODE),    "foobar",                   'newlines' );
+print 'foo';
+print 'bar';
+CODE
 
 # I know this doesn't work ATM.
 # Spaces in the path to perl?
