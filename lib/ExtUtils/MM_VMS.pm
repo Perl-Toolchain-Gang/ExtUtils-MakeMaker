@@ -1014,7 +1014,7 @@ INST_DYNAMIC_DEP = $inst_dynamic_dep
 
 ";
     push @m, '
-$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt blibdirs.ts $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt $(INST_ARCHAUTODIR) $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
 	If F$TrnLNm("',$shr,'").eqs."" Then Define/NoLog/User ',"$shr Sys\$Share:$shr.$Config{'dlext'}",'
 	Link $(LDFLAGS) /Shareable=$(MMS$TARGET)$(OTHERLDFLAGS) $(BASEEXT).opt/Option,$(PERL_INC)perlshr_attr.opt/Option
@@ -1042,7 +1042,7 @@ $(INST_STATIC) :
     my(@m,$lib);
     push @m,'
 # Rely on suffix rule for update action
-$(OBJECT) : blibdirs.ts
+$(OBJECT) : blibdirs
 
 $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
 ';

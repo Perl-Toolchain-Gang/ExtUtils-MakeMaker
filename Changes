@@ -1,8 +1,6 @@
 6.25_03
-    - dir_target() is back.  The blibdirs target introduced in 6.18 turned
-      out to be not such a hot idea and is how deprecated.  Now each
-      directory to be created has its own target like before, but no more
-      .exists files.
+    - dir_target() is back.  Now each directory to be created has its own 
+      target like before, but no more .exists or blibdirs.ts files.
 
 6.25_02  Mon Dec 20 03:31:49 EST 2004
     - Set PM_FILTER as late as possible so it can see all the earlier

@@ -348,15 +348,15 @@ MAKE_EXT
 }
 
 
-=head3 blibdirs_target  B<DEPRECATED>
+=head3 blibdirs_target
 
     my $make_frag = $mm->blibdirs_target;
 
-This method and the blibdirs.ts target are deprecated.  Use C<dir_target>
-instead and depend on the directory directly.
+Creates the blibdirs target which creates all the directories we use
+in blib/.
 
-Creates the blibdirs.ts target which creates all the directories we use in
-blib/.
+The blibdirs.ts target is deprecated.  Depend on blibdirs instead.
+
 
 =cut
 
@@ -370,7 +370,6 @@ sub blibdirs_target {
                                           );
 
     my $make = sprintf <<'MAKE', join(' ', @dirs);
-# Backwards compat with 6.18 through 6.25
 blibdirs : %s
 	$(NOECHO) $(NOOP)
 
