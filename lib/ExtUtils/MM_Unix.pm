@@ -2962,6 +2962,8 @@ sub postamble {
 
 =item prefixify
 
+  my $prefixed = $MM->prefixify($var, $search, $replace);
+
 Check a path variable in $self from %Config, if it contains a prefix,
 and replace it with another one.
 
@@ -2976,6 +2978,7 @@ sub prefixify {
     $self->{uc $var} = VMS::Filespec::unixpath($self->{uc $var}) if $Is_VMS;
     $self->{uc $var} =~ s,^\Q$sprefix\E(?=/|\z),$rprefix,s;
 }
+
 
 =item processPL (o)
 
