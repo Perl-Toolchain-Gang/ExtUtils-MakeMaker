@@ -11,7 +11,7 @@ use File::Spec;
 use DirHandle;
 use strict;
 use vars qw($VERSION @ISA
-            $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos
+            $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos $Is_VOS
             $Verbose %pm %static $Xsubpp_Version);
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
@@ -21,10 +21,11 @@ $VERSION = '1.15_01';
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
 
-$Is_OS2 = $^O eq 'os2';
-$Is_Mac = $^O eq 'MacOS';
+$Is_OS2   = $^O eq 'os2';
+$Is_Mac   = $^O eq 'MacOS';
 $Is_Win32 = $^O eq 'MSWin32';
-$Is_Dos = $^O eq 'dos';
+$Is_Dos   = $^O eq 'dos';
+$Is_VOS   = $^O eq 'vos';
 
 if ($Is_VMS = $^O eq 'VMS') {
     require VMS::Filespec;
@@ -369,13 +370,19 @@ EOT
     push(@otherfiles, $attribs{FILES}) if $attribs{FILES};
     push(@otherfiles, qw[./blib $(MAKE_APERL_FILE) 
                          $(INST_ARCHAUTODIR)/extralibs.all
-			 perlmain.c tmon.out mon.out core core.*perl.*.?
-			 *perl.core so_locations pm_to_blib
+			 perlmain.c tmon.out mon.out so_locations pm_to_blib
 			 *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
 			 $(BOOTSTRAP) $(BASEEXT).bso
 			 $(BASEEXT).def lib$(BASEEXT).def
 			 $(BASEEXT).exp $(BASEEXT).x
 			]);
+    if( $Is_VOS ) {
+        push(@otherfiles, qw[*.kp]);
+    }
+    else {
+        push(@otherfiles, qw[core core.*perl.*.? *perl.core]);
+    }
+
     push @m, "\t-$self->{RM_RF} @otherfiles\n";
     # See realclean and ext/utils/make_ext for usage of Makefile.old
     push(@m,
