@@ -1,4 +1,5 @@
 6.20
+    - Small Command.t test fix for 5.5.3.  No real bug [rt 4290]
     - Small Liblist fix for Cygwin and import libraries [Gerrit P. Haase]
     - metafile error message slightly mangled [rt 4285]
 
