@@ -31,13 +31,13 @@ my $mandirs =  !!$Config{man1direxp} + !!$Config{man3direxp};
 my $ei = bless( {}, 'ExtUtils::Installed' );
 
 # _is_prefix
-is( $ei->_is_prefix('foo/bar', 'foo'), 1, 
+ok( $ei->_is_prefix('foo/bar', 'foo'),
 	'_is_prefix() should match valid path prefix' );
-is( $ei->_is_prefix('\foo\bar', '\bar'), 0, 
+ok( !$ei->_is_prefix('\foo\bar', '\bar'),
 	'... should not match wrong prefix' );
 
 # _is_type
-is( $ei->_is_type(0, 'all'), 1, '_is_type() should be true for type of "all"' );
+ok( $ei->_is_type(0, 'all'), '_is_type() should be true for type of "all"' );
 
 foreach my $path (qw( man1dir man3dir )) {
 SKIP: {
@@ -45,8 +45,8 @@ SKIP: {
         skip("no man directory $path on this system", 2 ) unless $dir;
 
 	my $file = $dir . '/foo';
-	is( $ei->_is_type($file, 'doc'), 1, "... should find doc file in $path" );
-	is( $ei->_is_type($file, 'prog'), 0, "... but not prog file in $path" );
+	ok( $ei->_is_type($file, 'doc'),   "... should find doc file in $path" );
+	ok( !$ei->_is_type($file, 'prog'), "... but not prog file in $path" );
     }
 }
 
@@ -56,7 +56,7 @@ my $prefix = $Config{prefixexp} || $Config{prefix};
 # ActivePerl 5.6.1/631 has $Config{prefixexp} as 'p:' for some reason
 $prefix = $Config{prefix} if $prefix eq 'p:' && $^O eq 'MSWin32';
 
-is( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'), 1, 
+ok( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'),
 	"... should find prog file under $prefix" );
 
 SKIP: {
@@ -65,16 +65,16 @@ SKIP: {
 		'... should not find doc file outside path' );
 }
 
-is( $ei->_is_type('bar', 'prog'), 0, 
+ok( !$ei->_is_type('bar', 'prog'),
 	'... nor prog file outside path' );
-is( $ei->_is_type('whocares', 'someother'), 0, '... nor other type anywhere' );
+ok( !$ei->_is_type('whocares', 'someother'), '... nor other type anywhere' );
 
 # _is_under
 ok( $ei->_is_under('foo'), '_is_under() should return true with no dirs' );
 
 my @under = qw( boo bar baz );
-is( $ei->_is_under('foo', @under), 0, '... should find no file not under dirs');
-is( $ei->_is_under('baz', @under), 1, '... should find file under dir' );
+ok( !$ei->_is_under('foo', @under), '... should find no file not under dirs');
+ok( $ei->_is_under('baz', @under),  '... should find file under dir' );
 
 # new
 my $realei = ExtUtils::Installed->new();
@@ -151,7 +151,8 @@ like( $@, qr/type must be/,'files() should croak given bad type' );
 
 my @files;
 SKIP: {
-    skip('no man directory man1dir on this system', 2) unless $Config{man1direxp}; 
+    skip('no man directory man1dir on this system', 2) 
+      unless $Config{man1direxp}; 
     @files = $ei->files('goodmod', 'doc', $Config{man1direxp});
     is( scalar @files, 1, '... should find doc file under given dir' );
     is( grep({ /foo$/ } @files), 1, '... checking file name' );
