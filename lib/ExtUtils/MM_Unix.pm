@@ -3917,10 +3917,10 @@ test :: \$(TEST_TYPE)
 ");
 
     foreach my $dir (@{ $self->{DIR} }) {
-        my $test = $self->oneliner(sprintf <<'CODE');
-if( -f '$(FIRST_MAKEFILE)' ) { 
-    system '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)' 
-}
+        my $test = $self->oneliner(sprintf <<'CODE', $dir);
+chdir '%s';  
+system '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)' 
+    if -f '$(FIRST_MAKEFILE)';
 CODE
 
         push(@m, "\t\$(NOECHO) $test\n");
