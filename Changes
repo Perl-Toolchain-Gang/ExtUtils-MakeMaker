@@ -1,4 +1,4 @@
-6.25
+6.25  Wed Dec 15 06:59:46 EST 2004
     - Build.PL was being considered like Module_pm.PL.  Build.PL is now 
       ignored.  [radek@karnet.pl] [rt.cpan.org 8809]
     - Devel::Cover cover_db/ directory now ignored by MANIFEST.SKIP

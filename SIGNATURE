@@ -1,12 +1,12 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.41.
+signed via the Module::Signature module, version 0.42.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
 
     % cpansign -v
 
-It would check each file's integrity, as well as the signature's
+It will check each file's integrity, as well as the signature's
 validity.  If "==> Signature verified OK! <==" is not displayed,
 the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
@@ -14,10 +14,10 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 4ba738725b6d6bedc661c6fbace4f1aa7470e6f1 Changes
+SHA1 9fc09b9158be7229d4cca0090c84bb82265a3d4a Changes
 SHA1 769bfc199e537f2ff32b44108f225acd3e5804ce MANIFEST
-SHA1 001ec2e096a338ed14c59807bc4cae471c431ea2 MANIFEST.SKIP
-SHA1 4fec5ebadff3d203d59bc05c23e1777e8a5ec9bf META.yml
+SHA1 4abbb0b7a319bf4f132441f025a034e8e9f41023 MANIFEST.SKIP
+SHA1 02e173999569c49ee99633ac39b25c50023b0079 META.yml
 SHA1 064e6ca78be0856ffddcebf1b6e274e2bb092bbc Makefile.PL
 SHA1 2f8f45d02988e3454b6a79508e96fe8224101e0a NOTES
 SHA1 a894493ee3809cd37657385b131617ed11afb389 PATCHING
@@ -25,12 +25,12 @@ SHA1 4db004416d6d4945cdb5b2cee643870393d18bb5 README
 SHA1 538231b2a3677bfdfd0356f1c76b79dfb2822855 TODO
 SHA1 d7a96ce8d9c4c1df4916bf205ea4674e729bb1a1 bin/instmodsh
 SHA1 5ce7919e9cc9a325ae840cb573ace9b59b6d5685 lib/ExtUtils/Command.pm
-SHA1 5a4861767d17cf312156c9cc05bcf2fe2a873c89 lib/ExtUtils/Command/MM.pm
+SHA1 09a6ec4eb4a2a30944e51f22bf782c5c3a297890 lib/ExtUtils/Command/MM.pm
 SHA1 321bdc578f5f9f6e0b0d724ab18f3099151caf30 lib/ExtUtils/Install.pm
 SHA1 7d74c6a0911c18264bc0fe744a440e14d9e58ab3 lib/ExtUtils/Installed.pm
 SHA1 f8eda8ce72cf783b201b30ea7de318e7cb42575d lib/ExtUtils/Liblist.pm
 SHA1 7e3ff537d7ee4c17445fe2f94e3ddb320c94f6be lib/ExtUtils/Liblist/Kid.pm
-SHA1 e4c51239535dfa67c022aa156da302c8dc09ac01 lib/ExtUtils/MANIFEST.SKIP
+SHA1 2c39252559954a53a79561a2322c04965532e08a lib/ExtUtils/MANIFEST.SKIP
 SHA1 fc2dc03d9516dc4b2dc1ac4c645fb310b13be022 lib/ExtUtils/MM.pm
 SHA1 b346de7a3f1c02009844e4c4d440d4940661d174 lib/ExtUtils/MM_Any.pm
 SHA1 3586e4d48ab36bc57f27f414871cdbf376d4e575 lib/ExtUtils/MM_BeOS.pm
@@ -40,12 +40,12 @@ SHA1 58cbecb5f1a3ba3f21031cfe6d8a40c2def76c65 lib/ExtUtils/MM_MacOS.pm
 SHA1 e9796190c387cf0301a8c6fac223e491c57c6841 lib/ExtUtils/MM_NW5.pm
 SHA1 441da7524783ae12ce40f26353adbf4696a8f5b4 lib/ExtUtils/MM_OS2.pm
 SHA1 02b916060571fd20ced334ba4f2d1542d1590023 lib/ExtUtils/MM_UWIN.pm
-SHA1 3f083f60ece3b023cd5b421072054d381467843d lib/ExtUtils/MM_Unix.pm
+SHA1 93471b8ecd903ddf331998cad1a1e7652f713f13 lib/ExtUtils/MM_Unix.pm
 SHA1 f2f48b698b141d7810e9b3df9b5bb78b41224a05 lib/ExtUtils/MM_VMS.pm
 SHA1 90ff9e66a8548c2638088b5b5b890e1890db26a0 lib/ExtUtils/MM_Win32.pm
 SHA1 d6e19df6cd2c21853f63354cc3018d759c21babe lib/ExtUtils/MM_Win95.pm
 SHA1 0f51f0dce4cb33bac94c85c86d19ae361e59597a lib/ExtUtils/MY.pm
-SHA1 9e948e186e312fb43df3875cb35f95948dddcc3e lib/ExtUtils/MakeMaker.pm
+SHA1 66a1367c257bb294f062da9aff8dacca4d101dfc lib/ExtUtils/MakeMaker.pm
 SHA1 ac498acd95e253f02f8f7bc66d6884dd2aaa52b8 lib/ExtUtils/MakeMaker/FAQ.pod
 SHA1 4ad61c880011c3c39834b75c78abe964567aaa5f lib/ExtUtils/MakeMaker/Tutorial.pod
 SHA1 4685bb3361c2b9c42094ef68454e849edaf6f549 lib/ExtUtils/MakeMaker/bytes.pm
@@ -103,7 +103,7 @@ SHA1 4a7685da6367a7a79ecfac76f96adf2aeac46514 t/writemakefile_args.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.4 (Darwin)
 
-iD8DBQFBt+hiT4Li3Cw/PzQRAnigAJ9ZQrfToIrZHU7uIubQRZ6kbccmPwCcCvhV
-jKW33kQn/lA/enNCSxEidSw=
-=YTI3
+iD8DBQFBwPuST4Li3Cw/PzQRAvcGAJ4sr05AS2IDIAiy+syliJDVfE4sJACfRcgu
+ZuZrUTU9mBeDKCebGNX6kGI=
+=QE+o
 -----END PGP SIGNATURE-----
