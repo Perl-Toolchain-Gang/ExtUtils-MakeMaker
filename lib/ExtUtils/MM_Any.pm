@@ -2,7 +2,7 @@ package ExtUtils::MM_Any;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 use Config;
 use File::Spec;
@@ -135,7 +135,7 @@ sub test_via_harness {
     my($self, $perl, $tests) = @_;
 
     return qq{\t$perl \$(TEST_LIBS) "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE))" $tests};
+           qq{"-e" "test_harness(\$(TEST_VERBOSE))" $tests\n};
 }
 
 =item test_via_script
