@@ -8,6 +8,11 @@
     * Added a PATCHING guideline document.
     - Updated the class hierarchy in NOTES.
     - Installed.t now cleans up after itself better.
+    - Steve Purkis rewrote the manifypods system to use Pod::Man
+      rather than pod2man.  Its now portable and manifypods() moved from 
+      MM_Unix to MM_Any.  As a result, lots of icky and redudant code went
+      away.  This also removes the POD2MAN macro, but noone should be
+      using that.  
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
