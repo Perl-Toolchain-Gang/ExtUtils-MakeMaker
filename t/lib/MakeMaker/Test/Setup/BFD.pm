@@ -7,6 +7,7 @@ require Exporter;
 use strict;
 use File::Path;
 use File::Basename;
+use MakeMaker::Test::Utils;
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -94,28 +95,9 @@ END
             );
 
 
-sub _setup_bfd_test_root {
-    if( $Is_VMS ) {
-        # On older systems we might exceed the 8-level directory depth limit
-        # imposed by RMS.  We get around this with a rooted logical, but we
-        # can't create logical names with attributes in Perl, so we do it
-        # in a DCL subprocess and put it in the job table so the parent sees it.
-        open( BFDTMP, '>bfdtesttmp.com' ) || 
-          die "Error creating command file; $!";
-        print BFDTMP <<'COMMAND';
-$ BFD_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
-$ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED BFD_TEST_ROOT 'BFD_TEST_ROOT'
-COMMAND
-        close BFDTMP;
-
-        system '@bfdtesttmp.com';
-        1 while unlink 'bfdtesttmp.com';
-    }
-}
-
 sub setup_recurs {
-    _setup_bfd_test_root();
-    chdir 'BFD_TEST_ROOT:[t]' if $Is_VMS;
+    setup_mm_test_root();
+    chdir 'MM_TEST_ROOT:[t]' if $Is_VMS;
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.

@@ -13,6 +13,7 @@ $VERSION = 0.02;
 
 @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
              make make_run run make_macro calibrate_mtime
+             setup_mm_test_root
             );
 
 my $Is_VMS   = $^O eq 'VMS';
@@ -259,6 +260,32 @@ sub run {
         return `$cmd`;
     }
 }    
+
+=item B<setup_mm_test_root>
+
+Creates a rooted logical to avoid the 8-level limit on older VMS systems.  
+No action taken on non-VMS systems.
+
+=cut
+
+sub setup_mm_test_root {
+    if( $Is_VMS ) {
+        # On older systems we might exceed the 8-level directory depth limit
+        # imposed by RMS.  We get around this with a rooted logical, but we
+        # can't create logical names with attributes in Perl, so we do it
+        # in a DCL subprocess and put it in the job table so the parent sees it.
+        open( MMTMP, '>mmtesttmp.com' ) || 
+          die "Error creating command file; $!";
+        print MMTMP <<'COMMAND';
+$ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
+$ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED MM_TEST_ROOT 'MM_TEST_ROOT'
+COMMAND
+        close MMTMP;
+
+        system '@mmtesttmp.com';
+        1 while unlink 'mmtesttmp.com';
+    }
+}
 
 =back
 
