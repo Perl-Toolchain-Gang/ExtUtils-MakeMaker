@@ -23,6 +23,7 @@
     * metafile_addtomanifest now mentions what its doing.
     * metafile will not die if it can't write to META.yml, just emit a 
       warning.  This lets 'make dist' continue with a read-only META.yml
+    - Small fix to identify UWIN on NT (Randy Sims)
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
