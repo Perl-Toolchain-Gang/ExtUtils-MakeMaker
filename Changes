@@ -26,6 +26,8 @@
       VMS.
     - For simplicity, dir_target() is now a no-op.  Should not effect any
       existing uses.
+    - Converted utility commands from using $(PERLRUN) to $(ABSPERLRUN).
+      This allows distclean to work with SDBM_File. [rt 5616]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 

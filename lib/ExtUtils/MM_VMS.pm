@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71';
-($Revision) = q$Revision: 1.114 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.115 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -408,14 +408,14 @@ sub init_others {
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
     $self->{MAKEFILE_OLD}       ||= '$(FIRST_MAKEFILE)_old';
 
-    $self->{ECHO}     ||= '$(PERLRUN) -le "print qq{@ARGV}"';
-    $self->{ECHO_N}   ||= '$(PERLRUN) -e  "print qq{@ARGV}"';
-    $self->{TOUCH}    ||= '$(PERLRUN) "-MExtUtils::Command" -e touch';
-    $self->{CHMOD}    ||= '$(PERLRUN) "-MExtUtils::Command" -e chmod'; 
-    $self->{RM_F}     ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_f';
-    $self->{RM_RF}    ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_rf';
-    $self->{TEST_F}   ||= '$(PERLRUN) "-MExtUtils::Command" -e test_f';
-    $self->{EQUALIZE_TIMESTAMP} ||= '$(PERLRUN) -we "open F,qq{>>$ARGV[1]};close F;utime(0,(stat($ARGV[0]))[9]+1,$ARGV[1])"';
+    $self->{ECHO}     ||= '$(ABSPERLRUN) -le "print qq{@ARGV}"';
+    $self->{ECHO_N}   ||= '$(ABSPERLRUN) -e  "print qq{@ARGV}"';
+    $self->{TOUCH}    ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e touch';
+    $self->{CHMOD}    ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e chmod'; 
+    $self->{RM_F}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e rm_f';
+    $self->{RM_RF}    ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e rm_rf';
+    $self->{TEST_F}   ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e test_f';
+    $self->{EQUALIZE_TIMESTAMP} ||= '$(ABSPERLRUN) -we "open F,qq{>>$ARGV[1]};close F;utime(0,(stat($ARGV[0]))[9]+1,$ARGV[1])"';
 
     $self->{MOD_INSTALL} ||= 
       $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
@@ -2122,7 +2122,7 @@ sub oneliner {
     # Switches must be quoted else they will be lowercased.
     $switches = join ' ', map { qq{"$_"} } @$switches;
 
-    return qq{\$(PERLRUN) $switches -e $cmd};
+    return qq{\$(ABSPERLRUN) $switches -e $cmd};
 }
 
 

@@ -1894,9 +1894,9 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{CP}         ||= "cp";
     $self->{MV}         ||= "mv";
     $self->{CHMOD}      ||= "chmod";
-    $self->{MKPATH}     ||= '$(PERLRUN) "-MExtUtils::Command" -e mkpath';
+    $self->{MKPATH}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e mkpath';
     $self->{EQUALIZE_TIMESTAMP} ||= 
-      '$(PERLRUN) "-MExtUtils::Command" -e eqtime';
+      '$(ABSPERLRUN) "-MExtUtils::Command" -e eqtime';
 
     $self->{UNINST}     ||= 0;
     $self->{VERBINST}   ||= 0;
@@ -1905,11 +1905,11 @@ sub init_others {	# --- Initialize Other Attributes
 install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
 CODE
     $self->{DOC_INSTALL} ||= 
-      '$(PERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
+      '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
     $self->{UNINSTALL}   ||= 
-      '$(PERLRUN) "-MExtUtils::Command::MM" -e uninstall';
+      '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e uninstall';
     $self->{WARN_IF_OLD_PACKLIST} ||= 
-      '$(PERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
+      '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
 
     $self->{UMASK_NULL}         ||= "umask 0";
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
@@ -3548,7 +3548,7 @@ sub oneliner {
 
     $switches = join ' ', @$switches;
 
-    return qq{\$(PERLRUN) $switches -e $cmd};   
+    return qq{\$(ABSPERLRUN) $switches -e $cmd};   
 }
 
 
