@@ -1321,7 +1321,7 @@ sub installbin {
     my($self) = @_;
     return '' unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
     return '' unless @{$self->{EXE_FILES}};
-    my(@m, $from, $to, %fromto, @to, $line);
+    my(@m, $from, $to, %fromto, @to);
     my(@exefiles) = map { vmsify($_) } @{$self->{EXE_FILES}};
     for $from (@exefiles) {
 	my($path) = '$(INST_SCRIPT)' . basename($from);
@@ -1336,7 +1336,8 @@ EXE_FILES = @exefiles
 
 realclean ::
 ";
-    $line = '';  #avoid unitialized var warning
+
+    my $line = '';
     foreach $to (@to) {
 	if (length($line) + length($to) > 80) {
 	    push @m, "\t\$(RM_F) $line\n";
@@ -1405,24 +1406,28 @@ clean :: clean_subdirs
     # Unlink realclean, $attribs{FILES} is a string here; it may contain
     # a list or a macro that expands to a list.
     if ($attribs{FILES}) {
-	my($word,$key,@filist);
-	if (ref $attribs{FILES} eq 'ARRAY') { @filist = @{$attribs{FILES}}; }
-	else { @filist = split /\s+/, $attribs{FILES}; }
-	foreach $word (@filist) {
-	    if (($key) = $word =~ m#^\$\((.*)\)$# and ref $self->{$key} eq 'ARRAY') {
+        my @filelist = ref $attribs{FILES} eq 'ARRAY'
+            ? @{$attribs{FILES}}
+            : split /\s+/, $attribs{FILES};
+
+	foreach my $word (@fileist) {
+	    if (my($key) = $word =~ m#^\$\((.*)\)$# and 
+                ref $self->{$key} eq 'ARRAY') 
+            {
 		push(@otherfiles, @{$self->{$key}});
 	    }
 	    else { push(@otherfiles, $word); }
 	}
     }
-    push(@otherfiles, qw[ blib $(MAKE_APERL_FILE) extralibs.ld perlmain.c pm_to_blib.ts ]);
+    push(@otherfiles, qw[ blib $(MAKE_APERL_FILE) extralibs.ld 
+                          perlmain.c pm_to_blib.ts ]);
     push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
-    my($file,$line);
-    $line = '';  #avoid unitialized var warning
+
     # Occasionally files are repeated several times from different sources
-    { my(%of) = map { ($_,1) } @otherfiles; @otherfiles = keys %of; }
+    { my(%of) = map { ($_ => 1) } @otherfiles; @otherfiles = keys %of; }
     
-    foreach $file (@otherfiles) {
+    my $line = '';
+    foreach my $file (@otherfiles) {
 	$file = $self->fixpath($file);
 	if (length($line) + length($file) > 80) {
 	    push @m, "\t\$(RM_RF) $line\n";
@@ -1493,15 +1498,17 @@ realclean :: clean
     # corresponding %$self keys (i.e. they're defined in Descrip.MMS as a
     # combination of macros).  In order to stay below DCL's 255 char limit,
     # we put only 2 on a line.
-    my($file,$line,$fcnt);
+    my($file,$fcnt);
     my(@files) = qw{ $(MAKEFILE) $(MAKEFILE_OLD) };
     if ($self->has_link_code) {
 	push(@files,qw{ $(INST_DYNAMIC) $(INST_STATIC) $(INST_BOOT) $(OBJECT) });
     }
     push(@files, values %{$self->{PM}});
-    $line = '';  #avoid unitialized var warning
+
     # Occasionally files are repeated several times from different sources
     { my(%f) = map { ($_,1) } @files; @files = keys %f; }
+
+    my $line = '';
     foreach $file (@files) {
 	$file = $self->fixpath($file);
 	if (length($line) + length($file) > 80 || ++$fcnt >= 2) {
