@@ -1,5 +1,8 @@
 6.25_08
     - Fixing xsubpp on VMS.  Had a foo/bar path in it.
+    - Turning XSUBPP into a runable command by the addition of PERLRUN
+      made it unusable as a dependency.  Added XSUBPPRUN for that and left
+      XSUBPP alone.
 
 6.25_07  Fri Dec 31 03:47:20 EST 2004
     - perllocal on VMS was inserting executables twice.
