@@ -3,9 +3,13 @@
     * A failing Makefile.PL in a subdir will now kill the whole
       makefile making process.
     - Now supporting the usevendorprefix %Config setting
+    - Tests now guaranteed to run in alphabetical order.
 
     [[ Bug Fixes ]]
     - Missing prerequisite warning malformatted.
+    - INSTALL*MAN*DIR weren't allowed on the command line.
+    * For years now skipcheck() has been returning a different
+      value than what was documented.
 
     [[ Test Changes ]]
     - Shortening directory levels to accomodate old VMS's
