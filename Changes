@@ -16,6 +16,9 @@
     - "make manifypods" now works on Win32
     - Made MM_Unix->find_perl more portable.  Eliminated MM_Win32->find_perl
       override.  MM_VMS->find_perl remains.
+    * find_perl() can now handle filenames with spaces in them (RT448)
+    * find_perl() on Win32 no longer produces spurious "File Creation error"
+      messages (perlbug ID 20020709.001)
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
