@@ -13,9 +13,11 @@ BEGIN {
 chdir 't';
 
 use ExtUtils::MM;
+use MakeMaker::Test::Utils;
 
 use Test::More tests => 6;
 
+my $perl = which_perl;
 my $mm = bless { NAME => "Foo" }, "MM";
 
 # I don't expect anything to have a length shorter than 256 chars.
@@ -31,7 +33,7 @@ my @test_args = qw(foo bar baz yar car har ackapicklerootyjamboree);
 my @cmds = $mm->split_command($echo, @test_args);
 isnt( @cmds, 0 );
 
-s{\$\(PERLRUN\)}{$^X} foreach @cmds;
+s{\$\(PERLRUN\)}{$perl} foreach @cmds;
 is( join('', map { s/\n+$//; $_ } map { `$_` } @cmds), join('', @test_args));
 
 
@@ -40,6 +42,6 @@ $even_args = $mm->oneliner(q{print !(@ARGV % 2)});
 @cmds = $mm->split_command($even_args, %test_args);
 isnt( @cmds, 0 );
 
-s{\$\(PERLRUN\)}{$^X} foreach @cmds;
+s{\$\(PERLRUN\)}{$perl} foreach @cmds;
 like( join('', map { s/\n+$//; $_ } map { `$_` } @cmds), qr/^1+$/,
                                                     'pairs preserved' );
