@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.06_03";
-($Revision = substr(q$Revision: 1.99 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.100 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -288,8 +288,11 @@ sub full_setup {
         qw(
            ar cc cccdlflags ccdlflags dlext dlsrc ld lddlflags ldflags libc
            lib_ext obj_ext osname osvers ranlib sitelibexp sitearchexp so
-           exe_ext full_ar vendorarchexp vendorlibexp
+           exe_ext full_ar
           );
+
+    # 5.5.3 doesn't have any concept of vendor libs
+    push @Get_from_Config, qw( vendorarchexp vendorlibexp ) if $] >= 5.006;
 
     foreach my $item (@attrib_help){
         $Recognized_Att_Keys{$item} = 1;
@@ -1982,7 +1985,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.99 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.100 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

@@ -4,6 +4,8 @@
     - Fixing minor test warning on VMS when compiling ExtUtils::Manifest
     - Skipping STDIN read prompt() tests on 5.5.3.  Can't test due to
       eof() not honor tied handles.
+    - Config.pm on 5.5.3 doesn't have any concept of vendor*.  This was
+      causing warnings when generating the Makefile.
 
 6.06_03 Sat Mar 29 19:44:53 PST 2003
     - Added AUTHOR and ABSTRACT_FROM info for ppd generation.
