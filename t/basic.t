@@ -178,7 +178,10 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 use ExtUtils::Manifest qw(maniread);
 ok( -f 'META.yml',    'META.yml written' );
 my $manifest = maniread();
-is( $manifest->{'META.yml'}, 'Module meta-data in YAML' );
+# VMS is non-case preserving, so we can't know what the MANIFEST will
+# look like. :(
+_normalize($manifest);
+is( $manifest->{'meta.yml'}, 'Module meta-data in YAML' );
 
 
 # Make sure init_dirscan doesn't go into the distdir
@@ -201,3 +204,13 @@ is( $?, 0, 'realclean' ) || diag($realclean_out);
 
 open(STDERR, ">&SAVERR") or die $!;
 close SAVERR;
+
+
+sub _normalize {
+    my $hash = shift;
+
+    while(my($k,$v) = each %$hash) {
+        delete $hash->{$k};
+        $hash->{lc $k} = $v;
+    }
+}
