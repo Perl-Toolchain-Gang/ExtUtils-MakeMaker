@@ -1,5 +1,8 @@
 package ExtUtils::Liblist;
 
+use vars qw($VERSION);
+$VERSION = '1.00';
+
 use File::Spec;
 require ExtUtils::Liblist::Kid;
 @ISA = qw(ExtUtils::Liblist::Kid File::Spec);
