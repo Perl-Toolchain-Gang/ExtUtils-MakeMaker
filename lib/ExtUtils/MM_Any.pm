@@ -417,9 +417,51 @@ sub libscan {
     return $path;
 }
 
+=item tool_autosplit
+
+Defines a simple perl call that runs autosplit. May be deprecated by
+pm_to_blib soon.
+
+=cut
+
+sub tool_autosplit {
+    my($self, %attribs) = @_;
+
+    my $maxlen = $attribs{MAXLEN} ? '$$AutoSplit::Maxlen=$attribs{MAXLEN};' 
+                                  : '';
+
+    my $asplit = $self->perl_oneliner(sprintf <<'PERL_CODE', $maxlen);
+use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)
+PERL_CODE
+
+    return sprintf <<'MAKE_FRAG', $asplit;
+# Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
+AUTOSPLITFILE = %s
+
+MAKE_FRAG
+
+}
+
+
+=item all_target
+
+Generate the default target 'all'.
+
+=cut
+
+sub all_target {
+    my $self = shift;
+
+    return <<'MAKE_EXT';
+all :: pure_all
+	$(NOECHO) $(NOOP)
+MAKE_EXT
+
+}
+
 =back
 
-=head1 Abstract methods
+=head2 Abstract methods
 
 Methods which cannot be made cross-platform and each subclass will
 have to do their own implementation.
@@ -567,22 +609,6 @@ sub platform_constants {
     return '';
 }
 
-
-=item all_target
-
-Generate the default target 'all'.
-
-=cut
-
-sub all_target {
-    my $self = shift;
-
-    return <<'MAKE_EXT';
-all :: pure_all
-	$(NOECHO) $(NOOP)
-MAKE_EXT
-
-}
 
 =back
 
