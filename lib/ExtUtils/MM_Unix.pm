@@ -3342,8 +3342,12 @@ PPD_OUT
   $MM->prefixify($var, $prefix, $new_prefix, $default);
 
 Using either $MM->{uc $var} || $Config{lc $var}, it will attempt to
-replace it's $prefix with a $new_prefix.  Should the $prefix fail to
-match it sill simply set it to the $new_prefix + $default.
+replace it's $prefix with a $new_prefix.  
+
+Should the $prefix fail to match I<AND> a PREFIX was given as an
+argument to WriteMakefile() it will set it to the $new_prefix +
+$default.  This is for systems whose file layouts don't neatly fit into
+our ideas of prefixes.
 
 This is for heuristics which attempt to create directory structures
 that mirror those of the installed perl.
@@ -3368,7 +3372,7 @@ sub prefixify {
     print STDERR "  prefixify $var => $path\n" if $Verbose >= 2;
     print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
 
-    unless( $path =~ s{^\Q$sprefix\E\b}{$rprefix}s ) {
+    if( $path !~ s{^\Q$sprefix\E\b}{$rprefix}s && $self->{ARGS}{PREFIX} ) {
 
         print STDERR "    cannot prefix, using default.\n" if $Verbose >= 2;
         print STDERR "    no default!\n" if !$default && $Verbose >= 2;
@@ -3879,7 +3883,15 @@ Determines typemaps, xsubpp version, prototype behaviour.
 sub tool_xsubpp {
     my($self) = shift;
     return "" unless $self->needs_linking;
-    my($xsdir)  = $self->catdir($self->{PERL_LIB},"ExtUtils");
+
+    my $xsdir;
+    foreach my $dir (@INC) {
+        $xsdir = $self->catdir($dir, 'ExtUtils');
+        if( -r $self->catfile($xsdir, "xsubpp") ) {
+            last;
+        }
+    }
+
     my(@tmdeps) = $self->catdir('$(XSUBPPDIR)','typemap');
     if( $self->{TYPEMAPS} ){
 	my $typemap;
