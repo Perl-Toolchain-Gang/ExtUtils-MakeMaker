@@ -59,6 +59,10 @@ if( $Is{NW5} ) {
     $^O = 'NetWare';
     delete $Is{Win32};
 }
+$Is{VOS}    = $^O eq 'vos';
+$Is{QNX}    = $^O eq 'qnx';
+$Is{AIX}    = $^O eq 'aix';
+
 $Is{Unix}   = !grep { $_ } values %Is;
 
 map { delete $Is{$_} unless $Is{$_} } keys %Is;

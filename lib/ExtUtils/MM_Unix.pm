@@ -11,8 +11,8 @@ use File::Basename qw(basename dirname);
 use DirHandle;
 
 use vars qw($VERSION @ISA
-            $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos
-            $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
+            $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos
+            $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
             $Is_SunOS4 $Is_Solaris $Is_SunOS
             $Verbose %pm
             %Config_Override
@@ -28,10 +28,8 @@ require ExtUtils::MM_Any;
 BEGIN { 
     $Is_OS2     = $^O eq 'os2';
     $Is_Win32   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
-    $Is_Win95   = $Is_Win32 && Win32::IsWin95();
     $Is_Dos     = $^O eq 'dos';
     $Is_VMS     = $^O eq 'VMS';
-    $Is_AIX     = $^O eq 'aix';
     $Is_OSF     = $^O eq 'dec_osf';
     $Is_IRIX    = $^O eq 'irix';
     $Is_NetBSD  = $^O eq 'netbsd';
@@ -828,40 +826,14 @@ MAKE_FRAG
 
 =item dlsyms (o)
 
-Used by AIX and VMS to define DL_FUNCS and DL_VARS and write the *.exp
-files.
+Used by some OS' to define DL_FUNCS and DL_VARS and write the *.exp files.
+
+Normally just returns an empty string.
 
 =cut
 
 sub dlsyms {
-    my($self,%attribs) = @_;
-
-    return '' unless ($Is_AIX && $self->needs_linking() );
-
-    my($funcs) = $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = $attribs{DL_VARS} || $self->{DL_VARS} || [];
-    my($funclist)  = $attribs{FUNCLIST} || $self->{FUNCLIST} || [];
-    my(@m);
-
-    push(@m,"
-dynamic :: $self->{BASEEXT}.exp
-
-") unless $self->{SKIPHASH}{'dynamic'}; # dynamic and static are subs, so...
-
-    push(@m,"
-static :: $self->{BASEEXT}.exp
-
-") unless $self->{SKIPHASH}{'static'};  # we avoid a warning if we tick them
-
-    push(@m,"
-$self->{BASEEXT}.exp: Makefile.PL
-",'	$(PERLRUN) -e \'use ExtUtils::Mksymlists; \\
-	Mksymlists("NAME" => "',$self->{NAME},'", "DL_FUNCS" => ',
-	neatvalue($funcs), ', "FUNCLIST" => ', neatvalue($funclist),
-	', "DL_VARS" => ', neatvalue($vars), ');\'
-');
-
-    join('',@m);
+    return '';
 }
 
 
