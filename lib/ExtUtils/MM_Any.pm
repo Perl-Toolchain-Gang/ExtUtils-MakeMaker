@@ -214,9 +214,11 @@ Typical usage:
 
 sub POD2MAN_EXE_macro {
     my $self = shift;
+
+# Need the trailing '--' so perl stops gobbling arguments and - happens
+# to be an alternative end of line seperator on VMS so we quote it
     return <<'END_OF_DEF';
-# Need the trailing '--' so perl stops gobbling arguments
-POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e "pod2man @ARGV" --
+POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e "pod2man @ARGV" "--"
 END_OF_DEF
 }
 
