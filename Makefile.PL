@@ -74,6 +74,7 @@ WriteMakefile(
             push @perls, map "PERL5LIB=$lib /usr/local/bin/$_", 
               qw(bleadperl
                  perl5.6.1
+                 perl5.6.0
                 );
             push @perls, 
               map "PERL5LIB=$lib$Config{path_sep}$tlib /usr/local/bin/$_", 
