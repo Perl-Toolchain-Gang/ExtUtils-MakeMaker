@@ -8,6 +8,10 @@
       large modules like Encode. [Greg Matheson]
     - test target mangled by dmake.  Doesn't seem to like q{}.
       [Greg Matheson]
+    - instmodsh now using Archive::Tar to create archives if available.
+      [Slaven Rezic]
+    - instmodsh now using more portable tar flags to create archives.
+      [Slaven Rezic]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 

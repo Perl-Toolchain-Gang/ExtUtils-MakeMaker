@@ -107,14 +107,19 @@ sub create_archive {
     my $file = (split(' ', $reply))[1];
     my $tmp = "/tmp/inst.$$";
 
-    if (my $fh = IO::File->new($tmp, "w")) {
-        $fh->print(join("\n", $Inst->files($module)));
-        $fh->close();
-        system("tar cvf $file -I $tmp");
-        unlink($tmp);
+    if( !(defined $file and length $file) ) {
+        print "No tar file specified\n";
     }
-    else { 
-        print("Can't open $file: $!\n"); 
+    elsif( eval { require Archive::Tar } ) {
+        Archive::Tar->create_archive($file, 0, $Inst->files($module));
+    }
+    else {
+        my($first, @rest) = $Inst->files($module);
+        system('tar', 'cvf', $file, $first);
+        for my $f (@rest) {
+            system('tar', 'rvf', $file, $f);
+        }
+        print "Can't use tar\n" if $?;
     }
 }
 
