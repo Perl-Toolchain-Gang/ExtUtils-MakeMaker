@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.69';
-($Revision) = q$Revision: 1.107 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.108 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1229,9 +1229,10 @@ clean :: clean_subdirs
 	    else { push(@otherfiles, $word); }
 	}
     }
-    push(@otherfiles, qw[ blib $(MAKE_APERL_FILE) extralibs.ld 
+    push(@otherfiles, qw[ blib $(MAKE_APERL_FILE) 
                           perlmain.c pm_to_blib pm_to_blib.ts ]);
     push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
+    push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
 
     # Occasionally files are repeated several times from different sources
     { my(%of) = map { ($_ => 1) } @otherfiles; @otherfiles = keys %of; }
@@ -1308,8 +1309,8 @@ realclean :: clean
     # combination of macros).  In order to stay below DCL's 255 char limit,
     # we put only 2 on a line.
     my($file,$fcnt);
-    my(@files) = %{values $self->{PM}},
-                 qw{ $(FIRST_MAKEFILE) $(MAKEFILE_OLD) };
+    my(@files) = values %{$self->{PM}};
+    push @files, qw{ $(FIRST_MAKEFILE) $(MAKEFILE_OLD) };
     if ($self->has_link_code) {
 	push(@files,qw{ $(INST_DYNAMIC) $(INST_STATIC) $(INST_BOOT) $(OBJECT) });
     }
