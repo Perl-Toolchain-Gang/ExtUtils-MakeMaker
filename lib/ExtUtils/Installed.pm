@@ -12,7 +12,7 @@ use File::Spec;
 require VMS::Filespec if $^O eq 'VMS';
 
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 my $DOSISH = ($^O =~ /^(MSWin\d\d|os2|dos|mint)$/);
 
