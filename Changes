@@ -1,4 +1,4 @@
-6.03
+6.03 Wed Jun 19 17:06:14 EDT 2002
     - Documented that we're clamping down on cargo-cult MakeMaker
       programming.
     - Eased up the parameter verification to leave errant values alone.
