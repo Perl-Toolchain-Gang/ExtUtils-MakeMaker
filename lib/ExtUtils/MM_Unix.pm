@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.30_01';
+$VERSION = '1.31_01';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -1881,6 +1881,10 @@ sub init_INSTALL {
           "$Config{vendorprefixexp}/man/man\$(MAN1EXT)";
         $Config_Override{installvendorman3dir} =
           "$Config{vendorprefixexp}/man/man\$(MAN3EXT)";
+    }
+    else {
+        $Config_Override{installvendorman1dir} = '';
+        $Config_Override{installvendorman3dir} = '';
     }
 
     my $iprefix = $Config{installprefixexp} || '';
