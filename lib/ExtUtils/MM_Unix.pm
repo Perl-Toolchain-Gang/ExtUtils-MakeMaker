@@ -1480,8 +1480,11 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    }
 	    my($manpagename) = $name;
 	    $manpagename =~ s/\.p(od|m|l)\z//;
-	    unless ($manpagename =~ s!^\W*lib\W+!!s) { # everything below lib is ok
-		$manpagename = File::Spec->catfile(split(/::/,$self->{PARENT_NAME}),$manpagename);
+           # everything below lib is ok
+	    if($self->{PARENT_NAME} && $manpagename !~ s!^\W*lib\W+!!s) {
+		$manpagename = File::Spec->catfile(
+                                split(/::/,$self->{PARENT_NAME}),$manpagename
+                               );
 	    }
 	    if ($pods{MAN3}) {
 		$manpagename = $self->replace_manpage_separator($manpagename);
@@ -2141,6 +2144,10 @@ sub init_PERL {
     # Build up a set of file names (not command names).
     my $thisperl = File::Spec->canonpath($^X);
     $thisperl .= $Config{exe_ext} unless $thisperl =~ m/$Config{exe_ext}$/i;
+
+    # We need a relative path to perl when in the core.
+    $thisperl = File::Spec->abs2rel($thisperl) if $ENV{PERL_CORE};
+
     my @perls = ($thisperl);
     push @perls, map { "$_$Config{exe_ext}" }
                      ('perl', 'perl5', "perl$Config{version}");
