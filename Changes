@@ -149,6 +149,7 @@
       commands.
     - Seperated escape_newlines() from quote_literal().  This may
       be pointless.
+    - pm_to_blib() now generated with split_command().  3x speedup.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
