@@ -2,8 +2,8 @@ package ExtUtils::MakeMaker;
 
 BEGIN {require 5.005_03;}
 
-$VERSION = '6.16';
-($Revision) = q$Revision: 1.132 $ =~ /Revision:\s+(\S+)/;
+$VERSION = '6.17';
+($Revision) = q$Revision: 1.133 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -2040,7 +2040,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.132 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.133 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
