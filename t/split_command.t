@@ -14,7 +14,7 @@ chdir 't';
 
 use ExtUtils::MM;
 
-use Test::More 'no_plan';
+use Test::More tests => 6;
 
 my $mm = bless { NAME => "Foo" }, "MM";
 
@@ -33,3 +33,13 @@ isnt( @cmds, 0 );
 
 s{\$\(PERLRUN\)}{$^X} foreach @cmds;
 is( join('', map { s/\n+$//; $_ } map { `$_` } @cmds), join('', @test_args));
+
+
+my %test_args = ( foo => 42, bar => 23, car => 'har' );
+$even_args = $mm->oneliner(q{print !(@ARGV % 2)});
+@cmds = $mm->split_command($even_args, \%test_args);
+isnt( @cmds, 0 );
+
+s{\$\(PERLRUN\)}{$^X} foreach @cmds;
+like( join('', map { s/\n+$//; $_ } map { `$_` } @cmds), qr/^1+$/,
+                                                    'pairs preserved' );
