@@ -1,4 +1,5 @@
 6.18
+    - parse_version() was blowing over $_ (Ilya Zakharevich)
     - 5.6.2 has the same Cygwin shared lib name fix as 5.7.0. (Gerrit Haase)
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
