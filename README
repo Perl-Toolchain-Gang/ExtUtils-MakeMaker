@@ -1,32 +1,12 @@
-Known Good on Unix back to 5.6.0 except ExtUtils::Embed which is only
-good back to 5.6.1.
+This is a CPAN distribution of the venerable MakeMaker module.  It is
+currently in alpha release.  It's stable enough for personal use, but
+do not install in a production environment.
 
 
-Known Problems:
+Known Good:
 
-Debian
-------
-
-Due to a glitch in the layout of the Debian perl packages, Debian
-users will have to either install the libperl-dev package (which
-installs libperl.a and the symlink below) or add the symlink manually:
-
-    cd /usr/lib/
-    ln -s libperl.so.5.6.1 libperl.so
-
-or else ExtUtils::Embed won't be able to find -lperl.
-
-Debian is aware of the problem.
+Linux     back to 5.6.0
+OpenVMS   back to 5.6.1
 
 
-Win32
------
-
-Currently, ExtUtils::Installed isn't well.
-
-
-VMS
----
-
-Currently, ExtUtils::Installed and possibly ExtUtils::Manifest are not
-well.
+Please report any bugs via http://rt.cpan.org or to makemaker@perl.org.
