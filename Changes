@@ -13,6 +13,12 @@
     - Mysterious NetWare fix from Ananth (bleadperl 17376)
     - Support OPTIMIZE in MacOS (bleadperl 17347)
     - Support hints in MacOS (mutation of bleadperl 17347)
+    * Default man installation directories were using $(MAN*EXT) to
+      generate the directory name.  This turned out to be wrong more
+      often than right, so we'll use man1 and man3 hard-coded.
+    - Debian folks fixed the doc_install targets so the Appending
+      diagnostic gives the correct directory for perllocal.pod
+    * Added ExtUtils::MakeMaker::FAQ
 
 6.03 Wed Jun 19 17:06:14 EDT 2002
     - Documented that we're clamping down on cargo-cult MakeMaker
