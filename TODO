@@ -22,3 +22,6 @@ Investigate one method per make target.
 
 Merge 14902, 14690, 14688, 14680, 14677, 14658, 14655, 14648,
 14645, 14641, 14635, 14622, 14619, 14612, 14611, 14583, 14453, 14441
+
+Handle config files (ie. /etc) and their special PREFIX needs
+(ie. PREFIX=/usr, INSTALLCONFIGDIR=/etc).
