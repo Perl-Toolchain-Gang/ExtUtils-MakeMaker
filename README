@@ -1,6 +1,4 @@
-This is a CPAN distribution of the venerable MakeMaker module.  It is
-currently in alpha release.  It's stable enough for personal use, but
-do not install in a production environment.
+This is a CPAN distribution of the venerable MakeMaker module.
 
 
 Known Good:
