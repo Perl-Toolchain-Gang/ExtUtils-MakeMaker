@@ -7,7 +7,8 @@
       directory.  It will only be generated in the distdir.
     - A bunch of redundant Win9x and VMS code removed.
     - 'make test' on Windows no longer pre-expands its list of test files.
-      This caused problems on large distributions like bioperl.
+      This caused problems on large distributions like bioperl.  Thanks to
+      Tim Bunce for suggesting the obvious fix.
 
 6.25  Wed Dec 15 06:59:46 EST 2004
     - Build.PL was being considered like Module_pm.PL.  Build.PL is now 
