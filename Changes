@@ -1,6 +1,6 @@
 6.10_07
-    - Making sure escaped newlines are followed by a tab.  Sun's make is
-      very picky about such things.
+    - Sun's make treats escaped newlines oddly.  Switching oneliner() back
+      to using multiple -e's.
     - Bug in libscan() meant that any .pm containing RCS or CVS or SCCS
       in its name (for example, RCS.pm) would be skipped.
 
