@@ -150,7 +150,8 @@ sub _unix_os2_ext {
 	    warn "'-l$thislib' found at $fullname\n" if $verbose;
 	    my($fullnamedir) = dirname($fullname);
 	    push @ld_run_path, $fullnamedir 
-              unless $ld_run_path_seen{$fullnamedir}++;
+              unless $fullname =~ /$Config_libext$/o || 
+                     $ld_run_path_seen{$fullnamedir}++;
 	    push @libs, $fullname unless $libs_seen{$fullname}++;
 	    $found++;
 	    $found_lib++;
