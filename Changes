@@ -5,7 +5,7 @@
       MakeMaker.
     - Removed "always use h2xs" dogma.
     - Added compile & POD test
-    * 'make distdir' now generates Meta.yml module meta-data file.
+    * 'make distdir' now generates META.yml module meta-data file.
       Proof of concept.  Have to syncronize with Module::Build.
     * Added maniadd() to ExtUtils::Manifest to add entries to the MANIFEST
 

@@ -56,4 +56,4 @@ MM_VMS wrappers.
 
 Make MM look for xsubpp through @INC.
 
-Add "NO_META" to stop autogeneration (and auto overwrite) of Meta.yml.
+Add "NO_META" to stop autogeneration (and auto overwrite) of META.yml.

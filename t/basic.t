@@ -167,11 +167,11 @@ ok( $files{'perllocal.pod'},'  perllocal.pod created' );
 my $dist_test_out = `$make disttest`;
 is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
-# Test Meta.yml generation
+# Test META.yml generation
 use ExtUtils::Manifest qw(maniread);
-ok( -f 'Meta.yml',    'Meta.yml written' );
+ok( -f 'META.yml',    'META.yml written' );
 my $manifest = maniread();
-is( $manifest->{'Meta.yml'}, 'Module meta-data in YAML' );
+is( $manifest->{'META.yml'}, 'Module meta-data in YAML' );
 
 
 # Make sure init_dirscan doesn't go into the distdir
