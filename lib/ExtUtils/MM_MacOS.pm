@@ -36,6 +36,8 @@ ExtUtils::MM_MacOS - methods to override UN*X behaviour in ExtUtils::MakeMaker
 
 MM_MacOS currently only produces an approximation to the correct Makefile.
 
+=over 4
+
 =cut
 
 sub new {
@@ -934,6 +936,8 @@ sub _include {  # for Unix-style includes, with -I instead of -i
 	}
 }
 
-1;
+=back
 
-__END__
+=cut
+
+1;
