@@ -333,6 +333,7 @@ END
 CMD
     }
 
+    $manify .= "\t\$(NOECHO) \$(NOOP)\n" unless @man_cmds;
     $manify .= join '', map { "$_\n" } @man_cmds;
 
     return $manify;
