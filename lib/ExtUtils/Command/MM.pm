@@ -107,21 +107,21 @@ sub pod2man {
     my $parser = Pod::Man->new(%options);
 
     do {{  # so 'next' works
-        my ($infile, $outfile) = splice(@ARGV, 0, 2);
+        my ($pod, $man) = splice(@ARGV, 0, 2);
 
-    next if ((-e $outfile) &&
-         (-M $outfile < -M $infile) &&
-         (-M $outfile < -M "Makefile"));
+        next if ((-e $man) &&
+                 (-M $man < -M $pod) &&
+                 (-M $man < -M "Makefile"));
 
-    print "Manifying $outfile\n";
+        print "Manifying $man\n";
 
-    $parser->parse_from_file($infile, $outfile)
-      or do { warn("Could not install $outfile\n");  next };
+        $parser->parse_from_file($pod, $man)
+          or do { warn("Could not install $man\n");  next };
 
-    if (length $options{perm_rw}) {
-        chmod(oct($options{perm_rw}), $outfile)
-          or do { warn("chmod $options{perm_rw} $outfile: $!\n"); next };
-    }
+        if (length $options{perm_rw}) {
+            chmod(oct($options{perm_rw}), $man)
+              or do { warn("chmod $options{perm_rw} $man: $!\n"); next };
+        }
     }} while @ARGV;
 
     return 1;
