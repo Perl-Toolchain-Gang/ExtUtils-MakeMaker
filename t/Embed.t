@@ -15,6 +15,7 @@ chdir 't';
 
 use Config;
 use ExtUtils::Embed;
+use File::Copy;
 use File::Spec;
 
 open(my $fh,">embed_test.c") || die "Cannot open embed_test.c:$!";
@@ -22,8 +23,18 @@ print $fh <DATA>;
 close($fh);
 
 $| = 1;
-print "1..9\n";
 my $cc = $Config{'cc'};
+
+unless( grep { -x File::Spec->catfile($_, $cc) } 
+             split /\Q$Config{path_sep}\E/, $ENV{PATH} ) 
+{
+    print "1..0 # Skip: Can't find your C compiler ($cc)\n";
+    exit;
+}
+else {
+    print "1..9\n";
+}
+
 my $cl  = ($^O eq 'MSWin32' && $cc eq 'cl');
 my $skip_exe = $^O eq 'os2' && $Config{ldflags} =~ /(?<!\S)-Zexe\b/;
 my $exe = 'embed_test';
@@ -90,18 +101,23 @@ else {
        push(@cmd,ldopts());
    }
 
-   if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
-       my ($perl_exp) = grep { -f } qw(perl.exp ../perl.exp);
-       die "where is perl.exp?\n" unless defined $perl_exp;
-       for (@cmd) {
-           s!-bE:(\S+)!-bE:$perl_exp!;
+   if( $ENV{PERL_CORE} ) {
+       if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
+           my ($perl_exp) = grep { -f } qw(perl.exp ../perl.exp);
+           die "where is perl.exp?\n" unless defined $perl_exp;
+           for (@cmd) {
+               s!-bE:(\S+)!-bE:$perl_exp!;
+           }
        }
-   }
-   elsif ($^O eq 'cygwin') { # Cygwin needs the libperl copied
-       my $v_e_r_s = $Config{version};
-       $v_e_r_s =~ tr/./_/;
-       system("cp ../libperl$v_e_r_s.dll ./");    # for test 1
-       system("cp ../$Config{'libperl'} ../libperl.a");    # for test 1
+       # Cygwin needs the libperl copied for test 1
+       elsif ($^O eq 'cygwin') {
+           my $v_e_r_s = $Config{version};
+           $v_e_r_s =~ tr/./_/;
+           my $libperl = "libperl$v_e_r_s.dll";
+           copy("../$libperl", "./$libperl") || warn "$libperl not copied: $!";
+           copy("../$Config{'libperl'}", "../libperl.a") ||
+             warn "libperl.a not copied: $!";
+       }
    }
    elsif ($Config{'libperl'} !~ /\Alibperl\./) {
        # Everyone needs libperl copied if it's not found by '-lperl'.
