@@ -1,3 +1,5 @@
+#!/usr/bin/perl -w
+
 # A template for Makefile.PL.
 # - Set the $PACKAGE variable to the name of your module.
 # - Set $LAST_API_CHANGE to reflect the last version you changed the API 
