@@ -40,7 +40,7 @@ $| = 1;
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=dummy-install"});
+my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
@@ -119,12 +119,12 @@ is( $?, 0, 'install' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
 like( $install_out, qr/^Writing /m );
 
-ok( -r 'dummy-install',     '  install dir created' );
+ok( -r '../dummy-install',     '  install dir created' );
 my %files = ();
 find( sub { 
     # do it case-insensitive for non-case preserving OSs
     $files{lc $_} = $File::Find::name; 
-}, 'dummy-install' );
+}, '../dummy-install' );
 ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
 ok( $files{'liar.pm'},      '  Liar.pm installed'  );
 ok( $files{'.packlist'},    '  packlist created'   );
@@ -180,7 +180,7 @@ is( $?, 0, q{metafile_addtomanifest didn't die with locked MANIFEST} ) ||
 
 
 # Make sure init_dirscan doesn't go into the distdir
-@mpl_out = run(qq{$perl Makefile.PL "PREFIX=dummy-install"});
+@mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
 

@@ -12,6 +12,8 @@
       loading and install() running when uninstalling shadows.
     - META.yml generation deals gracefully when the MANIFEST is read-only
       (Slaven rt.cpan.org 2723)
+    - Fixing tests on limited dir depth VMS systems by moving the 
+      dummy-install dir one level up (Craig Berry rt.cpan.org 2747)
 
 6.10_04 Fri May 23 01:13:04 PDT 2003
     - Working around BSD threaading bug in version check. [from bleadperl]
