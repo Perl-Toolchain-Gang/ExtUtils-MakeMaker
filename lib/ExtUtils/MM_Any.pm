@@ -581,8 +581,8 @@ sub dist_test {
 
     my $test = $self->cd('$(DISTVNAME)',
                          '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
-                         '$(MAKE) $(MACROSTART)$(PASTHRU)$(MACROEND)',
-                         '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)'
+                         '$(MAKE) $(PASTHRU)',
+                         '$(MAKE) test $(PASTHRU)'
                         );
 
     return sprintf <<'MAKE_FRAG', $test;
@@ -910,7 +910,7 @@ sub special_targets {
     my $make_frag = <<'MAKE_FRAG';
 .SUFFIXES : .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
 
-.PHONY : all config static dynamic test linkext manifest
+.PHONY: all config static dynamic test linkext manifest pm_to_blib blibdirs clean realclean disttest distdir
 
 MAKE_FRAG
 

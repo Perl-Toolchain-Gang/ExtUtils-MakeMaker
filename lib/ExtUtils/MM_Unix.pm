@@ -2841,10 +2841,10 @@ sub pm_to_blib {
     my($autodir) = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
 # For backwards compat with anything that referenced this target.
-pm_to_blib: pm_to_blib.ts
-	$(NOOP)
+pm_to_blib:
+	$(NOECHO)$(NOOP)
 
-pm_to_blib.ts: $(TO_INST_PM)
+pm_to_blib.ts: $(TO_INST_PM) pm_to_blib
 };
 
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
@@ -2854,7 +2854,7 @@ CODE
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});
 
     $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
-    $r .= q{	$(NOECHO) $(TOUCH) $@};
+    $r .= qq{\t\$(NOECHO)\$(TOUCH) pm_to_blib.ts\n};
 
     return $r;
 }
@@ -3298,7 +3298,7 @@ sub subdir_x {
     my($self, $subdir) = @_;
 
     my $subdir_cmd = $self->cd($subdir, 
-      '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) all $(MACROSTART)$(PASTHRU)$(MACROEND)'
+      '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) all $(PASTHRU)'
     );
     return sprintf <<'EOT', $subdir_cmd;
 
@@ -3368,7 +3368,7 @@ test :: \$(TEST_TYPE)
     foreach my $dir (@{ $self->{DIR} }) {
         my $test = $self->oneliner(sprintf <<'CODE', $dir);
 chdir '%s';  
-system '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)' 
+system '$(MAKE) test $(PASTHRU)' 
     if -f '$(FIRST_MAKEFILE)';
 CODE
 
@@ -3454,7 +3454,8 @@ sub tools_other {
                       UNINST VERBINST
                       MOD_INSTALL DOC_INSTALL UNINSTALL
                       WARN_IF_OLD_PACKLIST
-                      MACROSTART MACROEND USEMAKEFILE
+		      MACROSTART MACROEND
+                      USEMAKEFILE
                       PM_FILTER
                       FIXIN
                     } ) 
