@@ -16,7 +16,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71_07';
-($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 4202 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1017,7 +1017,7 @@ a lot of commands.
 
 sub extra_clean_files {
     return qw(
-              *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) $(BASEEXT).bso
+              *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) *.Opt $(BASEEXT).bso
               .MM_Tmp
              );
 }
