@@ -11,11 +11,12 @@ BEGIN {
 }
 chdir 't';
 
+use strict;
 use Test::More;
 
 BEGIN {
 	if ($^O =~ /cygwin/i) {
-		plan tests => 11;
+		plan tests => 13;
 	} else {
 		plan skip_all => "This is not cygwin";
 	}
@@ -33,16 +34,16 @@ is( MM->canonpath('/a/../../c'), $path,
 	'canonpath() method should work just like the one in File::Spec' );
 
 # test cflags, with the fake package below
-my $args = bless({
+my $MM = bless({
 	CFLAGS	=> 'fakeflags',
 	CCFLAGS	=> '',
-}, MM);
+}, 'MM');
 
 # with CFLAGS set, it should be returned
-is( $args->cflags(), 'fakeflags',
+is( $MM->cflags(), 'fakeflags',
 	'cflags() should return CFLAGS member data, if set' );
 
-delete $args->{CFLAGS};
+delete $MM->{CFLAGS};
 
 # ExtUtils::MM_Cygwin::cflags() calls this, fake the output
 {
@@ -55,38 +56,38 @@ delete $args->{CFLAGS};
 # respects the config setting, should ignore whitespace around equal sign
 my $ccflags = $Config{useshrplib} eq 'true' ? ' -DUSEIMPORTLIB' : '';
 {
-    local $args->{NEEDS_LINKING} = 1;
-    $args->cflags(<<FLAGS);
+    local $MM->{NEEDS_LINKING} = 1;
+    $MM->cflags(<<FLAGS);
 OPTIMIZE = opt
 PERLTYPE  =pt
 FLAGS
 }
 
-like( $args->{CFLAGS}, qr/OPTIMIZE = opt/, '... should set OPTIMIZE' );
-like( $args->{CFLAGS}, qr/PERLTYPE = pt/, '... should set PERLTYPE' );
-like( $args->{CFLAGS}, qr/CCFLAGS = $ccflags/, '... should set CCFLAGS' );
+like( $MM->{CFLAGS}, qr/OPTIMIZE = opt/, '... should set OPTIMIZE' );
+like( $MM->{CFLAGS}, qr/PERLTYPE = pt/, '... should set PERLTYPE' );
+like( $MM->{CFLAGS}, qr/CCFLAGS = $ccflags/, '... should set CCFLAGS' );
 
 # test manifypods
-$args = bless({
+$MM = bless({
 	NOECHO => 'noecho',
 	MAN3PODS => {},
 	MAN1PODS => {},
     MAKEFILE => 'Makefile',
 }, 'MM');
-unlike( $args->manifypods(), qr/foo/,
+unlike( $MM->manifypods(), qr/foo/,
 	'manifypods() should return without PODS values set' );
 
-$args->{MAN3PODS} = { foo => 'foo.1' };
-my $res = $args->manifypods();
+$MM->{MAN3PODS} = { foo => 'foo.1' };
+my $res = $MM->manifypods();
 like( $res, qr/pure_all.*foo.*foo.1/s, '... should add MAN3PODS targets' );
 
 
 SKIP: {
     skip "Only relevent in the core", 2 unless $ENV{PERL_CORE};
-    $args->{PERL_SRC} = File::Spec->updir;
-    $args->{MAN1PODS} = { bar => 1 };
+    $MM->{PERL_SRC} = File::Spec->updir;
+    $MM->{MAN1PODS} = { bar => 1 };
     my $out = tie *STDOUT, 'FakeOut';
-    $res = $args->manifypods();
+    $res = $MM->manifypods();
     is( $$out, '', '... should not warn if PERL_SRC provided' );
     like( $res, qr/bar \\\n\t1 \\\n\tfoo/,
           '... should join MAN1PODS and MAN3PODS');
@@ -97,9 +98,9 @@ SKIP: {
 {
     my $libperl = $Config{libperl} || 'libperl.a';
     $libperl =~ s/\.a/.dll.a/ if $] >= 5.007;
-    $libperl "\$(PERL_INC)/$libperl";
+    $libperl = "\$(PERL_INC)/$libperl";
 
-    my $export  = '$(BASEEXT).def';
+    my $export  = '';
     my $after   = '';
     $MM->init_linker;
 
