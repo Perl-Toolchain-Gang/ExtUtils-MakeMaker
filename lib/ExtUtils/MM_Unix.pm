@@ -11,7 +11,7 @@ use File::Basename qw(basename dirname);
 use DirHandle;
 
 use vars qw($VERSION @ISA
-            $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos $Is_VOS
+            $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos $Is_VOS
             $Is_QNX $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
             $Is_SunOS4 $Is_Solaris $Is_SunOS
             $Verbose %pm
@@ -26,7 +26,6 @@ require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
 
 $Is_OS2     = $^O eq 'os2';
-$Is_Mac     = $^O eq 'MacOS';
 $Is_Win32   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
 $Is_Win95   = $Is_Win32 && Win32::IsWin95();
 $Is_Dos     = $^O eq 'dos';
@@ -1788,8 +1787,6 @@ sub init_main {
 		$Is_VMS
 		&&
 		-s $self->catfile($self->{PERL_SRC},'perlshr_attr.opt')
-		or
-		$Is_Mac
 		or
 		$Is_Win32
 	       ){

@@ -914,7 +914,7 @@ sub platform_constants {
 corresponding to the MM_*.pm file we're using.  
 
 The first element of @os_flavor is the major family (ie. Unix,
-Windows, VMS, OS/2, MacOS, etc...) and the rest are sub families.
+Windows, VMS, OS/2, etc...) and the rest are sub families.
 
 Some examples:
 
@@ -922,7 +922,6 @@ Some examples:
     Windows NT     ('Win32', 'WinNT')
     Win98          ('Win32', 'Win9x')
     Linux          ('Unix',  'Linux')
-    MacOS Classic  ('MacOS', 'MacOS Classic')
     MacOS X        ('Unix',  'Darwin', 'MacOS', 'MacOS X')
     OS/2           ('OS/2')
 
