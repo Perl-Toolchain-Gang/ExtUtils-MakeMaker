@@ -388,13 +388,6 @@ clean :: clean_subdirs
 ');
 
     my @files = values %{$self->{XS}}; # .c files from *.xs files
-    if ( $Is_QNX ) {
-      my @errfiles = @{$self->{C}};
-      for ( @errfiles ) {
-	s/.c$/.err/;
-      }
-      push( @files, @errfiles, 'perlmain.err' );
-    }
 
     if( $attribs{FILES} ) {
         push @files, ref $attribs{FILES}                ?
@@ -414,15 +407,9 @@ clean :: clean_subdirs
     push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
     push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
 
-    if( $Is_VOS ) {
-        push(@files, qw[*.kp]);
-    }
-    else {
-        push(@files, qw[core core.*perl.*.? *perl.core]);
-
-        # core.\d+
-        push(@files, map { "core." . "[0-9]"x$_ } (1..5));
-    }
+    # core files
+    push(@files, qw[core core.*perl.*.? *perl.core]);
+    push(@files, map { "core." . "[0-9]"x$_ } (1..5));
 
     # OS specific files to clean up
     push @files, $self->extra_clean_files;

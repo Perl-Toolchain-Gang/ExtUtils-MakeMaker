@@ -11,8 +11,8 @@ use File::Basename qw(basename dirname);
 use DirHandle;
 
 use vars qw($VERSION @ISA
-            $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos $Is_VOS
-            $Is_QNX $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
+            $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos
+            $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
             $Is_SunOS4 $Is_Solaris $Is_SunOS
             $Verbose %pm
             %Config_Override
@@ -30,9 +30,7 @@ BEGIN {
     $Is_Win32   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
     $Is_Win95   = $Is_Win32 && Win32::IsWin95();
     $Is_Dos     = $^O eq 'dos';
-    $Is_VOS     = $^O eq 'vos';
     $Is_VMS     = $^O eq 'VMS';
-    $Is_QNX     = $^O eq 'qnx';
     $Is_AIX     = $^O eq 'aix';
     $Is_OSF     = $^O eq 'dec_osf';
     $Is_IRIX    = $^O eq 'irix';
