@@ -200,7 +200,7 @@ Used on the t/*.t files.
 sub test_via_harness {
     my($self, $perl, $tests) = @_;
 
-    return "\t$perl".q{ $(TEST_LIBS) "-e" "use Test::Harness;  $$Test::Harness::Verbose=$(TEST_VERBOSE); runtests @ARGV;" } . "$tests\n";
+    return "\t$perl".q{ $(TEST_LIBS) "-e" 'use Test::Harness;  $$Test::Harness::Verbose=$(TEST_VERBOSE); runtests @ARGV;' } . "$tests\n";
 }
 
 =item test_via_script
