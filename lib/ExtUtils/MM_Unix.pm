@@ -1,5 +1,7 @@
 package ExtUtils::MM_Unix;
 
+require 5.005_03;  # Maybe further back, dunno
+
 use strict;
 
 use Exporter ();
@@ -8,13 +10,13 @@ use File::Basename qw(basename dirname fileparse);
 use File::Spec;
 use DirHandle;
 use strict;
-our ($Is_Mac,$Is_OS2,$Is_VMS,$Is_Win32,$Is_Dos,
-	    $Verbose,%pm,%static,$Xsubpp_Version);
+use vars qw($VERSION
+            $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos
+            $Verbose %pm %static $Xsubpp_Version);
 
-our $VERSION = '1.12607';
+use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-require ExtUtils::MakeMaker;
-ExtUtils::MakeMaker->import(qw($Verbose &neatvalue));
+$VERSION = '1.13_01';
 
 $Is_OS2 = $^O eq 'os2';
 $Is_Mac = $^O eq 'MacOS';
@@ -128,8 +130,12 @@ Returns a string representing of the current directory.  "." on UNIX.
 
 =cut
 
+# This has to be global, not lexical, or else the SelfLoaded modules
+# can't see it.
+use vars qw($Curdir $Rootdir $Updir);
+$Curdir = File::Spec->curdir;
 sub curdir {
-    return File::Spec->curdir();
+    return $Curdir;
 }
 
 =item rootdir
@@ -138,8 +144,9 @@ Returns a string representing of the root directory.  "/" on UNIX.
 
 =cut
 
+$Rootdir = File::Spec->rootdir;
 sub rootdir {
-    return File::Spec->rootdir();
+    return $Rootdir;
 }
 
 =item updir
@@ -148,8 +155,9 @@ Returns a string representing of the parent directory.  ".." on UNIX.
 
 =cut
 
+$Updir = File::Spec->updir;
 sub updir {
-    return File::Spec->updir();
+    return $Updir;
 }
 
 sub c_o;
@@ -1171,7 +1179,7 @@ in these dirs:
 	    } elsif (File::Spec->canonpath($name) eq File::Spec->canonpath(basename($name))) { # foo
 		$abs = File::Spec->catfile($dir, $name);
 	    } else { # foo/bar
-		$abs = File::Spec->canonpath(File::Spec->catfile(File::Spec->curdir, $name));
+		$abs = File::Spec->canonpath(File::Spec->catfile($Curdir, $name));
 	    }
 	    print "Checking $abs\n" if ($trace >= 2);
 	    next unless $self->maybe_command($abs);
@@ -1417,9 +1425,9 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     local(%pm); #the sub in find() has to see this hash
     @ignore{qw(Makefile.PL test.pl)} = (1,1);
     $ignore{'makefile.pl'} = 1 if $Is_VMS;
-    foreach $name ($self->lsdir(File::Spec->curdir)){
+    foreach $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
-	next if $name eq File::Spec->curdir or $name eq File::Spec->updir or $ignore{$name};
+	next if $name eq $Curdir or $name eq $Updir or $ignore{$name};
 	next unless $self->libscan($name);
 	if (-d $name){
 	    next if -l $name; # We do not support symlinks at all
@@ -1673,7 +1681,11 @@ sub init_main {
 
     unless ($self->{PERL_SRC}){
 	my($dir);
-	foreach $dir (File::Spec->updir(),File::Spec->catdir(File::Spec->updir(),File::Spec->updir()),File::Spec->catdir(File::Spec->updir(),File::Spec->updir(),File::Spec->updir()),File::Spec->catdir(File::Spec->updir(),File::Spec->updir(),File::Spec->updir(),File::Spec->updir())){
+	foreach $dir ($Updir,
+                      File::Spec->catdir($Updir,$Updir),
+                      File::Spec->catdir($Updir,$Updir,$Updir),
+                      File::Spec->catdir($Updir,$Updir,$Updir,$Updir))
+        {
 	    if (
 		-f File::Spec->catfile($dir,"config.sh")
 		&&
@@ -1784,11 +1796,11 @@ usually solves this kind of problem.
 	if (defined $self->{PERL_SRC} and $self->{INSTALLDIRS} eq "perl") {
 	    $self->{INST_LIB} = $self->{INST_ARCHLIB} = $self->{PERL_LIB};
 	} else {
-	    $self->{INST_LIB} = File::Spec->catdir(File::Spec->curdir,"blib","lib");
+	    $self->{INST_LIB} = File::Spec->catdir($Curdir,"blib","lib");
 	}
     }
-    $self->{INST_ARCHLIB} ||= File::Spec->catdir(File::Spec->curdir,"blib","arch");
-    $self->{INST_BIN} ||= File::Spec->catdir(File::Spec->curdir,'blib','bin');
+    $self->{INST_ARCHLIB} ||= File::Spec->catdir($Curdir,"blib","arch");
+    $self->{INST_BIN} ||= File::Spec->catdir($Curdir,'blib','bin');
 
     # We need to set up INST_LIBDIR before init_libscan() for VMS
     my @parentdir = split(/::/, $self->{PARENT_NAME});
@@ -1798,8 +1810,8 @@ usually solves this kind of problem.
     $self->{INST_ARCHAUTODIR} = File::Spec->catdir($self->{INST_ARCHLIB},'auto',$self->{FULLEXT});
 
     # INST_EXE is deprecated, should go away March '97
-    $self->{INST_EXE} ||= File::Spec->catdir(File::Spec->curdir,'blib','script');
-    $self->{INST_SCRIPT} ||= File::Spec->catdir(File::Spec->curdir,'blib','script');
+    $self->{INST_EXE} ||= File::Spec->catdir($Curdir,'blib','script');
+    $self->{INST_SCRIPT} ||= File::Spec->catdir($Curdir,'blib','script');
 
     # The user who requests an installation directory explicitly
     # should not have to tell us an architecture installation directory
@@ -1913,7 +1925,7 @@ usually solves this kind of problem.
 	if ($self->{INSTALLMAN1DIR} =~ /^(none|\s*)$/){
 	    $self->{INST_MAN1DIR} = $self->{INSTALLMAN1DIR};
 	} else {
-	    $self->{INST_MAN1DIR} = File::Spec->catdir(File::Spec->curdir,'blib','man1');
+	    $self->{INST_MAN1DIR} = File::Spec->catdir($Curdir,'blib','man1');
 	}
     }
     $self->{MAN1EXT} ||= $Config::Config{man1ext};
@@ -1924,7 +1936,7 @@ usually solves this kind of problem.
 	if ($self->{INSTALLMAN3DIR} =~ /^(none|\s*)$/){
 	    $self->{INST_MAN3DIR} = $self->{INSTALLMAN3DIR};
 	} else {
-	    $self->{INST_MAN3DIR} = File::Spec->catdir(File::Spec->curdir,'blib','man3');
+	    $self->{INST_MAN3DIR} = File::Spec->catdir($Curdir,'blib','man3');
 	}
     }
     $self->{MAN3EXT} ||= $Config::Config{man3ext};
@@ -1938,7 +1950,7 @@ usually solves this kind of problem.
 	if ($self->{INSTALLHTMLSITELIBDIR} =~ /^(none|\s*)$/){
 	    $self->{INST_HTMLLIBDIR} = $self->{INSTALLHTMLSITELIBDIR};
 	} else {
-	    $self->{INST_HTMLLIBDIR} = File::Spec->catdir(File::Spec->curdir,'blib','html','lib');
+	    $self->{INST_HTMLLIBDIR} = File::Spec->catdir($Curdir,'blib','html','lib');
 	}
     }
 
@@ -1948,7 +1960,7 @@ usually solves this kind of problem.
 	if ($self->{INSTALLHTMLSCRIPTDIR} =~ /^(none|\s*)$/){
 	    $self->{INST_HTMLSCRIPTDIR} = $self->{INSTALLHTMLSCRIPTDIR};
 	} else {
-	    $self->{INST_HTMLSCRIPTDIR} = File::Spec->catdir(File::Spec->curdir,'blib','html','bin');
+	    $self->{INST_HTMLSCRIPTDIR} = File::Spec->catdir($Curdir,'blib','html','bin');
 	}
     }
     $self->{HTMLEXT} ||= $Config::Config{htmlext} || 'html';
@@ -2065,7 +2077,10 @@ usually solves this kind of problem.
     $self->{PERLRUNINST} .= $self->{PERLRUN}. " -${aq}I\$(INST_ARCHLIB)$aq -${aq}I\$(INST_LIB)$aq";
 
     # What extra library dirs do we need when running the tests?
-    $self->{TEST_LIBS}   .= " -${aq}I\$(INST_ARCHLIB)$aq -${aq}I\$(INST_LIB)$aq";
+    # Make sure these are absolute paths in case the test chdirs.
+    $self->{TEST_LIBS}   .= join '', 
+                            map { " -${aq}I".File::Spec->rel2abs($_).$aq } 
+                                $self->{INST_ARCHLIB}, $self->{INST_LIB};
 
     # When building the core, we need to add some helper libs since
     # perl's @INC won't work (we're not installed yet).
@@ -2553,11 +2568,11 @@ MAP_LIBPERL = $libperl
 	push @m, "\tcat $catfile >> \$\@\n";
     }
     # SUNOS ld does not take the full path to a shared library
-    my $llibperl = ($libperl)?'$(MAP_LIBPERL)':'-lperl';
+    $self->{LLIBPERL} = ($libperl)?'$(MAP_LIBPERL)':'-lperl';
 
 push @m, "
 \$(MAP_TARGET) :: $tmp/perlmain\$(OBJ_EXT) \$(MAP_LIBPERL) \$(MAP_STATIC) \$(INST_ARCHAUTODIR)/extralibs.all
-	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) $llibperl `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
+	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) $self->{LLIBPERL} `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
 	$self->{NOECHO}echo 'To install the new \"\$(MAP_TARGET)\" binary, call'
 	$self->{NOECHO}echo '    make -f $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
 	$self->{NOECHO}echo 'To remove the intermediate files say'
@@ -2729,7 +2744,7 @@ sub maybe_command_in_dirs {	# $ver is optional argument if looking for perl
 	    } elsif (File::Spec->canonpath($name) eq File::Spec->canonpath(basename($name))) { # bar
 		$abs = File::Spec->catfile($dir, $name);
 	    } else { # foo/bar
-		$abs = File::Spec->catfile(File::Spec->curdir, $name);
+		$abs = File::Spec->catfile($Curdir, $name);
 	    }
 	    print "Checking $abs for $name\n" if ($trace >= 2);
 	    next unless $tryabs = $self->maybe_command($abs);
@@ -3223,7 +3238,7 @@ sub realclean {
     my($self, %attribs) = @_;
     my(@m);
 
-    push(@m,'LLIBPERL = '.$llibperl."\n");
+    push(@m,'LLIBPERL = '.$self->{LLIBPERL}."\n");
 
     push(@m,'
 # Delete temporary files (via clean) and also delete installed files
