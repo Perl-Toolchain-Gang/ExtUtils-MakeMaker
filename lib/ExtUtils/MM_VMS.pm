@@ -2052,6 +2052,11 @@ used instead.
 
 sub prefixify {
     my($self, $var, $sprefix, $rprefix, $default) = @_;
+
+    # Translate $(PERLPREFIX) to a real path.
+    $rprefix = $self->eliminate_macros($rprefix);
+    $rprefix = VMS::Filespec::vmsify($rprefix) if $rprefix;
+
     $default = VMS::Filespec::vmsify($default) 
       unless $default =~ /\[.*\]/;
 
@@ -2193,6 +2198,120 @@ sub init_linker {
 
     $self->{PERL_ARCHIVE_AFTER} ||= '';
 }
+
+=item eliminate_macros
+
+Expands MM[KS]/Make macros in a text string, using the contents of
+identically named elements of C<%$self>, and returns the result
+as a file specification in Unix syntax.
+
+NOTE:  This is the cannonical version of the method.  The version in
+File::Spec::VMS is deprecated.
+
+=cut
+
+sub eliminate_macros {
+    my($self,$path) = @_;
+    return '' unless $path;
+    $self = {} unless ref $self;
+
+    if ($path =~ /\s/) {
+      return join ' ', map { $self->eliminate_macros($_) } split /\s+/, $path;
+    }
+
+    my($npath) = unixify($path);
+    my($complex) = 0;
+    my($head,$macro,$tail);
+
+    # perform m##g in scalar context so it acts as an iterator
+    while ($npath =~ m#(.*?)\$\((\S+?)\)(.*)#gs) { 
+        if (defined $self->{$2}) {
+            ($head,$macro,$tail) = ($1,$2,$3);
+            if (ref $self->{$macro}) {
+                if (ref $self->{$macro} eq 'ARRAY') {
+                    $macro = join ' ', @{$self->{$macro}};
+                }
+                else {
+                    print "Note: can't expand macro \$($macro) containing ",ref($self->{$macro}),
+                          "\n\t(using MMK-specific deferred substitutuon; MMS will break)\n";
+                    $macro = "\cB$macro\cB";
+                    $complex = 1;
+                }
+            }
+            else { ($macro = unixify($self->{$macro})) =~ s#/\Z(?!\n)##; }
+            $npath = "$head$macro$tail";
+        }
+    }
+    if ($complex) { $npath =~ s#\cB(.*?)\cB#\${$1}#gs; }
+    $npath;
+}
+
+=item fixpath
+
+Catchall routine to clean up problem MM[SK]/Make macros.  Expands macros
+in any directory specification, in order to avoid juxtaposing two
+VMS-syntax directories when MM[SK] is run.  Also expands expressions which
+are all macro, so that we can tell how long the expansion is, and avoid
+overrunning DCL's command buffer when MM[KS] is running.
+
+If optional second argument has a TRUE value, then the return string is
+a VMS-syntax directory specification, if it is FALSE, the return string
+is a VMS-syntax file specification, and if it is not specified, fixpath()
+checks to see whether it matches the name of a directory in the current
+default directory, and returns a directory or file specification accordingly.
+
+NOTE:  This is the cannonical version of the method.  The version in
+File::Spec::VMS is deprecated.
+
+=cut
+
+sub fixpath {
+    my($self,$path,$force_path) = @_;
+    return '' unless $path;
+    $self = bless {} unless ref $self;
+    my($fixedpath,$prefix,$name);
+
+    if ($path =~ /\s/) {
+      return join ' ',
+             map { $self->fixpath($_,$force_path) }
+	     split /\s+/, $path;
+    }
+
+    if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) { 
+        if ($force_path or $path =~ /(?:DIR\)|\])\Z(?!\n)/) {
+            $fixedpath = vmspath($self->eliminate_macros($path));
+        }
+        else {
+            $fixedpath = vmsify($self->eliminate_macros($path));
+        }
+    }
+    elsif ((($prefix,$name) = ($path =~ m#^\$\(([^\)]+)\)(.+)#s)) && $self->{$prefix}) {
+        my($vmspre) = $self->eliminate_macros("\$($prefix)");
+        # is it a dir or just a name?
+        $vmspre = ($vmspre =~ m|/| or $prefix =~ /DIR\Z(?!\n)/) ? vmspath($vmspre) : '';
+        $fixedpath = ($vmspre ? $vmspre : $self->{$prefix}) . $name;
+        $fixedpath = vmspath($fixedpath) if $force_path;
+    }
+    else {
+        $fixedpath = $path;
+        $fixedpath = vmspath($fixedpath) if $force_path;
+    }
+    # No hints, so we try to guess
+    if (!defined($force_path) and $fixedpath !~ /[:>(.\]]/) {
+        $fixedpath = vmspath($fixedpath) if -d $fixedpath;
+    }
+
+    # Trim off root dirname if it's had other dirs inserted in front of it.
+    $fixedpath =~ s/\.000000([\]>])/$1/;
+    # Special case for VMS absolute directory specs: these will have had device
+    # prepended during trip through Unix syntax in eliminate_macros(), since
+    # Unix syntax has no way to express "absolute from the top of this device's
+    # directory tree".
+    if ($path =~ /^[\[>][^.\-]/) { $fixedpath =~ s/^[^\[<]+//; }
+
+    return $fixedpath;
+}
+
 
 =back
 
