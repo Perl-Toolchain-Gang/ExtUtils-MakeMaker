@@ -523,9 +523,9 @@ PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 
     push @m, "
 
-TO_INST_PM = ".$self->wraplist(sort keys %pm)."
+TO_INST_PM = ".$self->wraplist(sort keys %{$self->{PM}})."
 
-PM_TO_BLIB = ".$self->wraplist(%pm)."
+PM_TO_BLIB = ".$self->wraplist(%{$self->{PM}})."
 ";
 
     join('',@m);
@@ -1355,8 +1355,7 @@ sub has_link_code {
 =item init_dirscan
 
 Scans the directory structure and initializes DIR, XS, XS_FILES, PM,
-TO_INST_PM, PM_TO_BLIB, C, C_FILES, O_FILES, H, H_FILES, PL_FILES,
-MAN*PODS, EXE_FILES.
+C, C_FILES, O_FILES, H, H_FILES, PL_FILES, MAN*PODS, EXE_FILES.
 
 Called by init_main.
 
