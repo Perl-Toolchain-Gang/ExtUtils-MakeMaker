@@ -3865,7 +3865,7 @@ sub subdir_x {
     return sprintf <<'EOT', $subdir_cmd;
 
 subdirs ::
-	$(NOECHO)%s
+	$(NOECHO) %s
 EOT
 
 }
