@@ -59,8 +59,8 @@ WriteMakefile(
         my($self, $orig_perl, $tests) = @_;
 
         my @perls = ($orig_perl);
-        push @perls, map "/usr/local/bin/$_", 
-                        qw(bleadperl
+        push @perls, map "PERL5LIB=$lib /usr/local/bin/$_", 
+                        qw(bleadperl-optimized
                            perl5.6.1
                            perl5.6.0
                           )
