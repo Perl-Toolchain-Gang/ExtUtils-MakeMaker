@@ -475,26 +475,6 @@ sub export_list
  return "$self->{BASEEXT}.def";
 }
 
-=item canonpath
-
-No physical check on the filesystem, but a logical cleanup of a
-path. On UNIX eliminated successive slashes and successive "/.".
-
-=cut
-
-sub canonpath {
-    my($self,$path) = @_;
-    $path =~ s/^([a-z]:)/\u$1/;
-    $path =~ s|/|\\|g;
-    $path =~ s|(.)\\+|$1\\|g ;                     # xx////xx  -> xx/xx
-    $path =~ s|(\\\.)+\\|\\|g ;                    # xx/././xx -> xx/xx
-    $path =~ s|^(\.\\)+|| unless $path eq ".\\";   # ./xx      -> xx
-    $path =~ s|\\$|| 
-             unless $path =~ m#^([a-z]:)?\\#;      # xx/       -> xx
-    $path .= '.' if $path =~ m#\\$#;
-    $path;
-}
-
 =item perl_script
 
 Takes one argument, a file name, and returns the file name, if the
@@ -784,7 +764,6 @@ sub pasthru {
     my($self) = shift;
     return "PASTHRU = " . ($NMAKE ? "-nologo" : "");
 }
-
 
 
 1;
