@@ -2,8 +2,8 @@ package ExtUtils::MakeMaker;
 
 BEGIN {require 5.005_03;}
 
-$VERSION = "6.06_04";
-($Revision = substr(q$Revision: 1.102 $, 10)) =~ s/\s+$//;
+$VERSION = "6.06_05";
+($Revision = substr(q$Revision: 1.103 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -746,11 +746,16 @@ sub _run_hintfile {
     local($self) = shift;       # make $self available to the hint file.
     my($hint_file) = shift;
 
-    local $@;
+    local($@, $!);
     print STDERR "Processing hints file $hint_file\n";
+
+    # Just in case the ./ isn't on the hint file, which File::Spec can
+    # often strip off, we bung the curdir into @INC
+    local @INC = (File::Spec->curdir, @INC);
     my $ret = do $hint_file;
-    if( !defined $ret && $@) {
-        print STDERR $@;
+    if( !defined $ret ) {
+        my $error = $@ || $!;
+        print STDERR $error;
     }
 }
 
@@ -1999,7 +2004,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.102 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.103 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
