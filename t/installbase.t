@@ -47,6 +47,7 @@ ok( grep(/^Writing $makefile for Big::Dummy/,
                                            'Makefile.PL output looks right');
 
 my $make = make_run();
+run("$make");   # this is necessary due to a dmake bug.
 my $install_out = run("$make install");
 is( $?, 0, '  make install exited normally' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
