@@ -1419,7 +1419,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 		my($ispod)=0;
 		if (open(FH,"<$name")) {
 		    while (<FH>) {
-			if (/^=head1\s+\w+/) {
+			if (/^=(head|item|pod)\b/) {
 			    $ispod=1;
 			    last;
 			}

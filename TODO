@@ -28,3 +28,7 @@ Fix appending of .. when DIRS contains directories not immediately
 below the cwd.
 
 Fill in the IMPORTS docs.
+
+Document "make install UNINST=1"
+
+Remove tar -I Sun-ism.

@@ -1,0 +1,229 @@
+From makemaker-return-513-schwern=pobox.com@perl.org Fri Aug 02 14:57:48 2002
+Return-path: <makemaker-return-513-schwern=pobox.com@perl.org>
+Envelope-to: schwern@localhost
+Received: from blackrider.schwern.org
+	([127.0.0.1] helo=localhost ident=schwern)
+	by blackrider.schwern.org with esmtp (Exim 3.35 #1 (Debian))
+	id 17akQd-00029c-01
+	for <schwern@localhost>; Fri, 02 Aug 2002 14:57:47 -0700
+Delivered-To: schwern@magnonel.guild.net
+Received: from magnonel.guild.net [209.166.167.23]
+	by localhost with POP3 (fetchmail-5.9.11)
+	for schwern@localhost (single-drop); Fri, 02 Aug 2002 14:57:47 -0700 (PDT)
+Received: (qmail 19186 invoked by uid 1068); 3 Aug 2002 02:37:23 -0000
+Received: from cali-2.pobox.com (64.71.166.115)
+  by magnonel.guild.net with SMTP; 3 Aug 2002 02:37:23 -0000
+Received: from cali-2.pobox.com (localhost.localdomain [127.0.0.1])
+	by cali-2.pobox.com (Postfix) with ESMTP id 920F03E70E
+	for <schwern@magnonel.guild.net>; Fri,  2 Aug 2002 22:37:22 -0400 (EDT)
+Delivered-To: schwern@pobox.com
+Received: from onion.perl.org (onion.valueclick.com [64.70.54.95])
+	by cali-2.pobox.com (Postfix) with SMTP id B38D13E686
+	for <schwern@pobox.com>; Fri,  2 Aug 2002 22:37:21 -0400 (EDT)
+Received: (qmail 58982 invoked by uid 1005); 3 Aug 2002 02:37:20 -0000
+Mailing-List: contact makemaker-help@perl.org; run by ezmlm
+Precedence: bulk
+list-help: <mailto:makemaker-help@perl.org>
+list-unsubscribe: <mailto:makemaker-unsubscribe@perl.org>
+list-post: <mailto:makemaker@perl.org>
+Delivered-To: mailing list makemaker@perl.org
+Received: (qmail 58969 invoked by uid 76); 3 Aug 2002 02:37:20 -0000
+Message-ID: <3D4B419B.2000304@stason.org>
+Date: Sat, 03 Aug 2002 10:36:11 +0800
+From: Stas Bekman <stas@stason.org>
+Organization: Hope, Humanized
+User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.0.0) Gecko/20020510
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: Michael G Schwern <schwern@pobox.com>
+Cc: Nick Ing-Simmons <nick.ing-simmons@elixent.com>,
+	makemaker@perl.org
+Subject: Re: XS_FILES, H_FILES, C_FILES Makefile target
+References: <3D449DB2.9070108@stason.org> <20020729082641.1350.9@bactrian.elixent.com> <3D48AA92.4000409@stason.org> <20020801081616.1313.3@bactrian.elixent.com> <3D490BD0.6050402@stason.org> <20020801164216.GI1064@ool-18b93024.dyn.optonline.net>
+Content-Type: multipart/mixed;
+ boundary="------------020203080305000601040604"
+Status: RO
+Content-Length: 4036
+Lines: 180
+
+--------------020203080305000601040604
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Michael G Schwern wrote:
+> On Thu, Aug 01, 2002 at 06:22:08PM +0800, Stas Bekman wrote:
+> 
+>>do we have some place where this trick (technique) can be documented? 
+>>I'll submit a patch.
+>>
+>>or should we start something like perlmmtut.pod? where this kind of 
+>>tricks can go to?
+> 
+> 
+> Starting ExtUtils::MakeMaker::FAQ would be nice.
+
+Please find the attached FAQ.pod.
+
+__________________________________________________________________
+Stas Bekman            JAm_pH ------> Just Another mod_perl Hacker
+http://stason.org/     mod_perl Guide ---> http://perl.apache.org
+mailto:stas@stason.org http://use.perl.org http://apacheweek.com
+http://modperlbook.org http://apache.org   http://ticketmaster.com
+
+--------------020203080305000601040604
+Content-Type: text/plain;
+ name="FAQ.pod"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="FAQ.pod"
+
+package ExtUtils::MakeMaker::FAQ;
+
+our $VERSION = '0.01';
+
+1;
+__END__
+
+=head1 NAME
+
+ExtUtils::MakeMaker::FAQ - Frequently Asked Questions About MakeMaker
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Document tips and tricks for C<ExtUtils::MakeMaker>.
+
+=head1 How to Make Two and More XS files Coexist In The Same Directory?
+
+Sometimes you need to have two and more XS files in the same package.
+One way to go is to put them into separate directories, but sometimes
+this is not the most suitable solution. The following technique allows
+you to put two (and more) XS files in the same directory.
+
+Let's assume that we have a package C<Cool::Foo>, which includes
+C<Cool::Foo> and C<Cool::Bar> modules each having a separate XS
+file. First we use the following I<Makefile.PL>:
+
+  use ExtUtils::MakeMaker;
+  
+  WriteMakefile(
+      NAME		=> 'Cool::Foo',
+      VERSION_FROM	=> 'Foo.pm',
+      OBJECT              => q/$(O_FILES)/,
+      # ... other attrs ...
+  );
+
+Notice the C<OBJECT> attribute. MakeMaker generates the following
+variables in I<Makefile>:
+
+  # Handy lists of source code files:
+  XS_FILES= Bar.xs \
+  	Foo.xs
+  C_FILES = Bar.c \
+  	Foo.c
+  O_FILES = Bar.o \
+  	Foo.o
+
+Therefore we can use the C<O_FILES> variable to tell MakeMaker to use
+these objects into the shared library.
+
+That's pretty much it. Now write I<Foo.pm> and I<Foo.xs>, I<Bar.pm>
+and I<Bar.xs>, where I<Foo.pm> bootstraps the shared library and
+I<Bar.pm> simply loading I<Foo.pm>.
+
+The only issue left is to how to bootstrap I<Bar.xs>. This is done
+from I<Foo.xs>:
+
+  MODULE = Cool::Foo PACKAGE = Cool::Foo
+  
+  BOOT:
+  # boot the second XS file
+  boot_Cool__Bar(aTHX_ cv);
+
+If you have more than two files, this is the place where you should
+boot extra XS files from.
+
+The following four files sum up all the details discussed so far.
+
+  Foo.pm:
+  -------
+  package Cool::Foo;
+  
+  require DynaLoader;
+  
+  our @ISA = qw(DynaLoader);
+  our $VERSION = '0.01';
+  bootstrap Cool::Foo $VERSION;
+  
+  1;
+  
+  Bar.pm:
+  -------
+  package Cool::Bar;
+  
+  use Cool::Foo; # bootstraps Bar.xs
+  
+  1;
+
+  Foo.xs:
+  -------
+  #include "EXTERN.h"
+  #include "perl.h"
+  #include "XSUB.h"
+  
+  MODULE = Cool::Foo  PACKAGE = Cool::Foo
+  
+  BOOT:
+  # boot the second XS file
+  boot_Cool__Bar(aTHX_ cv);
+  
+  MODULE = Cool::Foo  PACKAGE = Cool::Foo  PREFIX = cool_foo_
+  
+  void
+  cool_foo_perl_rules()
+  
+      CODE:
+      fprintf(stderr, "Cool::Foo says: Perl Rules\n");
+
+  Bar.xs:
+  -------
+  #include "EXTERN.h"
+  #include "perl.h"
+  #include "XSUB.h"
+  
+  MODULE = Cool::Bar  PACKAGE = Cool::Bar PREFIX = cool_bar_
+  
+  void
+  cool_bar_perl_rules()
+  
+      CODE:
+      fprintf(stderr, "Cool::Bar says: Perl Rules\n");
+
+And of course a very basic test:
+
+  test.pl:
+  --------
+  use Test;
+  BEGIN { plan tests => 1 };
+  use Cool::Foo;
+  use Cool::Bar;
+  Cool::Foo::perl_rules();
+  Cool::Bar::perl_rules();
+  ok 1;
+
+This tip has been brought to you by Nick Ing-Simmons and Stas Bekman.
+
+=head1 AUTHOR
+
+=head1 SEE ALSO
+
+perl(3)
+
+=cut
+
+--------------020203080305000601040604--
+
+
+
+
