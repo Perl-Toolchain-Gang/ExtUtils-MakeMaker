@@ -2930,7 +2930,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 ' if $self->{OBJECT};
 
     push @m, q{
-# We take a very conservative approach here, but it\'s worth it.
+# We take a very conservative approach here, but it's worth it.
 # We move Makefile to Makefile.old here to avoid gnu make looping.
 $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(NOECHO) $(ECHO) "Makefile out-of-date with respect to $?"

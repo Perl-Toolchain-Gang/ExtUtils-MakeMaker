@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.67';
-($Revision) = q$Revision: 1.97 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.98 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1705,7 +1705,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 ] if $self->{OBJECT};
 
     push @m,q[
-# We take a very conservative approach here, but it\'s worth it.
+# We take a very conservative approach here, but it's worth it.
 # We move $(FIRST_MAKEFILE) to $(MAKEFILE_OLD) here to avoid gnu make looping.
 $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(NOECHO) $(ECHO) "$(FIRST_MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
