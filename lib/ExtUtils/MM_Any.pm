@@ -148,6 +148,37 @@ sub _expand_macros {
 }
 
 
+=item B<echo>
+
+    my @commands = $MM->echo($text);
+    my @commands = $MM->echo($text, $file);
+    my @commands = $MM->echo($text, $file, $appending);
+
+Generates a set of @commands which print the $text to a $file.
+
+If $file is not given, output goes to STDOUT.
+
+If $appending is true the $file will be appended to rather than
+overwritten.
+
+=cut
+
+sub echo {
+    my($self, $text, $file, $appending) = @_;
+    $appending ||= 0;
+
+    my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) } 
+               split /\n/, $text;
+    if( $file ) {
+        my $redirect = $appending ? '>>' : '>';
+        $cmds[0] .= " $redirect $file";
+        $_ .= " >> $file" foreach @cmds[1..$#cmds];
+    }
+
+    return @cmds;
+}
+
+
 =item init_VERSION
 
     $mm->init_VERSION
@@ -481,11 +512,11 @@ MAKE_EXT
 }
 
 
-=item metayaml_target
+=item metafile_target
 
-    my $target = $mm->metayaml_target;
+    my $target = $mm->metafile_target;
 
-Generate the metayaml target.
+Generate the metafile target.
 
 Writes the file META.yml, YAML encoded meta-data about the module.  The
 format follows Module::Build's as closely as possible.  Additionally, we
@@ -496,7 +527,7 @@ include:
 
 =cut
 
-sub metayaml_target {
+sub metafile_target {
     my $self = shift;
 
     my $prereq_pm = '';
@@ -516,26 +547,24 @@ distribution_type: module
 generated_by: ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
 YAML
 
-    $meta =~ s/\n/\\n/g;
-
-    my $write_meta = $self->oneliner(qq{print qq{$meta}});
-    return sprintf <<'MAKE_FRAG', $write_meta;
-metayaml :
-	$(NOECHO) %s > META.yml
+    my @write_meta = $self->echo($meta, 'META.yml');
+    return sprintf <<'MAKE_FRAG', join "\n\t", @write_meta;
+metafile :
+	%s
 MAKE_FRAG
 
 }
 
 
-=item metayaml_addtomanifest_target
+=item metafile_addtomanifest_target
 
-  my $target = $mm->metayaml_addtomanifest_target
+  my $target = $mm->metafile_addtomanifest_target
 
 Adds the META.yml file to the MANIFEST.
 
 =cut
 
-sub metayaml_addtomanifest_target {
+sub metafile_addtomanifest_target {
     my $self = shift;
 
     my $add_meta = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
@@ -543,7 +572,7 @@ maniadd({q{META.yml} => q{Module meta-data in YAML}});
 CODE
 
     return sprintf <<'MAKE_FRAG', $add_meta;
-metayaml_addtomanifest:
+metafile_addtomanifest:
 	$(NOECHO) %s
 MAKE_FRAG
 
