@@ -1098,16 +1098,20 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) blibdirs.ts $(EXPORT_LIST) $
 
     my $ld_run_path_shell = "";
     if ($self->{LD_RUN_PATH} ne "") {
-	$ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
+	$ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)"';
     }
-    push(@m,
-'	'.$ld_run_path_shell.'$(LD) '.$ldrun.' $(LDDLFLAGS) '.$ldfrom.
-' $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) $(PERL_ARCHIVE) '.$libs.' $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) $(INST_DYNAMIC_FIX)');
-    push @m, '
-	$(CHMOD) $(PERM_RWX) $@
-';
 
-    join('',@m);
+    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $ldfrom, $libs;
+	%s $(LD) %s $(LDDLFLAGS) %s $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
+	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST)     \
+	  $(INST_DYNAMIC_FIX)
+MAKE
+
+    push @m, <<'MAKE';
+	$(CHMOD) $(PERM_RWX) $@
+MAKE
+
+    return join('',@m);
 }
 
 =item exescan
