@@ -8,13 +8,16 @@ BEGIN {
     }
 }
 
-$ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
+chdir 't';
 
 use strict;
 use Test::More tests => 1;
+use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use TieOut;
 use File::Path;
+
+perl_lib();
 
 mkdir 'Odd-Version';
 END { chdir File::Spec->updir;  rmtree 'Odd-Version' }

@@ -44,7 +44,7 @@ WriteMakefile(
     use File::Spec;
 
     my $lib;
-    BEGIN { $lib = File::Spec->rel2abs('lib'); }
+    BEGIN { $lib = File::Spec->rel2abs('lib/'); }
 
     # Make sure PERLRUN uses the MakeMaker about to be installed
     # and not the currently installed one.

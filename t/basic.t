@@ -21,7 +21,7 @@ use TieOut;
 
 my $perl = which_perl();
 
-$ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
+chdir 't';
 
 perl_lib;
 
