@@ -13,10 +13,10 @@ The MakeMaker class hierarchy (subclasses on top).
 
 The MM_* hierarchy
 
-                                        MM_Win95   MM_NW5
-                                              \      /
-MM_BeOS     MM_Cygwin   MM_OS2    MM_VMS      MM_Win32
-      \             |      |         |        /
-       ---------------------------------------
+                               MM_Win95   MM_NW5
+                                    \      /
+MM_BeOS  MM_Cygwin  MM_OS2  MM_VMS  MM_Win32  MM_DOS  MM_MacOS  MM_UWIN
+      \        |      |         |        /      /       /       /
+       ---------------------------------------------------------
                            |
                         MM_Unix
