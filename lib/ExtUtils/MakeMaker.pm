@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.18';
-($Revision) = q$Revision: 1.136 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.137 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -381,7 +381,9 @@ sub new {
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.
-        eval "require $prereq; 0";
+        my $file = "$prereq.pm";
+        $file =~ s{::}{/}g;
+        eval { require $file };
 
         my $pr_version = $prereq->VERSION || 0;
 
@@ -2051,7 +2053,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.136 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.137 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
