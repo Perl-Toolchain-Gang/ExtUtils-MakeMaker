@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.91_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.39 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.40 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -122,7 +122,11 @@ sub full_setup {
     PREFIX          SITEPREFIX      VENDORPREFIX
     INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
     INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
-    INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
+    INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN
+    INSTALLMAN1DIR          INSTALLMAN3DIR
+    INSTALLSITEMAN1DIR      INSTALLSITEMAN3DIR
+    INSTALLVENDORMAN1DIR    INSTALLVENDORMAN3DIR
+    INSTALLSCRIPT 
     PERL_LIB        PERL_ARCHLIB 
     SITELIBEXP      SITEARCHEXP 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS
@@ -884,8 +888,8 @@ set of perl C<-I> options.
 
 MakeMaker also checks for any files matching glob("t/*.t"). It will
 add commands to the test target of the generated Makefile that execute
-all matching files via the L<Test::Harness> module with the C<-I>
-switches set correctly.
+all matching files in alphabetical order via the L<Test::Harness>
+module with the C<-I> switches set correctly.
 
 =head2 make testdb
 
@@ -1804,7 +1808,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.39 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.40 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
