@@ -1,5 +1,11 @@
 6.06_03
+    - Modernized VMS doc_*_install targets
+    - Changed some $(PERL) -e "print ..." code to use $(ECHO).
+    - Replaced uses of Delete/NoLog/NoConfirm with $(RM_F) in MM_VMS
+    - Fixed some duplicate macros making MMS happy.
     - Fixed $ExtUtils::MM_VMS::Revision.  It was just the $VERSION before.
+    - Fixed ExtUtils::Command::MM::perllocal_install(), uninstall(),
+      warn_if_old_packlist().
     * Pulling File::Spec::VMS::fixpath() and eliminate_macros() into MM_VMS
       as the new cannonical location.  They never should have been in F::S
       in the first place.
