@@ -216,6 +216,7 @@ sub init_VERSION {
     $self->{MAKEMAKER}  = $INC{'ExtUtils/MakeMaker.pm'};
     $self->{MM_VERSION} = $ExtUtils::MakeMaker::VERSION;
     $self->{MM_REVISION}= $ExtUtils::MakeMaker::Revision;
+    $self->{VERSION_FROM} ||= '';
 
     if ($self->{VERSION_FROM}){
         $self->{VERSION} = $self->parse_version($self->{VERSION_FROM});
