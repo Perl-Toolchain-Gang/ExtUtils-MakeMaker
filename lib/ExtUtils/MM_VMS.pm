@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.78 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.79 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -388,6 +388,10 @@ sub init_others {
     $self->{TEST_F}   ||= '$(PERLRUN) "-MExtUtils::Command" -e test_f';
     $self->{EQUALIZE_TIMESTAMP} ||= '$(PERLRUN) -we "open F,qq{>>$ARGV[1]};close F;utime(0,(stat($ARGV[0]))[9]+1,$ARGV[1])"';
 
+    $self->{MOD_INSTALL} ||= 
+      $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
+install({split(' ',<STDIN>)}, '$(VERBINST)', 0, '$(UNINST)');
+CODE
 
     $self->{SHELL}    ||= 'Posix';
 
@@ -1522,7 +1526,7 @@ pure_perl_install ::
 	$(NOECHO) $(ECHO) "$(INST_SCRIPT) $(INSTALLSCRIPT) " >>.MM_tmp
 	$(NOECHO) $(ECHO) "$(INST_MAN1DIR) $(INSTALLMAN1DIR) " >>.MM_tmp
 	$(NOECHO) $(ECHO) "$(INST_MAN3DIR) $(INSTALLMAN3DIR) " >>.MM_tmp
-	$(MOD_INSTALL) <.MM_tmp
+	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
 
@@ -1536,7 +1540,7 @@ pure_site_install ::
 	$(NOECHO) $(ECHO) "$(INST_SCRIPT) $(INSTALLSCRIPT) " >>.MM_tmp
 	$(NOECHO) $(ECHO) "$(INST_MAN1DIR) $(INSTALLSITEMAN1DIR) " >>.MM_tmp
 	$(NOECHO) $(ECHO) "$(INST_MAN3DIR) $(INSTALLSITEMAN3DIR) " >>.MM_tmp
-	$(MOD_INSTALL) <.MM_tmp
+	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
 
@@ -1549,7 +1553,7 @@ pure_vendor_install ::
 	$(NOECHO) $(ECHO) "$(INST_SCRIPT) $(INSTALLSCRIPT) " >>.MM_tmp
 	$(NOECHO) $(ECHO) "$(INST_MAN1DIR) $(INSTALLVENDORMAN1DIR) " >>.MM_tmp
 	$(NOECHO) $(ECHO) "$(INST_MAN3DIR) $(INSTALLVENDORMAN3DIR) " >>.MM_tmp
-	$(MOD_INSTALL) <.MM_tmp
+	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
 
 # Ditto
