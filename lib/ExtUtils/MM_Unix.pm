@@ -3482,19 +3482,20 @@ Defines how to produce the *.a (or equivalent) files.
 
 sub static_lib {
     my($self) = @_;
-# Come to think of it, if there are subdirs with linkcode, we still have no INST_STATIC
-#    return '' unless $self->needs_linking(); #might be because of a subdir
-
     return '' unless $self->has_link_code;
 
     my(@m);
     push(@m, <<'END');
+
 $(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)/.exists
 	$(RM_RF) $@
 END
+
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, "\t$self->{CP} \$(MYEXTLIB) \$\@\n") if $self->{MYEXTLIB};
+    push(@m, <<'MAKE_FRAG' if $self->{MYEXTLIB};
+	$(CP) $(MYEXTLIB) $@
+MAKE_FRAG
 
     my $ar; 
     if (exists $self->{FULL_AR} && -x $self->{FULL_AR}) {
@@ -3504,20 +3505,19 @@ END
     } else {
         $ar = 'AR';
     }
-    push @m,
-        "\t\$($ar) ".'$(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@'."\n";
-    push @m,
-q{	$(CHMOD) $(PERM_RWX) $@
+    push @m, sprintf <<'MAKE_FRAG', $ar;
+	$(%s) $(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@
+	$(CHMOD) $(PERM_RWX) $@
 	$(NOECHO) echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
-};
-    # Old mechanism - still available:
-    push @m,
-q{\t$(NOECHO) echo "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
-}	if $self->{PERL_SRC} && $self->{EXTRALIBS};
-    push @m, "\n";
+MAKE_FRAG
 
-    push @m, $self->dir_target('$(INST_ARCHAUTODIR)');
-    join('', "\n",@m);
+    # Old mechanism - still available:
+    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
+	$(NOECHO) echo "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
+MAKE_FRAG
+
+    push @m, "\n", $self->dir_target('$(INST_ARCHAUTODIR)');
+    join('', @m);
 }
 
 =item staticmake (o)
