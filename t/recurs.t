@@ -110,3 +110,4 @@ ok( open(MAKEFILE, $submakefile) ) || diag("Can't open $submakefile: $!");
   like( <MAKEFILE>, qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
         'prepend .. not stomping WriteMakefile args' ) 
 }
+close MAKEFILE;
