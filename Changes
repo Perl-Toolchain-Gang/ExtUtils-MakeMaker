@@ -1,3 +1,9 @@
+6.10_07
+    - Making sure escaped newlines are followed by a tab.  Sun's make is
+      very picky about such things.
+    - Bug in libscan() meant that any .pm containing RCS or CVS or SCCS
+      in its name (for example, RCS.pm) would be skipped.
+
 6.10_06 Sat Jun  7 00:55:29 PDT 2003
     - Whoops, Liblist.t busted on VMS after I turned strict on in
       ExtUtils::Liblist::Kid.  Merely a test bug, not a real bug.
