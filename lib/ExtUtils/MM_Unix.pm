@@ -1856,84 +1856,107 @@ sub init_INSTALL {
         }
     }
 
-    # we have to look at the relation between $Config{prefix} and the
-    # requested values. We're going to set the $Config{prefix} part of
-    # all the installation path variables to literally $(PREFIX), so
-    # the user can still say make PREFIX=foo
-    my($configure_prefix) = $Config{'prefix'};
-    $configure_prefix = VMS::Filespec::unixify($configure_prefix) if $Is_VMS;
-    $self->{PREFIX} ||= $configure_prefix;
 
+    my $iprefix = $Config{installprefix} || '';
+    my $vprefix = $Config{vendorprefix}  || $iprefix;
+    my $sprefix = $Config{siteprefix}    || '';
 
-    my($search_prefix, $replace_prefix);
-    # If the prefix contains perl, Configure shapes the tree as follows:
-    #    perlprefix/lib/                INSTALLPRIVLIB
-    #    perlprefix/lib/pod/
-    #    perlprefix/lib/site_perl/      INSTALLSITELIB
-    #    perlprefix/bin/                INSTALLBIN
-    #    perlprefix/man/                INSTALLMAN1DIR
-    # else
-    #    prefix/lib/perl5/              INSTALLPRIVLIB
-    #    prefix/lib/perl5/pod/
-    #    prefix/lib/perl5/site_perl/    INSTALLSITELIB
-    #    prefix/bin/                    INSTALLBIN
-    #    prefix/lib/perl5/man/          INSTALLMAN1DIR
-    #
-    # The above results in various kinds of breakage on various
-    # platforms, so we cope with it as follows: if prefix/lib/perl5
-    # or prefix/lib/perl5/man exist, we'll replace those instead
-    # of /prefix/{lib,man}
+    my $u_prefix  = $self->{PREFIX} || '';
+    my $u_mprefix = $self->{MANPREFIX} || $u_prefix;
+    my $u_lprefix = $self->{LIBPREFIX} || $self->{LIB} || $u_prefix;
 
-    $replace_prefix = '$(PREFIX)';
-    for my $install_variable (qw/INSTALLBIN INSTALLSCRIPT/)
-    {
-        $self->prefixify($install_variable,$configure_prefix,$replace_prefix);
+    my $arch    = $Config{archname};
+    my $version = $Config{version};
+
+    # default style
+    my $libstyle = 'lib/perl5';
+    my $manstyle = '';
+
+    if( $self->{LIBSTYLE} ) {
+        $libstyle = $self->{LIBSTYLE};
+        $manstyle = $self->{LIBSTYLE} eq 'lib/perl5' ? 'lib/perl5' : '';
     }
 
-    my $funkylibdir = File::Spec->catdir($configure_prefix,"lib","perl5");
-    $funkylibdir = '' unless -d $funkylibdir;
-    $search_prefix = $funkylibdir || 
-                     File::Spec->catdir($configure_prefix,"lib");
+    my %bin_layouts = 
+    (
+        bin         => { s => $iprefix,
+                         r => $u_prefix,
+                         d => 'bin' },
+        vendorbin   => { s => $vprefix,
+                         r => $u_prefix,
+                         d => 'bin' },
+        sitebin     => { s => $sprefix,
+                         r => $u_prefix,
+                         d => 'bin' },
+        script      => { s => $iprefix,
+                         r => $u_prefix,
+                         d => 'bin' },
+    );
+    
+    my %man_layouts =
+    (
+        man1dir     => { s => $iprefix,
+                         r => $u_mprefix,
+                         d => "man/man1",
+                         style => $manstyle, },
+        man3dir     => { s => $iprefix,
+                         r => $u_mprefix,
+                         d => "man/man3",
+                         style => $manstyle, },
+    );
 
-    if ($self->{LIB}) {
-        $self->{INSTALLPRIVLIB} = $self->{INSTALLSITELIB} = $self->{LIB};
-        $self->{INSTALLARCHLIB} = $self->{INSTALLSITEARCH} = 
-            File::Spec->catdir($self->{LIB},$Config{'archname'});
-    }
-    else {
-        if (-d File::Spec->catdir($self->{PREFIX},"lib","perl5")) {
-            $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib", 
-                                                 "perl5");
+    my %lib_layouts =
+    (
+        privlib     => { s => $iprefix,
+                         r => $u_lprefix,
+                         d => '',
+                         style => $libstyle, },
+        vendorlib   => { s => $vprefix,
+                         r => $u_lprefix,
+                         d => '',
+                         style => $libstyle, },
+        sitelib     => { s => $sprefix,
+                         r => $u_lprefix,
+                         d => 'site_perl',
+                         style => $libstyle, },
+        
+        vendorarch  => { s => $vprefix,
+                         r => $u_lprefix,
+                         d => "$version/$arch",
+                         style => $libstyle },
+        archlib     => { s => $iprefix,
+                         r => $u_lprefix,
+                         d => "$version/$arch",
+                         style => $libstyle },
+        sitearch    => { s => $sprefix,
+                         r => $u_lprefix,
+                         d => "site_perl/$version/$arch",
+                         style => $libstyle },
+    );
+
+    my %layouts = (%bin_layouts, %man_layouts, %lib_layouts);
+    while( my($var, $layout) = each(%layouts) ) {
+        my($s, $r, $d, $style) = @{$layout}{qw(s r d style)};
+
+        print STDERR "Prefixing $var\n" if $Verbose >= 2;
+
+        my $installvar = "install$var";
+        my $Installvar = uc $installvar;
+        next if $self->{$Installvar};
+
+        if( $r ) {
+            $d = "$style/$d" if $style;
+            $self->prefixify($installvar, $s, $r, $d);
         }
         else {
-            $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib");
+            $self->{$Installvar} = $Config{$installvar};
         }
-        for my $install_variable (qw/
-                               INSTALLPRIVLIB
-                               INSTALLARCHLIB
-                               INSTALLSITELIB
-                               INSTALLSITEARCH
-                               /)
-        {
-            $self->prefixify($install_variable,$search_prefix,$replace_prefix);
-        }
+
+        print STDERR "  $Installvar == $self->{$Installvar}\n" 
+          if $Verbose >= 2;
     }
-    my $funkymandir = File::Spec->catdir($configure_prefix,"lib","perl5","man");
-    $funkymandir = '' unless -d $funkymandir;
-    $search_prefix = $funkymandir || File::Spec->catdir($configure_prefix,"man");
-    if (-d File::Spec->catdir($self->{PREFIX},"lib","perl5", "man")) {
-        $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib", "perl5", "man");
-    }
-    else {
-        $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"man");
-    }
-    for my $install_variable (qw/
-                           INSTALLMAN1DIR
-                           INSTALLMAN3DIR
-                           /)
-    {
-        $self->prefixify($install_variable,$search_prefix,$replace_prefix);
-    }
+
+    $self->{PREFIX} ||= $iprefix;
 
     return 1;
 }
@@ -3077,21 +3100,21 @@ sub prefixify {
 
     my $path = $self->{uc $var} || $Config{lc $var};
 
-    print STDERR "Prefixing $var=$path\n" if $Verbose >= 2;
-    print STDERR "  from $sprefix to $rprefix\n" 
+    print STDERR "  prefixify $var=$path\n" if $Verbose >= 2;
+    print STDERR "    from $sprefix to $rprefix\n" 
       if $Verbose >= 2;
 
     $path = VMS::Filespec::unixpath($path) if $Is_VMS;
 
     unless( $path =~ s,^\Q$sprefix\E(?=/|\z),$rprefix,s ) {
 
-        print STDERR "  cannot prefix, using default.\n" if $Verbose >= 2;
-        print STDERR "  no default!\n" if $Verbose >= 2;
+        print STDERR "    cannot prefix, using default.\n" if $Verbose >= 2;
+        print STDERR "    no default!\n" if !$default && $Verbose >= 2;
 
         $path = File::Spec->catdir($rprefix, $default) if $default;
     }
 
-    print "  now $path\n" if $Verbose >= 2;
+    print "    now $path\n" if $Verbose >= 2;
     return $self->{uc $var} = $path;
 }
 

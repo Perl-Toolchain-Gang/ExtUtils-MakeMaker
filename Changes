@@ -1,3 +1,7 @@
+5.90_01
+    [[ API Changes ]]
+    * Partial implementation of the new PREFIX logic.
+
 5.55_03 Sat Apr  6 21:57:01 EST 2002
     - Reversing "fix" for RT 444.  It wasn't really fixed and it
       caused havoc with Compress::Zlib and Tk.
