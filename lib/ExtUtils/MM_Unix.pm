@@ -3156,10 +3156,8 @@ PERL_HDRS = \
 	$(PERL_INC)/nostdio.h		\
 	$(PERL_INC)/op.h		\
 	$(PERL_INC)/opcode.h		\
-	$(PERL_INC)/opnames.h		\
 	$(PERL_INC)/patchlevel.h	\
 	$(PERL_INC)/perl.h		\
-	$(PERL_INC)/perlapi.h		\
 	$(PERL_INC)/perlio.h		\
 	$(PERL_INC)/perlsdio.h		\
 	$(PERL_INC)/perlsfio.h		\
@@ -3176,9 +3174,7 @@ PERL_HDRS = \
 	$(PERL_INC)/thrdvar.h		\
 	$(PERL_INC)/thread.h		\
 	$(PERL_INC)/unixish.h		\
-	$(PERL_INC)/utf8.h		\
-	$(PERL_INC)/util.h		\
-	$(PERL_INC)/warnings.h
+	$(PERL_INC)/util.h
 
 $(OBJECT) : $(PERL_HDRS)
 } if $self->{OBJECT};
