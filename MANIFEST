@@ -7,12 +7,11 @@ TODO
 bin/instmodsh
 lib/ExtUtils/Command.pm
 lib/ExtUtils/Command/MM.pm
-lib/ExtUtils/Constant.pm
-lib/ExtUtils/Embed.pm
 lib/ExtUtils/Install.pm
 lib/ExtUtils/Installed.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
+lib/ExtUtils/MANIFEST.SKIP
 lib/ExtUtils/MM.pm
 lib/ExtUtils/MM_Any.pm
 lib/ExtUtils/MM_BeOS.pm
@@ -36,8 +35,6 @@ t/Big-Fat-Dummy/Makefile.PL
 t/Big-Fat-Dummy/lib/Big/Fat/Dummy.pm
 t/Big-Fat-Dummy/t/compile.t
 t/Command.t
-t/Constant.t
-t/Embed.t
 t/Installed.t
 t/MM_BeOS.t
 t/MM_Cygwin.t
