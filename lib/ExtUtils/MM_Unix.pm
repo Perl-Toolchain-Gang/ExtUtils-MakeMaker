@@ -1920,10 +1920,6 @@ sub init_INSTALL {
         $self->prefixify($install_variable,$search_prefix,$replace_prefix);
     }
 
-    # Now we head at the manpages.
-    $self->{INSTALLMAN1DIR} ||= $Config::Config{installman1dir};
-    $self->{INSTALLMAN3DIR} ||= $Config::Config{installman3dir};
-
     return 1;
 }
 
