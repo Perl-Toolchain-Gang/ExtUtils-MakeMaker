@@ -1,3 +1,7 @@
+Known Good on Unix back to 5.6.0 except ExtUtils::Embed which is only
+good back to 5.6.1.
+
+
 Known Problems:
 
 Debian
