@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 38;
+use Test::More tests => 40;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -134,6 +134,7 @@ while( my($type, $vars) = each %Install_Vars) {
 # are generated.
 {
     undef *ExtUtils::MM_Unix::Config;
+    undef *ExtUtils::MM_Unix::Config_Override;
     %ExtUtils::MM_Unix::Config = %Config;
     $ExtUtils::MM_Unix::Config{installman1dir} = '';
     $ExtUtils::MM_Unix::Config{installman3dir} = '';
@@ -151,4 +152,28 @@ while( my($type, $vars) = each %Install_Vars) {
 
     is( $mm->{INSTALLMAN1DIR}, $wibble );
     is( $mm->{INSTALLMAN3DIR}, 'none'  );
+}
+
+# Check that when installvendorman*dir is set in Config it is honored
+# [rt.cpan.org 2949]
+{
+    undef *ExtUtils::MM_Unix::Config;
+    undef *ExtUtils::MM_Unix::Config_Override;
+    %ExtUtils::MM_Unix::Config = %Config;
+    $ExtUtils::MM_Unix::Config{installvendorman1dir} = 'foo/bar';
+    $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
+    $ExtUtils::MM_Unix::Config{usevendorprefix} = 1;
+
+    my $stdout = tie *STDOUT, 'TieOut' or die;
+    my $mm = WriteMakefile(
+                           NAME          => 'Big::Dummy',
+                           VERSION_FROM  => 'lib/Big/Dummy.pm',
+                           PREREQ_PM     => {},
+                           PERL_CORE     => $ENV{PERL_CORE},
+                          );
+
+    is( $mm->{INSTALLVENDORMAN1DIR}, 'foo/bar', 
+                      'installvendorman1dir (in %Config) not modified' );
+    isnt( $mm->{INSTALLVENDORMAN3DIR}, '', 
+                      'installvendorman3dir (not in %Config) set'  );
 }
