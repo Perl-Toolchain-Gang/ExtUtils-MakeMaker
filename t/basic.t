@@ -35,7 +35,7 @@ ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
 
 # The perl core test suite will run any .t file in the MANIFEST.
 # So we have to generate this on the fly.
-mkdir 't';
+mkdir 't' || die "Can't create hints dir: $@";
 open(TEST, ">t/compile.t") or die "Can't open t/compile.t: $!";
 print TEST <DATA>;
 close TEST;
