@@ -35,12 +35,28 @@ ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
 
 # The perl core test suite will run any .t file in the MANIFEST.
 # So we have to generate this on the fly.
-mkdir 't' || die "Can't create hints dir: $@";
+mkdir 't' || die "Can't create test dir: $!";
 open(TEST, ">t/compile.t") or die "Can't open t/compile.t: $!";
-print TEST <DATA>;
+print TEST <<'COMPILE_T';
+print "1..2\n";
+
+print eval "use Big::Fat::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
+print "ok 2 - TEST_VERBOSE\n";
+COMPILE_T
 close TEST;
 
-END { unlink 't/compile.t' }
+mkdir 'Liar/t' || die "Can't create test dir: $!";
+open(TEST, ">Liar/t/sanity.t") or die "Can't open Liar/t/sanity.t: $!";
+print TEST <<'SANITY_T';
+print "1..3\n";
+
+print eval "use Big::Fat::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
+print eval "use Big::Fat::Liar; 1;" ? "ok 2\n" : "not ok 2\n";
+print "ok 3 - TEST_VERBOSE\n";
+SANITY_T
+
+
+END { unlink 't/compile.t', 'Liar/t/sanity.t' }
 
 my @mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
 
@@ -101,12 +117,13 @@ ok( grep(/^Writing $makefile for Big::Fat::Dummy/,
          @mpl_out) == 1,
                                 'init_dirscan skipped distdir');
 
+# I know we'll get ignored errors from make here, that's ok.
+# Send STDERR off to oblivion.
+open(SAVERR, ">&STDERR") or die $!;
+open(STDERR, ">".File::Spec->devnull) or die $!;
 
 my $realclean_out = `$make realclean`;
 is( $?, 0, 'realclean' ) || diag($realclean_out);
 
-__DATA__
-print "1..2\n";
-
-print eval "use Big::Fat::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
-print "ok 2 - TEST_VERBOSE\n";
+open(STDERR, ">&SAVERR") or die $!;
+close SAVERR;

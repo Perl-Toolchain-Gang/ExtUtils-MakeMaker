@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 14;
+use Test::More tests => 17;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -42,7 +42,13 @@ my $mm = WriteMakefile(
     VERSION_FROM  => 'lib/Big/Fat/Dummy.pm',
     PREREQ_PM     => {},
 );
-is( $stdout->read, "Writing $Makefile for Big::Fat::Dummy\n" );
+like( $stdout->read, qr{
+                        Writing\ $Makefile\ for\ Big::Fat::Liar\n
+                        Big::Fat::Liar's\ vars\n
+                        INST_LIB\ =.*\n
+                        INST_ARCH\ =.*\n
+                        Writing\ $Makefile\ for\ Big::Fat::Dummy\n
+}x );
 undef $stdout;
 untie *STDOUT;
 
@@ -80,6 +86,15 @@ is( $mm->{INST_ARCHLIB}, File::Spec->catdir($Curdir, 'blib', 'arch'),
                                      'INST_ARCHLIB');
 is( $mm->{INST_BIN},     File::Spec->catdir($Curdir, 'blib', 'bin'),
                                      'INST_BIN' );
+
+is( keys %{$mm->{CHILDREN}}, 1 );
+my($child_pack) = keys %{$mm->{CHILDREN}};
+my $c_mm = $mm->{CHILDREN}{$child_pack};
+is( $c_mm->{INST_ARCHLIB}, File::Spec->catdir($Updir, 'blib', 'arch'),
+                                     'CHILD INST_ARCHLIB');
+is( $c_mm->{INST_BIN},     File::Spec->catdir($Updir, 'blib', 'bin'),
+                                     'CHILD INST_BIN' );
+
 
 my $inst_lib;
 if( $ENV{PERL_CORE} ) {
