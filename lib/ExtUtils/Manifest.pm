@@ -12,7 +12,7 @@ our ($VERSION,@ISA,@EXPORT_OK,
 	    $Is_MacOS,$Is_VMS,
 	    $Debug,$Verbose,$Quiet,$MANIFEST,$DEFAULT_MSKIP);
 
-$VERSION = 1.36_01;
+$VERSION = 1.37_01;
 @ISA=('Exporter');
 @EXPORT_OK = ('mkmanifest', 'manicheck', 'fullcheck', 'filecheck', 
 	      'skipcheck', 'maniread', 'manicopy');
@@ -78,8 +78,10 @@ sub manifind {
 	(my $name = $File::Find::name) =~ s|^\./||;
 	$name =~ s/^:([^:]+)$/$1/ if $Is_MacOS;
 	warn "Debug: diskfile $name\n" if $Debug;
-	$name =~ s#(.*)\.$#\L$1# if $Is_VMS;
-	$name = uc($name) if /^MANIFEST/i && $Is_VMS;
+        if( $Is_VMS ) {
+            $name =~ s#(.*)\.$#\L$1#;
+            $name = uc($name) if $name =~ /^MANIFEST(\.SKIP)?$/i;
+        }
 	$found->{$name} = "";
     };
 
@@ -177,7 +179,7 @@ sub maniread {
 	    my $okfile = "$dir$base";
 	    warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
             $file = $okfile;
-            $file = lc($file) unless $file =~ /^MANIFEST/i;
+            $file = lc($file) unless $file =~ /^MANIFEST(\.SKIP)?$/;
 	}
 
         $read->{$file} = $comment;
@@ -208,8 +210,8 @@ sub _maniskip {
     my $regex = join '|', map "(?:$_)", @skip;
 
     return ($args{warn}
-	    ? sub { $_[0] =~ qr{$opts$regex}o && warn "Skipping $_[0]\n" }
-	    : sub { $_[0] =~ qr{$opts$regex}o }
+	    ? sub { $_[0] =~ qr{$opts$regex} && warn "Skipping $_[0]\n" }
+	    : sub { $_[0] =~ qr{$opts$regex} }
 	   );
 }
 
