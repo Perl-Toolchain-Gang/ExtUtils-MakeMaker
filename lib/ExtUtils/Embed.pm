@@ -1,4 +1,4 @@
-# $Id: Embed.pm,v 1.3 2002/01/31 00:15:05 schwern Exp $
+# $Id: Embed.pm,v 1.4 2002/02/04 08:14:29 schwern Exp $
 require 5.006_001;
 
 package ExtUtils::Embed;
@@ -7,10 +7,6 @@ require FileHandle;
 use Config;
 use Getopt::Std;
 use File::Spec;
-
-#Only when we need them
-#require ExtUtils::MakeMaker;
-#require ExtUtils::Liblist;
 
 use vars qw(@ISA @EXPORT $VERSION
 	    @Extensions $Verbose $lib_ext
@@ -24,10 +20,6 @@ $VERSION = 1.2506_01;
 @EXPORT = qw(&xsinit &ldopts 
 	     &ccopts &ccflags &ccdlflags &perl_inc
 	     &xsi_header &xsi_protos &xsi_body);
-
-#let's have Miniperl borrow from us instead
-#require ExtUtils::Miniperl;
-#*canon = \&ExtUtils::Miniperl::canon;
 
 $Verbose = 0;
 $lib_ext = $Config{lib_ext} || '.a';
@@ -208,6 +200,8 @@ sub ldopts {
 
     my $lpath = File::Spec->catdir($Config{archlibexp}, 'CORE');
     $lpath = qq["$lpath"] if $^O eq 'MSWin32';
+
+    require ExtUtils::MM;
     my($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path) =
 	MM->ext(join ' ', "-L$lpath", $libperl, @potential_libs);
 
