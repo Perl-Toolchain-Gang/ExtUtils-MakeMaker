@@ -5,12 +5,13 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.49_01";
 $Version_OK = "5.17";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.6 $, 10)) =~ s/\s+$//;
-
+($Revision = substr(q$Revision: 1.7 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
 use Carp ();
+use ExtUtils::MM;  # Things like CPAN assume loading ExtUtils::MakeMaker
+                   # will give them MM.
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
@@ -43,7 +44,6 @@ sub WriteMakefile {
     Carp::croak "WriteMakefile: Need even number of args" if @_ % 2;
     local $SIG{__WARN__} = \&warnhandler;
 
-    require ExtUtils::MM;
     require ExtUtils::MY;
     my %att = @_;
     MM->new(\%att)->flush;
@@ -323,7 +323,6 @@ sub new {
         mv_all_methods("MY",$newclass);
         bless $self, $newclass;
         push @Parent, $self;
-        require ExtUtils::MM;
         require ExtUtils::MY;
         @{"$newclass\:\:ISA"} = 'MM';
     }
@@ -486,7 +485,6 @@ sub WriteEmptyMakefile {
     Carp::croak "WriteEmptyMakefile: Need even number of args" if @_ % 2;
     local $SIG{__WARN__} = \&warnhandler;
 
-    require ExtUtils::MM;
     my %att = @_;
     my $self = MM->new(\%att);
     if (-f "$self->{MAKEFILE}.old") {
@@ -1800,7 +1798,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.6 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.7 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
