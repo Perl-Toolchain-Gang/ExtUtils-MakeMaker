@@ -1018,7 +1018,7 @@ sub top_targets {
     my($self) = shift;
     my(@m);
     push @m, '
-all :: pure_all manifypods
+all :: pure_all
 	$(NOECHO) $(NOOP)
 
 pure_all :: config pm_to_blib subdirs linkext
