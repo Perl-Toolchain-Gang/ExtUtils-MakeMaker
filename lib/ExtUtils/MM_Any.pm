@@ -598,10 +598,16 @@ distribution_type: module
 generated_by: ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
 YAML
 
-    my @write_meta = $self->echo($meta, 'META.yml');
-    return sprintf <<'MAKE_FRAG', join "\n\t", @write_meta;
+    my @write_meta = $self->echo($meta, 'META_new.yml');
+    my $move = $self->oneliner(<<'CODE', ['-MExtUtils::Command']);
+mv or warn "Cannot move META_new.yml to META.yml\n";
+CODE
+
+    return sprintf <<'MAKE_FRAG', join("\n\t", @write_meta), $move;
 metafile :
+	$(NOECHO) $(ECHO) Generating META.yml
 	%s
+	-$(NOECHO) %s META_new.yml META.yml
 MAKE_FRAG
 
 }
@@ -656,6 +662,7 @@ CODE
 
     return sprintf <<'MAKE_FRAG', $add_meta;
 metafile_addtomanifest:
+	$(NOECHO) $(ECHO) Adding META.yml to MANIFEST
 	$(NOECHO) %s
 MAKE_FRAG
 
@@ -685,6 +692,7 @@ CODE
 
     return sprintf <<'MAKE_FRAG', $add_sign;
 signature_addtomanifest :
+	$(NOECHO) $(ECHO) Adding SIGNATURE to MANIFEST
 	$(NOECHO) %s
 MAKE_FRAG
 
