@@ -1,3 +1,7 @@
+6.25_10
+    - pm_to_blib.ts is gone, back to pm_to_blib (except on VMS).  I 
+      couldn't make it work and still retain backwards compatibility.
+
 6.25_09  Sat Mar 12 10:10:34 PST 2005
     - Stubbing out PASTHRU on VMS.  $(MMSQUALIFIERS) should do the equivalent
       and better.

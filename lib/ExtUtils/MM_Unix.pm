@@ -2287,7 +2287,7 @@ FULLPERL      = $self->{FULLPERL}
 $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
 
-$(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib.ts
+$(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR=}, $dir, q{ \
@@ -2840,11 +2840,7 @@ sub pm_to_blib {
     my $self = shift;
     my($autodir) = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
-# For backwards compat with anything that referenced this target.
-pm_to_blib:
-	$(NOECHO)$(NOOP)
-
-pm_to_blib.ts: $(TO_INST_PM) pm_to_blib
+pm_to_blib : $(TO_INST_PM)
 };
 
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
@@ -2854,7 +2850,7 @@ CODE
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});
 
     $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
-    $r .= qq{\t\$(NOECHO)\$(TOUCH) pm_to_blib.ts\n};
+    $r .= qq{\t\$(NOECHO)\$(TOUCH) pm_to_blib\n};
 
     return $r;
 }
@@ -3054,7 +3050,7 @@ sub processPL {
 all :: %s
 	$(NOECHO) $(NOOP)
 
-%s :: %s pm_to_blib.ts
+%s :: %s pm_to_blib
 	$(PERLRUNINST) %s
 MAKE_FRAG
 
@@ -3563,7 +3559,7 @@ sub top_targets {
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
     push @m, '
-pure_all :: config pm_to_blib.ts subdirs linkext
+pure_all :: config pm_to_blib subdirs linkext
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)

@@ -431,7 +431,7 @@ clean :: clean_subdirs
 
     push(@files, qw[$(MAKE_APERL_FILE) 
                     perlmain.c tmon.out mon.out so_locations 
-                    blibdirs.ts pm_to_blib.ts
+                    blibdirs.ts pm_to_blib pm_to_blib.ts
                     *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
                     $(BOOTSTRAP) $(BASEEXT).bso
                     $(BASEEXT).def lib$(BASEEXT).def
@@ -910,7 +910,7 @@ sub special_targets {
     my $make_frag = <<'MAKE_FRAG';
 .SUFFIXES : .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
 
-.PHONY: all config static dynamic test linkext manifest pm_to_blib blibdirs clean realclean disttest distdir
+.PHONY: all config static dynamic test linkext manifest blibdirs clean realclean disttest distdir
 
 MAKE_FRAG
 
