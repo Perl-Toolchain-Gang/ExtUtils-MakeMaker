@@ -14,8 +14,8 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 0ddae32a4358762cbcca238bc54772356559388a .patch
-SHA1 03fb500f5c9277cfe461f3515c2a3082df39e542 Changes
+SHA1 a1bd0118d8382d34d3e8e0b4f34b201a0a181ef3 .patch
+SHA1 f5a3c80e03e68aa226157e92bc9e858c528348f3 Changes
 SHA1 9a5818da277e4c4d34dbb5011d3073b495ee37e8 MANIFEST
 SHA1 a61b9aa4655eb498906b3ff0babf01d3aea244af MANIFEST.SKIP
 SHA1 6376d1723dd8e244816a8564583987a1722818ec META.yml
@@ -30,7 +30,7 @@ SHA1 d0c26fe321a994eaae42f47077e5dd970a34a425 lib/ExtUtils/Command/MM.pm
 SHA1 15c2f8e45114d1f46ef76b50af3a004df151b5e8 lib/ExtUtils/Install.pm
 SHA1 7d74c6a0911c18264bc0fe744a440e14d9e58ab3 lib/ExtUtils/Installed.pm
 SHA1 f8eda8ce72cf783b201b30ea7de318e7cb42575d lib/ExtUtils/Liblist.pm
-SHA1 e6163cf5e7e240eaf5e78fbf5b3f3a386212cc6b lib/ExtUtils/Liblist/Kid.pm
+SHA1 3d657ca16f05b56c536fc78eb999acce6128c5d5 lib/ExtUtils/Liblist/Kid.pm
 SHA1 49327e65aeea05e2c1bdd672788c8ae81b861ae8 lib/ExtUtils/MANIFEST.SKIP
 SHA1 cf6ef9aabbb3092ebee02f9c88f613f776b947d3 lib/ExtUtils/MM.pm
 SHA1 4b43a9c8a18ee9d5845acc97a250bac10dc20e5d lib/ExtUtils/MM_Any.pm
@@ -103,7 +103,7 @@ SHA1 4a7685da6367a7a79ecfac76f96adf2aeac46514 t/writemakefile_args.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQE/p2cIT4Li3Cw/PzQRAu1+AJ4x3YYs6iH177jzhT8N9lnJscPAzwCdEhWZ
-UXe/okWcdgPOMFroKsNqOvc=
-=gU0V
+iD8DBQE/qFC1T4Li3Cw/PzQRAhAyAJ9Mdv90w4uX+9VvEYPN6FFJxK2ocgCfZ23d
+oeDkZRIfibGgsj9xSBZE1Q8=
+=aBgC
 -----END PGP SIGNATURE-----
