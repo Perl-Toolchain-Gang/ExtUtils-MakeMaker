@@ -1873,7 +1873,7 @@ usually solves this kind of problem.
     $self->{PERL_CORE} = 0 unless exists $self->{PERL_CORE};
 
     # How do we run perl?
-    $self->{PERLRUN}  = $self->{FULLPERL};
+    $self->{PERLRUN}  = $self->{PERL_CORE} ? $self->{PERL} : $self->{FULLPERL};
     $self->{PERLRUN} .= qq{ "-I\$(PERL_LIB)"} if $self->{UNINSTALLED_PERL};
 
     # How do we run perl when installing libraries?
