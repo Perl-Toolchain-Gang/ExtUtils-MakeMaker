@@ -20,10 +20,11 @@ the semantics.
 
 use Config;
 use File::Spec;
+require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
 
 use vars qw(@ISA $VERSION);
-@ISA = qw( ExtUtils::MM_Unix );
+@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_unix );
 $VERSION = 1.01_01;
 
 

@@ -8,8 +8,9 @@ use File::Spec;
 
 $VERSION = '1.02_01';
 
+require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw(ExtUtils::MM_Unix);
+@ISA = qw(ExtUtils::MM_Any ExtUtils::MM_Unix);
 
 =pod
 
