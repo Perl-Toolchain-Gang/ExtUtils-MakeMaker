@@ -3147,7 +3147,7 @@ realclean purge ::  clean
     if( $Is_Win32  &&  Win32::IsWin95() ) {
         $sub = <<'REALCLEAN';
 	-cd %s
-	-$(TEST_F) -e "system q{$(MAKE) realclean}" %s
+	-$(PERL) -e "exit unless -f shift; system q{$(MAKE) realclean}" %s
 	-cd ..
 REALCLEAN
     }
@@ -3411,7 +3411,7 @@ test :: \$(TEST_TYPE)
 ");
 
     if ($Is_Win32 && Win32::IsWin95()) {
-        push(@m, map(qq{\t$self->{NOECHO}\$(TEST_F) -e "chdir '$_'; system q{\$(MAKE) test \$(PASTHRU)}"\n}, @{$self->{DIR}}));
+        push(@m, map(qq{\t$self->{NOECHO}\$(PERLRUN) -e "exit unless -f shift; chdir '$_'; system q{\$(MAKE) test \$(PASTHRU)}" $self->{MAKEFILE}\n}, @{$self->{DIR}}));
     }
     else {
         push(@m, map("\t$self->{NOECHO}cd $_ && \$(TEST_F) $self->{MAKEFILE} && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
