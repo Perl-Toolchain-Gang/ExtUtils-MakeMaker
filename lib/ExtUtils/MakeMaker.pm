@@ -2,16 +2,14 @@ BEGIN {require 5.004;}
 
 package ExtUtils::MakeMaker;
 
-$VERSION = "5.51_01";
+$VERSION = "5.52_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.13 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.14 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
 use Carp ();
-use ExtUtils::MM;  # Things like CPAN assume loading ExtUtils::MakeMaker
-                   # will give them MM.
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
@@ -32,6 +30,9 @@ my $Is_VMS     = $^O eq 'VMS';
 my $Is_Win32   = $^O eq 'MSWin32';
 
 full_setup();
+
+require ExtUtils::MM;  # Things like CPAN assume loading ExtUtils::MakeMaker
+                       # will give them MM.
 
 sub warnhandler {
     $_[0] =~ /^Use of uninitialized value/ && return;
@@ -1746,7 +1747,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.13 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.14 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
