@@ -15,7 +15,7 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use MakeMaker::Test::Utils;
 use File::Spec;
 use TieOut;
@@ -30,13 +30,17 @@ ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
 
 my @mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
 
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with non-zero' ) ||
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
 my $makefile = makefile_name();
 ok( grep(/^Writing $makefile for Big::Fat::Dummy/, 
          @mpl_out) == 1,
                                            'Makefile.PL output looks right');
+
+ok( grep(/^Current package is: main$/,
+         @mpl_out) == 1,
+                                           'Makefile.PL run in package main');
 
 ok( -e $makefile,       'Makefile exists' );
 
