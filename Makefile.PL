@@ -59,7 +59,9 @@ my $MM = WriteMakefile(
 
 if( !$Is_VMS && $MM->{PERL} =~ /\S\s+\S/ ) {
     require Test::Harness;
-    print <<SPACE_WARN if $Test::Harness::VERSION < 2.27;
+    my $th_version = defined $Test::Harness::VERSION ? $Test::Harness::VERSION
+                                                     : 0;
+    print <<SPACE_WARN if $th_version < 2.27;
 
 NOTE: Your Perl looks like it contains a space in the path name.
 MakeMaker is now OK with that but your version of Test::Harness is not
