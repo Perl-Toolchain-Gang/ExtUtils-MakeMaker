@@ -13,6 +13,7 @@ lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
 lib/ExtUtils/MANIFEST.SKIP
 lib/ExtUtils/MM.pm
+lib/ExtUtils/MM_Any.pm
 lib/ExtUtils/MM_BeOS.pm
 lib/ExtUtils/MM_Cygwin.pm
 lib/ExtUtils/MM_NW5.pm
