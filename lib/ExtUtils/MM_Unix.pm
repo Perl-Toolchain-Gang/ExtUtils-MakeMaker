@@ -1400,10 +1400,10 @@ Called by init_main.
 
 sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my($self) = @_;
-    my($name, %dir, %xs, %c, %h, %ignore, %pl_files, %manifypods);
+    my($name, %dir, %xs, %c, %h, %pl_files, %manifypods);
     my %pm;
 
-    @ignore{qw(Makefile.PL test.pl t)} = (1,1,1);
+    my %ignore = map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t);
 
     # ignore the distdir
     $Is_VMS ? $ignore{"$self->{DISTVNAME}.dir"} = 1
