@@ -5,6 +5,9 @@ use vars qw($VERSION @ISA);
 $VERSION = '0.10_01';
 @ISA = qw(File::Spec);
 
+# We need $Verbose
+use ExtUtils::MakeMaker qw($Verbose);
+
 use Config;
 use File::Spec;
 
