@@ -30,6 +30,16 @@ $| = 1;
 ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
   diag("chdir failed: $!");
 
+
+# The perl core test suite will run any .t file in the MANIFEST.
+# So we have to generate this on the fly.
+mkdir 't';
+open(TEST, ">t/compile.t") or die "Can't open t/compile.t: $!";
+print TEST <DATA>;
+close TEST;
+
+END { unlink 't/compile.t' }
+
 my @mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
@@ -46,9 +56,14 @@ ok( grep(/^Current package is: main$/,
 
 ok( -e $makefile,       'Makefile exists' );
 
-# -M is flakey on VMS.
-my $mtime = (stat($makefile))[9];
-ok( ($^T - $mtime) <= 0,  '  its been touched' );
+# -M is flakey on VMS, flat out broken on Tru64 5.6.0
+SKIP: {
+    skip "stat a/mtime broken on Tru64 5.6.0", 1 if $^O eq 'dec_osf' and
+                                                    $] >= 5.006;
+
+    my $mtime = (stat($makefile))[9];
+    cmp_ok( $^T, '<=', $mtime,  '  its been touched' );
+}
 
 END { unlink makefile_name(), makefile_backup() }
 
@@ -80,3 +95,9 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
 my $realclean_out = `$make realclean`;
 is( $?, 0, 'realclean' ) || diag($realclean_out);
+
+__DATA__
+print "1..2\n";
+
+print eval "use Big::Fat::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
+print "ok 2 - TEST_VERBOSE\n";
