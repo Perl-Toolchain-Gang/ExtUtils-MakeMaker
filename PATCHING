@@ -119,9 +119,19 @@ Cross-Platform Compatibility
 
 - MakeMaker must work on many makes.  GNU, BSD, Solaris, nmake, dmake, MMS
   and MMK to name the most common.  Keep your make code as simple as 
-  possible.  Avoid special variables (even $@).  Format targets as
-  "target : dependency", the spacing is important.  Use the $(NOECHO),
-  and $(IGNORE) macros instead of @ and -.
+  possible.  
+
+- Avoid special variables (even $@).  
+
+- Format targets as "target : dependency", the spacing is important.  
+
+- Use $(NOECHO) instead of @.
+
+- Always put a space between $(NOECHO) and the command.
+
+- Always put a space between - (ignore) and the command.
+
+- Always put $(NOECHO) and - together, no space between them.
 
 - Often when you patch ExtUtils::MM_Unix, similar patches must be done
   to the other MM_* modules.  If you can, please do this extra work

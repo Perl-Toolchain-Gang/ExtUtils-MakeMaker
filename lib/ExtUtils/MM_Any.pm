@@ -451,12 +451,12 @@ clean :: clean_subdirs
     { my(%f) = map { ($_ => 1) } @files; @files = keys %f; }
     { my(%d) = map { ($_ => 1) } @dirs;  @dirs  = keys %d; }
 
-    push @m, map "\t$_\n", $self->split_command('$(IGNORE)$(RM_F)',  @files);
-    push @m, map "\t$_\n", $self->split_command('$(IGNORE)$(RM_RF)', @dirs);
+    push @m, map "\t$_\n", $self->split_command('- $(RM_F)',  @files);
+    push @m, map "\t$_\n", $self->split_command('- $(RM_RF)', @dirs);
 
     # Leave Makefile.old around for realclean
     push @m, <<'MAKE';
-	$(IGNORE)$(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
+	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
 MAKE
 
     push(@m, "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
@@ -725,7 +725,7 @@ YAML
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
 	%s
-	$(IGNORE)$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
+	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 MAKE_FRAG
 
 }
@@ -789,9 +789,9 @@ sub realclean {
     { my(%d) = map { ($_ => 1) } @dirs;   @dirs  = keys %d; }
 
     my $rm_cmd  = join "\n\t", map { "$_" } 
-                    $self->split_command('$(IGNORE)$(RM_F)',  @files);
+                    $self->split_command('- $(RM_F)',  @files);
     my $rmf_cmd = join "\n\t", map { "$_" } 
-                    $self->split_command('$(IGNORE)$(RM_RF)', @dirs);
+                    $self->split_command('- $(RM_RF)', @dirs);
 
     my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;
 # Delete temporary files (via clean) and also delete dist files
@@ -832,7 +832,7 @@ chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
 CODE
 
             $rclean .= sprintf <<'RCLEAN', $subrclean;
-	$(IGNORE)%s
+	- %s
 RCLEAN
 
         }

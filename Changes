@@ -1,5 +1,7 @@
 6.25_07
     - perllocal on VMS was inserting executables twice.
+    - No longer using $(IGNORE) macro.  Turns out MMS/K was not honoring
+      it.  Using "-$(NOECHO) command" which seems to make everybody happy.
 
 6.25_06  Sun Dec 26 17:21:37 EST 2004
     - Forgot to define BOOTDEP macro.
