@@ -96,6 +96,14 @@ sub file_name_is_absolute {
     return File::Spec->file_name_is_absolute(@_);
 }
 
+=item path
+
+=cut
+
+sub path {
+    return File::Spec->path();
+}
+
 =item rootdir
 
 =cut
