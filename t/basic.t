@@ -15,9 +15,10 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 8;
 use MakeMaker::Test::Utils;
 use File::Spec;
+use TieOut;
 
 my $perl = which_perl;
 perl_lib;
@@ -39,6 +40,13 @@ ok( -e $makefile,       'Makefile exists' );
 ok( -M $makefile <= 0,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
+
+open(STDERR, ">&STDOUT") || die $!;
+my $manifest_out = `make manifest`;
+ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
+ok( -s 'MANIFEST',      '  its not empty' );
+
+END { unlink 'MANIFEST'; }
 
 
 my $make = make();
