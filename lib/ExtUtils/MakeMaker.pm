@@ -2,10 +2,10 @@ BEGIN {require 5.004;}
 
 package ExtUtils::MakeMaker;
 
-$VERSION = "5.52_02";
+$VERSION = "5.53_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.18 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.19 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -647,9 +647,9 @@ sub mv_all_methods {
 
         # delete would do, if we were sure, nobody ever called
         # MY->makeaperl directly
-        
+
         # delete $symtab->{$method};
-        
+
         # If we delete a method, then it will be undefined and cannot
         # be called.  But as long as we have Makefile.PLs that rely on
         # %MY:: being intact, we have to fill the hole with an
@@ -1749,7 +1749,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.18 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.19 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
