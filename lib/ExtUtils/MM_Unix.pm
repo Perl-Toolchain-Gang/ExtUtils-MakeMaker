@@ -10,13 +10,16 @@ use File::Basename qw(basename dirname fileparse);
 use File::Spec;
 use DirHandle;
 use strict;
-use vars qw($VERSION
+use vars qw($VERSION @ISA
             $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos
             $Verbose %pm %static $Xsubpp_Version);
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
 $VERSION = '1.13_01';
+
+require ExtUtils::MM_Any;
+@ISA = qw(ExtUtils::MM_Any);
 
 $Is_OS2 = $^O eq 'os2';
 $Is_Mac = $^O eq 'MacOS';
@@ -69,96 +72,15 @@ Makefile.PL. Overridable methods are marked as (o). All methods are
 overridable by a platform specific MM_*.pm file (See
 L<ExtUtils::MM_VMS>) and L<ExtUtils::MM_OS2>).
 
-=head2 Preloaded methods
-
-=over 2
-
-=item canonpath
-
-No physical check on the filesystem, but a logical cleanup of a
-path. On UNIX eliminated successive slashes and successive "/.".
-
 =cut
 
-sub canonpath {
-    my($self,$path) = @_;
-    
-    # Handle POSIX-style node names beginning with double slash
-    my $node = '';
-    if ( $^O =~ m/^(?:qnx|nto)$/ && $path =~ s:^(//[^/]+)(/|\z):/:s ) {
-      $node = $1;
-    }
-    $path =~ s|(?<=[^/])/+|/|g ;                   # xx////xx  -> xx/xx
-    $path =~ s|(/\.)+/|/|g ;                       # xx/././xx -> xx/xx
-    $path =~ s|^(\./)+||s unless $path eq "./";    # ./xx      -> xx
-    $path =~ s|(?<=[^/])/\z|| ;                    # xx/       -> xx
-    return "$node$path";
-}
-
-=item catdir
-
-Concatenate two or more directory names to form a complete path ending
-with a directory. But remove the trailing slash from the resulting
-string, because it doesn't look good, isn't necessary and confuses
-OS2. Of course, if this is the root directory, don't cut off the
-trailing slash :-)
-
-=cut
-
-# ';
-
-sub catdir {
-    shift;
-    return File::Spec->catdir(@_);
-}
-
-=item catfile
-
-Concatenate one or more directory names and a filename to form a
-complete path ending with a filename
-
-=cut
-
-sub catfile {
-    shift;
-    return File::Spec->catdir(@_);
-}
-
-=item curdir
-
-Returns a string representing of the current directory.  "." on UNIX.
-
-=cut
-
-# This has to be global, not lexical, or else the SelfLoaded modules
-# can't see it.
+# So we don't have to keep calling the methods over and over again,
+# we have these globals to cache the values.  They have to be global
+# else the SelfLoaded methods can't see them.
 use vars qw($Curdir $Rootdir $Updir);
-$Curdir = File::Spec->curdir;
-sub curdir {
-    return $Curdir;
-}
-
-=item rootdir
-
-Returns a string representing of the root directory.  "/" on UNIX.
-
-=cut
-
+$Curdir  = File::Spec->curdir;
 $Rootdir = File::Spec->rootdir;
-sub rootdir {
-    return $Rootdir;
-}
-
-=item updir
-
-Returns a string representing of the parent directory.  ".." on UNIX.
-
-=cut
-
-$Updir = File::Spec->updir;
-sub updir {
-    return $Updir;
-}
+$Updir   = File::Spec->updir;
 
 sub c_o;
 sub clean;
@@ -181,13 +103,11 @@ sub dynamic_lib;
 sub exescan;
 sub export_list;
 sub extliblist;
-sub file_name_is_absolute;
 sub find_perl;
 sub fixin;
 sub force;
 sub guess_name;
 sub has_link_code;
-sub htmlifypods;
 sub init_dirscan;
 sub init_main;
 sub init_others;
@@ -1143,17 +1063,6 @@ sub extliblist {
     $self->ext($libs, $Verbose);
 }
 
-=item file_name_is_absolute
-
-Takes as argument a path and returns true, if it is an absolute path.
-
-=cut
-
-sub file_name_is_absolute {
-    shift;
-    return File::Spec->file_name_is_absolute(@_);
-}
-
 =item find_perl
 
 Finds the executables PERL and FULLPERL
@@ -1362,66 +1271,6 @@ sub has_link_code {
     return $self->{HAS_LINK_CODE} = 0;
 }
 
-=item htmlifypods (o)
-
-Defines targets and routines to translate the pods into HTML manpages
-and put them into the INST_HTMLLIBDIR and INST_HTMLSCRIPTDIR
-directories.
-
-=cut
-
-sub htmlifypods {
-    my($self, %attribs) = @_;
-    return "\nhtmlifypods : pure_all\n\t$self->{NOECHO}\$(NOOP)\n" unless
-	%{$self->{HTMLLIBPODS}} || %{$self->{HTMLSCRIPTPODS}};
-    my($dist);
-    my($pod2html_exe);
-    if (defined $self->{PERL_SRC}) {
-	$pod2html_exe = File::Spec->catfile($self->{PERL_SRC},'pod',
-                                            'pod2html');
-    } 
-    else {
-	$pod2html_exe = File::Spec->catfile($Config{scriptdirexp},'pod2html');
-    }
-    unless ($pod2html_exe = $self->perl_script($pod2html_exe)) {
-	# No pod2html but some HTMLxxxPODS to be installed
-	print <<END;
-
-Warning: I could not locate your pod2html program. Please make sure,
-         your pod2html program is in your PATH before you execute 'make'
-
-END
-        $pod2html_exe = "-S pod2html";
-    }
-
-    my $m = sprintf <<'MAKE_TEXT', $pod2html_exe, $self->{MAKEFILE};
-POD2HTML_EXE = %s
-POD2HTML = \$(PERLRUN) -we "use File::Basename; use File::Path qw(mkpath);" \\
--e "%%m=@ARGV;while (($p,$h) = each %%m){" \\
--e "  next if -e $$h && -M $$h < -M $$p && -M $$h < -M '%s';" \\
--e "  print qq(Htmlifying $$h\n);" \\
--e "  $$dir = dirname($$h); mkpath($$dir) unless -d $$dir;" \\
--e "  system(q[$(PERLRUN) $(POD2HTML_EXE) ].qq[$$p > $$h])==0 " \\
--e "    or warn qq(Couldn\\047t install $$h\n);" \\
--e "  chmod(oct($(PERM_RW))), $$h " \\
--e "    or warn qq(chmod $(PERM_RW) $$h: $$!\n);" \\
--e "}"
-
-MAKE_TEXT
-
-    $m .= "htmlifypods : pure_all ";
-    $m .= join " \\\n\t", keys %{$self->{HTMLLIBPODS}},
-                          keys %{$self->{HTMLSCRIPTPODS}};
-
-    $m .= "\n";
-    if (keys %{$self->{HTMLLIBPODS}} || keys %{$self->{HTMLSCRIPTPODS}}) {
-        push @m, "\t$self->{NOECHO}\$(POD2HTML) \\\n\t";
-        push @m, join " \\\n\t", %{$self->{HTMLLIBPODS}}, 
-                                 %{$self->{HTMLSCRIPTPODS}};
-    }
-
-    return $m;
-}
 
 =item init_dirscan
 
@@ -3543,29 +3392,27 @@ test :: \$(TEST_TYPE)
     join("", @m);
 }
 
-=item test_via_harness (o)
+=item test_via_harness (override)
 
-Helper method to write the test targets
+For some reason which I forget, Unix machines like to have
+PERL_DL_NONLAZY set for tests.
 
 =cut
 
 sub test_via_harness {
     my($self, $perl, $tests) = @_;
-    $perl = "PERL_DL_NONLAZY=1 $perl" unless $Is_Win32;
-    "\t$perl".q! $(TEST_LIBS) -e 'use Test::Harness qw(&runtests $$verbose); $$verbose=$(TEST_VERBOSE); runtests @ARGV;' !."$tests\n";
+    return $self->SUPER::test_via_harness("PERL_DL_NONLAZY=1 $perl", $tests);
 }
 
-=item test_via_script (o)
+=item test_via_script (override)
 
-Other helper method for test.
+Again, the PERL_DL_NONLAZY thing.
 
 =cut
 
 sub test_via_script {
     my($self, $perl, $script) = @_;
-    $perl = "PERL_DL_NONLAZY=1 $perl" unless $Is_Win32;
-    qq{\t$perl}.q{ $(TEST_LIBS) }.qq{$script
-};
+    return $self->SUPER::test_via_script("PERL_DL_NONLAZY=1 $perl", $script);
 }
 
 =item tool_autosplit (o)
