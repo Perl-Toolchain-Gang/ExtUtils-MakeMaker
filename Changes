@@ -1,4 +1,4 @@
-6.04 Mon Aug 26 18:19:41 PDT 2002
+6.04 Mon Aug 26 18:31:11 PDT 2002 
     - Little fix for pre-5.8 Cygwin test to get the shared library names 
       right.
     * disttest on Win9X broken because of forgotten tabs
@@ -19,6 +19,7 @@
     - Debian folks fixed the doc_install targets so the Appending
       diagnostic gives the correct directory for perllocal.pod
     * Added ExtUtils::MakeMaker::FAQ
+    - Quieted some warnings on MacOS (bleadperl 17669)
 
 6.03 Wed Jun 19 17:06:14 EDT 2002
     - Documented that we're clamping down on cargo-cult MakeMaker
