@@ -16,8 +16,7 @@
     - Slight tweaks to MAKEFILE_OLD and MAKE_APERL_FILE restoring a mistake
       made around 6.06 to fix static builds on OS/2
     - Added ExtUtils::Command::dos2unix()
-    - Fixed 'make dist' problem on OS/2.  The odd TO_UNIX macro using a
-      zip/unzip trick was making the distribution files read-only.
+    - manicopy() would make the copied files read-only if 'cp' was used.    
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)

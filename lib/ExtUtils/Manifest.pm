@@ -367,17 +367,21 @@ sub _maniskip {
 
 =item manicopy
 
-    manicopy($src, $dest_dir);
-    manicopy($src, $dest_dir, $how);
+    manicopy(\%src, $dest_dir);
+    manicopy(\%src, $dest_dir, $how);
 
-copies the files that are the keys in the HASH I<%$src> to the
-$dest_dir. The HASH reference $read is typically returned by the
-maniread() function. This function is useful for producing a directory
-tree identical to the intended distribution tree. The third parameter
-$how can be used to specify a different methods of "copying". Valid
+Copies the files that are the keys in %src to the $dest_dir.  %src is
+typically returned by the maniread() function.
+
+    manicopy( maniread(), $dest_dir );
+
+This function is useful for producing a directory tree identical to the 
+intended distribution tree. 
+
+$how can be used to specify a different methods of "copying".  Valid
 values are C<cp>, which actually copies the files, C<ln> which creates
 hard links, and C<best> which mostly links the files but copies any
-symbolic link to make a tree without any symbolic link. Best is the
+symbolic link to make a tree without any symbolic link.  C<cp> is the 
 default.
 
 =cut
@@ -442,13 +446,13 @@ sub cp_if_diff {
 
 sub cp {
     my ($srcFile, $dstFile) = @_;
-    my ($perm,$access,$mod) = (stat $srcFile)[2,8,9];
+    my ($access,$mod) = (stat $srcFile)[8,9];
+
     copy($srcFile,$dstFile);
     utime $access, $mod + ($Is_VMS ? 1 : 0), $dstFile;
-    # chmod a+rX-w,go-w
-    chmod(  0444 | ( $perm & 0111 ? 0111 : 0 ),  $dstFile ) 
-      unless ($^O eq 'MacOS');
+    _manicopy_chmod($dstFile);
 }
+
 
 sub ln {
     my ($srcFile, $dstFile) = @_;
@@ -456,29 +460,24 @@ sub ln {
     link($srcFile, $dstFile);
 
     # chmod a+r,go-w+X (except "X" only applies to u=x)
-    local($_) = $dstFile;
-    my $mode= 0444 | (stat)[2] & 0700;
-    if (! chmod(  $mode | ( $mode & 0100 ? 0111 : 0 ),  $_  )) {
+    unless( _manicopy_chmod($dstFile) ) {
         unlink $dstFile;
         return;
     }
     1;
 }
 
-unless (defined $Config{d_link}) {
-    # Really cool fix from Ilya :)
-    local $SIG{__WARN__} = sub { 
-        warn @_ unless $_[0] =~ /^Subroutine .* redefined/;
-    };
-    *ln = \&cp;
+# chmod a+rX-w,g-w... or something like that.
+sub _manicopy_chmod {
+    my($file) = shift;
+
+    my $perm = 0444 | (stat $file)[2] & 0700;
+    chmod( $perm | ( $perm & 0100 ? 0111 : 0 ), $file );
 }
-
-
-
 
 sub best {
     my ($srcFile, $dstFile) = @_;
-    if (-l $srcFile) {
+    if (!$Config{d_link} or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
 	ln($srcFile, $dstFile) or cp($srcFile, $dstFile);
@@ -489,13 +488,13 @@ sub _macify {
     my($file) = @_;
 
     return $file unless $Is_MacOS;
-    
+
     $file =~ s|^\./||;
     if ($file =~ m|/|) {
 	$file =~ s|/+|:|g;
 	$file = ":$file";
     }
-    
+
     $file;
 }
 
