@@ -9,9 +9,10 @@ use vars qw($VERSION @ISA @EXPORT);
 
 @EXPORT  = qw(test_harness pod2man perllocal_install uninstall 
               warn_if_old_packlist);
-$VERSION = '0.04';
+$VERSION = '0.04_01';
 
 my $Is_VMS = $^O eq 'VMS';
+
 
 =head1 NAME
 
@@ -50,9 +51,13 @@ sub test_harness {
 
     $Test::Harness::verbose = shift;
 
+    # Because Windows doesn't do this for us and listing all the *.t files
+    # out on the command line can blow over its exec limit.
+    my @argv = ExtUtils::Command::expand_wildcards(@ARGV);
+
     local @INC = @INC;
     unshift @INC, map { File::Spec->rel2abs($_) } @_;
-    Test::Harness::runtests(sort { lc $a cmp lc $b } @ARGV);
+    Test::Harness::runtests(sort { lc $a cmp lc $b } @argv);
 }
 
 
