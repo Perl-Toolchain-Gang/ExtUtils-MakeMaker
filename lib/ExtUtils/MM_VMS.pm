@@ -66,16 +66,6 @@ sub wraplist {
     $line;
 }
 
-=item rootdir (override)
-
-Returns a string representing of the root directory.
-
-=cut
-
-sub rootdir {
-    return File::Spec->rootdir();
-}
-
 package ExtUtils::MM_VMS;
 
 sub ExtUtils::MM_VMS::ext;
@@ -314,17 +304,6 @@ sub find_perl {
     0; # false and not empty
 }
 
-=item path (override)
-
-Translate logical name DCL$PATH as a searchlist, rather than trying
-to C<split> string value of C<$ENV{'PATH'}>.
-
-=cut
-
-sub path {
-    return File::Spec->path();
-}
-
 =item maybe_command (override)
 
 Follows VMS naming conventions for executable files.
@@ -409,17 +388,6 @@ sub perl_script {
     return "$file.com" if -r "$file.com";
     return "$file.pl" if -r "$file.pl";
     return '';
-}
-
-=item file_name_is_absolute (override)
-
-Checks for VMS directory spec as well as Unix separators.
-
-=cut
-
-sub file_name_is_absolute {
-    shift;
-    return File::Spec->file_name_is_absolute(@_);
 }
 
 =item replace_manpage_separator
@@ -2021,30 +1989,6 @@ testdb :: testdb_\$(LINKTYPE)
     }
 
     join('',@m);
-}
-
-=item test_via_harness (override)
-
-Use VMS-style quoting on command line.
-
-=cut
-
-sub test_via_harness {
-    my($self,$perl,$tests) = @_;
-    "	$perl".' "-I$(INST_ARCHLIB)" "-I$(INST_LIB)" "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)" \\'."\n\t".
-    '-e "use Test::Harness qw(&runtests $verbose); $verbose=$(TEST_VERBOSE); runtests @ARGV;" \\'."\n\t$tests\n";
-}
-
-=item test_via_script (override)
-
-Use VMS-style quoting on command line.
-
-=cut
-
-sub test_via_script {
-    my($self,$perl,$script) = @_;
-    "	$perl".' "-I$(INST_ARCHLIB)" "-I$(INST_LIB)" "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" '.$script.'
-';
 }
 
 =item makeaperl (override)
