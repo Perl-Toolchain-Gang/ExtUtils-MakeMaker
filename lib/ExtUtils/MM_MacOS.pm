@@ -548,7 +548,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	require File::Find;
 	File::Find::find(sub {
 	    if (-d $_){
-		if ($_ eq "CVS" || $_ eq "RCS"){
+	        unless ($self->libscan($_)){
 		    $File::Find::prune = 1;
 		}
 		return;
