@@ -30,8 +30,6 @@ $mm->check_hints;
 is( $mm->{CCFLAGS}, 'basset hounds got long ears' );
 is( $out->read, "Processing hints file $hint_file\n" );
 
-package Catch;
-
 
 END {
     use File::Path;
