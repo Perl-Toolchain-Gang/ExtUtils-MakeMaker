@@ -2687,7 +2687,7 @@ sub pasthru {
     $sep .= "\\\n\t";
 
     foreach $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
-                     PREFIX INSTALLBASE DESTDIR)
+                     PREFIX INSTALLBASE)
                  ) 
     {
         next unless defined $self->{$key};
