@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.10_08';
-($Revision) = q$Revision: 1.118 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.119 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -436,7 +436,12 @@ sub new {
         my $key;
         for $key (@Prepend_parent) {
             next unless defined $self->{PARENT}{$key};
-            $self->{$key} = $self->{PARENT}{$key};
+
+            # Don't stomp on WriteMakefile() args.
+            $self->{$key} = $self->{PARENT}{$key}
+                unless defined $self->{ARGS}{$key} and
+                       $self->{ARGS}{$key} eq $self->{$key};
+
             unless ($Is_VMS && $key =~ /PERL$/) {
                 $self->{$key} = $self->catdir("..",$self->{$key})
                   unless $self->file_name_is_absolute($self->{$key});
@@ -2029,7 +2034,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.118 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.119 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

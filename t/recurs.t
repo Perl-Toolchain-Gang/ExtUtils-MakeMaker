@@ -15,7 +15,7 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More 'no_plan';
+use Test::More tests => 25;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::Recurs;
 
@@ -82,3 +82,31 @@ $make = make_run();
 
 run("$make");
 is( $?, 0, 'recursive make exited normally' );
+
+
+ok( chdir File::Spec->updir );
+ok( teardown_recurs(), 'cleaning out recurs' );
+ok( setup_recurs(),    '  setting up fresh copy' );
+ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
+    diag("chdir failed: $!");
+
+
+# Check that arguments aren't stomped when they have .. prepended
+# [rt.perl.org 4345]
+@mpl_out = run(qq{$perl Makefile.PL "INST_SCRIPT=cgi"});
+
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
+  diag(@mpl_out);
+
+$makefile = makefile_name();
+my $submakefile = File::Spec->catdir('prj2',$makefile);
+
+ok( -e $makefile,    'Makefile written' );
+ok( -e $submakefile, 'sub Makefile written' );
+
+my $inst_script = File::Spec->catdir(File::Spec->updir, 'cgi');
+ok( open(MAKEFILE, $submakefile) ) || diag("Can't open $submakefile: $!");
+{ local $/;  
+  like( <MAKEFILE>, qr/^\s*INST_SCRIPT\s*=\s*$inst_script/m, 
+        'prepend .. not stomping WriteMakefile args' ) 
+}
