@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.67';
-($Revision) = q$Revision: 1.94 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.95 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1215,8 +1215,12 @@ realclean ::
     while (($from,$to) = each %fromto) {
 	last unless defined $from;
 	my $todir;
-	if ($to =~ m#[/>:\]]#) { $todir = dirname($to); }
-	else                   { ($todir = $to) =~ s/[^\)]+$//; }
+	if ($to =~ m#[/>:\]]#) {
+            $todir = dirname($to); 
+        }
+	else { 
+            ($todir = $to) =~ s/[^\)]+$//; 
+        }
 	$todir = $self->fixpath($todir,1);
 	push @m, "
 $to : $from \$(FIRST_MAKEFILE) ${todir}\$(DIRFILESEP).exists
