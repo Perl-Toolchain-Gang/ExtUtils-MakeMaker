@@ -8,6 +8,7 @@ BEGIN {
         @INC = '../lib';
     }
 }
+chdir 't';
 
 # use warnings;
 use strict;
