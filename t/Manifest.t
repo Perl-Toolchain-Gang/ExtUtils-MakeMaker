@@ -13,7 +13,7 @@ chdir 't';
 
 use strict;
 
-use Test::More tests => 47;
+use Test::More tests => 49;
 use Cwd;
 
 use File::Spec;
@@ -137,13 +137,16 @@ ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 
 # Check that manicopy copies files.
 manicopy( $files, 'copy', 'cp' );
-my %copies = ();
-find( sub { $copies{$_} = (stat $_)[2] if -f $_ }, 'copy' );
-is_deeply( [sort keys %copies], [sort keys %$files] );
+my @copies = ();
+find( sub { push @copies, $_ if -f }, 'copy' );
+is_deeply( [sort @copies], [sort keys %$files] );
 
 # cp would leave files readonly, so check permissions.
-foreach my $file (%$files) {
-    is( $copies{$file}, (stat $file)[2] );
+foreach my $orig (@copies) {
+    my $copy = "copy/$orig";
+    ok( -r $copy,               "$copy: must be readable" );
+    is( -w $copy, -w $orig,     "       writable if original was" );
+    is( -x $copy, -x $orig,     "       executable if original was" );
 }
 rmtree('copy');
 
@@ -233,7 +236,7 @@ SKIP: {
 
     chmod( 0600, 'MANIFEST' );
 }
-    
+
 
 END {
 	is( unlink( keys %Files ), keys %Files, 'remove all added files' );
