@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.79 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.80 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1276,7 +1276,7 @@ clean :: clean_subdirs
 	}
     }
     push(@otherfiles, qw[ blib $(MAKE_APERL_FILE) extralibs.ld 
-                          perlmain.c pm_to_blib.ts ]);
+                          perlmain.c pm_to_blib pm_to_blib.ts ]);
     push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
 
     # Occasionally files are repeated several times from different sources
@@ -1321,8 +1321,7 @@ NOOP_FRAG
 	$dir = $self->fixpath($dir,1);
 
         $clean .= sprintf <<'MAKE_FRAG', $dir, $dir;
-	If F$Search("%s$(FIRST_MAKEFILE)").nes."" Then \\
-	    $(PERLRUN) -e "chdir '%s'; print `$(MMS)$(MMSQUALIFIERS) clean`;"
+	If F$Search("%s$(FIRST_MAKEFILE)").nes."" Then $(PERLRUN) -e "chdir '%s'; print `$(MMS)$(MMSQUALIFIERS) clean`;"
 MAKE_FRAG
     }
 
@@ -1443,7 +1442,7 @@ sub shdist_target {
     return <<'MAKE_FRAG';
 shdist : distdir
 	$(PREOP)
-	$(SHAR) [.$(DISTVNAME...]*.*; $(DISTVNAME).share
+	$(SHAR) [.$(DISTVNAME)...]*.*; $(DISTVNAME).share
 	$(RM_RF) $(DISTVNAME)
 	$(POSTOP)
 MAKE_FRAG
