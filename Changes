@@ -1,3 +1,7 @@
+6.00 Sat May 25 17:14:09 EDT 2002
+    - VMS 8-level limit test tweak (bleadperl@16764)
+    * Here goes nothing.
+
 5.96_01 Wed May 22 19:11:09 EDT 2002
     - Fixed ExtUtils::testlib so it doesn't taint @INC.
     - Fixed ExtUtils::Command so it groks % shell wildcard on VMS.
