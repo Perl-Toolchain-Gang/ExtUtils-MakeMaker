@@ -415,7 +415,7 @@ MM_REVISION = $self->{MM_REVISION}
     for my $macro (qw/
               MAKE
 	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
-	      LDFROM LINKTYPE
+	      LDFROM LINKTYPE BOOTDEP
 	      /	) 
     {
 	next unless defined $self->{$macro};
