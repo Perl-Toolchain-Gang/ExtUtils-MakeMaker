@@ -1,4 +1,4 @@
-5.55_02
+5.55_02 Sat Apr  6 03:09:15 EST 2002
     [[ Bug Fixes ]]
     - Craig Berry fixed install on VMS (again, I munged the last patch)
     - MakeMaker might not be recognizing it's in PERL_SRC on Win32.
@@ -6,10 +6,12 @@
     - For some reason MM_VMS was using $Config{arch} instead of
       $Config{archname}
     - Fix (well, hack) for creating ABSPERL on VMS.
+    - Quieting some warnings revealed by ExtUtils::Constant
+    - test_via_script had a typo and forgot INST_ARCHLIB
 
     [[ Test Fixes ]]
     - INST.t has to tell MakeMaker it's in the PERL_CORE
-    - INST_LIB doesn't change if it's in the core
+    - Fixing expected values of INST_* when building the core.
 
 5.55_01 Thu Apr  4 23:58:06 EST 2002
     [[ API Changes ]]
@@ -219,7 +221,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.48 $ based $VERSIONs.
+    - Stripped out $Revision: 1.49 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
