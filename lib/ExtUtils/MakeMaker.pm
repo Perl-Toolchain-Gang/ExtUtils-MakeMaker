@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.73 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.74 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -1294,8 +1294,24 @@ Ref to array of subdirectories containing Makefile.PLs e.g. [ 'sdbm'
 
 =item DISTNAME
 
-Your name for distributing the package (by tar file). This defaults to
-NAME above.
+A safe filename for the package. 
+
+Defaults to NAME above but with :: replaced with -.
+
+For example, Foo::Bar becomes Foo-Bar.
+
+=item DISTVNAME
+
+Your name for distributing the package with the version number
+included.  This is used by 'make dist' to name the resulting archive
+file.
+
+Defaults to DISTNAME-VERSION.
+
+For example, version 1.04 of Foo::Bar becomes Foo-Bar-1.04.
+
+On some OS's where . has special meaning VERSION_SYM may be used in
+place of VERSION.
 
 =item DL_FUNCS
 
@@ -1922,7 +1938,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.73 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.74 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -1945,6 +1961,11 @@ would have to do something like
     depend => { Makefile => '$(VERSION_FROM)' }
 
 See attribute C<depend> below.
+
+=item VERSION_SYM
+
+A sanitized VERSION with . replaced by _.  For places where . has
+special meaning (some filesystems, RCS labels, etc...)
 
 =item XS
 
