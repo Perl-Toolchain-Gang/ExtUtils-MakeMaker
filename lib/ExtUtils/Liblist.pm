@@ -47,12 +47,12 @@ Dependent libraries can be linked in one of three ways:
 by the ld command when the perl binary is linked with the extension
 library. See EXTRALIBS below.
 
-=item * For dynamic extensions
+=item * For dynamic extensions at build/link time
 
 by the ld command when the shared object is built/linked. See
 LDLOADLIBS below.
 
-=item * For dynamic extensions
+=item * For dynamic extensions at load time
 
 by the DynaLoader when the shared object is loaded. See BSLOADLIBS
 below.

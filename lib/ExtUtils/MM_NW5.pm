@@ -65,6 +65,7 @@ sub init_others
 Initializes lots of constants and .SUFFIXES and .PHONY
 
 =cut
+
 # NetWare override
 sub const_cccmd {
     my($self,$libperl)=@_;

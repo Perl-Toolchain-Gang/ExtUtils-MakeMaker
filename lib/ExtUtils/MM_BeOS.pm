@@ -41,6 +41,8 @@ sub perl_archive
   return File::Spec->catdir('$(PERL_INC)',$Config{libperl});
   }
 
+=back
+
 1;
 __END__
 
