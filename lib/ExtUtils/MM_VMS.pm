@@ -16,7 +16,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71_03';
-($Revision) = q$Revision: 4056 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1042,9 +1042,9 @@ $(INST_STATIC) :
     my(@m,$lib);
     push @m,'
 # Rely on suffix rule for update action
-$(OBJECT) : blibdirs
+$(OBJECT) : $(FIRST_MAKEFILE)
 
-$(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
+$(INST_STATIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)
 ';
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.

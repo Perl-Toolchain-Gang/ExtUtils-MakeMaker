@@ -859,7 +859,7 @@ BOOTSTRAP = $(BASEEXT).bs
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) blibdirs
+$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
@@ -902,7 +902,7 @@ OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 INST_DYNAMIC_FIX = '.$ld_fix.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) blibdirs $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR) $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
 ');
     if ($armaybe ne ':'){
 	$ldfrom = 'tmp$(LIB_EXT)';
@@ -2180,7 +2180,7 @@ realclean ::
 	my $todir = $self->_todir($to);
 
 	push @m, "
-$to : $from \$(FIRST_MAKEFILE) blibdirs
+$to : $from \$(FIRST_MAKEFILE) \$(INST_SCRIPT) \$(INST_BIN)
 	\$(NOECHO) \$(RM_F) $to
 	\$(CP) $from $to
 	\$(FIXIN) $to
