@@ -316,8 +316,8 @@ clean :: clean_subdirs
                     $(BASEEXT).exp $(BASEEXT).x
                    ]);
 
-    push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
-    push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
+    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
+    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
 
     if( $Is_VOS ) {
         push(@files, qw[*.kp]);
