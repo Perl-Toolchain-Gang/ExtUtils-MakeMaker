@@ -74,3 +74,5 @@ line lengths.
 
 Move oneliner() and friends into a seperate module for general consumption.
 
+Make out of date check on 'make dist' more useful
+http://archive.develooper.com/makemaker@perl.org/msg01075.html
