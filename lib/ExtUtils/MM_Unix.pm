@@ -3050,8 +3050,8 @@ sub processPL {
 all :: %s
 	$(NOECHO) $(NOOP)
 
-%s :: %s pm_to_blib
-	$(PERLRUNINST) %s
+%s :: %s
+	$(PERLRUN) %s
 MAKE_FRAG
 
 	}
