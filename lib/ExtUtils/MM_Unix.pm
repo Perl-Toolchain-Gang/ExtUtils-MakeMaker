@@ -406,7 +406,7 @@ sub constants {
               PERLMAINCC PERL_SRC
 	      PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
               FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
-              FULL_AR PERL_CORE NOOP NOECHO
+              FULL_AR PERL_CORE
               PERM_RW PERM_RWX
 
 	      / ) 
@@ -2835,7 +2835,7 @@ sub needs_linking {
     my($self) = shift;
     my($child,$caller);
     $caller = (caller(0))[3];
-    confess("Needs_linking called too early") if 
+    confess("needs_linking called too early") if 
       $caller =~ /^ExtUtils::MakeMaker::/;
     return $self->{NEEDS_LINKING} if defined $self->{NEEDS_LINKING};
     if ($self->has_link_code or $self->{MAKEAPERL}){
@@ -3714,9 +3714,13 @@ MAKE_FRAG
 
 =item tools_other (o)
 
-Defines SHELL, LD, TOUCH, CP, MV, RM_F, RM_RF, CHMOD, UMASK_NULL in
-the Makefile. Also defines the perl programs MKPATH,
-WARN_IF_OLD_PACKLIST, MOD_INSTALL. DOC_INSTALL, and UNINSTALL.
+    my $make_frag = $MM->tools_other;
+
+Returns a make fragment containing definitions for:
+
+CHMOD, CP, LD, MV, NOOP, NOECHO, RM_F, RM_RF, TEST_F, TOUCH, DEV_NULL,
+UMASK_NULL, MKPATH, EQUALIZE_TIMESTAMP, WARN_IF_OLD_PACKLIST, UNINST,
+VERBINST, MOD_INSTALL, DOC_INSTALL and UNINSTALL
 
 =cut
 
@@ -3728,7 +3732,9 @@ sub tools_other {
 SHELL = $bin_sh
 };
 
-    for (qw/ CHMOD CP LD MV NOOP RM_F RM_RF TEST_F TOUCH UMASK_NULL DEV_NULL/ ) {
+    for (qw/ CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
+             UMASK_NULL DEV_NULL/ ) 
+    {
 	push @m, "$_ = $self->{$_}\n";
     }
 
@@ -3747,31 +3753,51 @@ EQUALIZE_TIMESTAMP = $(PERLRUN) "-MExtUtils::Command" -e eqtime
 
     return join "", @m if $self->{PARENT};
 
-    push @m, q{
+    my $old_packlist = $self->perl_oneliner(<<'CODE', ['-w']);
+exit unless -f $$ARGV[0];
+print "WARNING: I have found an old package in\n";
+print "\t$$ARGV[0].\n";
+print "Please make sure the two installations are not conflicting\n";
+CODE
+
+    my $mod_install = $self->perl_oneliner(<<'CODE', ['-I$(INST_LIB)', '-I$(PERL_LIB)', '-MExtUtils::Install']);
+install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
+CODE
+
+    my $doc_install = $self->perl_oneliner(<<'CODE');
+$$\ = "\n\n";
+print "=head2 ", scalar(localtime), ": C<", shift, ">", " L<", $$arg=shift, 
+      "|", $$arg, ">";
+print "=over 4";
+while (defined($$key = shift) and defined($$val = shift)){
+    print "=item *";print "C<$$key: $$val>";
+}
+print "=back";
+CODE
+
+    my $uninstall = $self->perl_oneliner(<<'CODE', ['-l','-MExtUtils::Install']);
+uninstall($$ARGV[0],1,1); 
+print "\nUninstall is deprecated. Please check the packlist above carefully.";
+print 'There may be errors. Remove the  appropriate files manually.';
+print 'Sorry for the inconveniences.';
+CODE
+
+
+    push @m, sprintf <<MAKE_FRAG, $old_packlist, $mod_install, $doc_install, $uninstall;
+
 # Here we warn users that an old packlist file was found somewhere,
 # and that they should call some uninstall routine
-WARN_IF_OLD_PACKLIST = $(PERL) -we 'exit unless -f $$ARGV[0];' \\
--e 'print "WARNING: I have found an old package in\n";' \\
--e 'print "\t$$ARGV[0].\n";' \\
--e 'print "Please make sure the two installations are not conflicting\n";'
+WARN_IF_OLD_PACKLIST = %s
 
 UNINST=0
 VERBINST=0
 
-MOD_INSTALL = $(PERL) "-I$(INST_LIB)" "-I$(PERL_LIB)" "-MExtUtils::Install" \
--e "install({@ARGV},'$(VERBINST)',0,'$(UNINST)');"
+MOD_INSTALL = %s
 
-DOC_INSTALL = $(PERL) -e '$$\="\n\n";' \
--e 'print "=head2 ", scalar(localtime), ": C<", shift, ">", " L<", $$arg=shift, "|", $$arg, ">";' \
--e 'print "=over 4";' \
--e 'while (defined($$key = shift) and defined($$val = shift)){print "=item *";print "C<$$key: $$val>";}' \
--e 'print "=back";'
+DOC_INSTALL = %s
 
-UNINSTALL =   $(PERLRUN) "-MExtUtils::Install" \
--e 'uninstall($$ARGV[0],1,1); print "\nUninstall is deprecated. Please check the";' \
--e 'print " packlist above carefully.\n  There may be errors. Remove the";' \
--e 'print " appropriate files manually.\n  Sorry for the inconveniences.\n"'
-};
+UNINSTALL = %s
+MAKE_FRAG
 
     return join "", @m;
 }
