@@ -193,8 +193,8 @@ sub manifypods_target {
 
     return <<END_OF_TARGET;
 manifypods : pure_all $dependencies
-	\$(NOECHO)\$(POD2MAN_EXE) --section=1 --perm_rw=\$(PERM_RW) $man1pods
-	\$(NOECHO)\$(POD2MAN_EXE) --section=3 --perm_rw=\$(PERM_RW) $man3pods
+	\$(NOECHO) \$(POD2MAN_EXE) --section=1 --perm_rw=\$(PERM_RW) $man1pods
+	\$(NOECHO) \$(POD2MAN_EXE) --section=3 --perm_rw=\$(PERM_RW) $man3pods
 END_OF_TARGET
 }
 
