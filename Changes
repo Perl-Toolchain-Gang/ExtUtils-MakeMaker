@@ -2,6 +2,11 @@
     - Making install "Skip ... (unchanged)" message happen consistently
     - Checking file sizes as well as modification times when deciding
       to skip installing a file.
+    - OS/2 was using $(RM) instead of $(RM_F) (Ilya)
+    - OS/2 needs .dll removed on failed build (Ilya)
+    - fixin() was assuming that rename() can overwrite the target (Ilya)
+    - manifypods target was empty if there are no pods to manify.  Put in
+      at least $(NOECHO) $(NOOP)
 
 6.06_05 Mon Mar 31 02:44:11 PST 2003
     - Syncing into bleadperl.  Minor nits revealed...
