@@ -20,8 +20,8 @@ BEGIN {
 
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
-($VERSION) = '5.70';
-($Revision) = q$Revision: 1.110 $ =~ /Revision:\s+(\S+)/;
+($VERSION) = '5.71';
+($Revision) = q$Revision: 1.111 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1006,13 +1006,12 @@ INST_DYNAMIC_DEP = $inst_dynamic_dep
 
 ";
     push @m, '
-$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt $(INST_ARCHAUTODIR)$(DIRFILESEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt blibdirs $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
 	If F$TrnLNm("',$shr,'").eqs."" Then Define/NoLog/User ',"$shr Sys\$Share:$shr.$Config{'dlext'}",'
 	Link $(LDFLAGS) /Shareable=$(MMS$TARGET)$(OTHERLDFLAGS) $(BASEEXT).opt/Option,$(PERL_INC)perlshr_attr.opt/Option
 ';
 
-    push @m, $self->dir_target('$(INST_ARCHAUTODIR)');
     join('',@m);
 }
 
@@ -1033,13 +1032,13 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # As MakeMaker mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(FIRST_MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
+$(BOOTSTRAP) : $(FIRST_MAKEFILE) '."$self->{BOOTDEP}".' blibdirs
 	$(NOECHO) $(ECHO) "Running mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) -
 	-e "use ExtUtils::Mkbootstrap; Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
 	$(NOECHO) $(TOUCH) $(MMS$TARGET)
 
-$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
+$(INST_BOOT) : $(BOOTSTRAP) blibdirs
 	$(NOECHO) $(RM_RF) $(INST_BOOT)
 	- $(CP) $(BOOTSTRAP) $(INST_BOOT)
 ';
@@ -1063,7 +1062,7 @@ $(INST_STATIC) :
     my(@m,$lib);
     push @m,'
 # Rely on suffix rule for update action
-$(OBJECT) : $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
+$(OBJECT) : blibdirs
 
 $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
 ';
@@ -1086,7 +1085,6 @@ $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
     foreach $lib (split ' ', $self->{EXTRALIBS}) {
       push(@m,"\t",'$(NOECHO) $(PERL) -e "print qq{',$lib,'\n}" >>$(INST_ARCHAUTODIR)extralibs.ld',"\n");
     }
-    push @m, $self->dir_target('$(INST_ARCHAUTODIR)');
     join('',@m);
 }
 
@@ -1172,10 +1170,10 @@ realclean ::
         }
 	$todir = $self->fixpath($todir,1);
 	push @m, "
-$to : $from \$(FIRST_MAKEFILE) ${todir}\$(DIRFILESEP).exists
+$to : $from \$(FIRST_MAKEFILE) blibdirs
 	\$(CP) $from $to
 
-", $self->dir_target($todir);
+";
     }
     join "", @m;
 }

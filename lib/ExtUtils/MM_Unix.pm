@@ -20,7 +20,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.42';
+$VERSION = '1.43';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -295,7 +295,8 @@ clean :: clean_subdirs
     push(@otherfiles, qw[./blib $(MAKE_APERL_FILE) 
                          $(INST_ARCHAUTODIR)/extralibs.all
                          $(INST_ARCHAUTODIR)/extralibs.ld
-			 perlmain.c tmon.out mon.out so_locations pm_to_blib
+			 perlmain.c tmon.out mon.out so_locations 
+                         blibdirs pm_to_blib
 			 *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
 			 $(BOOTSTRAP) $(BASEEXT).bso
 			 $(BASEEXT).def lib$(BASEEXT).def
@@ -558,47 +559,31 @@ sub depend {
     join "", @m;
 }
 
-=item dir_target (o)
+=item blibdirs_target (o)
 
-Takes an array of directories that need to exist and returns a
-Makefile entry for a .exists file in these directories. Returns
-nothing, if the entry has already been processed. We're helpless
-though, if the same directory comes as $(FOO) _and_ as "bar". Both of
-them get an entry, that's why we use "::".
+    my $make_frag = $mm->blibdirs_target;
+
+Creates the blibdirs target which creates all the directories we use in
+blib/.
 
 =cut
 
-sub dir_target {
-# --- Make-Directories section (internal method) ---
-# dir_target(@array) returns a Makefile entry for the file .exists in each
-# named directory. Returns nothing, if the entry has already been processed.
-# We're helpless though, if the same directory comes as $(FOO) _and_ as "bar".
-# Both of them get an entry, that's why we use "::". I chose '$(PERL)' as the
-# prerequisite, because there has to be one, something that doesn't change
-# too often :)
+sub blibdirs_target {
+    my $self = shift;
 
-    my($self,@dirs) = @_;
-    my(@m,$dir,$targdir);
-    foreach $dir (@dirs) {
-	my($src) = $self->catfile($self->{PERL_INC},'perl.h');
-	my($targ) = $self->catfile($dir,'.exists');
-	# catfile may have adapted syntax of $dir to target OS, so...
-	if ($Is_VMS) { # Just remove file name; dirspec is often in macro
-	    ($targdir = $targ) =~ s:/?\.exists\z::;
-	}
-	else { # while elsewhere we expect to see the dir separator in $targ
-	    $targdir = dirname($targ);
-	}
-	next if $self->{DIR_TARGET}{$self}{$targdir}++;
-	push @m, qq{
-$targ :: $src
-	\$(NOECHO) \$(MKPATH) $targdir
-	\$(NOECHO) \$(EQUALIZE_TIMESTAMP) $src $targ
-};
-	push(@m, "\t-\$(NOECHO) \$(CHMOD) \$(PERM_RWX) $targdir\n") 
-          unless $Is_VMS;
-    }
-    join "", @m;
+    my @dirs = map { uc "\$(INST_$_)" } qw(libdir
+                                       autodir archautodir
+                                       bin script
+                                       man1dir man3dir
+                                      );
+    my @mkpath = $self->split_command('$(NOECHO) $(MKPATH)', @dirs);
+    my @chmod  = $self->split_command('$(NOECHO) $(CHMOD) 755', @dirs);
+
+    my $make = "\nblibdirs : \n";
+    $make .= join "", map { "\t$_\n" } @mkpath, @chmod;
+    $make .= "\t\$(NOECHO) \$(TOUCH) blibdirs\n\n";
+
+    return $make;
 }
 
 =item init_DEST
@@ -1053,7 +1038,7 @@ BOOTSTRAP = $(BASEEXT).bs
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP): $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
+$(BOOTSTRAP): $(FIRST_MAKEFILE) $(BOOTDEP) blibdirs
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
@@ -1061,7 +1046,7 @@ $(BOOTSTRAP): $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exis
 	$(NOECHO) $(TOUCH) $(BOOTSTRAP)
 	$(CHMOD) $(PERM_RW) $@
 
-$(INST_BOOT): $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
+$(INST_BOOT): $(BOOTSTRAP) blibdirs
 	$(NOECHO) $(RM_RF) $(INST_BOOT)
 	-$(CP) $(BOOTSTRAP) $(INST_BOOT)
 	$(CHMOD) $(PERM_RW) $@
@@ -1096,7 +1081,7 @@ OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 INST_DYNAMIC_FIX = '.$ld_fix.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) blibdirs $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
 ');
     if ($armaybe ne ':'){
 	$ldfrom = 'tmp$(LIB_EXT)';
@@ -1140,7 +1125,6 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DIRFILE
 	$(CHMOD) $(PERM_RWX) $@
 ';
 
-    push @m, $self->dir_target('$(INST_ARCHAUTODIR)');
     join('',@m);
 }
 
@@ -1813,25 +1797,7 @@ from the perl source tree.
 EOP
 	      }
 	    }
-	}
-	
-	unless(-f ($perl_h = $self->catfile($self->{PERL_INC},"perl.h")))
-        {
-	    die qq{
-Error: Unable to locate installed Perl libraries or Perl source code.
-
-It is recommended that you install perl in a standard location before
-building extensions. Some precompiled versions of perl do not contain
-these header files, so you cannot build extensions. In such a case,
-please build and install your perl from a fresh perl distribution. It
-usually solves this kind of problem.
-
-\(You get this message, because MakeMaker could not find "$perl_h"\)
-};
-	}
-#	 print STDOUT "Using header files found in $self->{PERL_INC}\n"
-#	     if $Verbose && $self->needs_linking();
-
+	}	
     }
 
     # We get SITELIBEXP and SITEARCHEXP directly via
@@ -2599,7 +2565,6 @@ sub installbin {
     return "" unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
     return "" unless @{$self->{EXE_FILES}};
     my(@m, $from, $to, %fromto, @to);
-    push @m, $self->dir_target(qw[$(INST_SCRIPT)]);
     for $from (@{$self->{EXE_FILES}}) {
 	my($path)= $self->catfile('$(INST_SCRIPT)', basename($from));
 	local($_) = $path; # for backwards compatibility
@@ -2634,7 +2599,7 @@ realclean ::
 	last unless defined $from;
 	my $todir = dirname($to);
 	push @m, "
-$to: $from \$(FIRST_MAKEFILE) " . $self->catdir($todir,'.exists') . "
+$to: $from \$(FIRST_MAKEFILE) blibdirs
 	\$(NOECHO) \$(RM_F) $to
 	\$(CP) $from $to
 	\$(FIXIN) $to
@@ -2882,7 +2847,7 @@ LLIBPERL    = $llibperl
 ";
 
     push @m, "
-\$(INST_ARCHAUTODIR)/extralibs.all: \$(INST_ARCHAUTODIR)\$(DIRFILESEP).exists ".join(" \\\n\t", @$extra).'
+\$(INST_ARCHAUTODIR)/extralibs.all: blibdirs ".join(" \\\n\t", @$extra).'
 	$(NOECHO) $(RM_F)  $@
 	$(NOECHO) $(TOUCH) $@
 ';
@@ -3689,7 +3654,7 @@ sub static_lib {
     my(@m);
     push(@m, <<'END');
 
-$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
+$(INST_STATIC): $(OBJECT) $(MYEXTLIB) blibdirs
 	$(RM_RF) $@
 END
 
@@ -3718,7 +3683,6 @@ MAKE_FRAG
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
 MAKE_FRAG
 
-    push @m, "\n", $self->dir_target('$(INST_ARCHAUTODIR)');
     join('', @m);
 }
 
@@ -4014,7 +3978,7 @@ sub top_targets {
     my(@m);
 
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
-    
+
     push @m, '
 pure_all :: config pm_to_blib subdirs linkext
 	$(NOECHO) $(NOOP)
@@ -4022,34 +3986,11 @@ pure_all :: config pm_to_blib subdirs linkext
 subdirs :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
-config :: $(FIRST_MAKEFILE) $(INST_LIBDIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-
-config :: $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-
-config :: $(INST_AUTODIR)$(DIRFILESEP).exists
+config :: $(FIRST_MAKEFILE) blibdirs
 	$(NOECHO) $(NOOP)
 ';
 
-    push @m, $self->dir_target(qw[$(INST_AUTODIR) $(INST_LIBDIR) $(INST_ARCHAUTODIR)]);
-
-    if (%{$self->{MAN1PODS}}) {
-	push @m, q[
-config :: $(INST_MAN1DIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-
-];
-	push @m, $self->dir_target(qw[$(INST_MAN1DIR)]);
-    }
-    if (%{$self->{MAN3PODS}}) {
-	push @m, q[
-config :: $(INST_MAN3DIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-
-];
-	push @m, $self->dir_target(qw[$(INST_MAN3DIR)]);
-    }
+    push @m, $self->blibdirs_target;
 
     push @m, '
 $(O_FILES): $(H_FILES)

@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.18';
-($Revision) = q$Revision: 1.134 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.135 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -273,7 +273,7 @@ sub full_setup {
     @Overridable = @MM_Sections;
     push @Overridable, qw[
 
- dir_target libscan makeaperl needs_linking perm_rw perm_rwx
+ blibdirs_target libscan makeaperl needs_linking perm_rw perm_rwx
  subdir_x test_via_harness test_via_script init_PERL
                          ];
 
@@ -2040,7 +2040,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.134 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.135 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
