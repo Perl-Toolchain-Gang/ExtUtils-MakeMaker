@@ -418,17 +418,6 @@ sub pm_to_blib {
     use File::Compare qw(compare);
     use AutoSplit;
 
-    if (!ref($fromto) && -r $fromto)
-     {
-      # Win32 has severe command line length limitations, but
-      # can generate temporary files on-the-fly
-      # so we pass name of file here - eval it to get hash 
-      open(FROMTO,"<$fromto") or die "Cannot open $fromto:$!";
-      my $str = '$fromto = {qw{'.join('',<FROMTO>).'}}';
-      eval $str;
-      close(FROMTO);
-     }
-
     mkpath($autodir,0,0755);
     while(my($from, $to) = each %$fromto) {
 	if( -f $to && -s $from == -s $to && -M $to < -M $from ) {
