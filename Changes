@@ -38,6 +38,8 @@
       mistake, not a bug.  [rt 5365]
     - Fixed ExtUtils::Command::chmod() so it will work on directories on
       VMS. [rt 4676]
+    - parse_version.t was using no_plan causing trouble on older T::Hs.
+      [rt 5633]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 
