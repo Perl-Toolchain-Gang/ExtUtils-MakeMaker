@@ -12,6 +12,8 @@
       [Slaven Rezic]
     - instmodsh now using more portable tar flags to create archives.
       [Slaven Rezic]
+    - Added FAQ entry for "How do I use a module without installing it?"
+      and "How do I keep from installing man pages?" [Joe Cromie]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 
