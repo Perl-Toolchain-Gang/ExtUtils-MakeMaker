@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.03";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.63 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.64 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -57,109 +57,31 @@ sub WriteMakefile {
 # Basic signatures of the attributes WriteMakefile takes.  Each is the
 # reference type.  Empty value indicate it takes a non-reference
 # scalar.
-my %Att_Sigs =
-(
- ABSTRACT           => '',
- ABSTRACT_FROM      => '',
- AUTHOR             => '',
- BINARY_LOCATION    => '',
+my %Att_Sigs;
+my %Special_Sigs = (
  C                  => 'array',
- CCFLAGS            => '',
  CONFIG             => 'array',
  CONFIGURE          => 'code',
- DEFINE             => '',
  DIR                => 'array',
- DISTNAME           => '',
  DL_FUNCS           => 'hash',
  DL_VARS            => 'array',
  EXCLUDE_EXT        => 'array',
  EXE_FILES          => 'array',
- FIRST_MAKEFILE     => '',
- FULLPERL           => '',
- FULLPERLRUN        => '',
- FULLPERLRUNINST    => '',
  FUNCLIST           => 'array',
  H                  => 'array',
  IMPORTS            => 'hash',
- INC                => '',
  INCLUDE_EXT        => 'array',
- INSTALLARCHLIB     => '',
- INSTALLBIN         => '',
- INSTALLDIRS        => '',
- INSTALLMAN1DIR     => '',
- INSTALLMAN3DIR     => '',
- INSTALLPRIVLIB     => '',
- INSTALLSCRIPT      => '',
- INSTALLSITEARCH    => '',
- INSTALLSITEBIN     => '',
- INSTALLSITELIB     => '',
- INSTALLSITEMAN1DIR => '',
- INSTALLSITEMAN3DIR => '',
- INSTALLVENDORARCH  => '',
- INSTALLVENDORBIN   => '',
- INSTALLVENDORLIB   => '',
- INSTALLVENDORMAN1DIR   => '',
- INSTALLVENDORMAN3DIR   => '',
- INST_ARCHLIB       => '',
- INST_BIN           => '',
- INST_LIB           => '',
- INST_MAN1DIR       => '',
- INST_MAN3DIR       => '',
- INST_SCRIPT        => '',
- _KEEP_AFTER_FLUSH  => '',
- LDDLFLAGS          => '',
- LDFROM             => '',
- LIB                => '',
- LIBPERL_A          => '',
  LIBS               => ['array',''],
- LINKTYPE           => '',
- MAKEAPERL          => '',
- MAKEFILE           => '',
  MAN1PODS           => 'hash',
  MAN3PODS           => 'hash',
- MAP_TARGET         => '',
- MYEXTLIB           => '',
- NAME               => '',
- NEEDS_LINKING      => '',
- NOECHO             => '',
- NORECURS           => '',
- NO_VC              => '',
- OBJECT             => '',
- OPTIMIZE           => '',
- PERL               => '',
- PERL_CORE          => '',
- PERLMAINCC         => '',
- PERL_ARCHLIB       => '',
- PERL_LIB           => '',
- PERL_MALLOC_OK     => '',
- PERLRUN            => '',
- PERLRUNINST        => '',
- PERL_SRC           => '',
- PERM_RW            => '',
- PERM_RWX           => '',
  PL_FILES           => 'hash',
  PM                 => 'hash',
  PMLIBDIRS          => 'array',
- PM_FILTER          => '',
- POLLUTE            => '',
- PPM_INSTALL_EXEC   => '',
- PPM_INSTALL_SCRIPT => '',
- PREFIX             => '',
- PREREQ_FATAL       => '',
  PREREQ_PM          => 'hash',
- PREREQ_PRINT       => '',
- PRINT_PREREQ       => '',
- SITEPREFIX         => '',
  SKIP               => 'array',
  TYPEMAPS           => 'array',
- VENDORPREFIX       => '',
- VERBINST           => '',
- VERSION            => '',
- VERSION_FROM       => '',
  XS                 => 'hash',
- XSOPT              => '',
- XSPROTOARG         => '',
- XS_VERSION         => '',
+ _KEEP_AFTER_FLUSH  => '',
 
  clean      => 'hash',
  depend     => 'hash',
@@ -171,6 +93,9 @@ my %Att_Sigs =
  test       => 'hash',
  tool_autosplit => 'hash',
 );
+
+@Att_Sigs{keys %Recognized_Att_Keys} = ('') x keys %Recognized_Att_Keys;
+@Att_Sigs{keys %Special_Sigs} = values %Special_Sigs;
 
 
 sub _verify_att {
@@ -1576,6 +1501,12 @@ Directory, where executable files should be installed during
 testing. make install will copy the files in INST_SCRIPT to
 INSTALLSCRIPT.
 
+=item LD
+
+Program to be used to link libraries for dynamic loading.
+
+Defaults to $Config{ld}.
+
 =item LDDLFLAGS
 
 Any special flags that might need to be passed to ld to create a
@@ -1977,7 +1908,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.63 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.64 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
