@@ -284,7 +284,7 @@ sub clean {
 # --- Cleanup and Distribution Sections ---
 
     my($self, %attribs) = @_;
-    my(@m,$dir);
+    my @m;
     push(@m, '
 # Delete temporary files but do not touch installed files. We don\'t delete
 # the Makefile here so a later make realclean still has a makefile to use.
@@ -292,41 +292,47 @@ sub clean {
 clean :: clean_subdirs
 ');
 
-    my(@otherfiles) = values %{$self->{XS}}; # .c files from *.xs files
+    my @files = values %{$self->{XS}}; # .c files from *.xs files
     if ( $Is_QNX ) {
       my @errfiles = @{$self->{C}};
       for ( @errfiles ) {
 	s/.c$/.err/;
       }
-      push( @otherfiles, @errfiles, 'perlmain.err' );
+      push( @files, @errfiles, 'perlmain.err' );
     }
-    push(@otherfiles, $attribs{FILES}) if $attribs{FILES};
-    push(@otherfiles, qw[./blib $(MAKE_APERL_FILE) 
-                         $(INST_ARCHAUTODIR)/extralibs.all
-                         $(INST_ARCHAUTODIR)/extralibs.ld
-			 perlmain.c tmon.out mon.out so_locations 
-                         blibdirs.ts pm_to_blib.ts
-			 *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
-			 $(BOOTSTRAP) $(BASEEXT).bso
-			 $(BASEEXT).def lib$(BASEEXT).def
-			 $(BASEEXT).exp $(BASEEXT).x
-			]);
+    push(@files, $attribs{FILES}) if $attribs{FILES};
+    push(@files, qw[./blib $(MAKE_APERL_FILE) 
+                    $(INST_ARCHAUTODIR)/extralibs.all
+                    $(INST_ARCHAUTODIR)/extralibs.ld
+                    perlmain.c tmon.out mon.out so_locations 
+                    blibdirs.ts pm_to_blib.ts
+                    *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
+                    $(BOOTSTRAP) $(BASEEXT).bso
+                    $(BASEEXT).def lib$(BASEEXT).def
+                    $(BASEEXT).exp $(BASEEXT).x
+                   ]);
     if( $Is_VOS ) {
-        push(@otherfiles, qw[*.kp]);
+        push(@files, qw[*.kp]);
     }
     else {
-        push(@otherfiles, qw[core core.*perl.*.? *perl.core]);
+        push(@files, qw[core core.*perl.*.? *perl.core]);
 
         # core.\d+
-        push(@otherfiles, map { "core." . "[0-9]"x$_ } (1..5));
+        push(@files, map { "core." . "[0-9]"x$_ } (1..5));
     }
 
-    push @m, "\t-\$(RM_RF) @otherfiles\n";
-    # See realclean and ext/utils/make_ext for usage of Makefile.old
-    push(@m,
-	 "\t-\$(MV) \$(FIRST_MAKEFILE) \$(MAKEFILE_OLD) \$(DEV_NULL)\n");
-    push(@m,
-	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
+    # OS specific files to clean up
+    push @files, $self->extra_clean_files;
+
+    push @m, map "\t$_\n", $self->split_command('-$(RM_RF)', @files);
+
+    # Leave Makefile.old around for realclean
+    push @m, <<'MAKE';
+	-$(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
+MAKE
+
+    push(@m, "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
+
     join("", @m);
 }
 

@@ -164,6 +164,21 @@ require partial overrides.
 
 =over 4
 
+=item B<extra_clean_files>
+
+    my @files_to_clean = $MM->extra_clean_files;
+
+Returns a list of OS specific files to be removed in the clean target in
+addition to the usual set.
+
+=cut
+
+# An empty method here tickled a perl 5.8.1 bug and would return its object.
+sub extra_clean_files { 
+    return;
+}
+
+
 =item B<split_command>
 
     my @cmds = $MM->split_command($cmd, @args);
