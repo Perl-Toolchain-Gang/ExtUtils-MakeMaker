@@ -12,7 +12,9 @@ use File::Spec;
 use DirHandle;
 
 use vars qw($VERSION @ISA
-            $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos $Is_VOS
+            $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos $Is_VOS
+            $Is_QNX $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD 
+            $Is_SunOS4 $Is_Solaris $Is_SunOS
             $Verbose %pm %static $Xsubpp_Version
             %Config_Override
            );
@@ -24,12 +26,22 @@ $VERSION = '1.35';
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
 
-$Is_OS2   = $^O eq 'os2';
-$Is_Mac   = $^O eq 'MacOS';
-$Is_Win32 = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
-$Is_Dos   = $^O eq 'dos';
-$Is_VOS   = $^O eq 'vos';
-$Is_VMS   = $^O eq 'VMS';
+$Is_OS2     = $^O eq 'os2';
+$Is_Mac     = $^O eq 'MacOS';
+$Is_Win32   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
+$Is_Win95   = $Is_Win32 && Win32::IsWin95();
+$Is_Dos     = $^O eq 'dos';
+$Is_VOS     = $^O eq 'vos';
+$Is_VMS     = $^O eq 'VMS';
+$Is_QNX     = $^O eq 'qnx';
+$Is_AIX     = $^O eq 'aix';
+$Is_OSF     = $^O eq 'dec_osf';
+$Is_IRIX    = $^O eq 'irix';
+$Is_NetBSD  = $^O eq 'netbsd';
+$Is_SunOS4  = $^O eq 'sunos';
+$Is_Solaris = $^O eq 'solaris';
+$Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
+
 
 =head1 NAME
 
@@ -262,7 +274,7 @@ clean :: clean_subdirs
 ');
 
     my(@otherfiles) = values %{$self->{XS}}; # .c files from *.xs files
-    if ( $^O eq 'qnx' ) {
+    if ( $Is_QNX ) {
       my @errfiles = @{$self->{C}};
       for ( @errfiles ) {
 	s/.c$/.err/;
@@ -963,7 +975,7 @@ files.
 sub dlsyms {
     my($self,%attribs) = @_;
 
-    return '' unless ($^O eq 'aix' && $self->needs_linking() );
+    return '' unless ($Is_AIX && $self->needs_linking() );
 
     my($funcs) = $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
     my($vars)  = $attribs{DL_VARS} || $self->{DL_VARS} || [];
@@ -1058,7 +1070,7 @@ sub dynamic_lib {
     my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
     my($armaybe) = $attribs{ARMAYBE} || $self->{ARMAYBE} || ":";
     my($ldfrom) = '$(LDFROM)';
-    $armaybe = 'ar' if ($^O eq 'dec_osf' and $armaybe eq ':');
+    $armaybe = 'ar' if ($Is_OSF and $armaybe eq ':');
     my(@m);
     my $ld_opt = $Is_OS2 ? '$(OPTIMIZE) ' : '';	# Useful on other systems too?
     push(@m,'
@@ -1075,10 +1087,10 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_
 	push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
 	push(@m,'	$(RANLIB) '."$ldfrom\n");
     }
-    $ldfrom = "-all $ldfrom -none" if ($^O eq 'dec_osf');
+    $ldfrom = "-all $ldfrom -none" if $Is_OSF;
 
     # The IRIX linker doesn't use LD_RUN_PATH
-    my $ldrun = $^O eq 'irix' && $self->{LD_RUN_PATH} ?         
+    my $ldrun = $Is_IRIX && $self->{LD_RUN_PATH} ?         
                        qq{-rpath "$self->{LD_RUN_PATH}"} : '';
 
     # For example in AIX the shared objects/libraries from previous builds
@@ -1091,7 +1103,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_
 
     my $libs = '$(LDLOADLIBS)';
 
-    if ($^O eq 'netbsd') {
+    if ($Is_NetBSD) {
 	# Use nothing on static perl platforms, and to the flags needed
 	# to link against the shared libperl library on shared perl
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
@@ -2729,10 +2741,10 @@ MAP_PRELIBS   = $Config{perllibs} $Config{cryptlib}
 
         if (! -f $libperl and ! -f $lperl) {
           # We did not find a static libperl. Maybe there is a shared one?
-          if ($^O eq 'solaris' or $^O eq 'sunos') {
+          if ($Is_SunOS) {
             $lperl  = $libperl = "$dir/$Config{libperl}";
             # SUNOS ld does not take the full path to a shared library
-            $libperl = '' if $^O eq 'sunos';
+            $libperl = '' if $Is_SunOS4;
           }
         }
 
@@ -3397,7 +3409,7 @@ realclean purge ::  clean
 ');
     # realclean subdirectories first (already cleaned)
     my $sub;
-    if( $Is_Win32  &&  Win32::IsWin95() ) {
+    if( $Is_Win95 ) {
         $sub = <<'REALCLEAN';
 	-cd %s
 	-$(PERLRUN) -e "exit unless -f shift; system q{$(MAKE) realclean}" %s
@@ -3665,7 +3677,7 @@ testdb :: testdb_\$(LINKTYPE)
 test :: \$(TEST_TYPE)
 ");
 
-    if ($Is_Win32 && Win32::IsWin95()) {
+    if ($Is_Win95) {
         push(@m, map(qq{\t\$(NOECHO) \$(PERLRUN) -e "exit unless -f shift; chdir '$_'; system q{\$(MAKE) test \$(PASTHRU)}" \$(MAKEFILE)\n}, @{$self->{DIR}}));
     }
     else {
