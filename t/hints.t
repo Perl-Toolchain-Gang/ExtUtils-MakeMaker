@@ -15,6 +15,10 @@ use File::Spec;
 
 use Test::More tests => 3;
 
+# Having the CWD in @INC masked a bug in finding hint files
+my $curdir = File::Spec->curdir;
+@INC = grep { $_ ne $curdir && $_ ne '.' } @INC;
+
 mkdir('hints', 0777);
 my $hint_file = File::Spec->catfile('hints', "$^O.pl");
 open(HINT, ">$hint_file") || die "Can't write dummy hints file $hint_file: $!";
