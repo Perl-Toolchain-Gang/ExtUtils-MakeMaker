@@ -40,7 +40,6 @@ Make sure PDL builds
 
 Fix find_perl on Amiga trg@privat.utfors.se
 
-Support full recursive scans of Makefile.PL's.  Not just a shallow
-one-level peek.
+Fix appending of .. when DIRS contains directories not immediately
+below the cwd.
 
-Add a way to explicitly skip certain directories from processing.

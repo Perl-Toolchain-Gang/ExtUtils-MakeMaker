@@ -483,8 +483,7 @@ sub constants {
 	      PERL_ARCHLIB SITELIBEXP SITEARCHEXP LIBPERL_A MYEXTLIB
 	      FIRST_MAKEFILE MAKE_APERL_FILE PERLMAINCC PERL_SRC
 	      PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
-              FULLPERLRUNINST TEST_LIBS 
-              FULL_AR PERL_CORE NOOP NOECHO
+              FULLPERLRUNINST FULL_AR PERL_CORE NOOP NOECHO
 
 	      / ) {
 	next unless defined $self->{$tmp};
@@ -1458,7 +1457,7 @@ Initializes AR, AR_STATIC_ARGS, BASEEXT, CONFIG, DISTNAME, DLBASE,
 EXE_EXT, FULLEXT, FULLPERL, FULLPERLRUN, FULLPERLRUNINST, INST_*,
 INSTALL*, INSTALLDIRS, LD, LIB_EXT, LIBPERL_A, MAP_TARGET, NAME,
 OBJ_EXT, PARENT_NAME, PERL, PERL_ARCHLIB, PERL_INC, PERL_LIB,
-PERL_SRC, PERLRUN, PERLRUNINST, PREFIX, TEST_LIBS, VERSION,
+PERL_SRC, PERLRUN, PERLRUNINST, PREFIX, VERSION,
 VERSION_FROM, VERSION_SYM, XS_VERSION.
 
 =cut
@@ -1811,11 +1810,6 @@ usually solves this kind of problem.
     # XS_VERSION macro that defaults to VERSION:
     $self->{XS_VERSION} ||= $self->{VERSION};
 
-    # What extra library dirs do we need when running the tests?
-    # Make sure these are absolute paths in case the test chdirs.
-    $self->{TEST_LIBS} .= join '', 
-                          map { ' "-I'.File::Spec->rel2abs($_).'"' } 
-                               $self->{INST_ARCHLIB}, $self->{INST_LIB};
 
     # --- Initialize Perl Binary Locations
     $self->init_PERL;

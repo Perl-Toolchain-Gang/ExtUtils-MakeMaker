@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.55_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.26 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.27 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -14,7 +14,7 @@ use Carp ();
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
             $ISA_TTY $Revision $VERSION $Verbose $Version_OK %Config 
-            %Keep_after_flush %MM_Sections @Prepend_dot_dot 
+            %Keep_after_flush %MM_Sections @Prepend_parent
             %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
             @Parent $PACKNAME
            );
@@ -136,7 +136,7 @@ sub full_setup {
     PL_FILES PM PM_FILTER PMLIBDIRS POLLUTE PPM_INSTALL_EXEC
     PPM_INSTALL_SCRIPT PREFIX
     PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
-    SKIP TEST_LIBS TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
+    SKIP TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
     XS_VERSION clean depend dist dynamic_lib linkext macro realclean
     tool_autosplit
     MACPERL_SRC MACPERL_LIB MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC
@@ -213,7 +213,7 @@ sub full_setup {
     # us (the parent) for the values and will prepend "..", so that
     # all files to be installed end up below OUR ./blib
     #
-    @Prepend_dot_dot = qw(
+    @Prepend_parent = qw(
            INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT
            MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
            PERL FULLPERL
@@ -1723,13 +1723,6 @@ Makefile. Caution! Do not use the SKIP attribute for the negligible
 speedup. It may seriously damage the resulting Makefile. Only use it
 if you really need it.
 
-=item TEST_LIBS
-
-The set of -I's necessary to run a "make test".  Use as:
-$(PERL) $(TEST_LIBS) -e '...' for example.
-
-The paths will be absolute.
-
 =item TYPEMAPS
 
 Ref to array of typemap file names.  Use this when the typemaps are
@@ -1760,7 +1753,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.26 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.27 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -1880,7 +1873,7 @@ be linked.
 
 If you cannot achieve the desired Makefile behaviour by specifying
 attributes you may define private subroutines in the Makefile.PL.
-Each subroutines returns the text it wishes to have written to
+Each subroutine returns the text it wishes to have written to
 the Makefile. To override a section of the Makefile you can
 either say:
 
@@ -1888,8 +1881,8 @@ either say:
 
 or you can edit the default by saying something like:
 
-        sub MY::c_o {
-            package MY; # so that "SUPER" works right
+        package MY; # so that "SUPER" works right
+        sub c_o {
             my $inherited = shift->SUPER::c_o(@_);
             $inherited =~ s/old text/new text/;
             $inherited;
@@ -1902,18 +1895,20 @@ for embedding.
 
 If you still need a different solution, try to develop another
 subroutine that fits your needs and submit the diffs to
-F<perl5-porters@perl.org> or F<comp.lang.perl.moderated> as appropriate.
+F<makemaker@perl.org>
 
-For a complete description of all MakeMaker methods see L<ExtUtils::MM_Unix>.
+For a complete description of all MakeMaker methods see
+L<ExtUtils::MM_Unix>.
 
 Here is a simple example of how to add a new target to the generated
 Makefile:
 
     sub MY::postamble {
-        '
+        return <<'MAKE_FRAG';
     $(MYEXTLIB): sdbm/Makefile
             cd sdbm && $(MAKE) all
-    ';
+
+    MAKE_FRAG
     }
 
 
