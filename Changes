@@ -109,6 +109,8 @@
     - Eliminated duplicate code in constants() overrides
     - Added all_target() for easier customization of what's run by default
     - Eliminated duplicate top_targets() overrides
+    - Made tool_autosplit() method portable.  Moved to MM_Any.  Eliminated
+      overrides.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
