@@ -5,6 +5,9 @@
 # - Fill in your dependencies in PREREQ_PM
 # Alternatively, you can say the hell with this and use h2xs.
 
+use 5.006001;
+
+use lib qw(lib);    # build ourself with ourself
 use ExtUtils::MakeMaker;
 
 $PACKAGE = 'ExtUtils::MakeMaker';
@@ -31,6 +34,8 @@ WriteMakefile(
                          DirHandle          => 0,
                          Test::More         => 0.40,
                        },
+    INSTALLDIRS     => 'perl',
+    EXE_FILES       => [qw(bin/inst bin/xsubpp)]
 );
 
 
