@@ -9,7 +9,7 @@ use vars qw($VERSION @ISA @EXPORT);
 require Exporter;
 @ISA = qw(Exporter);
 
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
              make make_run run make_macro calibrate_mtime
@@ -149,7 +149,7 @@ Makefile.
 
 sub makefile_backup {
     my $makefile = makefile_name;
-    return $Is_VMS ? $makefile : "$makefile.old";
+    return $Is_VMS ? "$makefile_old" : "$makefile.old";
 }
 
 =item B<make>
