@@ -3,10 +3,10 @@
     - Making Makefile rebuild logic more resistant to inconsequential
       errors when cleaning up things that are going to be rebuilt anyway.
     - Adding SCCS to the list of directories in MANIFEST.SKIP.
-    - Fixing blibdirs so it doesn't rebuild every make run.
-    - Using a more conservative MAX_EXEC_LEN for Win98 to allow building
+    * Fixing blibdirs so it doesn't rebuild every make run.
+    * Using a more conservative MAX_EXEC_LEN for Win98 to allow building
       large modules like Encode. [Greg Matheson]
-    - test target mangled by dmake.  Doesn't seem to like q{}.
+    * test target mangled by dmake.  Doesn't seem to like q{}.
       [Greg Matheson]
     - instmodsh now using Archive::Tar to create archives if available.
       [Slaven Rezic]
@@ -18,6 +18,8 @@
       [Ilya Zakharevich]
     - When building Perl, we had a chance of picking up the old installed
       xsubpp from @INC [Andreas Koenig]
+    - makeaperl() now a bit more intellegent about ignoring perl libraries
+      not called libperl.  [Ilya Zakharevich bleadperl@22032]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 
