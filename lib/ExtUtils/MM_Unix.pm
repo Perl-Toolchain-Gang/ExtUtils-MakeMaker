@@ -3143,9 +3143,20 @@ sub realclean {
 realclean purge ::  clean
 ');
     # realclean subdirectories first (already cleaned)
-    my $sub = ($Is_Win32  &&  Win32::IsWin95()) ?
-      "\tcd %s\n\t\$(TEST_F) %s\n\t\$(MAKE) %s realclean\n\tcd ..\n" :
-      "\t-cd %s && \$(TEST_F) %s && \$(MAKE) %s realclean\n";
+    my $sub;
+    if( $Is_Win32  &&  Win32::IsWin95() ) {
+        $sub = <<'REALCLEAN';
+        -cd %s
+        -$(TEST_F) -e "system q{$(MAKE) realclean}" %s
+        -cd ..
+REALCLEAN
+    }
+    else {
+        $sub = <<'REALCLEAN';
+        -cd %s && $(TEST_F) %s && $(MAKE) %s realclean
+REALCLEAN
+    }
+
     foreach(@{$self->{DIR}}){
 	push(@m, sprintf($sub,$_,"$self->{MAKEFILE}.old","-f $self->{MAKEFILE}.old"));
 	push(@m, sprintf($sub,$_,"$self->{MAKEFILE}",''));
