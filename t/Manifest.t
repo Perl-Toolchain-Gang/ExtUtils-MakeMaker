@@ -5,6 +5,9 @@ BEGIN {
         chdir 't' if -d 't';
         unshift @INC, '../lib';
     }
+    else {
+        unshift @INC, 't/lib';
+    }
 }
 chdir 't';
 
@@ -127,14 +130,14 @@ $files = maniread();
 eval { (undef, $warn) = catch_warning( sub {
 		manicopy( $files, 'copy', 'cp' ) }) 
 };
+like( $@, qr/^Can't read none: /, 
+                                               'carped about none' );
 
 # a newline comes through, so get rid of it
 chomp($warn);
 
 # the copy should have given one warning and one error
 is($warn, 'Skipping MANIFEST.SKIP', 'warned about MANIFEST.SKIP' );
-like( $@, qr/^Can't read none: /, 
-                                               'carped about none' );
 
 # tell ExtUtils::Manifest to use a different file
 { package ExtUtils::Manifest; 
