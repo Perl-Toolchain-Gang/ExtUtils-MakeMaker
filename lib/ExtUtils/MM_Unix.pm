@@ -437,7 +437,6 @@ sub constants {
               FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE 
               PERLMAINCC PERL_SRC PERL_INC 
               PERL            FULLPERL          ABSPERL
-              PERLSAFE        FULLPERLSAFE      ABSPERLSAFE
               PERLRUN         FULLPERLRUN       ABSPERLRUN
               PERLRUNINST     FULLPERLRUNINST   ABSPERLRUNINST
               FULL_AR PERL_CORE
@@ -1187,7 +1186,7 @@ WARNING
             # To avoid using the unportable 2>&1 to supress STDERR,
             # we close it before running the command.
             close STDERR if $stderr_duped;
-            $val = `"$abs" -e "require $ver; print qq{VER_OK\n}"`;
+            $val = `$abs -e "require $ver; print qq{VER_OK\n}"`;
             open STDERR, '>&STDERR_COPY' if $stderr_duped;
 
             if ($val =~ /^VER_OK/) {
@@ -2241,8 +2240,6 @@ Called by init_main.  Sets up ABSPERL, PERL, FULLPERL and all the
     PERL is allowed to be miniperl
     FULLPERL must be a complete perl
 
-    *PERLSAFE is *PERL safe for use in shell commands
-    
     ABSPERL is PERL converted to an absolute path
 
     *PERLRUN contains everything necessary to run perl, find it's
@@ -2310,11 +2307,9 @@ sub init_PERL {
 
     # How do we run perl?
     foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
-        my $safe = $perl.'SAFE';
         my $run  = $perl.'RUN';
 
-        $self->{$safe} = $self->quote_literal("\$($perl)");
-        $self->{$run}  = "\$($safe)";
+        $self->{$run}  = "\$($perl)";
 
         # Make sure perl can find itself before it's installed.
         $self->{$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"} 
