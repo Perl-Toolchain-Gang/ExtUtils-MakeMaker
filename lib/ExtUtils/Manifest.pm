@@ -2,8 +2,9 @@ package ExtUtils::Manifest;
 
 require Exporter;
 use Config;
-use File::Find;
+use File::Basename;
 use File::Copy 'copy';
+use File::Find;
 use File::Spec;
 use Carp;
 use strict;
@@ -29,9 +30,7 @@ $Verbose = defined $ENV{PERL_MM_MANIFEST_VERBOSE} ?
 $Quiet = 0;
 $MANIFEST = 'MANIFEST';
 
-my $Filename = __FILE__;
-$DEFAULT_MSKIP = (File::Spec->splitpath($Filename))[1].
-                 "$MANIFEST.SKIP";
+$DEFAULT_MSKIP = File::Spec->catfile( dirname(__FILE__), "$MANIFEST.SKIP" );
 
 
 =head1 NAME
