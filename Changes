@@ -1,4 +1,10 @@
 6.11 Thu Jul 24 01:24:37 PDT 2003
+    - Small grammatical doc touch up by Sean Burke
+    - Making basic.t clean up better after itself so it can be run
+      twice without setting up and cleaning up Big-Dummy again.
+    * Noting where to find make in the README
+    * Noting that MakeMaker does not produce a GNU make compatible Makefile
+      on Windows.
     * 6.10_08 with a new version #.
 
 6.10_08 Mon Jul 21 18:17:06 PDT 2003
