@@ -32,20 +32,20 @@ the semantics.
 
 =over 4
 
-=item dist (o)
+=item init_dist (o)
 
 Define TO_UNIX to convert OS2 linefeeds to Unix style.
 
 =cut
 
-sub dist {
-    my($self, %attribs) = @_;
+sub init_dist {
+    my($self) = @_;
 
-    $attribs{TO_UNIX} ||= <<'MAKE_TEXT';
+    $self->{TO_UNIX} ||= <<'MAKE_TEXT';
 $(NOECHO) $(TEST_F) tmp.zip && $(RM) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM) tmp.zip
 MAKE_TEXT
 
-    return $self->SUPER::dist(%attribs);
+    $self->SUPER::init_dist;
 }
 
 sub dlsyms {

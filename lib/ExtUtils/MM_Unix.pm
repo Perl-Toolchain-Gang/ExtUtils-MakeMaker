@@ -595,12 +595,11 @@ $targ :: $src
     join "", @m;
 }
 
-=item dist (o)
+=item init_dist
 
-  my $dist_macros = $mm->dist(%overrides);
+  $mm->init_dist;
 
-Defines a lot of macros for distribution support.  The result is a
-make fragment defining all the following macros.
+Defines a lot of macros for distribution support.
 
   macro         description                     default
 
@@ -639,6 +638,39 @@ make fragment defining all the following macros.
   DISTVNAME     name of the resulting archive   $(DISTNAME)-$(VERSION)
                 (minus suffixes)
 
+=cut
+
+sub init_dist {
+    my $self = shift;
+
+    $self->{TAR}      ||= 'tar';
+    $self->{TARFLAGS} ||= 'cvf';
+    $self->{ZIP}      ||= 'zip';
+    $self->{ZIPFLAGS} ||= '-r';
+    $self->{COMPRESS} ||= 'gzip --best';
+    $self->{SUFFIX}   ||= '.gz';
+    $self->{SHAR}     ||= 'shar';
+    $self->{PREOP}    ||= '$(NOECHO) $(NOOP)'; # eg update MANIFEST
+    $self->{POSTOP}   ||= '$(NOECHO) $(NOOP)'; # eg remove the distdir
+    $self->{TO_UNIX}  ||= '$(NOECHO) $(NOOP)';
+
+    $self->{CI}       ||= 'ci -u';
+    $self->{RCS_LABEL}||= 'rcs -Nv$(VERSION_SYM): -q';
+    $self->{DIST_CP}  ||= 'best';
+    $self->{DIST_DEFAULT} ||= 'tardist';
+
+    ($self->{DISTNAME} = $self->{NAME}) =~ s{::}{-}g unless $self->{DISTNAME};
+    $self->{DISTVNAME} ||= $self->{DISTNAME}.'-'.$self->{VERSION};
+
+}
+
+=item dist (o)
+
+  my $dist_macros = $mm->dist(%overrides);
+
+Generates a make fragment defining all the macros initialized in
+init_dist.
+
 %overrides can be used to override any of the above.
 
 =cut
@@ -646,28 +678,16 @@ make fragment defining all the following macros.
 sub dist {
     my($self, %attribs) = @_;
 
-    # VERSION should be sanitised before use as a file name
-    $attribs{TAR}      ||= 'tar';
-    $attribs{TARFLAGS} ||= 'cvf';
-    $attribs{ZIP}      ||= 'zip';
-    $attribs{ZIPFLAGS} ||= '-r';
-    $attribs{COMPRESS} ||= 'gzip --best';
-    $attribs{SUFFIX}   ||= '.gz';
-    $attribs{SHAR}     ||= 'shar';
-    $attribs{PREOP}    ||= '$(NOECHO) $(NOOP)'; # eg update MANIFEST
-    $attribs{POSTOP}   ||= '$(NOECHO) $(NOOP)'; # eg remove the distdir
-    $attribs{TO_UNIX}  ||= '$(NOECHO) $(NOOP)';
-
-    $attribs{CI}       ||= 'ci -u';
-    $attribs{RCS_LABEL}||= 'rcs -Nv$(VERSION_SYM): -q';
-    $attribs{DIST_CP}  ||= 'best';
-    $attribs{DIST_DEFAULT} ||= 'tardist';
-
-    $attribs{DISTVNAME} ||= '$(DISTNAME)-$(VERSION)';
-
     my $make = '';
-    while(my($var, $value) = each %attribs) {
-        $make .= "$var = $value\n";
+    foreach my $key (qw( 
+            TAR TARFLAGS ZIP ZIPFLAGS COMPRESS SUFFIX SHAR
+            PREOP POSTOP TO_UNIX
+            CI RCS_LABEL DIST_CP DIST_DEFAULT
+            DISTNAME DISTVNAME
+           ))
+    {
+        my $value = $attribs{$key} || $self->{$key};
+        $make .= "$key = $value\n";
     }
 
     return $make;
@@ -1494,8 +1514,9 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 
     $self->{XS}  ||= \%xs;
     $self->{C}   ||= [sort keys %c];
-    $self->{O_FILES} = [grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, 
-                            @{$self->{C}}];
+    my @o_files = @{$self->{C}};
+    $self->{O_FILES} = [grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @o_files];
+                            
     $self->{H}   ||= [sort keys %h];
 
     # Set up names of manual pages to generate from pods
@@ -1792,10 +1813,6 @@ usually solves this kind of problem.
 	$once_only{$m} = 1;
     }
 
-    $self->init_INST;
-    $self->init_INSTALL;
-
-
 # This is too dangerous:
 #    if ($^O eq "next") {
 #	$self->{AR} = "libtool";
@@ -1819,16 +1836,6 @@ usually solves this kind of problem.
         (Exporter.pm not found)"
 	unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
         $self->{NAME} eq "ExtUtils::MakeMaker";
-
-    $self->init_VERSION();
-
-    # Determine VERSION and VERSION_FROM
-    ($self->{DISTNAME}=$self->{NAME}) =~ s#(::)#-#g unless $self->{DISTNAME};
-
-    $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION}";
-
-    # --- Initialize Perl Binary Locations
-    $self->init_PERL;
 }
 
 =item init_others
@@ -1914,7 +1921,8 @@ sub init_others {	# --- Initialize Other Attributes
 
     $mm->init_INST;
 
-Called by init_main.  Sets up all INST_* variables.
+Called by init_main.  Sets up all INST_* variables except those related
+to XS code.  Those are handled in init_xs.
 
 =cut
 
@@ -1955,19 +1963,6 @@ sub init_INST {
 
     $self->{INST_MAN1DIR} ||= File::Spec->catdir($Curdir,'blib','man1');
     $self->{INST_MAN3DIR} ||= File::Spec->catdir($Curdir,'blib','man3');
-
-    if ($self->has_link_code()) {
-        $self->{INST_STATIC}  = 
-          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT)$(LIB_EXT)');
-        $self->{INST_DYNAMIC} = 
-          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(DLBASE).$(DLEXT)');
-        $self->{INST_BOOT}    = 
-          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT).bs');
-    } else {
-        $self->{INST_STATIC}  = '';
-        $self->{INST_DYNAMIC} = '';
-        $self->{INST_BOOT}    = '';
-    }
 
     return 1;
 }
@@ -2381,7 +2376,33 @@ sub init_PERM {
 
     return 1;
 }
-    
+
+
+=item init_xs
+
+    $mm->init_xs
+
+Sets up macros having to do with XS code.  Currently just INST_STATIC,
+INST_DYNAMIC and INST_BOOT.
+
+=cut
+
+sub init_xs {
+    my $self = shift;
+
+    if ($self->has_link_code()) {
+        $self->{INST_STATIC}  = 
+          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT)$(LIB_EXT)');
+        $self->{INST_DYNAMIC} = 
+          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(DLBASE).$(DLEXT)');
+        $self->{INST_BOOT}    = 
+          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT).bs');
+    } else {
+        $self->{INST_STATIC}  = '';
+        $self->{INST_DYNAMIC} = '';
+        $self->{INST_BOOT}    = '';
+    }
+}    
 
 =item install (o)
 

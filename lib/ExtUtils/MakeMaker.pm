@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.05";
-($Revision = substr(q$Revision: 1.89 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.90 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -451,9 +451,16 @@ sub new {
 
     ($self->{NAME_SYM} = $self->{NAME}) =~ s/\W+/_/g;
 
-    $self->init_main();
-    $self->init_DIRFILESEP();
-    $self->init_linker();
+    $self->init_main;
+    $self->init_VERSION;
+    $self->init_dist;
+    $self->init_INST;
+    $self->init_INSTALL;
+    $self->init_dirscan;
+    $self->init_xs;
+    $self->init_PERL;
+    $self->init_DIRFILESEP;
+    $self->init_linker;
 
     if (! $self->{PERL_SRC} ) {
         require VMS::Filespec if $Is_VMS;
@@ -480,7 +487,6 @@ END
         }
     }
 
-    $self->init_dirscan();
     $self->init_others();
     $self->init_platform();
     $self->init_PERM();
@@ -1991,7 +1997,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.89 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.90 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

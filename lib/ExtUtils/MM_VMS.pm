@@ -854,7 +854,7 @@ UNINSTALL = \$(PERLRUN) "-MExtUtils::Install" -e "uninstall(\$ARGV[0],1,1);"
 !);
 }
 
-=item dist (override)
+=item init_dist (override)
 
 VMSish defaults for some values.
 
@@ -874,15 +874,15 @@ VMSish defaults for some values.
 
 =cut
 
-sub dist {
-    my($self, %attribs) = @_;
-    $attribs{ZIPFLAGS}     ||= '-Vu';
-    $attribs{COMPRESS}     ||= 'gzip';
-    $attribs{SUFFIX}       ||= '-gz';
-    $attribs{SHAR}         ||= 'vms_share';
-    $attribs{DIST_DEFAULT} ||= 'zipdist';
+sub init_dist {
+    my($self) = @_;
+    $self->{ZIPFLAGS}     ||= '-Vu';
+    $self->{COMPRESS}     ||= 'gzip';
+    $self->{SUFFIX}       ||= '-gz';
+    $self->{SHAR}         ||= 'vms_share';
+    $self->{DIST_DEFAULT} ||= 'zipdist';
 
-    return $self->SUPER::dist(%attribs);
+    $self->SUPER::init_dist;
 }
 
 =item c_o (override)
