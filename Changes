@@ -1,4 +1,4 @@
-6.27
+6.27  Mon Apr  4 16:36:14 PDT 2005
     * Added _darcs to the list of revision control administrative 
       directories skipped both in libscan and in MANIFEST.SKIP.
 
