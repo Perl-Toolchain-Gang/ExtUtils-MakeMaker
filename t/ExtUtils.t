@@ -5,7 +5,10 @@ print "1..27\n";
 BEGIN {
     if( $ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = ('../lib', 'lib/');
+    }
+    else {
+        unshift @INC, 't/lib';
     }
 }
 chdir 't';
@@ -16,9 +19,11 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Constant qw (constant_types C_constant XS_constant autoload);
 use Config;
 use File::Spec::Functions qw(catfile rel2abs);
+use MakeMaker::Test::Utils;
+
 # Because were are going to be changing directory before running Makefile.PL
-my $perl;
-$perl = rel2abs( $^X ) unless $] < 5.006; # Hack. Until 5.00503 has rel2abs
+my $perl = which_perl();
+
 # ExtUtils::Constant::C_constant uses $^X inside a comment, and we want to
 # compare output to ensure that it is the same. We were probably run as ./perl
 # whereas we will run the child with the full path in $perl. So make $^X for
@@ -26,7 +31,7 @@ $perl = rel2abs( $^X ) unless $] < 5.006; # Hack. Until 5.00503 has rel2abs
 $^X = $perl;
 
 print "# perl=$perl\n";
-my $runperl = "$perl \"-I../../lib\"";
+perl_lib;
 
 $| = 1;
 
@@ -112,18 +117,19 @@ my $xs = catfile($dir, "$package.xs");
 push @files, "$package.xs";
 open FH, ">$xs" or die "open >$xs: $!\n";
 
-print FH <<'EOT';
+print FH <<"EOT";
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "test.h"
+
+$constant_types;
+$C_constant
+MODULE = $package		PACKAGE = $package
+PROTOTYPES: ENABLE
+$XS_constant
 EOT
 
-print FH "#include \"test.h\"\n\n";
-print FH $constant_types;
-print FH $C_constant, "\n";
-print FH "MODULE = $package		PACKAGE = $package\n";
-print FH "PROTOTYPES: ENABLE\n";
-print FH $XS_constant;
 close FH or die "close $xs: $!\n";
 
 ################ PM
@@ -373,12 +379,12 @@ EOT
 
 close FH or die "close $makefilePL: $!\n";
 
-chdir $dir or die $!; push @INC,  '../../lib';
+chdir $dir or die $!;
 END {chdir ".." or warn $!};
 
-my @perlout = `$runperl Makefile.PL PERL_CORE=1`;
+my @perlout = `$perl Makefile.PL PERL_CORE=1`;
 if ($?) {
-  print "not ok 1 # $runperl Makefile.PL failed: $?\n";
+  print "not ok 1 # $perl Makefile.PL failed: $?\n";
   print "# $_" foreach @perlout;
   exit($?);
 } else {
@@ -386,21 +392,14 @@ if ($?) {
 }
 
 
-my $makefile = ($^O eq 'VMS' ? 'descrip' : 'Makefile');
-my $makefile_ext = ($^O eq 'VMS' ? '.mms' : '');
-if (-f "$makefile$makefile_ext") {
+if (-f makefile_name()) {
   print "ok 2\n";
 } else {
   print "not ok 2\n";
 }
-my $makefile_rename = ($^O eq 'VMS' ? '.mms' : '.old');
-push @files, "$makefile$makefile_rename"; # Renamed by make clean
+push @files, makefile_backup(); # Renamed by make clean
 
-my $make = $Config{make};
-
-$make = $ENV{MAKE} if exists $ENV{MAKE};
-
-if ($^O eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
+my $make = make_run();
 
 my @makeout;
 
@@ -466,14 +465,14 @@ if( $^O eq 'MSWin32' && $] <= 5.006001 ) {
         print REGENTMP $_ if $saw_shebang;
     }
     close XS;  close REGENTMP;
-    $regen = `$runperl regentmp`;
+    $regen = `$perl regentmp`;
     unlink 'regentmp';
 }
 else {
-    $regen = `$runperl -x $package.xs`;
+    $regen = `$perl -x $package.xs`;
 }
 if ($?) {
-  print "not ok $test # $runperl -x $package.xs failed: $?\n";
+  print "not ok $test # $perl -x $package.xs failed: $?\n";
 } else {
   print "ok $test - regen\n";
 }
