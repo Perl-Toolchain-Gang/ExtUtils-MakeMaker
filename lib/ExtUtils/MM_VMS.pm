@@ -731,62 +731,6 @@ sub const_cccmd {
 }
 
 
-=item tool_sxubpp (override)
-
-Use VMS-style quoting on xsubpp command line.
-
-=cut
-
-sub tool_xsubpp {
-    my($self) = @_;
-    return '' unless $self->needs_linking;
-
-    my $xsdir;
-    foreach my $dir (@INC) {
-        $xsdir = $self->catdir($dir, 'ExtUtils');
-        if( -r $self->catfile($xsdir, "xsubpp") ) {
-            last;
-        }
-    }
-
-    my $tmdir   = File::Spec->catdir($self->{PERL_LIB},"ExtUtils");
-    my(@tmdeps) = $self->catfile($tmdir,'typemap');
-    if( $self->{TYPEMAPS} ){
-	my $typemap;
-	foreach $typemap (@{$self->{TYPEMAPS}}){
-		if( ! -f  $typemap ){
-			warn "Typemap $typemap not found.\n";
-		}
-		else{
-			push(@tmdeps, $self->fixpath($typemap,0));
-		}
-	}
-    }
-    push(@tmdeps, "typemap") if -f "typemap";
-    my(@tmargs) = map("-typemap $_", @tmdeps);
-    if( exists $self->{XSOPT} ){
-	unshift( @tmargs, $self->{XSOPT} );
-    }
-
-    if ($Config{'ldflags'} && 
-        $Config{'ldflags'} =~ m!/Debug!i &&
-        (!exists($self->{XSOPT}) || $self->{XSOPT} !~ /linenumbers/)) {
-        unshift(@tmargs,'-nolinenumbers');
-    }
-
-
-    $self->{XSPROTOARG} = '' unless defined $self->{XSPROTOARG};
-
-    return "
-XSUBPPDIR = $xsdir
-XSUBPP = \$(PERLRUN) \$(XSUBPPDIR)xsubpp
-XSPROTOARG = $self->{XSPROTOARG}
-XSUBPPDEPS = @tmdeps
-XSUBPPARGS = @tmargs
-";
-}
-
-
 =item tools_other (override)
 
 Throw in some dubious extra macros for Makefile args.

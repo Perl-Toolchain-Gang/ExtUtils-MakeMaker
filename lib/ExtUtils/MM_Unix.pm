@@ -4009,12 +4009,21 @@ sub tool_xsubpp {
  	unshift( @tmargs, $self->{XSOPT} );
     }
 
+    if ($Is_VMS                          &&
+        $Config{'ldflags'}               && 
+        $Config{'ldflags'} =~ m!/Debug!i &&
+        (!exists($self->{XSOPT}) || $self->{XSOPT} !~ /linenumbers/)
+       ) 
+    {
+        unshift(@tmargs,'-nolinenumbers');
+    }
+
 
     $self->{XSPROTOARG} = "" unless defined $self->{XSPROTOARG};
 
     return qq{
 XSUBPPDIR = $xsdir
-XSUBPP = \$(XSUBPPDIR)/xsubpp
+XSUBPP = \$(PERLRUN) \$(XSUBPPDIR)/xsubpp
 XSPROTOARG = $self->{XSPROTOARG}
 XSUBPPDEPS = @tmdeps \$(XSUBPP)
 XSUBPPARGS = @tmargs
