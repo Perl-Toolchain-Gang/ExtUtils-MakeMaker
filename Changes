@@ -1,6 +1,14 @@
 5.90_01
     [[ API Changes ]]
     * Partial implementation of the new PREFIX logic.
+    * Added new INSTALL targets:
+        INSTALLSITEBIN
+        INSTALLSITEMAN1DIR   INSTALLSITEMAN3DIR 
+        INSTALLVENDORMAN1DIR INSTALLVENDORMAN3DIR
+        INSTALLVENDORBIN INSTALLVENDORLIB INSTALLVENDORARCH
+        SITEPREFIX VENDORPREFIX
+    * INSTALLDIRS=site now properly using $Config{siteprefixexp}
+    * Added INSTALLDIRS=vendor & support for vendor directories.
 
     [[ Bug Fixes ]]
     - nmake syntax nits from Mattia Barbon
