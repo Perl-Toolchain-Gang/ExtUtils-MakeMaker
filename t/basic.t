@@ -62,7 +62,7 @@ $| = 1;
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my @mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
+my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=dummy-install"});
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
@@ -89,7 +89,7 @@ my $make = make_run();
 {
     # Supress 'make manifest' noise
     local $ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
-    my $manifest_out = `$make manifest`;
+    my $manifest_out = run("$make manifest");
     ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
     ok( -s 'MANIFEST',      '  its not empty' );
 }
@@ -97,8 +97,8 @@ my $make = make_run();
 END { unlink 'MANIFEST'; }
 
 
-`$make ppd`;
-is( $?, 0,                      '  exited normally' );
+my $ppd_out = run("$make ppd");
+is( $?, 0,                      '  exited normally' ) || diag $ppd_out;
 ok( open(PPD, 'Big-Dummy.ppd'), '  .ppd file generated' );
 my $ppd_html;
 { local $/; $ppd_html = <PPD> }
@@ -124,19 +124,19 @@ like( $ppd_html, qr{^\s*</SOFTPKG>}m,                      '  </SOFTPKG>');
 END { unlink 'Big-Dummy.ppd' }
 
 
-my $test_out = `$make test`;
+my $test_out = run("$make test");
 like( $test_out, qr/All tests successful/, 'make test' );
 is( $?, 0,                                 '  exited normally' );
 
 # Test 'make test TEST_VERBOSE=1'
 my $make_test_verbose = make_macro($make, 'test', TEST_VERBOSE => 1);
-$test_out = `$make_test_verbose`;
+$test_out = run("$make_test_verbose");
 like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
 like( $test_out, qr/All tests successful/,  '  successful' );
 is( $?, 0,                                  '  exited normally' );
 
 
-my $install_out = `$make install`;
+my $install_out = run("$make install");
 is( $?, 0, 'install' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
 like( $install_out, qr/^Writing /m );
@@ -156,7 +156,7 @@ ok( $files{'perllocal.pod'},'  perllocal.pod created' );
 SKIP: {
     skip "VMS install targets do not preserve PREFIX", 8 if $Is_VMS;
 
-    $install_out = `$make install PREFIX=elsewhere`;
+    $install_out = run("$make install PREFIX=elsewhere");
     is( $?, 0, 'install with PREFIX override' ) || diag $install_out;
     like( $install_out, qr/^Installing /m );
     like( $install_out, qr/^Writing /m );
@@ -171,7 +171,7 @@ SKIP: {
 }
 
 
-my $dist_test_out = `$make disttest`;
+my $dist_test_out = run("$make disttest");
 is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
 # Test META.yml generation
@@ -185,7 +185,7 @@ is( $manifest->{'meta.yml'}, 'Module meta-data in YAML' );
 
 
 # Make sure init_dirscan doesn't go into the distdir
-@mpl_out = `$perl Makefile.PL "PREFIX=dummy-install"`;
+@mpl_out = run(qq{$perl Makefile.PL "PREFIX=dummy-install"});
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
@@ -199,7 +199,7 @@ ok( grep(/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
 open(SAVERR, ">&STDERR") or die $!;
 open(STDERR, ">".File::Spec->devnull) or die $!;
 
-my $realclean_out = `$make realclean`;
+my $realclean_out = run("$make realclean");
 is( $?, 0, 'realclean' ) || diag($realclean_out);
 
 open(STDERR, ">&SAVERR") or die $!;
