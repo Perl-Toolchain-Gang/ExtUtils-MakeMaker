@@ -980,6 +980,7 @@ sub init_INST {
     return 1;
 }
 
+
 =head3 init_INSTALL
 
     $mm->init_INSTALL;
@@ -991,6 +992,28 @@ INSTALLDIRS) and *PREFIX.
 
 sub init_INSTALL {
     my($self) = shift;
+
+    if( $self->{ARGS}{INSTALLBASE} and $self->{ARGS}{PREFIX} ) {
+        die "Only one of PREFIX or INSTALLBASE can be given.  Not both.\n";
+    }
+
+    if( $self->{ARGS}{INSTALLBASE} ) {
+        $self->init_INSTALL_from_INSTALLBASE;
+    }
+    else {
+        $self->init_INSTALL_from_PREFIX;
+    }
+}
+
+
+=head3 init_INSTALL_from_PREFIX
+
+  $mm->init_INSTALL_from_PREFIX;
+
+=cut
+
+sub init_INSTALL_from_PREFIX {
+    my $self = shift;
 
     $self->init_lib2arch;
 
@@ -1183,6 +1206,51 @@ sub init_INSTALL {
     # Generate these if they weren't figured out.
     $self->{VENDORARCHEXP} ||= $self->{INSTALLVENDORARCH};
     $self->{VENDORLIBEXP}  ||= $self->{INSTALLVENDORLIB};
+
+    return 1;
+}
+
+
+=head3 init_from_INSTALLBASE
+
+    $mm->init_from_INSTALLBASE
+
+=cut
+
+my %map = (
+           lib      => [qw(lib perl5)],
+           arch     => [('lib', 'perl5', $Config{archname})],
+           bin      => [qw(bin)],
+           man1dir  => [qw(man man1)],
+           man3dir  => [qw(man man3)]
+          );
+$map{script} = $map{bin};
+
+sub init_INSTALL_from_INSTALLBASE {
+    my $self = shift;
+
+    @{$self}{qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)} = 
+                                                         '$(INSTALLBASE)';
+
+    my %install;
+    foreach my $thing (keys %map) {
+        foreach my $dir (('', 'SITE', 'VENDOR')) {
+            my $uc_thing = uc $thing;
+            my $key = "INSTALL".$dir.$uc_thing;
+
+            $install{$key} ||= 
+              $self->catdir('$(INSTALLBASE)', @{$map{$thing}});
+        }
+    }
+
+    # Adjust for variable quirks.
+    $install{INSTALLARCHLIB} ||= delete $install{INSTALLARCH};
+    $install{INSTALLPRIVLIB} ||= delete $install{INSTALLLIB};
+    delete @install{qw(INSTALLVENDORSCRIPT INSTALLSITESCRIPT)};
+
+    foreach my $key (keys %install) {
+        $self->{$key} ||= $install{$key};
+    }
 
     return 1;
 }

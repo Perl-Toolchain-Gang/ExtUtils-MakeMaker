@@ -1,6 +1,7 @@
 6.25_06
     - .exists files are back.  Directories cannot be used directly as 
       targets as their mod time changes too frequently.
+    * Added INSTALLBASE as an alternative to PREFIX.
 
 6.25_05  Wed Dec 22 07:59:02 EST 2004
     - One of the 6.25 alphas broke BSD make.  It doesn't like "- @ command".
