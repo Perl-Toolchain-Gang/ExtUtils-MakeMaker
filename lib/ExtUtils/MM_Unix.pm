@@ -3854,8 +3854,8 @@ sub tools_other {
     for my $tool (qw/ SHELL CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
                       UMASK_NULL DEV_NULL/ ) 
     {
-        next unless defined $self->{$tool}
-	push @m, "$tool = $self->{$tool}\n";
+        next unless defined $self->{$tool};
+        push @m, "$tool = $self->{$tool}\n";
     }
 
     push @m, q{
