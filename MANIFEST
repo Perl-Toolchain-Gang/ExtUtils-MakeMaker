@@ -31,10 +31,8 @@ lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/Packlist.pm
 lib/ExtUtils/testlib.pm
-t/Big-Fat-Dummy/Liar/Makefile.PL
-t/Big-Fat-Dummy/Liar/lib/Big/Fat/Liar.pm
-t/Big-Fat-Dummy/Makefile.PL
-t/Big-Fat-Dummy/lib/Big/Fat/Dummy.pm
+t/00setup_dummy.t
+t/basic.t
 t/Command.t
 t/INST.t
 t/INST_PREFIX.t
@@ -48,9 +46,6 @@ t/MM_Win32.t
 t/Manifest.t
 t/Mkbootstrap.t
 t/Packlist.t
-t/Problem-Module/Makefile.PL
-t/Problem-Module/subdir/Makefile.PL
-t/basic.t
 t/hints.t
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
@@ -60,3 +55,4 @@ t/lib/TieOut.pm
 t/prefixify.t
 t/problems.t
 t/testlib.t
+t/zz_cleanup_dummy.t

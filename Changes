@@ -1,3 +1,7 @@
+5.91_01
+    [[ Test Changes ]]
+    - Shortening directory levels to accomodate old VMS's
+
 5.90_01 Thu Apr 11 01:11:54 EDT 2002
     [[ API Changes ]]
     * Implementation of the new PREFIX logic.

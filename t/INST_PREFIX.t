@@ -33,30 +33,30 @@ my $Makefile = makefile_name;
 my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
 
-ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
+ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
 my $stdout = tie *STDOUT, 'TieOut' or die;
 my $mm = WriteMakefile(
-    NAME          => 'Big::Fat::Dummy',
-    VERSION_FROM  => 'lib/Big/Fat/Dummy.pm',
+    NAME          => 'Big::Dummy',
+    VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => {},
     PERL_CORE     => $ENV{PERL_CORE},
     PREFIX        => 'foo/bar',
 );
 like( $stdout->read, qr{
-                        Writing\ $Makefile\ for\ Big::Fat::Liar\n
-                        Big::Fat::Liar's\ vars\n
+                        Writing\ $Makefile\ for\ Big::Liar\n
+                        Big::Liar's\ vars\n
                         INST_LIB\ =\ \S+\n
                         INST_ARCHLIB\ =\ \S+\n
-                        Writing\ $Makefile\ for\ Big::Fat::Dummy\n
+                        Writing\ $Makefile\ for\ Big::Dummy\n
 }x );
 undef $stdout;
 untie *STDOUT;
 
 isa_ok( $mm, 'ExtUtils::MakeMaker' );
 
-is( $mm->{NAME}, 'Big::Fat::Dummy',  'NAME' );
+is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
 is( $mm->{PREFIX}, 'foo/bar',   'PREFIX' );

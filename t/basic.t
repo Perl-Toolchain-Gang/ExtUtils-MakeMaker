@@ -29,7 +29,7 @@ my $Touch_Time = calibrate_mtime();
 
 $| = 1;
 
-ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
+ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
 
@@ -40,7 +40,7 @@ open(TEST, ">t/compile.t") or die "Can't open t/compile.t: $!";
 print TEST <<'COMPILE_T';
 print "1..2\n";
 
-print eval "use Big::Fat::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
+print eval "use Big::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
 print "ok 2 - TEST_VERBOSE\n";
 COMPILE_T
 close TEST;
@@ -50,8 +50,8 @@ open(TEST, ">Liar/t/sanity.t") or die "Can't open Liar/t/sanity.t: $!";
 print TEST <<'SANITY_T';
 print "1..3\n";
 
-print eval "use Big::Fat::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
-print eval "use Big::Fat::Liar; 1;" ? "ok 2\n" : "not ok 2\n";
+print eval "use Big::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
+print eval "use Big::Liar; 1;" ? "ok 2\n" : "not ok 2\n";
 print "ok 3 - TEST_VERBOSE\n";
 SANITY_T
 close TEST;
@@ -64,7 +64,7 @@ cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
 my $makefile = makefile_name();
-ok( grep(/^Writing $makefile for Big::Fat::Dummy/, 
+ok( grep(/^Writing $makefile for Big::Dummy/, 
          @mpl_out) == 1,
                                            'Makefile.PL output looks right');
 
@@ -113,7 +113,7 @@ is( $?, 0, 'disttest' ) || diag($dist_test_out);
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
-ok( grep(/^Writing $makefile for Big::Fat::Dummy/, 
+ok( grep(/^Writing $makefile for Big::Dummy/, 
          @mpl_out) == 1,
                                 'init_dirscan skipped distdir') || 
   diag(@mpl_out);
