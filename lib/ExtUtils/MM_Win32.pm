@@ -399,31 +399,6 @@ sub perl_script {
     return;
 }
 
-=item pm_to_blib
-
-Defines target that copies all files in the hash PM to their
-destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
-
-=cut
-
-sub pm_to_blib {
-    my $self = shift;
-    my($autodir) = File::Spec->catdir('$(INST_LIB)','auto');
-    return q{
-pm_to_blib: $(TO_INST_PM)
-	$(NOECHO) $(PERLRUNINST) -MExtUtils::Install \
-        -e "pm_to_blib(}.
-	($NMAKE ? 'qw[ <<pmfiles.dat ],' :
-	 $DMAKE ? 'qw[ $(mktmp,pmfiles.dat $(PM_TO_BLIB:s,\\,\\\\,)\n) ],'
-	        : '{ qw[$(PM_TO_BLIB)] },'
-	 ).q{'}.$autodir.q{','$(PM_FILTER)')"
-}. ($NMAKE ? q{
-$(PM_TO_BLIB)
-<<
-	} : '') . "\t".$self->{NOECHO}.q{$(TOUCH) $@
-};
-}
-
 
 =item xs_o (o)
 
