@@ -14,8 +14,8 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 9d2503abaa8092e5c2edccbd643342b6ed78f180 .patch
-SHA1 ccd8b8011693a75db3d031ac2fe39eb245ab88ca Changes
+SHA1 a540ee643c197c55e4f86b5d36ddb3a8186028c0 .patch
+SHA1 cbe33110d5985e062039f37ffc10183714f1a7bc Changes
 SHA1 9a5818da277e4c4d34dbb5011d3073b495ee37e8 MANIFEST
 SHA1 a61b9aa4655eb498906b3ff0babf01d3aea244af MANIFEST.SKIP
 SHA1 f530caa05e45ec39325f2130da2bed28d0a6614d META.yml
@@ -41,12 +41,12 @@ SHA1 7eed153d0aae182d035739604f78fc8e454b5644 lib/ExtUtils/MM_MacOS.pm
 SHA1 de38d740614d3340a87be2bf585aec5ef7367836 lib/ExtUtils/MM_NW5.pm
 SHA1 441da7524783ae12ce40f26353adbf4696a8f5b4 lib/ExtUtils/MM_OS2.pm
 SHA1 02b916060571fd20ced334ba4f2d1542d1590023 lib/ExtUtils/MM_UWIN.pm
-SHA1 ca659ec6752a7d8c94894af954d78bf34ec9e8d4 lib/ExtUtils/MM_Unix.pm
+SHA1 55afce495aeb3bfaea2ddd31ec1d5330d885652a lib/ExtUtils/MM_Unix.pm
 SHA1 6b35a5f292fcd62075f696762d233937b0a17a67 lib/ExtUtils/MM_VMS.pm
 SHA1 c6ab78ae156669adf7bab2ac2a1906340f29c457 lib/ExtUtils/MM_Win32.pm
 SHA1 e3142ac122edbb45f899435084c84f58219bae73 lib/ExtUtils/MM_Win95.pm
 SHA1 0f51f0dce4cb33bac94c85c86d19ae361e59597a lib/ExtUtils/MY.pm
-SHA1 7141859b72ab3b4866c979e2642540941da0d35a lib/ExtUtils/MakeMaker.pm
+SHA1 3613e6f146dfd99eec232c1371927f2a412bdef9 lib/ExtUtils/MakeMaker.pm
 SHA1 2941c3d867595a9b6aef2ffa71f1ab85848bf236 lib/ExtUtils/MakeMaker/FAQ.pod
 SHA1 34d8c354eea23b0b7f467b476069a5180826eafc lib/ExtUtils/MakeMaker/Tutorial.pod
 SHA1 4685bb3361c2b9c42094ef68454e849edaf6f549 lib/ExtUtils/MakeMaker/bytes.pm
@@ -103,7 +103,7 @@ SHA1 4a7685da6367a7a79ecfac76f96adf2aeac46514 t/writemakefile_args.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQE/r02uT4Li3Cw/PzQRAmJMAKCmtNjl6ZNiC2oWCwvPdMMxfPE7EQCeNwDJ
-Zef8SH4HoP0oAsLI9x2tWqg=
-=6g29
+iD8DBQE/sJpcT4Li3Cw/PzQRAoI8AKCCmrN4aR7eYWWrnojDaXqczeLlewCcDJEg
+mdIKXLxl2hRCgtrKy+Lq8LA=
+=LeyS
 -----END PGP SIGNATURE-----
