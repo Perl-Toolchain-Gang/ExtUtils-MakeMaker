@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.80 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.81 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -380,7 +380,7 @@ sub init_others {
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
     $self->{MAKEFILE_OLD}       ||= '$(FIRST_MAKEFILE)_old';
 
-    $self->{ECHO}     ||= '$(PERLRUN) -e "print qq{@ARGV}"';
+    $self->{ECHO}     ||= '$(PERLRUN) -le "print qq{@ARGV}"';
     $self->{TOUCH}    ||= '$(PERLRUN) "-MExtUtils::Command" -e touch';
     $self->{CHMOD}    ||= '$(PERLRUN) "-MExtUtils::Command" -e chmod'; 
     $self->{RM_F}     ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_f';
