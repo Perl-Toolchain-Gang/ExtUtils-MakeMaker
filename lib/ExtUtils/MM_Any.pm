@@ -87,11 +87,26 @@ sub os_flavor_is {
     return (grep { $flavors{$_} } @_) ? 1 : 0;
 }
 
+
+=item dir_targets B<DEPRECATED>
+
+    my $make_frag = $mm->dir_target(@directories);
+
+I<This function is deprecated> its use is no longer necessary and is
+I<only provided for backwards compatibility>.  It is now a no-op.
+blibdirs_target provides a much simpler mechanism and pm_to_blib() can
+create its own directories anyway.
+
+=cut
+
+sub dir_targets {}
+
+
 =item blibdirs_target (o)
 
     my $make_frag = $mm->blibdirs_target;
 
-Creates the blibdirs target which creates all the directories we use in
+Creates the blibdirs.ts target which creates all the directories we use in
 blib/.
 
 =cut
@@ -99,17 +114,20 @@ blib/.
 sub blibdirs_target {
     my $self = shift;
 
-    my @dirs = map { uc "\$(INST_$_)" } qw(libdir
-                                       autodir archautodir
-                                       bin script
-                                       man1dir man3dir
-                                      );
+    my @dirs = map { uc "\$(INST_$_)" } qw(libdir archlib
+                                           autodir archautodir
+                                           bin script
+                                           man1dir man3dir
+                                          );
     my @mkpath = $self->split_command('$(NOECHO) $(MKPATH)', @dirs);
     my @chmod  = $self->split_command('$(NOECHO) $(CHMOD) 755', @dirs);
 
-    my $make = "\nblibdirs :: Makefile.PL \n";
+    my $make = "\nblibdirs.ts :\n";
     $make .= join "", map { "\t$_\n" } @mkpath, @chmod;
-    $make .= "\t\$(NOECHO) \$(TOUCH) blibdirs\n\n";
+    $make .= <<'MAKE';
+	$(NOECHO) $(TOUCH) $@
+
+MAKE
 
     return $make;
 }

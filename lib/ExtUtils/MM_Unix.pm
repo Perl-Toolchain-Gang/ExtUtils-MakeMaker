@@ -295,7 +295,7 @@ clean :: clean_subdirs
                          $(INST_ARCHAUTODIR)/extralibs.all
                          $(INST_ARCHAUTODIR)/extralibs.ld
 			 perlmain.c tmon.out mon.out so_locations 
-                         blibdirs pm_to_blib
+                         blibdirs.ts pm_to_blib.ts
 			 *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
 			 $(BOOTSTRAP) $(BASEEXT).bso
 			 $(BASEEXT).def lib$(BASEEXT).def
@@ -556,72 +556,6 @@ sub depend {
 	push @m, "$key : $val\n";
     }
     join "", @m;
-}
-
-
-=item dir_target B<DEPRECATED>
-
-    my $make_frag = $mm->dir_target(@directories);
-
-I<This function is deprecated> its use is no longer necessary and is I<only
-provided for backwards compatibility>.  blibdirs_target provides a much
-simpler mechanism and pm_to_blib() can create its own directories anyway.
-
-Returns a Makefile entry for a .exists file in each of the @directories.
-The purpose is to create a directory and provide a make target to depend on.
-The make target is a .exists file in each of those directories.
-
-For example
-
-    $mm->dir_target('$(INST_ARCHDIR)');
-
-would return the make target C<$(INST_ARCHDIR)/.exists> which would
-create $(INST_ARCHDIR) and touch .exists.  You would depend on this target
-to make sure $(INST_ARCHDIR) is created.
-
-Ignores directories which have already gone through dir_target() so you
-might wind up getting nothing.
-
-=cut
-
-sub dir_target {
-    my($self, @dirs) = @_;
-
-    my @targs = ();
-    my $make = '';
-    foreach my $dir (@dirs) {
-        my $targ = $self->catfile($dir, '.exists');
-
-        my $targdir;
-        if ($Is_VMS) { # Just remove file name; dirspec is often in macro
-            ($targdir = $targ) =~ s:/?\.exists\z::;
-        }
-        else { # while elsewhere we expect to see the dir separator in $targ
-            $targdir = dirname($targ);
-        }
-
-        next if $self->{DIR_TARGET}{$self}{$targdir}++;
-
-        push @targs, $targ;
-        $make .= <<MAKE_FRAG;
-$targ ::
-	\$(NOECHO) \$(MKPATH) $targdir
-	\$(NOECHO) \$(TOUCH) $targ
-	\$(NOECHO) \$(CHMOD) \$(PERM_RWX) $targdir
-
-MAKE_FRAG
-
-    }
-
-    # So these new .exists targets get called along with blibdirs.
-    my $blib_addition = '';
-    $blib_addition = <<MAKE_FRAG if @targs;
-blibdirs :: @targs
-	\$(NOECHO) \$(NOOP)
-
-MAKE_FRAG
-
-    return $blib_addition . $make;
 }
 
 
@@ -1077,17 +1011,17 @@ BOOTSTRAP = $(BASEEXT).bs
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP): $(FIRST_MAKEFILE) $(BOOTDEP) blibdirs
+$(BOOTSTRAP): $(FIRST_MAKEFILE) $(BOOTDEP) blibdirs.ts
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
 		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
-	$(NOECHO) $(TOUCH) $(BOOTSTRAP)
+	$(NOECHO) $(TOUCH) $@
 	$(CHMOD) $(PERM_RW) $@
 
-$(INST_BOOT): $(BOOTSTRAP) blibdirs
-	$(NOECHO) $(RM_RF) $(INST_BOOT)
-	-$(CP) $(BOOTSTRAP) $(INST_BOOT)
+$(INST_BOOT): $(BOOTSTRAP) blibdirs.ts
+	$(NOECHO) $(RM_RF) $@
+	-$(CP) $(BOOTSTRAP) $@
 	$(CHMOD) $(PERM_RW) $@
 MAKE_FRAG
 }
@@ -1120,7 +1054,7 @@ OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 INST_DYNAMIC_FIX = '.$ld_fix.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) blibdirs $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) blibdirs.ts $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
 ');
     if ($armaybe ne ':'){
 	$ldfrom = 'tmp$(LIB_EXT)';
@@ -2638,7 +2572,7 @@ realclean ::
 	last unless defined $from;
 	my $todir = dirname($to);
 	push @m, "
-$to : $from \$(FIRST_MAKEFILE) blibdirs
+$to : $from \$(FIRST_MAKEFILE) blibdirs.ts
 	\$(NOECHO) \$(RM_F) $to
 	\$(CP) $from $to
 	\$(FIXIN) $to
@@ -2890,7 +2824,7 @@ LLIBPERL    = $llibperl
 ";
 
     push @m, "
-\$(INST_ARCHAUTODIR)/extralibs.all: blibdirs ".join(" \\\n\t", @$extra).'
+\$(INST_ARCHAUTODIR)/extralibs.all: blibdirs.ts ".join(" \\\n\t", @$extra).'
 	$(NOECHO) $(RM_F)  $@
 	$(NOECHO) $(TOUCH) $@
 ';
@@ -3273,7 +3207,7 @@ sub pm_to_blib {
     my $self = shift;
     my($autodir) = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
-pm_to_blib: $(TO_INST_PM)
+pm_to_blib.ts: $(TO_INST_PM)
 };
 
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
@@ -3699,7 +3633,7 @@ sub static_lib {
     my(@m);
     push(@m, <<'END');
 
-$(INST_STATIC): $(OBJECT) $(MYEXTLIB) blibdirs
+$(INST_STATIC): $(OBJECT) $(MYEXTLIB) blibdirs.ts
 	$(RM_RF) $@
 END
 
@@ -4030,13 +3964,13 @@ sub top_targets {
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
     push @m, '
-pure_all :: config pm_to_blib subdirs linkext
+pure_all :: config pm_to_blib.ts subdirs linkext
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
-config :: $(FIRST_MAKEFILE) blibdirs
+config :: $(FIRST_MAKEFILE) blibdirs.ts
 	$(NOECHO) $(NOOP)
 ';
 
