@@ -2173,11 +2173,11 @@ sub _catprefix {
 }
 
 
-=item perl_oneliner (o)
+=item oneliner (o)
 
 =cut
 
-sub perl_oneliner {
+sub oneliner {
     my($self, $cmd, $switches) = @_;
     $switches = [] unless defined $switches;
 

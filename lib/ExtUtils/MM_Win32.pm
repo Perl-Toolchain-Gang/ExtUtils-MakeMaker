@@ -449,14 +449,14 @@ sub pasthru {
 }
 
 
-=item perl_oneliner (o)
+=item oneliner (o)
 
 These are based on what command.com does on Win98.  They may be wrong
 for other Windows shells, I don't know.
 
 =cut
 
-sub perl_oneliner {
+sub oneliner {
     my($self, $cmd, $switches) = @_;
     $switches = [] unless defined $switches;
 

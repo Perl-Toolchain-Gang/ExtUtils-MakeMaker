@@ -27,7 +27,7 @@ isa_ok($mm, 'ExtUtils::MM_Any');
 
 sub try_oneliner {
     my($code, $switches, $expect, $name) = @_;
-    my $cmd = $mm->perl_oneliner($code, $switches);
+    my $cmd = $mm->oneliner($code, $switches);
     $cmd =~ s{\$\(PERLRUN\)}{$^X};
 
     # VMS likes to put newlines at the end of commands if there isn't
@@ -62,7 +62,7 @@ CODE
 #     skip "symlink not available", 1 if $@ =~ /unimplemented/ or
 #                                        !$symlink;
 
-#     $command = $mm->perl_oneliner(q{print "foo"});
+#     $command = $mm->oneliner(q{print "foo"});
 #     $command =~ s{\$\(PERLRUN\)}{$trick_perl};
 #     is(`$command`, q{foo},           'spaces in path to perl' );
 #     END { unlink 'p erl'; }

@@ -117,7 +117,7 @@ Cross-Platform Compatibility
   ExtUtils::Command::MM function.
 
 - Most shells quote differently.  If you need to put a perl one-liner
-  in the Makefile, please use perl_oneliner() to generate it.
+  in the Makefile, please use oneliner() to generate it.
 
 
 Tests

@@ -754,7 +754,7 @@ depends on $(DIST_DEFAULT).
 sub dist_target {
     my($self) = shift;
 
-    my $date_check = $self->perl_oneliner(<<'CODE', ['-l']);
+    my $date_check = $self->oneliner(<<'CODE', ['-l']);
 print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
   if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(MAKEFILE)';
 CODE
@@ -3256,7 +3256,7 @@ PPD_HTML
     chomp $ppd_xml;
 
     my @ppd_oneliners = (); 
-    push @ppd_oneliners, $self->perl_oneliner(qq{print qq{$ppd_xml}."\\n"});
+    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}."\\n"});
 
     $ppd_xml = '\t<IMPLEMENTATION>\n';
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
@@ -3271,7 +3271,7 @@ PPD_OUT
         chomp $ppd_xml;
     }
 
-    push @ppd_oneliners, $self->perl_oneliner(qq{print qq{$ppd_xml}});
+    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}});
 
     $ppd_xml = sprintf <<'PPD_OUT', $Config{archname};
 \t\t<OS NAME="$(OSNAME)" />\n\t\t<ARCHITECTURE NAME="%s" />\n
@@ -3299,7 +3299,7 @@ PPD_XML
 
     chomp $ppd_xml;
 
-    push @ppd_oneliners, $self->perl_oneliner(qq{print qq{$ppd_xml}});
+    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}});
 
     return sprintf <<'PPD_OUT', @ppd_oneliners;
 # Creates a PPD (Perl Package Description) for a binary distribution.
@@ -3497,11 +3497,11 @@ sub replace_manpage_separator {
 }
 
 
-=item perl_oneliner (o)
+=item oneliner (o)
 
 =cut
 
-sub perl_oneliner {
+sub oneliner {
     my($self, $cmd, $switches) = @_;
     $switches = [] unless defined $switches;
 
@@ -3805,7 +3805,7 @@ EQUALIZE_TIMESTAMP = $(PERLRUN) "-MExtUtils::Command" -e eqtime
 
     return join "", @m if $self->{PARENT};
 
-    my $mod_install = $self->perl_oneliner(<<'CODE', ['-I$(INST_LIB)', '-I$(PERL_LIB)', '-MExtUtils::Install']);
+    my $mod_install = $self->oneliner(<<'CODE', ['-I$(INST_LIB)', '-I$(PERL_LIB)', '-MExtUtils::Install']);
 install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
 CODE
 

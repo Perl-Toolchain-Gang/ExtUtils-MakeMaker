@@ -430,7 +430,7 @@ sub tool_autosplit {
     my $maxlen = $attribs{MAXLEN} ? '$$AutoSplit::Maxlen=$attribs{MAXLEN};' 
                                   : '';
 
-    my $asplit = $self->perl_oneliner(sprintf <<'PERL_CODE', $maxlen);
+    my $asplit = $self->oneliner(sprintf <<'PERL_CODE', $maxlen);
 use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)
 PERL_CODE
 
@@ -468,9 +468,9 @@ have to do their own implementation.
 
 =over 4
 
-=item perl_oneliner
+=item oneliner
 
-  my $oneliner = $MM->perl_oneliner($perl_code, \@switches);
+  my $oneliner = $MM->oneliner($perl_code, \@switches);
 
 This will generate a perl one-liner safe for the particular platform
 you're on based on the given $perl_code and @switches (a -e is
@@ -482,7 +482,7 @@ $(PERLRUN) will be used as perl.
 Any newlines in $perl_code will be escaped.  Leading and trailing
 newlines will be stripped.  Makes this idiom much easier:
 
-    my $code = $MM->perl_oneliner(<<'CODE', [...switches...]);
+    my $code = $MM->oneliner(<<'CODE', [...switches...]);
 some code here
 another line here
 CODE
@@ -490,7 +490,7 @@ CODE
 Usage might be something like:
 
     # an echo emulation
-    $oneliner = $MM->perl_oneliner('print "Foo\n"');
+    $oneliner = $MM->oneliner('print "Foo\n"');
     $make = '$oneliner > somefile';
 
 All dollar signs must be doubled in the $perl_code if you expect them
@@ -499,7 +499,7 @@ macro.  Also remember to quote make macros else it might be used as a
 bareword.  For example:
 
     # Assign the value of the $(VERSION_FROM) make macro to $vf.
-    $oneliner = $MM->perl_oneliner('$$vf = "$(VERSION_FROM)"');
+    $oneliner = $MM->oneliner('$$vf = "$(VERSION_FROM)"');
 
 Its currently very simple and may be expanded sometime in the figure
 to include more flexible code and switches.
