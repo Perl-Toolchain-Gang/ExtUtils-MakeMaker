@@ -420,7 +420,7 @@ sub constants {
     for my $macro (qw/
 
               AR_STATIC_ARGS DIRFILESEP
-              NAME DISTNAME NAME_SYM 
+              NAME NAME_SYM 
               VERSION    VERSION_MACRO    VERSION_SYM DEFINE_VERSION
               XS_VERSION XS_VERSION_MACRO             XS_DEFINE_VERSION
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
@@ -438,7 +438,7 @@ sub constants {
               PERL            FULLPERL          ABSPERL
               PERLRUN         FULLPERLRUN       ABSPERLRUN
               PERLRUNINST     FULLPERLRUNINST   ABSPERLRUNINST
-              FULL_AR PERL_CORE
+              PERL_CORE
               PERM_RW PERM_RWX
 
 	      / ) 
@@ -3855,7 +3855,7 @@ sub test_via_script {
 
 Returns a make fragment containing definitions for:
 
-SHELL, CHMOD, CP, LD, MV, NOOP, NOECHO, RM_F, RM_RF, TEST_F, TOUCH,
+SHELL, CHMOD, CP, MV, NOOP, NOECHO, RM_F, RM_RF, TEST_F, TOUCH,
 DEV_NULL, UMASK_NULL, MKPATH, EQUALIZE_TIMESTAMP,
 WARN_IF_OLD_PACKLIST, UNINST, VERBINST, MOD_INSTALL, DOC_INSTALL and
 UNINSTALL
@@ -3868,7 +3868,7 @@ sub tools_other {
     my($self) = shift;
     my @m;
 
-    for my $tool (qw{ SHELL CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
+    for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
                       UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP ECHO
                       UNINST VERBINST
                       MOD_INSTALL DOC_INSTALL UNINSTALL
