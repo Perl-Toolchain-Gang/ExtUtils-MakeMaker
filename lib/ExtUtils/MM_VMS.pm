@@ -488,8 +488,10 @@ CODE
 
     $self->SUPER::init_others;
 
-    $self->{CP} = 'Copy/NoConfirm';
-    $self->{MV} = 'Rename/NoConfirm';
+    # So we can copy files into directories with less fuss
+    $self->{CP}         = '$(ABSPERLRUN) "-MExtUtils::Command" -e cp';
+    $self->{MV}         = '$(ABSPERLRUN) "-MExtUtils::Command" -e mv';
+
     $self->{UMASK_NULL} = '! ';  
 
     # Redirection on VMS goes before the command, not after as on Unix.
