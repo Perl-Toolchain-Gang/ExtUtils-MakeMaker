@@ -39,7 +39,11 @@ $prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 WriteMakefile(
     NAME            => $PACKAGE,
     VERSION_FROM    => "lib/$PACKAGE_FILE.pm", # finds $VERSION
-    PREREQ_PM       => \%prereq,
+    PREREQ_PM       => { %prereq,
+
+                         # manifypods needs Pod::Man
+                         Pod::Man   => 0,
+                       },
     INSTALLDIRS     => 'perl',
     EXE_FILES       => [qw(bin/instmodsh)],
 );
