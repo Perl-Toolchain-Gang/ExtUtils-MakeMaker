@@ -28,7 +28,6 @@ lib/ExtUtils/MM_Win95.pm
 lib/ExtUtils/MY.pm
 lib/ExtUtils/MakeMaker.pm
 lib/ExtUtils/Manifest.pm
-lib/ExtUtils/Miniperl.pm
 lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/Packlist.pm
