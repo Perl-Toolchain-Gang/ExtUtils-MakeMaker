@@ -49,10 +49,6 @@ ExtUtils::Install is a disaster.
 
 Fix split_command() tests on Win32. (split_command() not broken, only tests)
 
-Make MakeMaker a subclass of File::Spec.
-
-Change File::Spec class method calls to object methods.
-
 Copy eliminate_macros() and fixpath() from File::Spec::VMS and into MM_VMS.
 
 Eliminate the above from inside FS::VMS->catfile and catdir.  Make into 
