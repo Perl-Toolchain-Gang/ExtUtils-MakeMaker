@@ -19,6 +19,7 @@ disttest : distdir
         $(MAKE) test
         cd ..
 };
+}
 
 sub xs_c {
     my($self) = shift;
