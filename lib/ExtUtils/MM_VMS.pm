@@ -320,12 +320,12 @@ off to the default MM_Unix method.
 sub init_others {
     my($self) = @_;
 
-    $self->{NOOP} = 'Continue';
-    $self->{FIRST_MAKEFILE} ||= 'Descrip.MMS';
-    $self->{MAKE_APERL_FILE} ||= 'Makeaperl.MMS';
-    $self->{MAKEFILE}     ||= $self->{FIRST_MAKEFILE};
-    $self->{MAKEFILE_OLD} ||= $self->{MAKEFILE}.'_old';
-    $self->{NOECHO} ||= '@ ';
+    $self->{NOOP}               = 'Continue';
+    $self->{MAKEFILE}           ||= 'Descrip.MMS';
+    $self->{FIRST_MAKEFILE}     ||= '$(MAKEFILE)';
+    $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
+    $self->{MAKEFILE_OLD}       ||= '$(MAKEFILE)_old';
+    $self->{NOECHO}             ||= '@ ';
     $self->{RM_F} = '$(PERL) -e "foreach (@ARGV) { 1 while ( -d $_ ? rmdir $_ : unlink $_)}"';
     $self->{RM_RF} = '$(PERLRUN) -e "use File::Path; @dirs = map(VMS::Filespec::unixify($_),@ARGV); rmtree(\@dirs,0,0)"';
     $self->{TOUCH} = '$(PERL) -e "$t=time; foreach (@ARGV) { -e $_ ? utime($t,$t,@ARGV) : (open(F,qq(>$_)),close F)}"';
