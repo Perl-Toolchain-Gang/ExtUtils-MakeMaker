@@ -1,14 +1,17 @@
 #!./perl
 
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
+    if( $ENV{PERL_CORE} ) {
+        chdir 't' if -d 't';
+        @INC = '../lib';
+    }
 }
+chdir 't';
 
 use vars qw( $required );
 use Test::More tests => 18;
 
-use_ok( 'ExtUtils::Mkbootstrap' );
+BEGIN { use_ok( 'ExtUtils::Mkbootstrap' ) }
 
 
 # Mkbootstrap makes a backup copy of "$_[0].bs" if it exists and is non-zero
