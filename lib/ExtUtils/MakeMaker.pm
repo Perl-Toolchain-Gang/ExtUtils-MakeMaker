@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.10_04';
-($Revision) = q$Revision: 1.113 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.114 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -2029,7 +2029,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.113 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.114 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2342,7 +2342,7 @@ An example:
 
 Long plaguing users of MakeMaker based modules has been the problem of
 getting basic information about the module out of the sources
-I<without> running the F<Makfile.PL> and doing a bunch of messy
+I<without> running the F<Makefile.PL> and doing a bunch of messy
 heuristics on the resulting F<Makefile>.  To this end a simple module
 meta-data file has been introduced, F<META.yml>.
 
