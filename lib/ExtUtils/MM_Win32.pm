@@ -276,12 +276,12 @@ q{	$(AR) }.($BORLAND ? '$@ $(OBJECT:^"+")'
 			  : ($GCC ? '-ru $@ $(OBJECT)'
 			          : '-out:$@ $(OBJECT)')).q{
 	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
 };
 
     # Old mechanism - still available:
     push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) echo "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
 MAKE_FRAG
 
     push @m, "\n", $self->dir_target('$(INST_ARCHAUTODIR)');

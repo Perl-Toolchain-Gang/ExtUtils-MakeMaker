@@ -1028,7 +1028,7 @@ BOOTSTRAP = $(BASEEXT).bs
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
 $(BOOTSTRAP): $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
-	$(NOECHO) echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
+	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
 		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
@@ -2442,10 +2442,10 @@ pure_install :: pure_$(INSTALLDIRS)_install
 doc_install :: doc_$(INSTALLDIRS)_install
 
 pure__install : pure_site_install
-	@echo INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
+	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 doc__install : doc_site_install
-	@echo INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
+	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 pure_perl_install ::
 	$(NOECHO) $(MOD_INSTALL) \
@@ -2486,7 +2486,7 @@ pure_vendor_install ::
 		$(INST_MAN3DIR) $(INSTALLVENDORMAN3DIR)
 
 doc_perl_install ::
-	$(NOECHO) echo Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
+	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
 	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
@@ -2497,7 +2497,7 @@ doc_perl_install ::
 		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
 
 doc_site_install ::
-	$(NOECHO) echo Appending installation info to $(INSTALLSITEARCH)/perllocal.pod
+	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLSITEARCH)/perllocal.pod
 	-$(NOECHO) $(MKPATH) $(INSTALLSITEARCH)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
@@ -2508,7 +2508,7 @@ doc_site_install ::
 		>> }.$self->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
 
 doc_vendor_install ::
-	$(NOECHO) echo Appending installation info to $(INSTALLVENDORLIB)/perllocal.pod
+	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLVENDORLIB)/perllocal.pod
 	-$(NOECHO) $(MKPATH) $(INSTALLVENDORLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
@@ -2670,7 +2670,7 @@ $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) -f $(MAKE_APERL_FILE) $@
 
 $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
-	$(NOECHO) echo Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
+	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR=}, $dir, q{ \
 		FIRST_MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
@@ -2836,10 +2836,10 @@ LLIBPERL    = $llibperl
 push @m, "
 \$(MAP_TARGET) :: $tmp/perlmain\$(OBJ_EXT) \$(MAP_LIBPERL) \$(MAP_STATIC) \$(INST_ARCHAUTODIR)/extralibs.all
 	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) \$(LLIBPERL) `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
-	\$(NOECHO) echo 'To install the new \"\$(MAP_TARGET)\" binary, call'
-	\$(NOECHO) echo '    make -f $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
-	\$(NOECHO) echo 'To remove the intermediate files say'
-	\$(NOECHO) echo '    make -f $makefilename map_clean'
+	\$(NOECHO) \$(ECHO) 'To install the new \"\$(MAP_TARGET)\" binary, call'
+	\$(NOECHO) \$(ECHO) '    make -f $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
+	\$(NOECHO) \$(ECHO) 'To remove the intermediate files say'
+	\$(NOECHO) \$(ECHO) '    make -f $makefilename map_clean'
 
 $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 ";
@@ -2847,7 +2847,7 @@ $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 
     push @m, qq{
 $tmp/perlmain.c: $makefilename}, q{
-	$(NOECHO) echo Writing $@
+	$(NOECHO) $(ECHO) Writing $@
 	$(NOECHO) $(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
 		-e "writemain(grep s#.*/auto/##s, split(q| |, q|$(MAP_STATIC)|))" > $@t && $(MV) $@t $@
 
@@ -2858,7 +2858,7 @@ $tmp/perlmain.c: $makefilename}, q{
 
     push @m, q{
 doc_inst_perl:
-	$(NOECHO) echo Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
+	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
 	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Perl binary" "$(MAP_TARGET)" \
@@ -2904,14 +2904,14 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 # We take a very conservative approach here, but it\'s worth it.
 # We move Makefile to Makefile.old here to avoid gnu make looping.
 $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP) $(VERSION_FROM)
-	$(NOECHO) echo "Makefile out-of-date with respect to $?"
-	$(NOECHO) echo "Cleaning current config before rebuilding Makefile..."
+	$(NOECHO) $(ECHO) "Makefile out-of-date with respect to $?"
+	$(NOECHO) $(ECHO) "Cleaning current config before rebuilding Makefile..."
 	$(NOECHO) $(RM_F) $(MAKEFILE_OLD)
 	$(NOECHO) $(MV)   $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
 	-$(MAKE) -f $(MAKEFILE_OLD) clean $(DEV_NULL) || $(NOOP)
 	$(PERLRUN) Makefile.PL }.join(" ",map(qq["$_"],@ARGV)).q{
-	$(NOECHO) echo "==> Your Makefile has been rebuilt. <=="
-	$(NOECHO) echo "==> Please rerun the make command.  <=="
+	$(NOECHO) $(ECHO) "==> Your Makefile has been rebuilt. <=="
+	$(NOECHO) $(ECHO) "==> Please rerun the make command.  <=="
 	false
 
 };
@@ -3103,10 +3103,10 @@ sub perldepend {
 # We do NOT just update config.h because that is not sufficient.
 # An out of date config.h is not fatal but complains loudly!
 $(PERL_INC)/config.h: $(PERL_SRC)/config.sh
-	-$(NOECHO) echo "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; false
+	-$(NOECHO) $(ECHO) "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; false
 
 $(PERL_ARCHLIB)/Config.pm: $(PERL_SRC)/config.sh
-	$(NOECHO) echo "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(PERL_SRC)/config.sh"
+	$(NOECHO) $(ECHO) "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(PERL_SRC)/config.sh"
 	cd $(PERL_SRC) && $(MAKE) lib/Config.pm
 } if $self->{PERL_SRC};
 
@@ -3658,12 +3658,12 @@ MAKE_FRAG
     push @m, sprintf <<'MAKE_FRAG', $ar;
 	$(%s) $(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@
 	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
 MAKE_FRAG
 
     # Old mechanism - still available:
     push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) echo "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
 MAKE_FRAG
 
     push @m, "\n", $self->dir_target('$(INST_ARCHAUTODIR)');
@@ -3791,7 +3791,7 @@ test :: \$(TEST_TYPE)
         push(@m, map("\t\$(NOECHO) cd $_ && \$(TEST_F) \$(FIRST_MAKEFILE) && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
     }
 
-    push(@m, "\t\$(NOECHO) echo 'No tests defined for \$(NAME) extension.'\n")
+    push(@m, "\t\$(NOECHO) $(ECHO) 'No tests defined for \$(NAME) extension.'\n")
 	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 

@@ -164,12 +164,12 @@ END
 
     $m .= sprintf <<'END', $ar_arg;
 	$(AR) %s
-	$(NOECHO)echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
 	$(CHMOD) 755 $@
 END
 
     $m .= <<'END' if $self->{PERL_SRC};
-	$(NOECHO)echo "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
     
     
 END
@@ -203,16 +203,16 @@ INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 
 # Create xdc data for an MT safe NLM in case of mpk build
 $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP)
-	@echo Export boot_$(BOOT_SYMBOL) > $(BASEEXT).def
-	@echo $(BASE_IMPORT) >> $(BASEEXT).def
-	@echo Import @$(PERL_INC)\perl.imp >> $(BASEEXT).def
+	$(NOECHO) $(ECHO) Export boot_$(BOOT_SYMBOL) > $(BASEEXT).def
+	$(NOECHO) $(ECHO) $(BASE_IMPORT) >> $(BASEEXT).def
+	$(NOECHO) $(ECHO) Import @$(PERL_INC)\perl.imp >> $(BASEEXT).def
 MAKE_FRAG
 
 
     if ( $self->{CCFLAGS} =~ m/ -DMPK_ON /) {
         $m .= <<'MAKE_FRAG';
 	$(MPKTOOL) $(XDCFLAGS) $(BASEEXT).xdc
-	@echo xdcdata $(BASEEXT).xdc >> $(BASEEXT).def
+	$(NOECHO) $(ECHO) xdcdata $(BASEEXT).xdc >> $(BASEEXT).def
 MAKE_FRAG
     }
 

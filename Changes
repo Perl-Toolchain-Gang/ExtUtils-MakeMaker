@@ -1,4 +1,5 @@
 6.06_03
+    - Cleaned up hard coded 'echo' and '@' to $(ECHO) and $(NOECHO)
     - $(SAY) is now $(ECHO) on VMS
     - Moved rogue initializations from tools_other() to init_others()
     - Normalized MM_VMS's tools_other() to mostly use its superclass.
