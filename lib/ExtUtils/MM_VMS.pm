@@ -10,7 +10,14 @@ use strict;
 use Carp qw( &carp );
 use Config;
 require Exporter;
-use VMS::Filespec;
+
+BEGIN {
+    # so we can compile the thing on non-VMS platforms.
+    if( $^O eq 'VMS' ) {
+        require VMS::Filespec;
+    }
+}
+
 use File::Basename;
 use File::Spec;
 use vars qw($Revision @ISA $VERSION);
@@ -496,7 +503,7 @@ sub constants {
                    FULLEXT VERSION_FROM OBJECT LDFROM
 	      /	) {
         next unless defined $self->{$macro};
-        $self->{$macro} = $self->fixpath($self->{$macro},0),"\n";
+        $self->{$macro} = $self->fixpath($self->{$macro},0)."\n";
     }
 
 
@@ -2183,9 +2190,6 @@ sub oneliner {
     $cmd =~ s{^\n+}{};
     $cmd =~ s{\n+$}{};
 
-    # Escape newlines.  XXX Necessary?
-    $cmd =~ s{\n}{-\n}g;
-
     $cmd = $self->quote_literal($cmd);
 
     # Switches must be quoted else they will be lowercased.
@@ -2203,9 +2207,12 @@ sub quote_literal {
     my($self, $text) = @_;
 
     # I believe this is all we should need.
-    $cmd =~ s{"}{""}g;
+    $text =~ s{"}{""}g;
 
-    return qq{"$cmd"};
+    # Escape newlines.
+    $text =~ s{\n}{-\n}g;
+
+    return qq{"$text"};
 }
 
 =item init_linker (o)
