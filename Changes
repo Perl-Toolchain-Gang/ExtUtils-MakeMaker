@@ -43,6 +43,8 @@
       one-liners with ExtUtils::Command::MM functions
     - Replaced VMS hand-rolled perl code for TOUCH, CHMOD, RM_F and RM_RF
       with ExtUtils::Command functions.  Added TEST_F.
+    - Added $(EXISTS_EXT) macro and init_EXISTS_EXT to avoid
+      hardcoding /.exists.  Reduces code duplication in the MM_* modules.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
