@@ -1,82 +1,3 @@
-From makemaker-return-513-schwern=pobox.com@perl.org Fri Aug 02 14:57:48 2002
-Return-path: <makemaker-return-513-schwern=pobox.com@perl.org>
-Envelope-to: schwern@localhost
-Received: from blackrider.schwern.org
-	([127.0.0.1] helo=localhost ident=schwern)
-	by blackrider.schwern.org with esmtp (Exim 3.35 #1 (Debian))
-	id 17akQd-00029c-01
-	for <schwern@localhost>; Fri, 02 Aug 2002 14:57:47 -0700
-Delivered-To: schwern@magnonel.guild.net
-Received: from magnonel.guild.net [209.166.167.23]
-	by localhost with POP3 (fetchmail-5.9.11)
-	for schwern@localhost (single-drop); Fri, 02 Aug 2002 14:57:47 -0700 (PDT)
-Received: (qmail 19186 invoked by uid 1068); 3 Aug 2002 02:37:23 -0000
-Received: from cali-2.pobox.com (64.71.166.115)
-  by magnonel.guild.net with SMTP; 3 Aug 2002 02:37:23 -0000
-Received: from cali-2.pobox.com (localhost.localdomain [127.0.0.1])
-	by cali-2.pobox.com (Postfix) with ESMTP id 920F03E70E
-	for <schwern@magnonel.guild.net>; Fri,  2 Aug 2002 22:37:22 -0400 (EDT)
-Delivered-To: schwern@pobox.com
-Received: from onion.perl.org (onion.valueclick.com [64.70.54.95])
-	by cali-2.pobox.com (Postfix) with SMTP id B38D13E686
-	for <schwern@pobox.com>; Fri,  2 Aug 2002 22:37:21 -0400 (EDT)
-Received: (qmail 58982 invoked by uid 1005); 3 Aug 2002 02:37:20 -0000
-Mailing-List: contact makemaker-help@perl.org; run by ezmlm
-Precedence: bulk
-list-help: <mailto:makemaker-help@perl.org>
-list-unsubscribe: <mailto:makemaker-unsubscribe@perl.org>
-list-post: <mailto:makemaker@perl.org>
-Delivered-To: mailing list makemaker@perl.org
-Received: (qmail 58969 invoked by uid 76); 3 Aug 2002 02:37:20 -0000
-Message-ID: <3D4B419B.2000304@stason.org>
-Date: Sat, 03 Aug 2002 10:36:11 +0800
-From: Stas Bekman <stas@stason.org>
-Organization: Hope, Humanized
-User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.0.0) Gecko/20020510
-X-Accept-Language: en-us, en
-MIME-Version: 1.0
-To: Michael G Schwern <schwern@pobox.com>
-Cc: Nick Ing-Simmons <nick.ing-simmons@elixent.com>,
-	makemaker@perl.org
-Subject: Re: XS_FILES, H_FILES, C_FILES Makefile target
-References: <3D449DB2.9070108@stason.org> <20020729082641.1350.9@bactrian.elixent.com> <3D48AA92.4000409@stason.org> <20020801081616.1313.3@bactrian.elixent.com> <3D490BD0.6050402@stason.org> <20020801164216.GI1064@ool-18b93024.dyn.optonline.net>
-Content-Type: multipart/mixed;
- boundary="------------020203080305000601040604"
-Status: RO
-Content-Length: 4036
-Lines: 180
-
---------------020203080305000601040604
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
-
-Michael G Schwern wrote:
-> On Thu, Aug 01, 2002 at 06:22:08PM +0800, Stas Bekman wrote:
-> 
->>do we have some place where this trick (technique) can be documented? 
->>I'll submit a patch.
->>
->>or should we start something like perlmmtut.pod? where this kind of 
->>tricks can go to?
-> 
-> 
-> Starting ExtUtils::MakeMaker::FAQ would be nice.
-
-Please find the attached FAQ.pod.
-
-__________________________________________________________________
-Stas Bekman            JAm_pH ------> Just Another mod_perl Hacker
-http://stason.org/     mod_perl Guide ---> http://perl.apache.org
-mailto:stas@stason.org http://use.perl.org http://apacheweek.com
-http://modperlbook.org http://apache.org   http://ticketmaster.com
-
---------------020203080305000601040604
-Content-Type: text/plain;
- name="FAQ.pod"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="FAQ.pod"
-
 package ExtUtils::MakeMaker::FAQ;
 
 our $VERSION = '0.01';
@@ -94,7 +15,9 @@ ExtUtils::MakeMaker::FAQ - Frequently Asked Questions About MakeMaker
 
 Document tips and tricks for C<ExtUtils::MakeMaker>.
 
-=head1 How to Make Two and More XS files Coexist In The Same Directory?
+=over 4
+
+=item How do I make two or more XS files coexist in the same directory?
 
 Sometimes you need to have two and more XS files in the same package.
 One way to go is to put them into separate directories, but sometimes
@@ -214,16 +137,19 @@ And of course a very basic test:
 
 This tip has been brought to you by Nick Ing-Simmons and Stas Bekman.
 
+=back
+
+=head1 PATCHING
+
+If you have a question you'd like to see added to the FAQ (whether or
+not you have the answer) please send it to makemaker@perl.org.
+
 =head1 AUTHOR
+
+The denizens of makemaker@perl.org.
 
 =head1 SEE ALSO
 
-perl(3)
+L<ExtUtils::MakeMaker>
 
 =cut
-
---------------020203080305000601040604--
-
-
-
-

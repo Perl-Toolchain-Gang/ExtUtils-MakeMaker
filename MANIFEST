@@ -27,6 +27,7 @@ lib/ExtUtils/MM_Win32.pm
 lib/ExtUtils/MM_Win95.pm
 lib/ExtUtils/MY.pm
 lib/ExtUtils/MakeMaker.pm
+lib/ExtUtils/MakeMaker/FAQ.pod
 lib/ExtUtils/Manifest.pm
 lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
