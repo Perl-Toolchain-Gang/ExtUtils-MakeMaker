@@ -20,7 +20,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.46_05';
+$VERSION = '1.46_06';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -2179,7 +2179,7 @@ realclean ::
 	$(NOECHO) $(RM_F) %s
 	$(CP) %s %s
 	$(FIXIN) %s
-	-$(NOECHO) $(CHMOD) $(PERM_RWX) %s
+	$(IGNORE)$(NOECHO) $(CHMOD) $(PERM_RWX) %s
 
 MAKE
 
@@ -3433,7 +3433,7 @@ sub tools_other {
 
     # We set PM_FILTER as late as possible so it can see all the earlier
     # on macro-order sensitive makes such as nmake.
-
+    # IGNORE must go last else MMS gets confused.
     for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
                       UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP 
                       ECHO ECHO_N
@@ -3442,8 +3442,8 @@ sub tools_other {
                       WARN_IF_OLD_PACKLIST
                       MACROSTART MACROEND USEMAKEFILE
                       PM_FILTER
-                      IGNORE
                       FIXIN
+                      IGNORE
                     } ) 
     {
         next unless defined $self->{$tool};
