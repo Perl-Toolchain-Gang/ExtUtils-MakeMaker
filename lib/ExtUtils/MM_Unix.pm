@@ -2944,31 +2944,34 @@ Defines how to rewrite the Makefile.
 
 sub makefile {
     my($self) = shift;
-    my @m;
+    my $m;
     # We do not know what target was originally specified so we
     # must force a manual rerun to be sure. But as it should only
     # happen very rarely it is not a significant problem.
-    push @m, '
+    $m = '
 $(OBJECT) : $(FIRST_MAKEFILE)
 ' if $self->{OBJECT};
 
-    push @m, q{
+    my $newer_than_target = $Is_VMS ? '$(MMS$SOURCE_LIST)' : '$?';
+    my $mpl_args = join " ", map qq["$_"], @ARGV;
+
+    $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
 # We take a very conservative approach here, but it's worth it.
 # We move Makefile to Makefile.old here to avoid gnu make looping.
 $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
-	$(NOECHO) $(ECHO) "Makefile out-of-date with respect to $?"
+	$(NOECHO) $(ECHO) "Makefile out-of-date with respect to %s"
 	$(NOECHO) $(ECHO) "Cleaning current config before rebuilding Makefile..."
 	-$(NOECHO) $(RM_F) $(MAKEFILE_OLD)
 	-$(NOECHO) $(MV)   $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
-	-$(MAKE) $(USEMAKEFILE) $(MAKEFILE_OLD) clean $(DEV_NULL) || $(NOOP)
-	$(PERLRUN) Makefile.PL }.join(" ",map(qq["$_"],@ARGV)).q{
+	-$(MAKE) $(USEMAKEFILE) $(MAKEFILE_OLD) clean $(DEV_NULL)
+	$(PERLRUN) Makefile.PL %s
 	$(NOECHO) $(ECHO) "==> Your Makefile has been rebuilt. <=="
-	$(NOECHO) $(ECHO) "==> Please rerun the make command.  <=="
+	$(NOECHO) $(ECHO) "==> Please rerun the $(MAKE) command.  <=="
 	false
 
-};
+MAKE_FRAG
 
-    join "", @m;
+    return $m;
 }
 
 

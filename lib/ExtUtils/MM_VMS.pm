@@ -1566,38 +1566,6 @@ $(PERL_ARCHLIB)Config.pm : $(PERL_SRC)config.sh
     join('',@m);
 }
 
-=item makefile (override)
-
-Use VMS commands and quoting.
-
-=cut
-
-sub makefile {
-    my($self) = @_;
-    my(@m,@cmd);
-    # We do not know what target was originally specified so we
-    # must force a manual rerun to be sure. But as it should only
-    # happen very rarely it is not a significant problem.
-    push @m, q[
-$(OBJECT) : $(FIRST_MAKEFILE)
-] if $self->{OBJECT};
-
-    push @m,q[
-# We take a very conservative approach here, but it's worth it.
-# We move $(FIRST_MAKEFILE) to $(MAKEFILE_OLD) here to avoid gnu make looping.
-$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
-	$(NOECHO) $(ECHO) "$(FIRST_MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
-	$(NOECHO) $(ECHO) "Cleaning current config before rebuilding $(FIRST_MAKEFILE) ..."
-	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
-	- $(MAKE) $(USEMAKEFILE)$(MAKEFILE_OLD) clean
-	$(PERLRUN) Makefile.PL ],join(' ',map(qq["$_"],@ARGV)),q[
-	$(NOECHO) $(ECHO) "$(FIRST_MAKEFILE) has been rebuilt."
-	$(NOECHO) $(ECHO) "Please run $(MMS) to build the extension."
-];
-
-    join('',@m);
-}
-
 
 =item makeaperl (override)
 
