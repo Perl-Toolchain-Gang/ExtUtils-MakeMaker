@@ -144,8 +144,10 @@ Using \ for Windows.
 sub init_DIRFILESEP {
     my($self) = shift;
 
-    # gotta be careful this isn't interpreted as an escape.
-    $self->{DIRFILESEP} = '^\\';
+    # The ^ makes sure its not interpreted as an escape in nmake
+    $self->{DIRFILESEP} = $NMAKE ? '^\\' :
+                          $DMAKE ? '\\\\'
+                                 : '\\';
 }
 
 =item B<init_others>
@@ -182,6 +184,9 @@ sub init_others {
     $self->{AR}     ||= $Config{ar} || 'lib';
 
     $self->SUPER::init_others;
+
+    # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
+    delete $self->{SHELL};
 
     $self->{LDLOADLIBS} ||= $Config{libs};
     # -Lfoo must come first for Borland, so we put it in LDDLFLAGS
@@ -457,6 +462,11 @@ sub quote_literal {
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
     $text =~ s{"}{\\"}g;
+
+    # dmake eats '{' inside double quotes and leaves alone { outside double
+    # quotes; however it transforms {{ into { either inside and outside double
+    # quotes
+    $text =~ s/{/{{/g if $DMAKE;
 
     return qq{"$text"};
 }
