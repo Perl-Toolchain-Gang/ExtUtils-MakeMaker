@@ -35,7 +35,7 @@ WriteMakefile(
                          Test::More         => 0.40,
                        },
     INSTALLDIRS     => 'perl',
-    EXE_FILES       => [qw(bin/inst bin/xsubpp)]
+    EXE_FILES       => [qw(bin/instmodsh bin/xsubpp)]
 );
 
 
