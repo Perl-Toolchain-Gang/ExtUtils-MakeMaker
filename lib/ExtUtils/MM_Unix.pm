@@ -792,7 +792,7 @@ print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
 CODE
 
     return sprintf <<'MAKE_FRAG', $date_check;
-dist : $(DIST_DEFAULT)
+dist : $(DIST_DEFAULT) $(FIRST_MAKEFILE)
 	$(NOECHO) %s
 MAKE_FRAG
 }
@@ -1200,10 +1200,8 @@ WARNING
             # we close it before running the command.
             close STDERR if $stderr_duped;
             my $version_check = qq{$abs -e "require $ver; print qq{VER_OK\n}"};
-            $val = `$version_check`;
+            $val = `$version_check` || '';
             open STDERR, '>&STDERR_COPY' if $stderr_duped;
-            print STDERR "Perl version check failed: '$version_check'\n"
-                unless defined $val;
 
             if ($val =~ /^VER_OK/) {
                 print "Using PERL=$abs\n" if $trace;
@@ -3044,8 +3042,7 @@ sub parse_version {
 	$inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
 	next if $inpod || /^\s*#/;
 	chop;
-	# next unless /\$(([\w\:\']*)\bVERSION)\b.*\=/;
-	next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+	next unless /(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
 	my $eval = qq{
 	    package ExtUtils::MakeMaker::_version;
 	    no strict;
