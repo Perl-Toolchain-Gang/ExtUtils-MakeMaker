@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.03";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.66 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.67 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -1912,7 +1912,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.66 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.67 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2242,11 +2242,10 @@ used to write a makefile.  It displays the $message as a prompt for
 input.  If a $default is provided it will be used as a default.  The
 function returns the $value selected by the user.
 
-If C<prompt()> detects that it is not running in interactively (say,
-if it is running from a CPAN shell), or if the PERL_MM_USE_DEFAULT
-environment variable is set to true, the $default will be used without
-prompting.  This prevents automated processes from blocking on user
-input.
+If C<prompt()> detects that it is not running interactively, or if the
+PERL_MM_USE_DEFAULT environment variable is set to true, the $default
+will be used without prompting.  This prevents automated processes
+from blocking on user input.
 
 If no $default is provided an empty string will be used instead.
 
