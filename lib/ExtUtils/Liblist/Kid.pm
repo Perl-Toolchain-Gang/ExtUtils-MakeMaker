@@ -366,7 +366,7 @@ sub _vms_ext {
   my($self, $potential_libs,$verbose,$give_libs) = @_;
   my(@crtls,$crtlstr);
   my($dbgqual) = $self->{OPTIMIZE} || $Config{'optimize'} ||
-                 $self->{CCFLAS}   || $Config{'ccflags'};
+                 $self->{CCFLAGS}   || $Config{'ccflags'};
   @crtls = ( ($dbgqual =~ m-/Debug-i ? $Config{'dbgprefix'} : '')
               . 'PerlShr/Share' );
   push(@crtls, grep { not /\(/ } split /\s+/, $Config{'perllibs'});
@@ -398,8 +398,8 @@ sub _vms_ext {
   my(@dirs,@libs,$dir,$lib,%found,@fndlibs,$ldlib);
   my $cwd = cwd();
   my($so,$lib_ext,$obj_ext) = @Config{'so','lib_ext','obj_ext'};
-  # List of common Unix library names and there VMS equivalents
-  # (VMS equivalent of '' indicates that the library is automatially
+  # List of common Unix library names and their VMS equivalents
+  # (VMS equivalent of '' indicates that the library is automatically
   # searched by the linker, and should be skipped here.)
   my(@flibs, %libs_seen);
   my %libmap = ( 'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => '',
