@@ -79,7 +79,7 @@ sub init_linker {
         if( $] >= 5.007 ) {
             $libperl =~ s/a$/dll.a/;
         }
-        $self->{PERL_ARCHVE} = $libperl;
+        $self->{PERL_ARCHIVE} = $libperl;
     } else {
         $self->{PERL_ARCHIVE} = 
           '$(PERL_INC)' .'/'. ("$Config{libperl}" or "libperl.a");
