@@ -16,7 +16,7 @@ use Test::More tests => 4;
 use_ok('ExtUtils::MakeMaker::bytes');
 
 SKIP: {
-    skip "bytes.pm appeared in 5.6", 2 if $] < 5.006;
+    skip "bytes.pm appeared in 5.6", 3 if $] < 5.006;
 
     my $chr = chr(400);
     is( length $chr, 1 );
