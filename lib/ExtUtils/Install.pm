@@ -446,9 +446,30 @@ sub pm_to_blib {
 	utime($atime,$mtime+$Is_VMS,$to);
 	chmod(0444 | ( $mode & 0111 ? 0111 : 0 ),$to);
 	next unless $from =~ /\.pm$/;
-	autosplit($to,$autodir);
+	_autosplit($to,$autodir);
     }
 }
+
+
+=begin _private
+
+=item _autosplit
+
+From 1.0307 back, AutoSplit will sometimes leave an open filehandle to
+the file being split.  This causes problems on systems with mandatory
+locking (ie. Windows).  So we wrap it and close the filehandle.
+
+=end _private
+
+=cut
+
+sub _autosplit {
+    my $retval = autosplit(@_);
+    close *AutoSplit::IN;
+
+    return $retval;
+}
+
 
 package ExtUtils::Install::Warn;
 
