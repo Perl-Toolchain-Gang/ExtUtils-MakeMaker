@@ -15,7 +15,7 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 05325a673db0a1d38bb98551c85360cbdf316b9b .patch
-SHA1 245dc5593871fced46fb626cee9a99a5896cac5b Changes
+SHA1 90b0c5195c7cecc321a9c07ec95fc6cf90dc7702 Changes
 SHA1 9a5818da277e4c4d34dbb5011d3073b495ee37e8 MANIFEST
 SHA1 001ec2e096a338ed14c59807bc4cae471c431ea2 MANIFEST.SKIP
 SHA1 86b2321ecbc3ad0ab4b9a7cbf0485645345f2170 META.yml
@@ -37,7 +37,7 @@ SHA1 f1e34d3379839ca6b799f11a7959d634e6fea9c6 lib/ExtUtils/MM_Any.pm
 SHA1 3586e4d48ab36bc57f27f414871cdbf376d4e575 lib/ExtUtils/MM_BeOS.pm
 SHA1 e1555751ebc59dff97ded68db139d7496589dece lib/ExtUtils/MM_Cygwin.pm
 SHA1 861544f8e7a840853f767f35bb391a895f9aa1db lib/ExtUtils/MM_DOS.pm
-SHA1 75f1fa677a833206d2bc1cc2d51afc562dcf2348 lib/ExtUtils/MM_MacOS.pm
+SHA1 58cbecb5f1a3ba3f21031cfe6d8a40c2def76c65 lib/ExtUtils/MM_MacOS.pm
 SHA1 e9796190c387cf0301a8c6fac223e491c57c6841 lib/ExtUtils/MM_NW5.pm
 SHA1 441da7524783ae12ce40f26353adbf4696a8f5b4 lib/ExtUtils/MM_OS2.pm
 SHA1 02b916060571fd20ced334ba4f2d1542d1590023 lib/ExtUtils/MM_UWIN.pm
@@ -46,7 +46,7 @@ SHA1 f2f48b698b141d7810e9b3df9b5bb78b41224a05 lib/ExtUtils/MM_VMS.pm
 SHA1 90ff9e66a8548c2638088b5b5b890e1890db26a0 lib/ExtUtils/MM_Win32.pm
 SHA1 d6e19df6cd2c21853f63354cc3018d759c21babe lib/ExtUtils/MM_Win95.pm
 SHA1 0f51f0dce4cb33bac94c85c86d19ae361e59597a lib/ExtUtils/MY.pm
-SHA1 c64768b450d937887524619a2aa392bee9f83e7a lib/ExtUtils/MakeMaker.pm
+SHA1 dc7fff15c61fae3df4ffa68f12c480a497d7d44c lib/ExtUtils/MakeMaker.pm
 SHA1 a4af695d0d4bc61e663b1fe0acca67e368fe911c lib/ExtUtils/MakeMaker/FAQ.pod
 SHA1 4ad61c880011c3c39834b75c78abe964567aaa5f lib/ExtUtils/MakeMaker/Tutorial.pod
 SHA1 4685bb3361c2b9c42094ef68454e849edaf6f549 lib/ExtUtils/MakeMaker/bytes.pm
@@ -103,7 +103,7 @@ SHA1 4a7685da6367a7a79ecfac76f96adf2aeac46514 t/writemakefile_args.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.4 (Darwin)
 
-iD8DBQFBpAgxT4Li3Cw/PzQRAjMhAJ9dxKG4u+ltIEzZ7SCtVHd33V5acgCcDsCm
-d2hDbQGSJEnh0oFacahU/GY=
-=LOGt
+iD8DBQFBp5xcT4Li3Cw/PzQRAunIAKCPi0260fUXm/j7Hj8iw89wu3JFIwCfZmB2
+6s77Bqh/dmoAyBvwGnx06WI=
+=jqL/
 -----END PGP SIGNATURE-----
