@@ -883,9 +883,7 @@ sub uutardist_target {
 
     return <<'MAKE_FRAG';
 uutardist : $(DISTVNAME).tar$(SUFFIX)
-	uuencode $(DISTVNAME).tar$(SUFFIX) \\
-		$(DISTVNAME).tar$(SUFFIX) > \\
-		$(DISTVNAME).tar$(SUFFIX)_uu
+	uuencode $(DISTVNAME).tar$(SUFFIX) $(DISTVNAME).tar$(SUFFIX) > $(DISTVNAME).tar$(SUFFIX)_uu
 MAKE_FRAG
 }
 
