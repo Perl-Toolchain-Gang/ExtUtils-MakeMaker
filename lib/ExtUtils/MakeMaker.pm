@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.06_04";
-($Revision = substr(q$Revision: 1.101 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.102 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -339,6 +339,11 @@ sub new {
     my($class,$self) = @_;
     my($key);
 
+    # Store the original args passed to WriteMakefile()
+    foreach my $k (keys %$self) {
+        $self->{ARGS}{$k} = $self->{$k};
+    }
+
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
         require Data::Dumper;
         print Data::Dumper->Dump([$self->{PREREQ_PM}], [qw(PREREQ_PM)]);
@@ -369,6 +374,9 @@ sub new {
         eval "require $prereq; 0";
 
         my $pr_version = $prereq->VERSION || 0;
+
+        # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
+        $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
 
         if ($@) {
             warn sprintf "Warning: prerequisite %s %s not found.\n", 
@@ -517,6 +525,8 @@ END
 END
 
     foreach my $key (sort keys %initial_att){
+        next if $key eq 'ARGS';
+
         my($v) = neatvalue($initial_att{$key});
         $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
         $v =~ tr/\n/ /s;
@@ -531,6 +541,7 @@ END
 END
         if (scalar(keys %configure_att) > 0) {
             foreach my $key (sort keys %configure_att){
+               next if $key eq 'ARGS';
                my($v) = neatvalue($configure_att{$key});
                $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
                $v =~ tr/\n/ /s;
@@ -646,7 +657,9 @@ sub parse_args{
                  (getpwuid($>))[7]
                  ]ex;
         }
-        $self->{uc($name)} = $value;
+
+        # Remember the original args passed it.  It will be useful later.
+        $self->{ARGS}{uc $name} = $self->{uc $name} = $value;
     }
 
     # catch old-style 'potential_libs' and inform user how to 'upgrade'
@@ -691,6 +704,7 @@ sub parse_args{
     }
 
     foreach my $mmkey (sort keys %$self){
+        next if $mmkey eq 'ARGS';
         print STDOUT "  $mmkey => ", neatvalue($self->{$mmkey}), "\n" if $Verbose;
         print STDOUT "'$mmkey' is not a known MakeMaker parameter name.\n"
             unless exists $Recognized_Att_Keys{$mmkey};
@@ -1985,7 +1999,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.101 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.102 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
