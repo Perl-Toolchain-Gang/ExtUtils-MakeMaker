@@ -50,8 +50,6 @@ Add 'how to install additional files' to ExtUtils::MakeMaker::FAQ.
 
 Fix NORECUSE bug continuing to set DIR
 
-Make 00compile.t test work off MANIFEST
-
 Give typemap location its own macro.
 
 Only look for typemaps in the core library.
