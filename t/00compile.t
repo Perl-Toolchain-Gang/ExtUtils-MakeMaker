@@ -29,23 +29,20 @@ find( sub {
             return;
         }
         push @modules, $File::Find::name if /\.pm$/;
-    }, '.'  # yes, File::Find always returns unixy files
+    }, 'ExtUtils'
 );
 
 plan tests => scalar @modules * 2;
 foreach my $file (@modules) {
-    # attempting to normalize the file to be something like what Perl
-    # puts in %INC via require Foo::Bar.  Can't use canonpath, it will
-    # nativize the filename.
-    $file =~ s{^\./}{};  # this is ok, we have unix filenames for sure
-
     local @INC = @INC;
     unshift @INC, File::Spec->curdir;
 
     # This piece of insanity brought to you by non-case preserving
     # file systems!  We have extutils/command.pm, %INC has 
     # ExtUtils/Command.pm
-    eval q{ require($file) } unless grep { lc $file =~ lc $_ } keys %INC;
+    # Furthermore, 5.8.0 has a bug about require alone in an eval.  Thus
+    # the extra statement.
+    eval q{ require($file); 1 } unless grep { lc $file =~ lc $_ } keys %INC;
     is( $@, '', "require $file" );
 
     SKIP: {
