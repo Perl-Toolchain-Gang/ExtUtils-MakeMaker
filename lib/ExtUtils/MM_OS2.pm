@@ -42,7 +42,7 @@ sub init_dist {
     my($self) = @_;
 
     $self->{TO_UNIX} ||= <<'MAKE_TEXT';
-$(NOECHO) $(TEST_F) tmp.zip && $(RM) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM) tmp.zip
+$(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
 MAKE_TEXT
 
     $self->SUPER::init_dist;
