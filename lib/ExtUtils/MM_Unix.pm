@@ -20,7 +20,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.44';
+$VERSION = '1.45';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -1083,9 +1083,9 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) blibdirs $(EXPORT_LIST) $(PE
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
 	# or -R to add paths to the run-time library search path.
         if ($Config{'lddlflags'} =~ /-Wl,-R/) {
-            $libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -lperl';
+            $libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -Wl,-R$(PERL_ARCHLIB)/CORE -lperl';
         } elsif ($Config{'lddlflags'} =~ /-R/) {
-            $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -lperl';
+            $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -R$(PERL_ARCHLIB)/CORE -lperl';
         }
     }
 

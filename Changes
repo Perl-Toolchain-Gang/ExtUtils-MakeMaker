@@ -1,3 +1,8 @@
+6.21
+    - NetBSD was looking in INSTALLARCHLIB/CORE for libperl isntead of 
+      PERL_ARCHLIB/CORE.  Would cause problems if INSTALLARCHLIB was changed
+      (ie. LIB or PREFIX used). [Jochen Eisinger]
+
 6.20 Thu Nov  6 02:25:58 PST 2003
     - Fixing dos2unix on Cygwin.  In-place editing doesn't work 100% so we
       take a more conservative approach.
