@@ -3209,6 +3209,10 @@ sub pm_to_blib {
     my $self = shift;
     my($autodir) = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
+# For backwards compat with anything that referenced this target.
+pm_to_blib: pm_to_blib.ts
+	$(NOOP)
+
 pm_to_blib.ts: $(TO_INST_PM)
 };
 
