@@ -1,8 +1,3 @@
-#   MM_VMS.pm
-#   MakeMaker default methods for VMS
-#
-#   Author:  Charles Bailey  bailey@newman.upenn.edu
-
 package ExtUtils::MM_VMS;
 
 use strict;
@@ -21,7 +16,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71_02';
-($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 4056 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1897,6 +1892,16 @@ sub os_flavor {
 }
 
 =back
+
+
+=head1 AUTHOR
+
+Original author Charles Bailey F<bailey@newman.upenn.edu>
+
+Maintained by Michael G Schwern F<schwern@pobox.com>
+
+See L<ExtUtils::MakeMaker> for patching and contact information.
+
 
 =cut
 
