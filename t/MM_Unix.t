@@ -18,7 +18,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 112;
+        plan tests => 111;
     }
 }
 
@@ -103,7 +103,6 @@ foreach ( qw /
   makeaperl
   makefile
   manifypods
-  maybe_command_in_dirs
   needs_linking
   pasthru
   perldepend
