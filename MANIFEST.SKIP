@@ -32,6 +32,7 @@ merge_bleadperl$
 \bblib/
 \bMakeMaker-\d
 \bpm_to_blib\.ts$
+\bpm_to_blib$
 \bblibdirs\.ts$
 
 # Avoid Module::Build generated and utility files.
