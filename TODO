@@ -40,3 +40,16 @@ Consider adding a timeout option to prompt() and env variable.
 Remove the dogmatic "always use h2xs" from the docs and replace with
 something a bit more sensible.  References to ModuleMaker and perhaps
 a small Makefile.PL tutorial.
+
+Unify Win32->find_perl and VMS->find_perl
+
+Remove maybe_command_in_dirs().
+
+Consider if VMS->find_perl needs to have pieces put into maybe_command()
+
+Replace non-working $safe_abs Win32->find_perl with "$abs".
+
+Change find_perl's "require $version" and instead just print $].
+
+Consider integrating Ed Avis's old find_perl fix that involves moving
+STD* filehandles around.
