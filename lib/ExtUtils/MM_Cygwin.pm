@@ -1,20 +1,15 @@
 package ExtUtils::MM_Cygwin;
 
 use strict;
-
-our $VERSION = '1.00';
+use vars qw($VERSION @ISA);
 
 use Config;
-#use Cwd;
-#use File::Basename;
-require Exporter;
-
-require ExtUtils::MakeMaker;
-ExtUtils::MakeMaker->import(qw( $Verbose &neatvalue));
-
 use File::Spec;
 
-unshift @MM::ISA, 'ExtUtils::MM_Cygwin';
+require ExtUtils::MM_Unix;
+@ISA = qw( ExtUtils::MM_Unix );
+
+$VERSION = 1.01_01;
 
 sub canonpath {
     shift;
@@ -24,7 +19,8 @@ sub canonpath {
 sub cflags {
     my($self,$libperl)=@_;
     return $self->{CFLAGS} if $self->{CFLAGS};
-    my $base =$self->ExtUtils::MM_Unix::cflags($libperl);
+
+    my $base = $self->SUPER::cflags($libperl);
     foreach (split /\n/, $base) {
       / *= */ and $self->{$`} = $';
     };
