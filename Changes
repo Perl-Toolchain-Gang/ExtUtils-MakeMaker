@@ -24,7 +24,6 @@
     * Noting where to find make in the README
     * Noting that MakeMaker does not produce a GNU make compatible Makefile
       on Windows.
-    * 6.10_08 with a new version #.
 
 6.10_08 Mon Jul 21 18:17:06 PDT 2003
     * $Config{installvendorman*dir} was being ignored and our default
