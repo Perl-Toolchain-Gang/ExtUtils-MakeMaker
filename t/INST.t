@@ -59,7 +59,7 @@ is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
 my $config_prefix = $^O eq 'VMS' 
-                        ? VMS::Filespec::unixify($Config{installprefixexp})
+                        ? $Config{installprefixexp} || $Config{prefix}
                         : $Config{installprefixexp};
 is( $mm->{PREFIX}, $config_prefix,   'PREFIX' );
 

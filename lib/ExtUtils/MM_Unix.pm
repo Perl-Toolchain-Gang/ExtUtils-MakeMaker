@@ -30,10 +30,6 @@ $Is_Win32 = $^O eq 'MSWin32';
 $Is_Dos   = $^O eq 'dos';
 $Is_VOS   = $^O eq 'vos';
 
-if ($Is_VMS = $^O eq 'VMS') {
-    require VMS::Filespec;
-    import VMS::Filespec qw( &vmsify );
-}
 
 =head1 NAME
 
@@ -1843,33 +1839,7 @@ INSTALLDIRS) and PREFIX.
 sub init_INSTALL {
     my($self) = shift;
 
-    # The user who requests an installation directory explicitly
-    # should not have to tell us an architecture installation directory
-    # as well. We look if a directory exists that is named after the
-    # architecture. If not we take it as a sign that it should be the
-    # same as the requested installation directory. Otherwise we take
-    # the found one.
-    # We do the same thing twice: for privlib/archlib and for sitelib/sitearch
-    for my $libpair ({l=>"privlib", a=>"archlib"}, 
-                     {l=>"sitelib", a=>"sitearch"}) 
-    {
-        my $lib = "install$libpair->{l}";
-        my $Lib = uc $lib;
-        my $Arch = uc "install$libpair->{a}";
-        if( $self->{$Lib} && ! $self->{$Arch} ){
-            my($ilib) = $Config{$lib};
-            $ilib = VMS::Filespec::unixify($ilib) if $Is_VMS;
-
-            $self->prefixify($Arch,$ilib,$self->{$Lib});
-
-            unless (-d $self->{$Arch}) {
-                print STDOUT "Directory $self->{$Arch} not found\n" 
-                  if $Verbose;
-                $self->{$Arch} = $self->{$Lib};
-            }
-            print STDOUT "Defaulting $Arch to $self->{$Arch}\n" if $Verbose;
-        }
-    }
+    $self->init_lib2arch;
 
     # There are no Config.pm defaults for these.
     $Config_Override{installsiteman1dir} = 
@@ -2030,6 +2000,48 @@ sub init_INSTALL {
     $self->{PREFIX} ||= $iprefix;
 
     return 1;
+}
+
+=begin _protected
+
+=item init_lib2arch
+
+    $mm->init_lib2arch
+
+=end _protected
+
+=cut
+
+sub init_lib2arch {
+    my($self) = shift;
+
+    # The user who requests an installation directory explicitly
+    # should not have to tell us an architecture installation directory
+    # as well. We look if a directory exists that is named after the
+    # architecture. If not we take it as a sign that it should be the
+    # same as the requested installation directory. Otherwise we take
+    # the found one.
+    for my $libpair ({l=>"privlib",   a=>"archlib"}, 
+                     {l=>"sitelib",   a=>"sitearch"},
+                     {l=>"vendorlib", a=>"vendorarch"},
+                    )
+    {
+        my $lib = "install$libpair->{l}";
+        my $Lib = uc $lib;
+        my $Arch = uc "install$libpair->{a}";
+        if( $self->{$Lib} && ! $self->{$Arch} ){
+            my($ilib) = $Config{$lib};
+
+            $self->prefixify($Arch,$ilib,$self->{$Lib});
+
+            unless (-d $self->{$Arch}) {
+                print STDOUT "Directory $self->{$Arch} not found\n" 
+                  if $Verbose;
+                $self->{$Arch} = $self->{$Lib};
+            }
+            print STDOUT "Defaulting $Arch to $self->{$Arch}\n" if $Verbose;
+        }
+    }
 }
 
 

@@ -11,7 +11,14 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 2;
+use Test::More;
+
+if( $^O eq 'VMS' ) {
+    plan skip_all => 'prefixify works differently on VMS';
+}
+else {
+    plan tests => 2;
+}
 use File::Spec;
 use ExtUtils::MM;
 

@@ -23,6 +23,8 @@ use File::Spec;
 use TieOut;
 use Config;
 
+my $Is_VMS = $^O eq 'VMS';
+
 $ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
 
 perl_lib;
@@ -42,7 +44,7 @@ my $mm = WriteMakefile(
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => {},
     PERL_CORE     => $ENV{PERL_CORE},
-    PREFIX        => 'foo/bar',
+    PREFIX        => 'foo/bar/',
 );
 like( $stdout->read, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
@@ -59,7 +61,7 @@ isa_ok( $mm, 'ExtUtils::MakeMaker' );
 is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
-is( $mm->{PREFIX}, 'foo/bar',   'PREFIX' );
+is( $mm->{PREFIX}, 'foo/bar/',   'PREFIX' );
 
 is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );
 
@@ -85,15 +87,18 @@ my @Vend_Install = qw(vendorarch vendorlib vendorbin
                       vendorman1dir vendorman3dir);
 
 foreach my $var (@Perl_Install) {
-    like( $mm->{uc "install$var"}, qr/^\$\(PREFIX\)/, "PREFIX + $var" );
+    my $prefix = $Is_VMS ? '[.foo.bar' : '$(PREFIX)';
+    like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, "PREFIX + $var" );
 }
 
 foreach my $var (@Site_Install) {
-    like( $mm->{uc "install$var"}, qr/^\$\(SITEPREFIX\)/, 
+    my $prefix = $Is_VMS ? '[.foo.bar' : '$(SITEPREFIX)';
+    like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, 
                                                     "SITEPREFIX + $var" );
 }
 
 foreach my $var (@Vend_Install) {
-    like( $mm->{uc "install$var"}, qr/^\$\(VENDORPREFIX\)/,
+    my $prefix = $Is_VMS ? '[.foo.bar' : '$(VENDORPREFIX)';
+    like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/,
                                                     "VENDORPREFIX + $var" );
 }
