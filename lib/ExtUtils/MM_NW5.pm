@@ -23,7 +23,7 @@ use Config;
 use File::Basename;
 
 use vars qw(@ISA $VERSION);
-$VERSION = '2.02_01';
+$VERSION = '2.03_01';
 
 require ExtUtils::MM_Win32;
 @ISA = qw(ExtUtils::MM_Win32);
@@ -259,7 +259,7 @@ END
     # If this extension has it's own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
     $m .= <<'END'  if $self->{MYEXTLIB};
-	$self->{CP} $(MYEXTLIB) $\@
+	$self->{CP} $(MYEXTLIB) $@
 END
 
     my $ar_arg;
