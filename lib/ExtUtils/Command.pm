@@ -223,25 +223,18 @@ Converts DOS and OS/2 linefeeds to Unix style recursively.
 sub dos2unix {
     require File::Find;
     File::Find::find(sub {
-        return if -d;
+        return if -d $_;
         return unless -w _;
-        return unless -r _;
         return if -B _;
 
+        local @ARGV = $_;
+        local $^I = '';
         local $\;
 
-	my $orig = $_;
-	my $temp = '.dos2unix_tmp';
-	open ORIG, $_ or do { warn "dos2unix can't open $_: $!"; return };
-	open TEMP, ">$temp" or 
-	    do { warn "dos2unix can't create .dos2unix_tmp: $!"; return };
-        while (my $line = <ORIG>) { 
-            $line =~ s/\015\012/\012/g;
-            print TEMP $line;
+        while (<>) { 
+            s/\015\012/\012/g;
+            print;
         }
-	close ORIG;
-	close TEMP;
-	rename $temp, $orig;
 
     }, @ARGV);
 }
