@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.15_01';
+$VERSION = '1.16_01';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -727,13 +727,13 @@ distclean :: realclean distcheck
 	$(NOECHO) $(NOOP)
 
 distcheck :
-	$(PERLRUN) -MExtUtils::Manifest=fullcheck -e fullcheck
+	$(PERLRUN) "-MExtUtils::Manifest=fullcheck" -e fullcheck
 
 skipcheck :
-	$(PERLRUN) -MExtUtils::Manifest=skipcheck -e skipcheck
+	$(PERLRUN) "-MExtUtils::Manifest=skipcheck" -e skipcheck
 
 manifest :
-	$(PERLRUN) -MExtUtils::Manifest=mkmanifest -e mkmanifest
+	$(PERLRUN) "-MExtUtils::Manifest=mkmanifest" -e mkmanifest
 
 veryclean : realclean
 	$(RM_F) *~ *.orig */*~ */*.orig
@@ -753,7 +753,7 @@ sub dist_ci {
     my @m;
     push @m, q{
 ci :
-	$(PERLRUN) -MExtUtils::Manifest=maniread \\
+	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
 		-e "@all = keys %{ maniread() };" \\
 		-e 'print("Executing $(CI) @all\n"); system("$(CI) @all");' \\
 		-e 'print("Executing $(RCS_LABEL) ...\n"); system("$(RCS_LABEL) @all");'
@@ -820,7 +820,7 @@ sub dist_dir {
     return <<'MAKE_FRAG';
 distdir :
 	$(RM_RF) $(DISTVNAME)
-	$(PERLRUN) -MExtUtils::Manifest=manicopy,maniread \
+	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
 
 MAKE_FRAG
@@ -925,7 +925,7 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 $(BOOTSTRAP): '."$self->{MAKEFILE} $self->{BOOTDEP}".' $(INST_ARCHAUTODIR)/.exists
 	'.$self->{NOECHO}.'echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	'.$self->{NOECHO}.'$(PERLRUN) \
-		-MExtUtils::Mkbootstrap \
+		"-MExtUtils::Mkbootstrap" \
 		-e "Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
 	'.$self->{NOECHO}.'$(TOUCH) $(BOOTSTRAP)
 	$(CHMOD) $(PERM_RW) $@
@@ -1583,7 +1583,8 @@ EOP
 	    }
 	}
 	
-	unless (-f ($perl_h = $self->catfile($self->{PERL_INC},"perl.h"))){
+	unless(-f ($perl_h = File::Spec->catfile($self->{PERL_INC},"perl.h")))
+        {
 	    die qq{
 Error: Unable to locate installed Perl libraries or Perl source code.
 
@@ -1698,21 +1699,23 @@ usually solves this kind of problem.
 			   /) {
 	$self->prefixify($install_variable,$configure_prefix,$replace_prefix);
     }
-    my $funkylibdir = $self->catdir($configure_prefix,"lib","perl5");
+    my $funkylibdir = File::Spec->catdir($configure_prefix,"lib","perl5");
     $funkylibdir = '' unless -d $funkylibdir;
-    $search_prefix = $funkylibdir || $self->catdir($configure_prefix,"lib");
+    $search_prefix = $funkylibdir || 
+                     File::Spec->catdir($configure_prefix,"lib");
 
     if ($self->{LIB}) {
 	$self->{INSTALLPRIVLIB} = $self->{INSTALLSITELIB} = $self->{LIB};
 	$self->{INSTALLARCHLIB} = $self->{INSTALLSITEARCH} = 
-	    $self->catdir($self->{LIB},$Config{'archname'});
+	    File::Spec->catdir($self->{LIB},$Config{'archname'});
     }
     else {
-	if (-d $self->catdir($self->{PREFIX},"lib","perl5")) {
-	    $replace_prefix = $self->catdir(qq[\$\(PREFIX\)],"lib", "perl5");
+	if (-d File::Spec->catdir($self->{PREFIX},"lib","perl5")) {
+	    $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib", 
+                                                 "perl5");
 	}
 	else {
-	    $replace_prefix = $self->catdir(qq[\$\(PREFIX\)],"lib");
+	    $replace_prefix = File::Spec->catdir(qq[\$\(PREFIX\)],"lib");
 	}
 	for $install_variable (qw/
 			       INSTALLPRIVLIB
@@ -1839,7 +1842,7 @@ usually solves this kind of problem.
     }
 
     # Build up a set of file names (not command names).
-    my $thisperl = $self->canonpath($^X);
+    my $thisperl = File::Spec->canonpath($^X);
     $thisperl .= $Config{exe_ext} unless $thisperl =~ m/$Config{exe_ext}$/i;
     my @perls = ('perl', 'perl5', "perl$Config{version}");
     @perls = ($thisperl, (map $_.=$Config{exe_ext}, @perls));
@@ -1867,7 +1870,7 @@ usually solves this kind of problem.
     $self->{PERL_CORE} = 0 unless exists $self->{PERL_CORE};
 
     # How do we run perl?
-    $self->{PERLRUN}  = $self->{PERL};
+    $self->{PERLRUN}  = $self->{FULLPERL};
     $self->{PERLRUN} .= qq{ "-I\$(PERL_LIB)"} if $self->{UNINSTALLED_PERL};
 
     # How do we run perl when installing libraries?
@@ -2077,7 +2080,7 @@ EXE_FILES = @{$self->{EXE_FILES}}
 
 } . ($Is_Win32
   ? q{FIXIN = pl2bat.bat
-} : q{FIXIN = $(PERLRUN) -MExtUtils::MY \
+} : q{FIXIN = $(PERLRUN) "-MExtUtils::MY" \
     -e "MY->fixin(shift)"
 }).qq{
 pure_all :: @to
@@ -2377,7 +2380,7 @@ $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
     push @m, qq{
 $tmp/perlmain.c: $makefilename}, q{
 	}.$self->{NOECHO}.q{echo Writing $@
-	}.$self->{NOECHO}.q{$(PERL) $(MAP_PERLINC) -MExtUtils::Miniperl \\
+	}.$self->{NOECHO}.q{$(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
 		-e "writemain(grep s#.*/auto/##s, split(q| |, q|$(MAP_STATIC)|))" > $@t && $(MV) $@t $@
 
 };
@@ -2894,7 +2897,7 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 sub _pm_to_blib_flush {
     my ($self, $autodir, $rr, $ra, $rl) = @_;
     $$rr .= 
-q{	}.$self->{NOECHO}.q[$(PERLRUNINST) -MExtUtils::Install \
+q{	}.$self->{NOECHO}.q[$(PERLRUNINST) "-MExtUtils::Install" \
 	-e "pm_to_blib({qw{].qq[@$ra].q[}},'].$autodir.q{','$(PM_FILTER)')"
 };
     @$ra = ();
@@ -3394,13 +3397,13 @@ SHELL = $bin_sh
     push @m, q{
 # The following is a portable way to say mkdir -p
 # To see which directories are created, change the if 0 to if 1
-MKPATH = $(PERLRUN) -MExtUtils::Command -e mkpath
+MKPATH = $(PERLRUN) "-MExtUtils::Command" -e mkpath
 
 # This helps us to minimize the effect of the .exists files A yet
 # better solution would be to have a stable file in the perl
 # distribution with a timestamp of zero. But this solution doesn't
 # need any changes to the core distribution and works with older perls
-EQUALIZE_TIMESTAMP = $(PERLRUN) -MExtUtils::Command -e eqtime
+EQUALIZE_TIMESTAMP = $(PERLRUN) "-MExtUtils::Command" -e eqtime
 };
 
 
@@ -3417,7 +3420,7 @@ WARN_IF_OLD_PACKLIST = $(PERL) -we 'exit unless -f $$ARGV[0];' \\
 UNINST=0
 VERBINST=0
 
-MOD_INSTALL = $(PERL) "-I$(INST_LIB)" "-I$(PERL_LIB)" -MExtUtils::Install \
+MOD_INSTALL = $(PERL) "-I$(INST_LIB)" "-I$(PERL_LIB)" "-MExtUtils::Install" \
 -e "install({@ARGV},'$(VERBINST)',0,'$(UNINST)');"
 
 DOC_INSTALL = $(PERL) -e '$$\="\n\n";' \
@@ -3426,7 +3429,7 @@ DOC_INSTALL = $(PERL) -e '$$\="\n\n";' \
 -e 'while (defined($$key = shift) and defined($$val = shift)){print "=item *";print "C<$$key: $$val>";}' \
 -e 'print "=back";'
 
-UNINSTALL =   $(PERLRUN) -MExtUtils::Install \
+UNINSTALL =   $(PERLRUN) "-MExtUtils::Install" \
 -e 'uninstall($$ARGV[0],1,1); print "\nUninstall is deprecated. Please check the";' \
 -e 'print " packlist above carefully.\n  There may be errors. Remove the";' \
 -e 'print " appropriate files manually.\n  Sorry for the inconveniences.\n"'
