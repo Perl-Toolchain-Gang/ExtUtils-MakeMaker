@@ -1,5 +1,7 @@
 6.22
     - Minor potential glitch in the version check logic.
+    - Making Makefile rebuild logic more resistant to inconsequential
+      errors when cleaning up things that are going to be rebuilt anyway.
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl isntead of 
