@@ -1,5 +1,7 @@
 package ExtUtils::MM_Win32;
 
+use strict;
+
 
 =head1 NAME
 
@@ -453,14 +455,14 @@ sub quote_literal {
 
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
-    $cmd =~ s{"}{\\"}g;
+    $text =~ s{"}{\\"}g;
 
     # Backwacks are normally literal but \" is an escaped quote and
     # \\ is an escaped backwack.
-    $cmd =~ s{\\\\}{\\\\\\\\}g;
-    $cmd =~ s{\\"}{\\\\"}g;
+    $text =~ s{\\\\}{\\\\\\\\}g;
+    $text =~ s{\\"}{\\\\"}g;
 
-    return qq{"$cmd"};
+    return qq{"$text"};
 }
 
 
