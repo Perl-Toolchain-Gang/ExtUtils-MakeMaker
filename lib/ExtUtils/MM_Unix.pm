@@ -3845,7 +3845,7 @@ test :: \$(TEST_TYPE)
 ");
 
     if ($Is_Win95) {
-        push(@m, map(qq{\t\$(NOECHO) \$(PERLRUN) -e "exit unless -f shift; chdir '$_'; system q{\$(MAKE) test \$(PASTHRU)}" \$(FIRST_MAKEFILE)\n}, @{$self->{DIR}}));
+        push(@m, map(qq{\t\$(NOECHO) \$(PERLRUN) -e "exit unless -f shift; chdir '$_'; system q[\$(MAKE) test \$(PASTHRU)]" \$(FIRST_MAKEFILE)\n}, @{$self->{DIR}}));
     }
     else {
         push(@m, map("\t\$(NOECHO) cd $_ && \$(TEST_F) \$(FIRST_MAKEFILE) && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
