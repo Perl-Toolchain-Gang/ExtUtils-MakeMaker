@@ -52,6 +52,4 @@ Fix NORECUSE bug continuing to set DIR
 
 Give typemap location its own macro.
 
-Fix ExtUtils::Installed on VMS.
-
 Merge MM_VMS->tool_xsubpp

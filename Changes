@@ -24,6 +24,8 @@
     - ExtUtils::Manifest will now work case insensitively.
     - Fixed 'subroutine redefined' warnings in 00compile.t
     - Fixed it so typemaps are only looked for in the perl core library.
+    - Hacking around VMS filesystem problems reconstructing package names
+      from filenames in ExtUtils::Installed.  (Jesper Naur)
 
 # There was no 6.06, I jumped straight to 6.10_XX because there's been
 # so much change between 6.05 and now.
