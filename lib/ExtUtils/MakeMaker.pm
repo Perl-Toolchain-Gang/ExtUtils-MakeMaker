@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.55_03";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.35 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.36 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -920,6 +920,7 @@ INSTALLDIRS according to the following table:
                                  INSTALLDIRS set to
                            perl        site          vendor
 
+                 PREFIX          SITEPREFIX          VENDORPREFIX
   INST_ARCHLIB   INSTALLARCHLIB  INSTALLSITEARCH     INSTALLVENDORARCH
   INST_LIB       INSTALLPRIVLIB  INSTALLSITELIB      INSTALLVENDORLIB
   INST_BIN       INSTALLBIN      INSTALLSITEBIN      INSTALLVENDORBIN
@@ -1803,7 +1804,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.35 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.36 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
