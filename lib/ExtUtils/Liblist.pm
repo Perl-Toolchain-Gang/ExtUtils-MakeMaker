@@ -11,8 +11,9 @@ sub lsdir {
   shift;
   my $rex = qr/$_[1]/;
   opendir DIR, $_[0];
-  grep /$rex/, readdir DIR;
+  my @out = grep /$rex/, readdir DIR;
   closedir DIR;
+  return @out;
 }
 
 __END__

@@ -42,6 +42,7 @@ t/Command.t
 t/INST.t
 t/INST_PREFIX.t
 t/Installed.t
+t/Liblist.t
 t/MM_BeOS.t
 t/MM_Cygwin.t
 t/MM_NW5.t
