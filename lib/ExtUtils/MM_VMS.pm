@@ -14,7 +14,7 @@ use VMS::Filespec;
 use File::Basename;
 use File::Spec;
 use vars qw($Revision @ISA $VERSION);
-($VERSION) = $Revision = '5.60_01';
+($VERSION) = $Revision = '5.61_01';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -909,7 +909,7 @@ RM_RF = $self->{RM_RF}
 SAY = Write Sys\$Output
 UMASK_NULL = $self->{UMASK_NULL}
 MKPATH = Create/Directory
-EQUALIZE_TIMESTAMP = \$(PERL) -we "open F,qq{>\$ARGV[1]};close F;utime(0,(stat(\$ARGV[0]))[9]+1,\$ARGV[1])"
+EQUALIZE_TIMESTAMP = $(PERLRUN) -MExtUtils::Command -e eqtime
 !. ($self->{PARENT} ? '' : 
 qq!WARN_IF_OLD_PACKLIST = \$(PERL) -e "if (-f \$ARGV[0]){print qq[WARNING: Old package found (\$ARGV[0]); please check for collisions\\n]}"
 MOD_INSTALL = \$(PERL) "-I\$(PERL_LIB)" "-MExtUtils::Install" -e "install({split(' ',<STDIN>)},1);"
@@ -1603,11 +1603,11 @@ sub install {
 	foreach $file (@{$self->{EXE_FILES}}) {
 	    $line .= "$file ";
 	    if (length($line) > 128) {
-		push(@docfiles,qq[\t\$(PERL) -e "print '$line'" >>.MM_tmp\n]);
+		push(@docfiles,qq[\t\$(NOECHO) \$(PERL) -e "print '$line'" >>.MM_tmp\n]);
 		$line = '';
 	    }
 	}
-	push(@docfiles,qq[\t\$(PERL) -e "print '$line'" >>.MM_tmp\n]) if $line;
+	push(@docfiles,qq[\t\$(NOECHO) \$(PERL) -e "print '$line'" >>.MM_tmp\n]) if $line;
     }
 
     push @m, q[
@@ -1637,8 +1637,8 @@ doc__install : doc_site_install
 
 # This hack brought to you by DCL's 255-character command line limit
 pure_perl_install ::
-	$(NOECHO) $(PERL) -e "print 'read ].File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q[ '" >.MM_tmp
-	$(NOECHO) $(PERL) -e "print 'write ].File::Spec->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q[ '" >>.MM_tmp
+	$(NOECHO) $(PERL) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist') " >.MM_tmp
+	$(NOECHO) $(PERL) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist') " >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLPRIVLIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLARCHLIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLBIN) '" >>.MM_tmp
@@ -1647,12 +1647,12 @@ pure_perl_install ::
 	$(NOECHO) $(PERL) -e "print '$(INST_MAN3DIR) $(INSTALLMAN3DIR) '" >>.MM_tmp
 	$(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;
-	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q[
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].File::Spec->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
 
 # Likewise
 pure_site_install ::
-	$(NOECHO) $(PERL) -e "print 'read ].File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q[ '" >.MM_tmp
-	$(NOECHO) $(PERL) -e "print 'write ].File::Spec->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q[ '" >>.MM_tmp
+	$(NOECHO) $(PERL) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist') " >.MM_tmp
+	$(NOECHO) $(PERL) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist') " >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLSITELIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLSITEARCH) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLBIN) '" >>.MM_tmp
@@ -1661,7 +1661,7 @@ pure_site_install ::
 	$(NOECHO) $(PERL) -e "print '$(INST_MAN3DIR) $(INSTALLMAN3DIR) '" >>.MM_tmp
 	$(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;
-	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q[
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].File::Spec->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
 
 # Ditto
 doc_perl_install ::
@@ -1672,7 +1672,7 @@ q%	$(NOECHO) $(PERL) -e "print q[@ARGV=split(/\\|/,<STDIN>);]" >.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[print '=head2 ',scalar(localtime),': C<',shift,qq[>\\n\\n=over 4\\n\\n];]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[while(($key=shift) && ($val=shift)) ]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[{print qq[=item *\\n\\nC<$key: $val>\\n\\n];}print qq[=back\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.File::Spec->catfile('$(INSTALLARCHLIB)','perllocal.pod').q[
+	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.File::Spec->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;,.MM2_tmp;
 
 # And again
@@ -1684,7 +1684,7 @@ q%	$(NOECHO) $(PERL) -e "print q[@ARGV=split(/\\|/,<STDIN>);]" >.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[print '=head2 ',scalar(localtime),': C<',shift,qq[>\\n\\n=over 4\\n\\n];]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[while(($key=shift) && ($val=shift)) ]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[{print qq[=item *\\n\\nC<$key: $val>\\n\\n];}print qq[=back\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.File::Spec->catfile('$(INSTALLARCHLIB)','perllocal.pod').q[
+	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.File::Spec->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;,.MM2_tmp;
 
 ];
@@ -1694,13 +1694,13 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) ].File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q[
+	$(NOECHO) $(UNINSTALL) ].File::Spec->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
 	$(NOECHO) $(SAY) "Uninstall is now deprecated and makes no actual changes."
 	$(NOECHO) $(SAY) "Please check the list above carefully for errors, and manually remove"
 	$(NOECHO) $(SAY) "the appropriate files.  Sorry for the inconvenience."
 
 uninstall_from_sitedirs ::
-	$(NOECHO) $(UNINSTALL) ],File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist'),"\n",q[
+	$(NOECHO) $(UNINSTALL) ],File::Spec->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist'),"\n",q[
 	$(NOECHO) $(SAY) "Uninstall is now deprecated and makes no actual changes."
 	$(NOECHO) $(SAY) "Please check the list above carefully for errors, and manually remove"
 	$(NOECHO) $(SAY) "the appropriate files.  Sorry for the inconvenience."
