@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.69';
-($Revision) = q$Revision: 1.106 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.107 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1308,7 +1308,8 @@ realclean :: clean
     # combination of macros).  In order to stay below DCL's 255 char limit,
     # we put only 2 on a line.
     my($file,$fcnt);
-    my(@files) = qw{ $(FIRST_MAKEFILE) $(MAKEFILE_OLD) };
+    my(@files) = %{values $self->{PM}},
+                 qw{ $(FIRST_MAKEFILE) $(MAKEFILE_OLD) };
     if ($self->has_link_code) {
 	push(@files,qw{ $(INST_DYNAMIC) $(INST_STATIC) $(INST_BOOT) $(OBJECT) });
     }
