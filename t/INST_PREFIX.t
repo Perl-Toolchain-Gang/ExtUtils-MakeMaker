@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 26;
+use Test::More tests => 30;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -64,6 +64,10 @@ is( $mm->{VERSION}, 0.01,            'VERSION' );
 
 is( $mm->{PREFIX}, '$(DESTDIR)'.$PREFIX,   'PREFIX' );
 
+foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
+    like( $mm->{$prefix}, qr/^\$\(DESTDIR\)/, "$prefix & \$(DESTDIR)" );
+}
+
 is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );
 
 my($perl_src, $mm_perl_src);
@@ -88,7 +92,7 @@ my %Install_Vars = (
 
 while( my($type, $vars) = each %Install_Vars) {
     foreach my $var (@$vars) {
-        my $prefix = $type eq 'PERL' ? '$(PREFIX)' : '$('.$type.'PREFIX)';
+        my $prefix = '$('.$type.'PREFIX)';
 
         # support for man page skipping
         $prefix = 'none' if $type eq 'PERL' && 
