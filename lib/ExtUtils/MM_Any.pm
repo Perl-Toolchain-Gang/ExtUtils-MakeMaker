@@ -47,9 +47,9 @@ Any methods marked I<Abstract> must be implemented by subclasses.
 
 These are methods which help writing cross-platform code.
 
-=over 4
 
-=item os_flavor  I<Abstract>
+
+=head3 os_flavor  I<Abstract>
 
     my @os_flavor = $mm->os_flavor;
 
@@ -72,7 +72,7 @@ This is used to write code for styles of operating system.
 See os_flavor_is() for use.
 
 
-=item os_flavor_is
+=head3 os_flavor_is
 
     my $is_this_flavor = $mm->os_flavor_is($this_flavor);
     my $is_this_flavor = $mm->os_flavor_is(@one_of_these_flavors);
@@ -97,7 +97,7 @@ sub os_flavor_is {
 }
 
 
-=item split_command
+=head3 split_command
 
     my @cmds = $MM->split_command($cmd, @args);
 
@@ -105,7 +105,7 @@ Most OS have a maximum command length they can execute at once.  Large
 modules can easily generate commands well past that limit.  Its
 necessary to split long commands up into a series of shorter commands.
 
-split_command() will return a series of @cmds each processing part of
+C<split_command> will return a series of @cmds each processing part of
 the args.  Collectively they will process all the arguments.  Each
 individual line in @cmds will not be longer than the
 $self->max_exec_len being careful to take into account macro expansion.
@@ -174,7 +174,7 @@ sub _expand_macros {
 }
 
 
-=item echo
+=head3 echo
 
     my @commands = $MM->echo($text);
     my @commands = $MM->echo($text, $file);
@@ -205,7 +205,7 @@ sub echo {
 }
 
 
-=item wraplist
+=head3 wraplist
 
   my $args = $mm->wraplist(@list);
 
@@ -224,7 +224,7 @@ sub wraplist {
 }
 
 
-=item cd  I<Abstract>
+=head3 cd  I<Abstract>
 
   my $subdir_cmd = $MM->cd($subdir, @cmds);
 
@@ -247,7 +247,7 @@ makes it easier to embed in a make string.  For example.
   CODE
 
 
-=item oneliner  I<Abstract>
+=head3 oneliner  I<Abstract>
 
   my $oneliner = $MM->oneliner($perl_code);
   my $oneliner = $MM->oneliner($perl_code, \@switches);
@@ -285,7 +285,7 @@ Its currently very simple and may be expanded sometime in the figure
 to include more flexible code and switches.
 
 
-=item quote_literal  I<Abstract>
+=head3 quote_literal  I<Abstract>
 
     my $safe_text = $MM->quote_literal($text);
 
@@ -295,14 +295,14 @@ For example, on Unix this would escape any single-quotes in $text and
 put single-quotes around the whole thing.
 
 
-=item escape_newlines  I<Abstract>
+=head3 escape_newlines  I<Abstract>
 
     my $escaped_text = $MM->escape_newlines($text);
 
 Shell escapes newlines in $text.
 
 
-=item max_exec_len  I<Abstract>
+=head3 max_exec_len  I<Abstract>
 
     my $max_exec_len = $MM->max_exec_len;
 
@@ -313,7 +313,7 @@ this is the max size of a shell command line.
 $self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
 
 
-=back
+
 
 
 =head2 Targets
@@ -321,10 +321,7 @@ $self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
 These are methods which produce make targets.
 
 
-=over 4
-
-
-=item dir_target B<DEPRECATED>
+=head3 dir_target B<DEPRECATED>
 
     my $make_frag = $mm->dir_target(@directories);
 
@@ -338,7 +335,7 @@ create its own directories anyway.
 sub dir_target {}
 
 
-=item blibdirs_target (o)
+=head3 blibdirs_target
 
     my $make_frag = $mm->blibdirs_target;
 
@@ -369,7 +366,7 @@ MAKE
 }
 
 
-=item manifypods_target
+=head3 manifypods_target
 
   my $manifypods_target = $self->manifypods_target;
 
@@ -413,7 +410,7 @@ CMD
 }
 
 
-=item makemakerdflt_target
+=head3 makemakerdflt_target
 
   my $make_frag = $mm->makemakerdflt_target
 
@@ -433,7 +430,7 @@ MAKE_FRAG
 }
 
 
-=item special_targets
+=head3 special_targets
 
   my $make_frag = $mm->special_targets
 
@@ -459,7 +456,7 @@ MAKE_FRAG
 }
 
 
-=item all_target
+=head3 all_target
 
 Generate the default target 'all'.
 
@@ -476,7 +473,7 @@ MAKE_EXT
 }
 
 
-=item metafile_target
+=head3 metafile_target
 
     my $target = $mm->metafile_target;
 
@@ -533,7 +530,7 @@ MAKE_FRAG
 }
 
 
-=item signature_target
+=head3 signature_target
 
     my $target = $mm->signature_target;
 
@@ -554,7 +551,7 @@ MAKE_FRAG
 }
 
 
-=item metafile_addtomanifest_target
+=head3 metafile_addtomanifest_target
 
   my $target = $mm->metafile_addtomanifest_target
 
@@ -584,7 +581,7 @@ MAKE_FRAG
 }
 
 
-=item signature_addtomanifest_target
+=head3 signature_addtomanifest_target
 
   my $target = $mm->signature_addtomanifest_target
 
@@ -613,7 +610,7 @@ MAKE_FRAG
 
 }
 
-=back
+
 
 
 =head2 Init methods
@@ -621,9 +618,9 @@ MAKE_FRAG
 Methods which help initialize the MakeMaker object and macros.
 
 
-=over 4
 
-=item init_VERSION  I<Abstract>
+
+=head3 init_VERSION  I<Abstract>
 
     $mm->init_VERSION
 
@@ -698,7 +695,7 @@ sub init_VERSION {
 }
 
 
-=item init_others  I<Abstract>
+=head3 init_others  I<Abstract>
 
     $MM->init_others();
 
@@ -737,7 +734,7 @@ Defines at least these macros.
   DEV_NULL          Supress all command output
 
 
-=item init_DIRFILESEP  I<Abstract>
+=head3 init_DIRFILESEP  I<Abstract>
 
   $MM->init_DIRFILESEP;
   my $dirfilesep = $MM->{DIRFILESEP};
@@ -758,7 +755,7 @@ Do not use this as a seperator between directories.  Some operating
 systems use different seperators between subdirectories as between
 directories and filenames (for example:  VOLUME:[dir1.dir2]file on VMS).
 
-=item init_linker  I<Abstract>
+=head3 init_linker  I<Abstract>
 
     $mm->init_linker;
 
@@ -778,7 +775,7 @@ to be exported.
 Some OSes do not need these in which case leave it blank.
 
 
-=item init_platform
+=head3 init_platform
 
     $mm->init_platform
 
@@ -794,16 +791,16 @@ sub init_platform {
 }
 
 
-=back
+
 
 
 =head2 Tools
 
 A grab bag of methods to generate specific macros and commands.
 
-=over 4
 
-=item manifypods
+
+=head3 manifypods
 
 Defines targets and routines to translate the pods into manpages and
 put them into the INST_* directories.
@@ -827,7 +824,7 @@ END_OF_TARGET
 }
 
 
-=item POD2MAN_macro
+=head3 POD2MAN_macro
 
   my $pod2man_macro = $self->POD2MAN_macro
 
@@ -853,7 +850,7 @@ END_OF_DEF
 }
 
 
-=item test_via_harness
+=head3 test_via_harness
 
   my $command = $mm->test_via_harness($perl, $tests);
 
@@ -871,7 +868,7 @@ sub test_via_harness {
            qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
 }
 
-=item test_via_script
+=head3 test_via_script
 
   my $command = $mm->test_via_script($perl, $script);
 
@@ -890,7 +887,7 @@ sub test_via_script {
 }
 
 
-=item tool_autosplit
+=head3 tool_autosplit
 
 Defines a simple perl call that runs autosplit. May be deprecated by
 pm_to_blib soon.
@@ -915,7 +912,7 @@ MAKE_FRAG
 
 }
 
-=back
+
 
 
 =head2 File::Spec wrappers
@@ -923,9 +920,9 @@ MAKE_FRAG
 ExtUtils::MM_Any is a subclass of File::Spec.  The methods noted here
 override File::Spec.
 
-=over 4
 
-=item catfile
+
+=head3 catfile
 
 File::Spec <= 0.83 has a bug where the file part of catfile is not
 canonicalized.  This override fixes that bug.
@@ -937,15 +934,15 @@ sub catfile {
     return $self->canonpath($self->SUPER::catfile(@_));
 }
 
-=back
+
 
 =head2 Misc
 
 Methods I can't really figure out where they should go yet.
 
-=over 4
 
-=item extra_clean_files
+
+=head3 extra_clean_files
 
     my @files_to_clean = $MM->extra_clean_files;
 
@@ -960,7 +957,7 @@ sub extra_clean_files {
 }
 
 
-=item installvars
+=head3 installvars
 
     my @installvars = $mm->installvars;
 
@@ -980,7 +977,7 @@ sub installvars {
 }
 
 
-=item libscan
+=head3 libscan
 
   my $wanted = $self->libscan($path);
 
@@ -1003,7 +1000,7 @@ sub libscan {
 }
 
 
-=item platform_constants
+=head3 platform_constants
 
     my $make_frag = $mm->platform_constants
 
@@ -1015,8 +1012,6 @@ init_platform() rather than put them in constants().
 sub platform_constants {
     return '';
 }
-
-=back
 
 
 =head1 AUTHOR
