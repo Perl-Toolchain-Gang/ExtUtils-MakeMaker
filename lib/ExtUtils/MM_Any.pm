@@ -164,7 +164,7 @@ formatting.
 
 sub test_via_script {
     my($self, $perl, $script) = @_;
-    return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCH)" $script\n};
+    return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" $script\n};
 }
 
 =back
