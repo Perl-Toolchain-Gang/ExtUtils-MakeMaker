@@ -1341,14 +1341,14 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
 	    if ($Verbose >= 2);
 	require File::Find;
-	File::Find::find(sub {
-	    if (-d $_){
-		if ($_ eq "CVS" || $_ eq "RCS"){
-		    $File::Find::prune = 1;
-		}
-		return;
-	    }
-	    return if /\#/;
+        File::Find::find(sub {
+            if (-d $_){
+                if ($_ eq "CVS" || $_ eq "RCS"){
+                    $File::Find::prune = 1;
+                }
+                return;i
+            }
+            return if /\#/;
             return if /~$/;    # emacs temp files
 
 	    my $path   = $File::Find::name;
