@@ -94,8 +94,6 @@ sub init_platform {
     $self->{MM_NW5_VERSION} = $VERSION;
 }
 
-=cut
-
 sub platform_constants {
     my($self) = shift;
     my $make_frag = '';
