@@ -1932,7 +1932,7 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{MACROEND}           ||= '';
 
     # Not everybody uses -f to indicate "use this Makefile instead"
-    $self->{USEMAKEFILE}        ||= ' -f ';
+    $self->{USEMAKEFILE}        ||= '-f';
 
     $self->{SHELL}              ||= $Config{sh} || '/bin/sh';
 
@@ -2715,7 +2715,7 @@ FULLPERL      = $self->{FULLPERL}
     unless ($self->{MAKEAPERL}) {
 	push @m, q{
 $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
-	$(MAKE)$(USEMAKEFILE)$(MAKE_APERL_FILE) $@
+	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
 
 $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
 	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
@@ -2889,9 +2889,9 @@ push @m, "
 \$(MAP_TARGET) :: $tmp/perlmain\$(OBJ_EXT) \$(MAP_LIBPERL) \$(MAP_STATIC) \$(INST_ARCHAUTODIR)/extralibs.all
 	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) \$(LLIBPERL) `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
 	\$(NOECHO) \$(ECHO) 'To install the new \"\$(MAP_TARGET)\" binary, call'
-	\$(NOECHO) \$(ECHO) '    \$(MAKE)\$(USEMAKEFILE)$makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
+	\$(NOECHO) \$(ECHO) '    \$(MAKE) \$(USEMAKEFILE) $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
 	\$(NOECHO) \$(ECHO) 'To remove the intermediate files say'
-	\$(NOECHO) \$(ECHO) '    \$(MAKE)\$(USEMAKEFILE)$makefilename map_clean'
+	\$(NOECHO) \$(ECHO) '    \$(MAKE) \$(USEMAKEFILE) $makefilename map_clean'
 
 $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 ";
@@ -2960,7 +2960,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(NOECHO) $(ECHO) "Cleaning current config before rebuilding Makefile..."
 	-$(NOECHO) $(RM_F) $(MAKEFILE_OLD)
 	-$(NOECHO) $(MV)   $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
-	-$(MAKE)$(USEMAKEFILE)$(MAKEFILE_OLD) clean $(DEV_NULL) || $(NOOP)
+	-$(MAKE) $(USEMAKEFILE) $(MAKEFILE_OLD) clean $(DEV_NULL) || $(NOOP)
 	$(PERLRUN) Makefile.PL }.join(" ",map(qq["$_"],@ARGV)).q{
 	$(NOECHO) $(ECHO) "==> Your Makefile has been rebuilt. <=="
 	$(NOECHO) $(ECHO) "==> Please rerun the make command.  <=="
@@ -3563,7 +3563,7 @@ NOOP_FRAG
     foreach my $dir (@{$self->{DIR}}) {
         foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
             my $rclean .= $self->oneliner(sprintf <<'CODE', $makefile, $dir, $makefile);
-if( -f '%s' ) { chdir '%s'; system '$(MAKE)$(USEMAKEFILE)%s realclean' }
+if( -f '%s' ) { chdir '%s'; system '$(MAKE) $(USEMAKEFILE) %s realclean' }
 CODE
 
             $rclean .= sprintf <<'RCLEAN', $rclean;
@@ -3794,7 +3794,7 @@ sub subdir_x {
     my($self, $subdir) = @_;
 
     my $subdir_cmd = $self->cd($subdir, 
-      '$(MAKE)$(USEMAKEFILE)$(FIRST_MAKEFILE) all $(MACROSTART)$(PASTHRU)$(MACROEND)'
+      '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) all $(MACROSTART)$(PASTHRU)$(MACROEND)'
     );
     return sprintf <<'EOT', $subdir_cmd;
 
