@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.18_01';
+$VERSION = '1.19_01';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -476,7 +476,7 @@ sub constants {
     for $tmp (qw/
 
 	      AR_STATIC_ARGS NAME DISTNAME NAME_SYM VERSION
-	      VERSION_SYM XS_VERSION INST_BIN INST_EXE INST_LIB
+	      VERSION_SYM XS_VERSION INST_BIN INST_LIB
 	      INST_ARCHLIB INST_SCRIPT PREFIX  INSTALLDIRS
 	      INSTALLPRIVLIB INSTALLARCHLIB INSTALLSITELIB
 	      INSTALLSITEARCH INSTALLBIN INSTALLSCRIPT PERL_LIB
@@ -1093,15 +1093,17 @@ specified by @ExtUtils::MakeMaker::MM_Sections.
 
 =item fixin
 
-Inserts the sharpbang or equivalent magic number to a script
+  $mm->fixin(@files);
+
+Inserts the sharpbang or equivalent magic number to a set of @files.
 
 =cut
 
 sub fixin { # stolen from the pink Camel book, more or less
-    my($self,@files) = @_;
+    my($self, @files) = @_;
+
     my($does_shbang) = $Config::Config{'sharpbang'} =~ /^\s*\#\!/;
-    my($file,$interpreter);
-    for $file (@files) {
+    for my $file (@files) {
 	local(*FIXIN);
 	local(*FIXOUT);
 	open(FIXIN, $file) or Carp::croak "Can't process '$file': $!";
@@ -1113,6 +1115,7 @@ sub fixin { # stolen from the pink Camel book, more or less
 	$cmd =~ s!^.*/!!;
 
 	# Now look (in reverse) for interpreter in absolute PATH (unless perl).
+        my $interpreter;
 	if ($cmd eq "perl") {
             if ($Config{startperl} =~ m,^\#!.*/perl,) {
                 $interpreter = $Config{startperl};
@@ -1165,14 +1168,6 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 	close FIXIN;
 	close FIXOUT;
 
-	# can't rename/chmod open files on some DOSISH platforms
-
-	# If they override perm_rwx, we won't notice it during fixin,
-	# because fixin is run through a new instance of MakeMaker.
-	# That is why we must run another CHMOD later.
-	$mode = oct($self->perm_rwx) unless $dev;
-	chmod $mode, $file;
-
 	unless ( rename($file, "$file.bak") ) {	
 	    warn "Can't rename $file to $file.bak: $!";
 	    next;
@@ -1188,8 +1183,6 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 	unlink "$file.bak";
     } continue {
 	close(FIXIN) if fileno(FIXIN);
-	chmod oct($self->perm_rwx), $file or
-	  die "Can't reset permissions for $file: $!\n";
 	system("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';;
     }
 }
@@ -1501,7 +1494,7 @@ sub init_main {
     }
 
 
-    # --- Initialize PERL_LIB, INST_LIB, PERL_SRC
+    # --- Initialize PERL_LIB, PERL_SRC
 
     # *Real* information: where did we get these two from? ...
     my $inc_config_dir = dirname($INC{'Config.pm'});
@@ -1614,33 +1607,9 @@ usually solves this kind of problem.
     # MakeMaker.
     $self->{INSTALLDIRS} ||= "site";
 
-    # INST_LIB typically pre-set if building an extension after
-    # perl has been built and installed. Setting INST_LIB allows
-    # you to build directly into, say $Config::Config{privlibexp}.
-    unless ($self->{INST_LIB}){
 
+    $self->init_INST;
 
-	##### XXXXX We have to change this nonsense
-
-	if (defined $self->{PERL_SRC} and $self->{INSTALLDIRS} eq "perl") {
-	    $self->{INST_LIB} = $self->{INST_ARCHLIB} = $self->{PERL_LIB};
-	} else {
-	    $self->{INST_LIB} = File::Spec->catdir($Curdir,"blib","lib");
-	}
-    }
-    $self->{INST_ARCHLIB} ||= File::Spec->catdir($Curdir,"blib","arch");
-    $self->{INST_BIN} ||= File::Spec->catdir($Curdir,'blib','bin');
-
-    # We need to set up INST_LIBDIR before init_libscan() for VMS
-    my @parentdir = split(/::/, $self->{PARENT_NAME});
-    $self->{INST_LIBDIR} = File::Spec->catdir($self->{INST_LIB},@parentdir);
-    $self->{INST_ARCHLIBDIR} = File::Spec->catdir($self->{INST_ARCHLIB},@parentdir);
-    $self->{INST_AUTODIR} = File::Spec->catdir($self->{INST_LIB},'auto',$self->{FULLEXT});
-    $self->{INST_ARCHAUTODIR} = File::Spec->catdir($self->{INST_ARCHLIB},'auto',$self->{FULLEXT});
-
-    # INST_EXE is deprecated, should go away March '97
-    $self->{INST_EXE} ||= File::Spec->catdir($Curdir,'blib','script');
-    $self->{INST_SCRIPT} ||= File::Spec->catdir($Curdir,'blib','script');
 
     # The user who requests an installation directory explicitly
     # should not have to tell us an architecture installation directory
@@ -1915,9 +1884,54 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{DEV_NULL} ||= "> /dev/null 2>&1";
 }
 
+=item init_INST
+
+    $mm->init_INST;
+
+Called by init_main.  Sets up all INST_* variables.
+
+=cut
+
+sub init_INST {
+    my($self) = shift;
+
+    $self->{INST_ARCHLIB} ||= File::Spec->catdir($Curdir,"blib","arch");
+    $self->{INST_BIN}     ||= File::Spec->catdir($Curdir,'blib','bin');
+
+    # INST_LIB typically pre-set if building an extension after
+    # perl has been built and installed. Setting INST_LIB allows
+    # you to build directly into, say $Config::Config{privlibexp}.
+    unless ($self->{INST_LIB}){
+	if ($self->{PERL_CORE}) {
+	    $self->{INST_LIB} = $self->{INST_ARCHLIB} = $self->{PERL_LIB};
+	} else {
+	    $self->{INST_LIB} = File::Spec->catdir($Curdir,"blib","lib");
+	}
+    }
+
+    my @parentdir = split(/::/, $self->{PARENT_NAME});
+    $self->{INST_LIBDIR} = File::Spec->catdir($self->{INST_LIB},@parentdir);
+    $self->{INST_ARCHLIBDIR} = File::Spec->catdir($self->{INST_ARCHLIB},
+                                                  @parentdir);
+    $self->{INST_AUTODIR} = File::Spec->catdir($self->{INST_LIB},'auto',
+                                               $self->{FULLEXT});
+    $self->{INST_ARCHAUTODIR} = File::Spec->catdir($self->{INST_ARCHLIB},
+                                                   'auto',$self->{FULLEXT});
+
+    $self->{INST_SCRIPT} ||= File::Spec->catdir($Curdir,'blib','script');
+
+    return 1;
+}
+
+=item init_INSTALL
+
+    $mm->init_INSTALL;
+
+Called by init_main.  Sets up all INSTALL_* variables.
+
 =item init_PERL
 
-    $self->init_PERL;
+    $mm->init_PERL;
 
 Called by init_main.  Sets up PERL, FULLPERL, PERLRUN, PERLRUNINST,
 FULLPERLRUN and FULLPERLRUNINST.
@@ -1987,6 +2001,23 @@ sub init_PERL {
     return 1;
 }
 
+=item init_PERM
+
+  $mm->init_PERM
+
+Called by init_main.  Initializes PERL_*
+
+=cut
+
+sub init_PERM {
+    my($self) = shift;
+
+    $self->{PERM_RW}  = 644;
+    $self->{PERM_RWX} = 755;
+
+    return 1;
+}
+    
 
 =item install (o)
 
