@@ -15,7 +15,7 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More 'no_plan';
+use Test::More tests => 6;
 use MakeMaker::Test::Utils;
 use File::Spec;
 
@@ -34,14 +34,14 @@ cmp_ok( $?, '==', 0, 'Makefile.PL exited with non-zero' ) ||
 ok( grep(/^Writing Makefile for Big::Fat::Dummy/, @mpl_out) == 1,
                                            'Makefile.PL output looks right');
 
-my $makefile = makefile_name;
+my $makefile = makefile_name();
 ok( -e $makefile,       'Makefile exists' );
 ok( -M $makefile <= 0,  '  its been touched' );
 
-END { unlink makefile_name, makefile_backup }
+END { unlink makefile_name(), makefile_backup() }
 
 
-my $make = make;
+my $make = make();
 
 my $test_out = `$make test`;
 like( $test_out, qr/All tests successful/, 'make test' );
