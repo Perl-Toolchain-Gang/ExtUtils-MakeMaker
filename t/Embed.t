@@ -122,8 +122,8 @@ else {
        $testlib = $Config{'libperl'};
        my $srclib = $testlib;
        $testlib =~ s/^[^.]+/libperl/;
-       $testlib = File::Spec::->catfile($lib, $testlib);
-       $srclib = File::Spec::->catfile($lib, $srclib);
+       $testlib = File::Spec->catfile($lib, $testlib);
+       $srclib = File::Spec->catfile($lib, $srclib);
        if (-f $srclib) {
            unlink $testlib if -f $testlib;
            my $ln_or_cp = $Config{'ln'} || $Config{'cp'};
@@ -134,10 +134,13 @@ else {
    }
 }
 my $status;
-my $display_cmd = "@cmd";
-chomp($display_cmd); # where is the newline coming from? ldopts()?
-print "# $display_cmd\n"; 
-$status = system(join(' ',@cmd));
+my $cmd = join ' ', @cmd;
+chomp($cmd); # where is the newline coming from? ldopts()?
+print "# $cmd\n"; 
+my @out = `$cmd`;
+$status = $?;
+print "# $_\n" foreach @out;
+
 if ($^O eq 'VMS' && !$status) {
     print "# @cmd2\n";
     $status = system(join(' ',@cmd2)); 
