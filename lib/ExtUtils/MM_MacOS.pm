@@ -244,7 +244,7 @@ sub guess_name {
 
 =item macify
 
-Translate relative path names into Mac names.
+Translate relative Unix filepaths into Mac names.
 
 =cut
 
@@ -270,7 +270,7 @@ sub macify {
 
 =item patternify
 
-Translate to Mac names & patterns
+Translate Unix filepaths and shell globs to Mac style.
 
 =cut
 
@@ -819,26 +819,49 @@ sub realclean {
 # Delete temporary files (via clean) and also delete installed files
 realclean purge ::  clean
 ');
-    # realclean subdirectories first (already cleaned)
-    my $sub = 
-"	Set OldEcho \{Echo\}
-	Set Echo 0
-	Directory %s
-	If \"\`Exists -f %s\`\" != \"\"
-	    \$(MAKE) realclean
-	End
-	Set Echo \{OldEcho\}
-	";
-    foreach(@{$self->{DIR}}){
-	push(@m, sprintf($sub,$_,'$(MAKEFILE_OLD)','-f $(MAKEFILE_OLD)'));
-	push(@m, sprintf($sub,$_,'$(MAKEFILE)',''));
-    }
+
     my(@otherfiles) = ('$(MAKEFILE)', '$(MAKEFILE_OLD)'); # Makefiles last
     push(@otherfiles, patternify($attribs{FILES})) if $attribs{FILES};
     push(@m, "\t\$(RM_RF) @otherfiles\n") if @otherfiles;
     push(@m, "\t$attribs{POSTOP}\n")       if $attribs{POSTOP};
     join("", @m);
 }
+
+
+=item realclean_subdirs_target
+
+MacOS semantics for changing directories and checking for existence
+very different than everyone else.
+
+=cut
+
+sub realclean_subdirs_target {
+    my $self = shift;
+
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+realclean_subdirs :
+	$(NOECHO)$(NOOP)
+NOOP_FRAG
+
+    my $rclean = "realclean_subdirs :\n";
+
+    foreach my $dir (@{$self->{DIR}}){
+        $rclean .= sprintf <<'RCLEAN', $dir, 
+	Set OldEcho \{Echo\}
+	Set Echo 0
+	Directory %s
+	If \"\`Exists -f $(MAKEFILE)\`\" != \"\"
+	    \$(MAKE) realclean
+	End
+	Set Echo \{OldEcho\}
+
+RCLEAN
+
+    }
+
+    return $rclean;
+}
+
 
 =item rulez (o)
 
