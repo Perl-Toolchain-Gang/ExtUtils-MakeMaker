@@ -1,4 +1,4 @@
-5.90_01
+5.90_01 Thu Apr 11 01:11:54 EDT 2002
     [[ API Changes ]]
     * Implementation of the new PREFIX logic.
     * Added new INSTALL targets:
