@@ -135,17 +135,16 @@ sub find_tests {
 }
 
 
-=item B<init_EXISTS_EXT>
+=item B<init_DIRFILESEP>
 
-Using \.exists
+Using \ for Windows.
 
 =cut
 
-sub init_EXISTS_EXT {
+sub init_DIRFILESEP {
     my($self) = shift;
 
-    $self->{EXISTS_EXT} = '\.exists';
-    return 1;
+    $self->{DIRFILESEP} = '\';
 }
 
 =item B<init_others>
@@ -199,154 +198,50 @@ sub init_others {
 }
 
 
-=item constants (o)
+=item init_platform (o)
 
-Initializes lots of constants and .SUFFIXES and .PHONY
+Add MM_Win32_VERSION.
+
+=item platform_constants (o)
 
 =cut
 
-sub constants {
+sub init_platform {
+    my($self) = shift;
+
+    $self->{MM_Win32_VERSION} = $VERSION;
+}
+
+sub platform_constants {
+    my($self) = shift;
+    my $make_frag = '';
+
+    foreach my $macro (qw(MM_Win32_VERSION))
+    {
+        next unless defined $self->{$macro};
+        $make_frag .= "$macro = $self->{$macro}\n";
+    }
+
+    return $make_frag;
+}
+
+
+=item special_targets (o)
+
+Add .USESHELL target for dmake.
+
+=cut
+
+sub special_targets {
     my($self) = @_;
-    my(@m,$tmp);
 
-    for $tmp (qw/
-              AR_STATIC_ARGS NAME DISTNAME NAME_SYM VERSION
-              VERSION_SYM XS_VERSION 
-              INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT 
-              EXISTS_EXT
-              INSTALLDIRS
-              PREFIX          SITEPREFIX      VENDORPREFIX
-              INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
-              INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
-              INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
-              PERL_LIB        PERL_ARCHLIB 
-              SITELIBEXP      SITEARCHEXP 
-              LIBPERL_A MYEXTLIB
-              FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE 
-              PERLMAINCC PERL_SRC
-              PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
-              FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
-              FULL_AR PERL_CORE
-              PERM_RW PERM_RWX
-              / ) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
-    }
+    my $make_frag = $self->SUPER::special_targets;
 
-    push @m, qq{
-VERSION_MACRO = VERSION
-DEFINE_VERSION = -D\$(VERSION_MACRO)=\\\"\$(VERSION)\\\"
-XS_VERSION_MACRO = XS_VERSION
-XS_DEFINE_VERSION = -D\$(XS_VERSION_MACRO)=\\\"\$(XS_VERSION)\\\"
-};
-
-    push @m, qq{
-MAKEMAKER = $INC{'ExtUtils/MakeMaker.pm'}
-MM_VERSION = $ExtUtils::MakeMaker::VERSION
-};
-
-    push @m, q{
-# FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
-# BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
-# PARENT_NAME = NAME without BASEEXT and no trailing :: (eg Foo::Bar)
-# DLBASE  = Basename part of dynamic library. May be just equal BASEEXT.
-};
-
-    for $tmp (qw/
-	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
-	      LDFROM LINKTYPE
-	      /	) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
-    }
-
-    push @m, "
-# Handy lists of source code files:
-XS_FILES= ".join(" \\\n\t", sort keys %{$self->{XS}})."
-C_FILES = ".join(" \\\n\t", @{$self->{C}})."
-O_FILES = ".join(" \\\n\t", @{$self->{O_FILES}})."
-H_FILES = ".join(" \\\n\t", @{$self->{H}})."
-MAN1PODS = ".join(" \\\n\t", sort keys %{$self->{MAN1PODS}})."
-MAN3PODS = ".join(" \\\n\t", sort keys %{$self->{MAN3PODS}})."
-";
-
-    for $tmp (qw/
-	      INST_MAN1DIR  MAN1EXT 
-              INSTALLMAN1DIR INSTALLSITEMAN1DIR INSTALLVENDORMAN1DIR
-	      INST_MAN3DIR  MAN3EXT
-              INSTALLMAN3DIR INSTALLSITEMAN3DIR INSTALLVENDORMAN3DIR
-	      /) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
-    }
-
-    push @m, qq{
+    $make_frag .= <<'MAKE_FRAG' if $DMAKE;
 .USESHELL :
-} if $DMAKE;
+MAKE_FRAG
 
-    push @m, q{
-.NO_CONFIG_REC: Makefile
-} if $ENV{CLEARCASE_ROOT};
-
-    # why not q{} ? -- emacs
-    push @m, qq{
-# work around a famous dec-osf make(1) feature(?):
-makemakerdflt: all
-
-.SUFFIXES: .xs .c .C .cpp .cxx .cc \$(OBJ_EXT)
-
-# Nick wanted to get rid of .PRECIOUS. I don't remember why. I seem to 
-# recall, that some make implementations will delete the Makefile when we 
-# rebuild it. Because we call false(1) when we rebuild it. So make(1) is 
-# not completely wrong when it does so. Our milage may vary.
-# .PRECIOUS: Makefile    # seems to be not necessary anymore
-
-.PHONY: all config static dynamic test linkext manifest
-
-# Where is the Config information that we are using/depend on
-CONFIGDEP = \$(PERL_ARCHLIB)\\Config.pm \$(PERL_INC)\\config.h
-};
-
-    my @parentdir = split(/::/, $self->{PARENT_NAME});
-    push @m, q{
-# Where to put things:
-INST_LIBDIR      = }. File::Spec->catdir('$(INST_LIB)',@parentdir)        .q{
-INST_ARCHLIBDIR  = }. File::Spec->catdir('$(INST_ARCHLIB)',@parentdir)    .q{
-
-INST_AUTODIR     = }. File::Spec->catdir('$(INST_LIB)','auto','$(FULLEXT)')       .q{
-INST_ARCHAUTODIR = }. File::Spec->catdir('$(INST_ARCHLIB)','auto','$(FULLEXT)')   .q{
-};
-
-    if ($self->has_link_code()) {
-	push @m, '
-INST_STATIC  = $(INST_ARCHAUTODIR)\$(BASEEXT)$(LIB_EXT)
-INST_DYNAMIC = $(INST_ARCHAUTODIR)\$(DLBASE).$(DLEXT)
-INST_BOOT    = $(INST_ARCHAUTODIR)\$(BASEEXT).bs
-';
-    } else {
-	push @m, '
-INST_STATIC  =
-INST_DYNAMIC =
-INST_BOOT    =
-';
-    }
-
-    $tmp = $self->export_list;
-    push @m, "
-EXPORT_LIST = $tmp
-";
-    $tmp = $self->perl_archive;
-    push @m, "
-PERL_ARCHIVE = $tmp
-";
-
-    push @m, q{
-TO_INST_PM = }.join(" \\\n\t", sort keys %{$self->{PM}}).q{
-
-PM_TO_BLIB = }.join(" \\\n\t", %{$self->{PM}}).q{
-};
-
-    join('',@m);
+    return $make_frag;
 }
 
 
@@ -365,7 +260,7 @@ sub static_lib {
 
     my(@m);
     push(@m, <<'END');
-$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(EXISTS_EXT)
+$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 	$(RM_RF) $@
 END
 
@@ -427,7 +322,7 @@ sub dynamic_lib {
 OTHERLDFLAGS = '.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_EXT) $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DIRFILESEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 ');
     if ($GCC) {
       push(@m,  
@@ -476,28 +371,16 @@ END
     return $s;
 }
 
-=item perl_archive
-
-Location of libperl on Windows.
+=item init_linker
 
 =cut
 
-sub perl_archive
-{
-    my ($self) = @_;
-    return '$(PERL_INC)\\'.$Config{'libperl'};
-}
+sub init_linker {
+    my $self = shift;
 
-=item export_list
-
-Returns $(BASEEXT).def 
-
-=cut
-
-sub export_list
-{
- my ($self) = @_;
- return "$self->{BASEEXT}.def";
+    $self->{PERL_ARCHIVE}       = "\$(PERL_INC)\\$Config{libperl}";
+    $self->{PERL_ARCHIVE_AFTER} = '';
+    $self->{EXPORT_LIST}        = '$(BASEEXT).def';
 }
 
 
@@ -596,13 +479,13 @@ pure_all :: config pm_to_blib subdirs linkext
 subdirs :: $(MYEXTLIB)
 	'.$self->{NOECHO}.'$(NOOP)
 
-config :: $(MAKEFILE) $(INST_LIBDIR)$(EXISTS_EXT)
+config :: $(MAKEFILE) $(INST_LIBDIR)$(DIRFILESEP).exists
 	'.$self->{NOECHO}.'$(NOOP)
 
-config :: $(INST_ARCHAUTODIR)$(EXISTS_EXT)
+config :: $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 	'.$self->{NOECHO}.'$(NOOP)
 
-config :: $(INST_AUTODIR)$(EXISTS_EXT)
+config :: $(INST_AUTODIR)$(DIRFILESEP).exists
 	'.$self->{NOECHO}.'$(NOOP)
 ';
 
@@ -610,7 +493,7 @@ config :: $(INST_AUTODIR)$(EXISTS_EXT)
 
     if (%{$self->{MAN1PODS}}) {
 	push @m, qq[
-config :: \$(INST_MAN1DIR)\$(EXISTS_EXT)
+config :: \$(INST_MAN1DIR)\$(DIRFILESEP).exists
 	$self->{NOECHO}\$(NOOP)
 
 ];
@@ -618,7 +501,7 @@ config :: \$(INST_MAN1DIR)\$(EXISTS_EXT)
     }
     if (%{$self->{MAN3PODS}}) {
 	push @m, qq[
-config :: \$(INST_MAN3DIR)\$(EXISTS_EXT)
+config :: \$(INST_MAN3DIR)\$(DIRFILESEP).exists
 	$self->{NOECHO}\$(NOOP)
 
 ];
