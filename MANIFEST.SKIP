@@ -1,0 +1,7 @@
+\.ppd$
+\bCVS\b
+~$
+t/lib/File/
+.gz$
+.bak$
+Makefile$

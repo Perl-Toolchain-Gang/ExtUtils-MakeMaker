@@ -5,6 +5,12 @@
     * VMS still broken.  Need to convert File::Spec method calls back to
       object method calls so the weird FS::VMS->eliminate_macros() and 
       fixpath() work again.
+    - Added ExtUtils::MakeMaker::vmsish wrapper around vmsish so MM_VMS
+      can be compiled on non-VMS machines.  For testing.
+    * Added ExtUtils::MakeMaker::Tutorial about writing modules with
+      MakeMaker.
+    - Removed "always use h2xs" dogma.
+    - Added compile test
 
 6.06_01 Thu Dec 19 00:14:49 PST 2002
     - Andreas found that when building the core it is desirable for

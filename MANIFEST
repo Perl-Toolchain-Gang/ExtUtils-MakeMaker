@@ -1,7 +1,9 @@
 .patch
 Changes
 MANIFEST			This list of files
+MANIFEST.SKIP
 Makefile.PL
+Meta.yml
 NOTES
 PATCHING
 README
@@ -30,14 +32,15 @@ lib/ExtUtils/MM_Win95.pm
 lib/ExtUtils/MY.pm
 lib/ExtUtils/MakeMaker.pm
 lib/ExtUtils/MakeMaker/FAQ.pod
+lib/ExtUtils/MakeMaker/Tutorial.pod
+lib/ExtUtils/MakeMaker/vmsish.pm
 lib/ExtUtils/Manifest.pm
 lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/Packlist.pm
 lib/ExtUtils/testlib.pm
+t/00compile.t
 t/00setup_dummy.t
-t/backwards.t
-t/basic.t
 t/Command.t
 t/INST.t
 t/INST_PREFIX.t
@@ -54,6 +57,9 @@ t/MM_Win32.t
 t/Manifest.t
 t/Mkbootstrap.t
 t/Packlist.t
+t/VERSION_FROM.t
+t/backwards.t
+t/basic.t
 t/hints.t
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
@@ -67,6 +73,5 @@ t/problems.t
 t/prompt.t
 t/split_command.t
 t/testlib.t
-t/VERSION_FROM.t
 t/writemakefile_args.t
 t/zz_cleanup_dummy.t
