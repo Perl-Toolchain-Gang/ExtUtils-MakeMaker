@@ -9,7 +9,7 @@ BEGIN {
         unshift @INC, 't/lib/';
     }
 }
-chdir 't';
+$ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
 
 use Test::More tests => 3;
 
