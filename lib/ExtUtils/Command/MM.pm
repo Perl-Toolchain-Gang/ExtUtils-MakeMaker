@@ -104,7 +104,7 @@ sub pod2man {
 
     # Official sets --center, but don't override things explicitly set.
     if ($options{official} && !defined $options{center}) {
-        $options{center} = 'Perl Programmers Reference Guide';
+        $options{center} = q[Perl Programmer's Reference Guide];
     }
 
     # This isn't a valid Pod::Man option and is only accepted for backwards

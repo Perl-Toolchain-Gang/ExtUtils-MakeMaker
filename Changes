@@ -1,3 +1,6 @@
+6.25
+    - At long last the core man page title has its apostrophe.
+
 6.24 Tue Nov 30 15:35:13 EST 2004
     - dir_target() was accidentally named dir_targets() causing problems
       installing some Tk modules.
