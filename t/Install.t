@@ -17,7 +17,7 @@ use TieOut;
 use File::Path;
 use File::Spec;
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 BEGIN { use_ok('ExtUtils::Install') }
 
@@ -59,8 +59,10 @@ open(PACKLIST, 'install-test/packlist' );
 my %packlist = map { chomp;  ($_ => 1) } <PACKLIST>;
 close PACKLIST;
 
+# On case-insensitive filesystems (ie. VMS), the keys of the packlist might 
+# be lowercase. :(
 my $native_dummy = File::Spec->catfile(qw(install-test lib perl Big Dummy.pm));
-is_deeply( \%packlist, { $native_dummy => 1 },
-                              'packlist written');
+is( keys %packlist, 1 );
+is( lc((keys %packlist)[0]), lc $native_dummy, 'packlist written' );
 
 END { rmtree 'blib' }
