@@ -4,6 +4,7 @@
       makefile making process.
     - Now supporting the usevendorprefix %Config setting
     - Tests now guaranteed to run in alphabetical order.
+    - Allowing $VERSION = 0.
 
     [[ Bug Fixes ]]
     - Missing prerequisite warning malformatted.
