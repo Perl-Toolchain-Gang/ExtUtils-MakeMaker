@@ -296,6 +296,20 @@ sub replace_manpage_separator {
     $man;
 }
 
+=item init_EXISTS_EXT
+
+Using .exists.
+
+=cut
+
+sub init_EXISTS_EXT {
+    my($self) = shift;
+
+    $self->{EXISTS_EXT} = '.exists';
+    return 1;
+}
+
+
 =item init_main (override)
 
 Override DISTVNAME so it uses VERSION_SYM to avoid getting too many
@@ -1038,27 +1052,27 @@ pure_all :: config pm_to_blib subdirs linkext
 subdirs :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
-config :: $(MAKEFILE) $(INST_LIBDIR).exists
+config :: $(MAKEFILE) $(INST_LIBDIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 
-config :: $(INST_ARCHAUTODIR).exists
+config :: $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 
-config :: $(INST_AUTODIR).exists
+config :: $(INST_AUTODIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 ';
 
     push @m, $self->dir_target(qw[$(INST_AUTODIR) $(INST_LIBDIR) $(INST_ARCHAUTODIR)]);
     if (%{$self->{MAN1PODS}}) {
 	push @m, q[
-config :: $(INST_MAN1DIR).exists
+config :: $(INST_MAN1DIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 ];
 	push @m, $self->dir_target(qw[$(INST_MAN1DIR)]);
     }
     if (%{$self->{MAN3PODS}}) {
 	push @m, q[
-config :: $(INST_MAN3DIR).exists
+config :: $(INST_MAN3DIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 ];
 	push @m, $self->dir_target(qw[$(INST_MAN3DIR)]);
@@ -1181,7 +1195,7 @@ INST_DYNAMIC_DEP = $inst_dynamic_dep
 
 ";
     push @m, '
-$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt $(INST_ARCHAUTODIR).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt $(INST_ARCHAUTODIR)$(EXISTS_EXT) $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
 	If F$TrnLNm("',$shr,'").eqs."" Then Define/NoLog/User ',"$shr Sys\$Share:$shr.$Config{'dlext'}",'
 	Link $(LDFLAGS) /Shareable=$(MMS$TARGET)$(OTHERLDFLAGS) $(BASEEXT).opt/Option,$(PERL_INC)perlshr_attr.opt/Option
@@ -1208,13 +1222,13 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # As MakeMaker mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR).exists
+$(BOOTSTRAP) : $(MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(NOECHO) $(SAY) "Running mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) -
 	-e "use ExtUtils::Mkbootstrap; Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
 	$(NOECHO) $(TOUCH) $(MMS$TARGET)
 
-$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR).exists
+$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(NOECHO) $(RM_RF) $(INST_BOOT)
 	- $(CP) $(BOOTSTRAP) $(INST_BOOT)
 ';
@@ -1238,7 +1252,7 @@ $(INST_STATIC) :
     my(@m,$lib);
     push @m,'
 # Rely on suffix rule for update action
-$(OBJECT) : $(INST_ARCHAUTODIR).exists
+$(OBJECT) : $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 
 $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
 ';
@@ -1339,7 +1353,7 @@ realclean ::
 	else                   { ($todir = $to) =~ s/[^\)]+$//; }
 	$todir = $self->fixpath($todir,1);
 	push @m, "
-$to : $from \$(MAKEFILE) ${todir}.exists
+$to : $from \$(MAKEFILE) ${todir}\$(EXISTS_EXT)
 	\$(CP) $from $to
 
 ", $self->dir_target($todir);

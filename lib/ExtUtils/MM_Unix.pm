@@ -394,6 +394,7 @@ sub constants {
 	      AR_STATIC_ARGS NAME DISTNAME NAME_SYM VERSION
 	      VERSION_SYM XS_VERSION 
 	      INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
+              EXISTS_EXT
               INSTALLDIRS
               PREFIX          SITEPREFIX      VENDORPREFIX
 	      INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
@@ -1004,25 +1005,25 @@ sub dynamic_bs {
 BOOTSTRAP =
 ' unless $self->has_link_code();
 
-    return '
-BOOTSTRAP = '."$self->{BASEEXT}.bs".'
+    return <<'MAKE_FRAG';
+BOOTSTRAP = $(BASEEXT).bs
 
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP): $(MAKEFILE) '.$self->{BOOTDEP}.' $(INST_ARCHAUTODIR)/.exists
+$(BOOTSTRAP): $(MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(NOECHO) echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
-		-e "Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
+		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
 	$(NOECHO) $(TOUCH) $(BOOTSTRAP)
 	$(CHMOD) $(PERM_RW) $@
 
-$(INST_BOOT): $(BOOTSTRAP) $(INST_ARCHAUTODIR)/.exists
+$(INST_BOOT): $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(NOECHO) $(RM_RF) $(INST_BOOT)
 	-$(CP) $(BOOTSTRAP) $(INST_BOOT)
 	$(CHMOD) $(PERM_RW) $@
-';
+MAKE_FRAG
 }
 
 =item dynamic_lib (o)
@@ -1051,7 +1052,7 @@ ARMAYBE = '.$armaybe.'
 OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)/.exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(EXISTS_EXT) $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
 ');
     if ($armaybe ne ':'){
 	$ldfrom = 'tmp$(LIB_EXT)';
@@ -1583,6 +1584,20 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     }
 }
 
+=item init_EXISTS_EXT
+
+Using /.exists.
+
+=cut
+
+sub init_EXISTS_EXT {
+    my($self) = shift;
+
+    $self->{EXISTS_EXT} = '/.exists';
+    return 1;
+}
+    
+
 =item init_main
 
 Initializes AR, AR_STATIC_ARGS, BASEEXT, CONFIG, DISTNAME, DLBASE,
@@ -1760,7 +1775,7 @@ usually solves this kind of problem.
     # MakeMaker.
     $self->{INSTALLDIRS} ||= "site";
 
-
+    $self->init_EXISTS_EXT;
     $self->init_INST;
     $self->init_INSTALL;
 
@@ -2720,7 +2735,7 @@ LLIBPERL    = $llibperl
 ";
 
     push @m, "
-\$(INST_ARCHAUTODIR)/extralibs.all: \$(INST_ARCHAUTODIR)/.exists ".join(" \\\n\t", @$extra).'
+\$(INST_ARCHAUTODIR)/extralibs.all: \$(INST_ARCHAUTODIR)\$(EXISTS_EXT) ".join(" \\\n\t", @$extra).'
 	$(NOECHO) $(RM_F)  $@
 	$(NOECHO) $(TOUCH) $@
 ';
@@ -3487,13 +3502,13 @@ sub static_lib {
     my(@m);
     push(@m, <<'END');
 
-$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)/.exists
+$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(RM_RF) $@
 END
 
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, <<'MAKE_FRAG' if $self->{MYEXTLIB};
+    push(@m, <<'MAKE_FRAG') if $self->{MYEXTLIB};
 	$(CP) $(MYEXTLIB) $@
 MAKE_FRAG
 
@@ -3918,13 +3933,13 @@ pure_all :: config pm_to_blib subdirs linkext
 subdirs :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
-config :: $(MAKEFILE) $(INST_LIBDIR)/.exists
+config :: $(MAKEFILE) $(INST_LIBDIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 
-config :: $(INST_ARCHAUTODIR)/.exists
+config :: $(INST_ARCHAUTODIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 
-config :: $(INST_AUTODIR)/.exists
+config :: $(INST_AUTODIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 ';
 
@@ -3932,7 +3947,7 @@ config :: $(INST_AUTODIR)/.exists
 
     if (%{$self->{MAN1PODS}}) {
 	push @m, q[
-config :: $(INST_MAN1DIR)/.exists
+config :: $(INST_MAN1DIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 
 ];
@@ -3940,7 +3955,7 @@ config :: $(INST_MAN1DIR)/.exists
     }
     if (%{$self->{MAN3PODS}}) {
 	push @m, q[
-config :: $(INST_MAN3DIR)/.exists
+config :: $(INST_MAN3DIR)$(EXISTS_EXT)
 	$(NOECHO) $(NOOP)
 
 ];
