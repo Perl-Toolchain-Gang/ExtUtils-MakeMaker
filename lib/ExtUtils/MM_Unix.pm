@@ -2884,7 +2884,7 @@ push @m, "
 
 $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 ";
-    push @m, qq{\tcd $tmp && $cccmd "-I\$(PERL_INC)" perlmain.c\n};
+    push @m, "\t".$self->cd($tmp, qq[$cccmd "-I\$(PERL_INC)" perlmain.c])."\n";
 
     push @m, qq{
 $tmp/perlmain.c: $makefilename}, q{
@@ -3141,7 +3141,10 @@ distribution.
 sub perldepend {
     my($self) = shift;
     my(@m);
-    push @m, q{
+
+    my $make_config = $self->cd('$(PERL_SRC)', '$(MAKE) lib/Config.pm');
+
+    push @m, sprintf <<'MAKE_FRAG', $make_config if $self->{PERL_SRC};
 # Check for unpropogated config.sh changes. Should never happen.
 # We do NOT just update config.h because that is not sufficient.
 # An out of date config.h is not fatal but complains loudly!
@@ -3150,8 +3153,8 @@ $(PERL_INC)/config.h: $(PERL_SRC)/config.sh
 
 $(PERL_ARCHLIB)/Config.pm: $(PERL_SRC)/config.sh
 	$(NOECHO) $(ECHO) "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(PERL_SRC)/config.sh"
-	cd $(PERL_SRC) && $(MAKE) lib/Config.pm
-} if $self->{PERL_SRC};
+	%s
+MAKE_FRAG
 
     return join "", @m unless $self->needs_linking;
 
@@ -3546,10 +3549,17 @@ NOOP_FRAG
 
     my $rclean = "realclean_subdirs :\n";
 
-    foreach my $dir (@{$self->{DIR}}){
-        $rclean .= sprintf <<'RCLEAN', $dir, $dir;
-	-cd %s && $(TEST_F) $(MAKEFILE_OLD) && $(MAKE) -f $(MAKEFILE_OLD) realclean
-	-cd %s && $(TEST_F) $(FIRST_MAKEFILE) && $(MAKE) realclean
+    foreach my $dir (@{$self->{DIR}}) {
+        my $cmd1 = $self->cd($dir, 
+                             '$(TEST_F) $(MAKEFILE_OLD) && '.
+                             '$(MAKE) -f $(MAKEFILE_OLD) realclean');
+        my $cmd2 = $self->cd($dir, 
+                             '$(TEST_F) $(FIRST_MAKEFILE) && '.
+                             '$(MAKE) realclean');
+
+        $rclean .= sprintf <<'RCLEAN', $cmd1, $cmd2;
+	-%s
+	-%s
 RCLEAN
 
     }
@@ -3773,11 +3783,16 @@ Helper subroutine for subdirs
 
 sub subdir_x {
     my($self, $subdir) = @_;
-    return sprintf <<'EOT', $subdir;
+
+    my $subdir_cmd = $self->cd($subdir, 
+                               '$(MAKE) -f $(FIRST_MAKEFILE) all $(PASTHRU)'
+                              );
+    return sprintf <<'EOT', $subdir_cmd;
 
 subdirs ::
-	$(NOECHO)cd %s && $(MAKE) -f $(FIRST_MAKEFILE) all $(PASTHRU)
+	$(NOECHO)%s
 EOT
+
 }
 
 =item subdirs (o)
@@ -3837,11 +3852,11 @@ testdb :: testdb_\$(LINKTYPE)
 test :: \$(TEST_TYPE)
 ");
 
-    if ($Is_Win95) {
-        push(@m, map(qq{\t\$(NOECHO) \$(PERLRUN) -e "exit unless -f shift; chdir '$_'; system q[\$(MAKE) test \$(PASTHRU)]" \$(FIRST_MAKEFILE)\n}, @{$self->{DIR}}));
-    }
-    else {
-        push(@m, map("\t\$(NOECHO) cd $_ && \$(TEST_F) \$(FIRST_MAKEFILE) && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
+    foreach my $dir (@{ $self->{DIR} }) {
+        my $cmd = $self->cd($dir, 
+                    '$(TEST_F) $(FIRST_MAKEFILE) && $(MAKE) test $(PASTHRU)'
+                  );
+        push(@m, "\t\$(NOECHO) $cmd\n");
     }
 
     push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
