@@ -16,7 +16,7 @@ $VERSION = 1.38;
 @ISA=('Exporter');
 @EXPORT_OK = qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
-                manifind   maniread   manicopy
+                manifind   maniread   manicopy   maniadd
                );
 
 $Is_MacOS = $^O eq 'MacOS';
@@ -38,23 +38,23 @@ ExtUtils::Manifest - utilities to write and check a MANIFEST file
 
 =head1 SYNOPSIS
 
-    use ExtUtils::Manifest qw(...funcs to import);
+    use ExtUtils::Manifest qw(...funcs to import...);
 
-    mkmanifest;
+    mkmanifest();
 
-    my @missing_files = manicheck;
-
-    my @extra_files   = filecheck;
-
+    my @missing_files    = manicheck;
+    my @skipped          = skipcheck;
+    my @extra_files      = filecheck;
     my($missing, $extra) = fullcheck;
-
-    my @skipped  = skipcheck;
 
     my $found    = manifind();
 
     my $manifest = maniread();
 
     manicopy($read,$target);
+
+    maniadd({$file => $comment, ...});
+
 
 =head1 DESCRIPTION
 
@@ -64,8 +64,6 @@ ExtUtils::Manifest exports no functions by default.  The following are
 exported on request
 
 =over 4
-
-
 
 =item mkmanifest
 
@@ -514,6 +512,38 @@ sub _unmacify {
     
     $file;
 }
+
+
+=item maniadd
+
+  maniadd({ $file => $comment, ...});
+
+Adds an entry to an existing F<MANIFEST>.
+
+$file will be normalized (ie. Unixified).  B<UNIMPLEMENTED>
+
+=cut
+
+sub maniadd {
+    my($additions) = shift;
+
+    _normalize($additions);
+
+    my $manifest = maniread();
+    open(MANIFEST, ">>$MANIFEST") or die "Could not open $MANIFEST: $!";
+    while( my($file, $comment) = each %$additions ) {
+        $comment ||= '';
+        printf MANIFEST "%-40s%s\n", $file, $comment unless
+          exists $manifest->{$file};
+    }
+    close MANIFEST;
+}
+
+# UNIMPLEMENTED
+sub _normalize {
+    return;
+}
+
 
 =back
 
