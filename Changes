@@ -17,6 +17,11 @@
       Mentioned it in the FAQ instead.
     - Fixing PERL_ARCHIVE macro on VMS.  Apparently it never appeared
       properly before. (Craig Berry)
+    - Fixing ECHO on dmake.
+    - Adding os_flavor() and os_flavor_is()
+    - Making basic.t error output combine STDOUT & STDERR for easier 
+      reading.
+    - ExtUtils::Manifest will now work case insensitively.
 
 # There was no 6.06, I jumped straight to 6.10_XX because there's been
 # so much change between 6.05 and now.
