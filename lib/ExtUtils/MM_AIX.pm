@@ -26,7 +26,7 @@ Unless otherwise stated it works just like ExtUtils::MM_Unix
 
 =head2 Overridden methods
 
-=item dlsyms
+=head3 dlsyms
 
 Define DL_FUNCS and DL_VARS and write the *.exp files.
 
