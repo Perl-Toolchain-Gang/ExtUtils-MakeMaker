@@ -8,6 +8,8 @@
     - Fix (well, hack) for creating ABSPERL on VMS.
     - Quieting some warnings revealed by ExtUtils::Constant
     - test_via_script had a typo and forgot INST_ARCHLIB
+    - Reversing "fix" for RT 444.  It wasn't really fixed and it
+      caused havoc with Compress::Zlib and Tk.
 
     [[ Test Fixes ]]
     - INST.t has to tell MakeMaker it's in the PERL_CORE
@@ -221,7 +223,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.49 $ based $VERSIONs.
+    - Stripped out $Revision based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
