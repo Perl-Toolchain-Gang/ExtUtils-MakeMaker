@@ -7,7 +7,7 @@ BEGIN {
     }
 
     if( $] < 5.006_001 ) {
-        print "1..0 # Skip: ExtUtils::Embed works on perl 5.6.1 and up\n";
+        print "1..0 # Skip: This version of ExtUtils::Embed works on perl 5.6.1 and up\n";
         exit;
     }
 }
