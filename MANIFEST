@@ -1,7 +1,9 @@
 Changes
-MANIFEST
-README
+MANIFEST			This list of files
 Makefile.PL
+NOTES
+README
+TODO
 bin/instmodsh
 bin/xsubpp
 lib/ExtUtils/Command.pm
@@ -20,8 +22,8 @@ lib/ExtUtils/MM_Cygwin.pm
 lib/ExtUtils/MM_DOS.pm
 lib/ExtUtils/MM_NW5.pm
 lib/ExtUtils/MM_OS2.pm
-lib/ExtUtils/MM_Unix.pm
 lib/ExtUtils/MM_UWIN.pm
+lib/ExtUtils/MM_Unix.pm
 lib/ExtUtils/MM_VMS.pm
 lib/ExtUtils/MM_Win32.pm
 lib/ExtUtils/MM_Win95.pm
@@ -33,6 +35,9 @@ lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/Packlist.pm
 lib/ExtUtils/testlib.pm
 lib/ExtUtils/typemap
+t/Big-Fat-Dummy/Makefile.PL
+t/Big-Fat-Dummy/lib/Big/Fat/Dummy.pm
+t/Big-Fat-Dummy/t/compile.t
 t/Command.t
 t/Embed.t
 t/ExtUtils.t
@@ -46,7 +51,9 @@ t/MM_Win32.t
 t/Manifest.t
 t/Mkbootstrap.t
 t/Packlist.t
+t/basic.t
 t/hints.t
+t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
