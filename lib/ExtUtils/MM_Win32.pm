@@ -134,6 +134,7 @@ sub find_tests {
     return join(' ', <t\\*.t>);
 }
 
+
 =item B<init_others>
 
 Override some of the Unix specific commands with portable
@@ -212,6 +213,7 @@ sub constants {
               PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
               FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
               FULL_AR PERL_CORE
+              PERM_RW PERM_RWX
               / ) {
 	next unless defined $self->{$tmp};
 	push @m, "$tmp = $self->{$tmp}\n";
@@ -342,9 +344,6 @@ Defines how to produce the *.a (or equivalent) files.
 
 sub static_lib {
     my($self) = @_;
-# Come to think of it, if there are subdirs with linkcode, we still have no INST_STATIC
-#    return '' unless $self->needs_linking(); #might be because of a subdir
-
     return '' unless $self->has_link_code;
 
     my(@m);
@@ -352,25 +351,28 @@ sub static_lib {
 $(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)\.exists
 	$(RM_RF) $@
 END
+
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, "\t$self->{CP} \$(MYEXTLIB) \$\@\n") if $self->{MYEXTLIB};
+    push(@m, <<'MAKE_FRAG' if $self->{MYEXTLIB};
+	$(CP) $(MYEXTLIB) $@
+MAKE_FRAG
 
     push @m,
 q{	$(AR) }.($BORLAND ? '$@ $(OBJECT:^"+")'
 			  : ($GCC ? '-ru $@ $(OBJECT)'
 			          : '-out:$@ $(OBJECT)')).q{
-	}.$self->{NOECHO}.q{echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
-	$(CHMOD) 755 $@
+	$(CHMOD) $(PERM_RWX) $@
+	$(NOECHO) echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
 };
 
-# Old mechanism - still available:
+    # Old mechanism - still available:
+    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
+	$(NOECHO) echo "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
+MAKE_FRAG
 
-    push @m, "\t$self->{NOECHO}".q{echo "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs}."\n\n"
-	if $self->{PERL_SRC};
-
-    push @m, $self->dir_target('$(INST_ARCHAUTODIR)');
-    join('', "\n",@m);
+    push @m, "\n", $self->dir_target('$(INST_ARCHAUTODIR)');
+    join('', @m);
 }
 
 =item dynamic_bs (o)
@@ -397,12 +399,12 @@ $(BOOTSTRAP): $(MAKEFILE) '.$self->{BOOTDEP}.' $(INST_ARCHAUTODIR)\.exists
 		-MExtUtils::Mkbootstrap \
 		-e "Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
 	'.$self->{NOECHO}.'$(TOUCH) $(BOOTSTRAP)
-	$(CHMOD) 644 $@
+	$(CHMOD) $(PERM_RW) $@
 
 $(INST_BOOT): $(BOOTSTRAP) $(INST_ARCHAUTODIR)\.exists
 	'."$self->{NOECHO}$self->{RM_RF}".' $(INST_BOOT)
 	-'.$self->{CP}.' $(BOOTSTRAP) $(INST_BOOT)
-	$(CHMOD) 644 $@
+	$(CHMOD) $(PERM_RW) $@
 ';
 }
 
@@ -462,7 +464,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)\.exists 
       .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)});
     }
     push @m, '
-	$(CHMOD) 755 $@
+	$(CHMOD) $(PERM_RWX) $@
 ';
 
     push @m, $self->dir_target('$(INST_ARCHAUTODIR)');
