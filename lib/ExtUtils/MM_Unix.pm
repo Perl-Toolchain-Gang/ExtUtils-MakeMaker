@@ -1978,6 +1978,23 @@ sub init_INSTALL {
                          style => $libstyle },
     );
 
+
+    # Special case for LIB.
+    if( $self->{LIB} ) {
+        foreach my $var (keys %lib_layouts) {
+            my $Installvar = uc "install$var";
+
+            if( $var =~ /arch/ ) {
+                $self->{$Installvar} ||= 
+                  File::Spec->catdir($self->{LIB}, $Config{archname});
+            }
+            else {
+                $self->{$Installvar} ||= $self->{LIB};
+            }
+        }
+    }
+
+
     my %layouts = (%bin_layouts, %man_layouts, %lib_layouts);
     while( my($var, $layout) = each(%layouts) ) {
         my($s, $r, $d, $style) = @{$layout}{qw(s r d style)};
