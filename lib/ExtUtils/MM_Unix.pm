@@ -2908,7 +2908,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
     push @m, q{
 # We take a very conservative approach here, but it\'s worth it.
 # We move Makefile to Makefile.old here to avoid gnu make looping.
-$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP) $(VERSION_FROM)
+$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(NOECHO) $(ECHO) "Makefile out-of-date with respect to $?"
 	$(NOECHO) $(ECHO) "Cleaning current config before rebuilding Makefile..."
 	$(NOECHO) $(RM_F) $(MAKEFILE_OLD)

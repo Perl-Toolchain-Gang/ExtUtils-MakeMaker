@@ -12,6 +12,9 @@
     - Small fixes for dmake (Mattia Barbon)
     * Added "Reporting bugs" section to the PATCHING doc.
     - Minor bug in compile test missed ExtUtils::Liblist::Kid
+    - Removing $(VERSION_FROM) from Makefile dependency.  It was too
+      annoying to rebuild the Makefile every time the module changed.
+      Mentioned it in the FAQ instead.
 
 # There was no 6.06, I jumped straight to 6.10_XX because there's been
 # so much change between 6.05 and now.
