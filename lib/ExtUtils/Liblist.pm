@@ -7,6 +7,11 @@ use File::Spec;
 require ExtUtils::Liblist::Kid;
 @ISA = qw(ExtUtils::Liblist::Kid File::Spec);
 
+# Backwards compatibility with old interface.
+sub ext {
+    goto &ExtUtils::Liblist::Kid::ext;
+}
+
 sub lsdir {
   shift;
   my $rex = qr/$_[1]/;
@@ -24,9 +29,12 @@ ExtUtils::Liblist - determine libraries to use and how to use them
 
 =head1 SYNOPSIS
 
-C<require ExtUtils::Liblist;>
+  require ExtUtils::Liblist;
 
-C<ExtUtils::Liblist::ext($self, $potential_libs, $verbose, $need_names);>
+  $MM->ext($potential_libs, $verbose, $need_names);
+
+  # Usually you can get away with:
+  ExtUtils::Liblist->ext($potential_libs, $verbose, $need_names)
 
 =head1 DESCRIPTION
 

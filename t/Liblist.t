@@ -12,12 +12,15 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Data::Dumper;
 
 BEGIN {
     use_ok( 'ExtUtils::Liblist' );
 }
+
+ok( defined &ExtUtils::Liblist::ext, 
+    'ExtUtils::Liblist::ext() defined for backwards compat' );
 
 {
     my @warn;
