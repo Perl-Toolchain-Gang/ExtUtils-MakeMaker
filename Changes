@@ -1,7 +1,7 @@
 6.10_08 Mon Jul 21 18:17:06 PDT 2003
     * $Config{installvendorman*dir} was being ignored and our default
       always used. [rt.cpan.org #2949]
-    * Setting NORECUS to true was still resulting in a Makefile which
+    * Setting NORECURS to true was still resulting in a Makefile which
       tried to recurse into subdirectories which contained a Makefile.PL
       (it simply wouldn't have run them to generate Makefile's).
       This appears to be a rather old bug.
