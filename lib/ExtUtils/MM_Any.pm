@@ -873,6 +873,9 @@ eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }
 CODE
 
     my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s');
+
+    # cpansign -s complains if SIGNATURE is in the MANIFEST yet does not
+    # exist
     my $touch_sig        = $self->cd('$(DISTVNAME)' => '$(TOUCH) SIGNATURE');
     my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $add_sign );
 
