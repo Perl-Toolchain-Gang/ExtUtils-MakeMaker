@@ -1,4 +1,4 @@
-6.06
+6.06_01 Thu Dec 19 00:14:49 PST 2002
     - Andreas found that when building the core it is desirable for
       MakeMaker to use a relative path to perl.
     - File::Spec->catfile() has a bug where the resulting file may not be
