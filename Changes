@@ -22,6 +22,7 @@
     - Craig Berry fixed some macro corruption on VMS.
     - Systems configured to not have man pages now honored thanks to
       Paul Green
+    - Hack to allow 5.6.X versions of ExtUtils::Embed use MY implicitly.
 
     [[ Test Changes ]]
     - Shortening directory levels to accomodate old VMS's
