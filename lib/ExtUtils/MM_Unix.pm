@@ -3147,7 +3147,7 @@ realclean purge ::  clean
     if( $Is_Win32  &&  Win32::IsWin95() ) {
         $sub = <<'REALCLEAN';
 	-cd %s
-	-$(PERL) -e "exit unless -f shift; system q{$(MAKE) realclean}" %s
+	-$(PERLRUN) -e "exit unless -f shift; system q{$(MAKE) realclean}" %s
 	-cd ..
 REALCLEAN
     }
