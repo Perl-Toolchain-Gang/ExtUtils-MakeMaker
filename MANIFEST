@@ -37,4 +37,6 @@ t/MM_Win32.t
 t/Manifest.t
 t/Mkbootstrap.t
 t/Packlist.t
+t/hints.t
+t/lib/TieOut.pm
 t/testlib.t
