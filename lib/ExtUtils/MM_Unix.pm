@@ -3552,44 +3552,40 @@ Defines the realclean target.
 
 sub realclean {
     my($self, %attribs) = @_;
-    my(@m);
 
-    push(@m,'
-# Delete temporary files (via clean) and also delete installed files
-realclean purge ::  clean realclean_subdirs
-	$(RM_RF) $(INST_AUTODIR) $(INST_ARCHAUTODIR)
-	$(RM_RF) $(DISTVNAME)
-');
+    my @files = qw($(INST_AUTODIR) $(INST_ARCHAUTODIR) $(DISTVNAME));
+
+    push @files, values %{$self->{PM}}, 
+                 qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
 
     if( $self->has_link_code ){
-        push(@m, "	\$(RM_F) \$(INST_DYNAMIC) \$(INST_BOOT)\n");
-        push(@m, "	\$(RM_F) \$(INST_STATIC)\n");
+        push @files, qw($(INST_DYNAMIC) $(INST_BOOT) $(INST_STATIC) $(OBJECT));
     }
 
-    my @files = values %{$self->{PM}};
-    push @files, $attribs{FILES} if $attribs{FILES};
-    push @files, '$(FIRST_MAKEFILE)', '$(MAKEFILE_OLD)';
-
-    # Occasionally files are repeated several times from different sources
-    { my(%f) = map { ($_,1) } @files; @files = keys %f; }
-
-    # Issue a several little RM_RF commands rather than risk creating a
-    # very long command line (useful for extensions such as Encode
-    # that have many files).
-    my $line = "";
-    foreach my $file (@files) {
-        if (length($line) + length($file) > 200) {
-            push @m, "\t\$(RM_RF) $line\n";
-            $line = $file;
+    if( $attribs{FILES} ) {
+        if( ref $attribs{FILES} ) {
+            push @files, @{ $attribs{FILES} };
         }
         else {
-            $line .= " $file"; 
+            push @files, split /\s+/, $attribs{FILES};
         }
     }
-    push @m, "\t\$(RM_RF) $line\n" if $line;
-    push(@m, "\t$attribs{POSTOP}\n")      if $attribs{POSTOP};
 
-    join("", @m);
+    # Occasionally files are repeated several times from different sources
+    { my(%f) = map { ($_ => 1) } @files;  @files = keys %f; }
+
+    my $rm_cmd = join "\n\t", map { "$_" } 
+                   $self->split_command('$(RM_RF)', @files);
+
+    my $m = sprintf <<'MAKE', $rm_cmd;
+# Delete temporary files (via clean) and also delete installed files
+realclean purge ::  clean realclean_subdirs
+	%s
+MAKE
+
+    $m .= "\t$attribs{POSTOP}\n" if $attribs{POSTOP};
+
+    return $m;
 }
 
 
