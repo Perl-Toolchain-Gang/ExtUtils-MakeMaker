@@ -1,6 +1,15 @@
 5.91_01
+    [[ API Changes ]]
+    * A failing Makefile.PL in a subdir will now kill the whole
+      makefile making process.
+    - Now supporting the usevendorprefix %Config setting
+
+    [[ Bug Fixes ]]
+    - Missing prerequisite warning malformatted.
+
     [[ Test Changes ]]
     - Shortening directory levels to accomodate old VMS's
+    - was using a slightly wrong prefix for the prefix tests
 
 5.90_01 Thu Apr 11 01:11:54 EDT 2002
     [[ API Changes ]]
