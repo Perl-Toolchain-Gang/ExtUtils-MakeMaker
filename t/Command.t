@@ -41,8 +41,12 @@ BEGIN {
 		}
 	}
 
+
+    # % means 'match one character' on VMS.  Everything else is ?
+    my $match_char = $^O eq 'VMS' ? '%' : '?';
+	($ARGV[0] = $file) =~ s/.\z/$match_char/;
+
 	# this should find the file
-	($ARGV[0] = $file) =~ s/.\z/\?/;
 	ExtUtils::Command::expand_wildcards();
 
 	is( scalar @ARGV, 1, 'found one file' );
