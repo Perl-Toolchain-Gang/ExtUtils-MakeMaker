@@ -320,7 +320,7 @@ sub clean_subdirs_target {
     # No subdirectories, no cleaning.
     return <<'NOOP_FRAG' unless @{$self->{DIR}};
 clean_subdirs :
-	$(NOECHO)$(NOOP)
+	$(NOECHO) $(NOOP)
 NOOP_FRAG
 
 
@@ -1904,13 +1904,30 @@ sub init_others {	# --- Initialize Other Attributes
 
     $self->{SHELL}              ||= $Config{sh} || '/bin/sh';
 
-    $self->{RM_F}               ||= "rm -f";
-    $self->{RM_RF}              ||= "rm -rf";
-    $self->{TOUCH}              ||= "touch";
-    $self->{TEST_F}             ||= "test -f";
-    $self->{CP}                 ||= "cp";
-    $self->{MV}                 ||= "mv";
-    $self->{CHMOD}              ||= "chmod";
+    $self->{ECHO}       ||= 'echo';
+    $self->{RM_F}       ||= "rm -f";
+    $self->{RM_RF}      ||= "rm -rf";
+    $self->{TOUCH}      ||= "touch";
+    $self->{TEST_F}     ||= "test -f";
+    $self->{CP}         ||= "cp";
+    $self->{MV}         ||= "mv";
+    $self->{CHMOD}      ||= "chmod";
+    $self->{MKPATH}     ||= '$(PERLRUN) "-MExtUtils::Command" -e mkpath';
+    $self->{EQUALIZE_TIMESTAMP} ||= 
+      '$(PERLRUN) "-MExtUtils::Command" -e eqtime';
+
+    $self->{UNINST}     ||= 0;
+    $self->{VERBINST}   ||= 0;
+    $self->{MOD_INSTALL} ||= 
+      $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
+install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
+CODE
+    $self->{DOC_INSTALL} ||= 
+      '$(PERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
+    $self->{UNINSTALL}   ||= 
+      '$(PERLRUN) "-MExtUtils::Command::MM" -e uninstall';
+    $self->{WARN_IF_OLD_PACKLIST} ||= 
+      '$(PERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
 
     $self->{UMASK_NULL}         ||= "umask 0";
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
@@ -3483,7 +3500,7 @@ sub realclean_subdirs_target {
 
     return <<'NOOP_FRAG' unless @{$self->{DIR}};
 realclean_subdirs :
-	$(NOECHO)$(NOOP)
+	$(NOECHO) $(NOOP)
 NOOP_FRAG
 
     my $rclean = "realclean_subdirs :\n";
@@ -3851,47 +3868,16 @@ sub tools_other {
     my($self) = shift;
     my @m;
 
-    for my $tool (qw/ SHELL CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
-                      UMASK_NULL DEV_NULL/ ) 
+    for my $tool (qw{ SHELL CHMOD CP LD MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
+                      UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP ECHO
+                      UNINST VERBINST
+                      MOD_INSTALL DOC_INSTALL UNINSTALL
+                      WARN_IF_OLD_PACKLIST
+                    } ) 
     {
         next unless defined $self->{$tool};
         push @m, "$tool = $self->{$tool}\n";
     }
-
-    push @m, q{
-# The following is a portable way to say mkdir -p
-# To see which directories are created, change the if 0 to if 1
-MKPATH = $(PERLRUN) "-MExtUtils::Command" -e mkpath
-
-# This helps us to minimize the effect of the .exists files A yet
-# better solution would be to have a stable file in the perl
-# distribution with a timestamp of zero. But this solution doesn't
-# need any changes to the core distribution and works with older perls
-EQUALIZE_TIMESTAMP = $(PERLRUN) "-MExtUtils::Command" -e eqtime
-};
-
-
-    return join "", @m if $self->{PARENT};
-
-    my $mod_install = $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
-install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
-CODE
-
-    push @m, sprintf <<'MAKE_FRAG', $mod_install;
-
-# Here we warn users that an old packlist file was found somewhere,
-# and that they should call some uninstall routine
-WARN_IF_OLD_PACKLIST = $(PERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist
-
-UNINST=0
-VERBINST=0
-
-MOD_INSTALL = %s
-
-DOC_INSTALL = $(PERLRUN) "-MExtUtils::Command::MM" -e perllocal_install
-
-UNINSTALL = $(PERLRUN) "-MExtUtils::Command::MM" -e uninstall
-MAKE_FRAG
 
     return join "", @m;
 }
