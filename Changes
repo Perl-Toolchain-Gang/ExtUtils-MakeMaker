@@ -22,6 +22,11 @@
       installation targets now use DESTINSTALL* instead.  This prevents
       the DESTDIR from showing up in places it shouldn't like perllocal.pod.
       DESTDIR is still appearing in .packlist (bug). [rt.cpan.org #2954]
+    - MM_VMS->prefixify() wasn't honoring the %Config_Override causing
+      some MakeMaker generated config variables to be ignored.
+    - MM_VMS->prefixify() was only VMSifying part of its filepaths causing 
+      internal comparisions to get confused and think it had to prefixify 
+      when it didn't.
 
 6.10_07 Sat Jul  5 16:12:52 PDT 2003
     * Fixing location of perllocal.pod so its always in INSTALLARCHLIB

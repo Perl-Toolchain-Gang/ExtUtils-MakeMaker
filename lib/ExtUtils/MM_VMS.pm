@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.68';
-($Revision) = q$Revision: 1.103 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.104 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2098,13 +2098,15 @@ sub prefixify {
     # Translate $(PERLPREFIX) to a real path.
     $rprefix = $self->eliminate_macros($rprefix);
     $rprefix = VMS::Filespec::vmspath($rprefix) if $rprefix;
+    $sprefix = VMS::Filespec::vmspath($sprefix) if $sprefix;
 
     $default = VMS::Filespec::vmsify($default) 
       unless $default =~ /\[.*\]/;
 
     (my $var_no_install = $var) =~ s/^install//;
-    my $path = $self->{uc $var} || $Config{lc $var} || 
-               $Config{lc $var_no_install};
+    my $path = $self->{uc $var} || 
+               $ExtUtils::MM_Unix::Config_Override{lc $var} || 
+               $Config{lc $var} || $Config{lc $var_no_install};
 
     if( !$path ) {
         print STDERR "  no Config found for $var.\n" if $Verbose >= 2;
