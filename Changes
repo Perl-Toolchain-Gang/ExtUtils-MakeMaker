@@ -7,7 +7,8 @@
 
     [[ Bug Fixes ]]
     - Missing prerequisite warning malformatted.
-    - INSTALL*MAN*DIR weren't allowed on the command line.
+    - INSTALL*MAN*DIR and INST_MAN*DIR weren't allowed on the command 
+      line.
     * For years now skipcheck() has been returning a different
       value than what was documented.
     - Partially reversing Ken's "speed up ExtUtils::Manifest" patch
