@@ -2532,6 +2532,7 @@ sub makefile {
     # happen very rarely it is not a significant problem.
     $m = '
 $(OBJECT) : $(FIRST_MAKEFILE)
+	$(NOECHO) $(NOOP)
 ' if $self->{OBJECT};
 
     my $newer_than_target = $Is_VMS ? '$(MMS$SOURCE_LIST)' : '$?';
