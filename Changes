@@ -12,6 +12,9 @@
     * Made sure PREFIX always has something in it.  Module authors like to use
       it when extending MakeMaker.  Currently using one of 
       PERL/SITE/VENDORPREFIX based on the value of INSTALLDIRS.
+    * Added SIGN to generate module signatures with cpansign (Autrijus Tang)
+    - Slight tweaks to MAKEFILE_OLD and MAKE_APERL_FILE restoring a mistake
+      made around 6.06 to fix static builds on OS/2
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
