@@ -7,7 +7,7 @@ use strict;
 use Exporter ();
 use Carp;
 use Config         qw(%Config);
-use File::Basename qw(basename dirname fileparse);
+use File::Basename qw(basename dirname);
 use DirHandle;
 
 use vars qw($VERSION @ISA
@@ -595,9 +595,8 @@ $targ :: $src
 	\$(NOECHO) \$(MKPATH) $targdir
 	\$(NOECHO) \$(EQUALIZE_TIMESTAMP) $src $targ
 };
-	push(@m, qq{
-	-\$(NOECHO) \$(CHMOD) \$(PERM_RWX) $targdir
-}) unless $Is_VMS;
+	push(@m, "\t-\$(NOECHO) \$(CHMOD) \$(PERM_RWX) $targdir\n") 
+          unless $Is_VMS;
     }
     join "", @m;
 }
