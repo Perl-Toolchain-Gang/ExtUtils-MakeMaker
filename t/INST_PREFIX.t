@@ -115,7 +115,11 @@ my %Install_Vars = (
 );
 
 while( my($type, $vars) = each %Install_Vars) {
-    foreach my $var (@$vars) {
+
+    SKIP: foreach my $var (@$vars) {
+        skip "VMS must expand macros in INSTALL* vars", scalar @$vars 
+          if $Is_VMS;
+
         my $prefix = '$('.$type.'PREFIX)';
 
         # support for man page skipping
