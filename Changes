@@ -5,6 +5,7 @@
       Made safer.
     - For some reason MM_VMS was using $Config{arch} instead of
       $Config{archname}
+    - Fix (well, hack) for creating ABSPERL on VMS.
 
     [[ Test Fixes ]]
     - INST.t has to tell MakeMaker it's in the PERL_CORE
@@ -218,7 +219,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.46 $ based $VERSIONs.
+    - Stripped out $Revision: 1.47 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
