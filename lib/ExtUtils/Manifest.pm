@@ -19,7 +19,7 @@ $VERSION = 1.37_01;
 
 $Is_MacOS = $^O eq 'MacOS';
 $Is_VMS = $^O eq 'VMS';
-if ($Is_VMS) { require File::Basename }
+require VMS::Filespec if $Is_VMS;
 
 $Debug = $ENV{PERL_MM_MANIFEST_DEBUG} || 0;
 $Verbose = 1;
@@ -171,6 +171,7 @@ sub maniread {
 	    $file =~ s/\\([0-3][0-7][0-7])/sprintf("%c", oct($1))/ge;
 	}
 	elsif ($Is_VMS) {
+        require File::Basename;
 	    my($base,$dir) = File::Basename::fileparse($file);
 	    # Resolve illegal file specifications in the same way as tar
 	    $dir =~ tr/./_/;
