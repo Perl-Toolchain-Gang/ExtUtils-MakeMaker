@@ -3075,6 +3075,7 @@ sub parse_version {
     my $result;
     local *FH;
     local $/ = "\n";
+    local $_;
     open(FH,$parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     while (<FH>) {
