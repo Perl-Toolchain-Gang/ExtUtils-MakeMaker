@@ -20,6 +20,8 @@ my $Inc_uninstall_warn_handler;
 my $INSTALL_ROOT = $ENV{PERL_INSTALL_ROOT};
 
 use File::Spec;
+my $Curdir = File::Spec->curdir;
+my $Updir  = File::Spec->updir;
 
 
 =head1 NAME
@@ -75,7 +77,7 @@ without actually doing it.  Default is false.
 =cut
 
 sub install {
-    my($hash,$verbose,$nonono,$inc_uninstall) = @_;
+    my($from_to,$verbose,$nonono,$inc_uninstall) = @_;
     $verbose ||= 0;
     $nonono  ||= 0;
 
@@ -86,32 +88,31 @@ sub install {
     use File::Find qw(find);
     use File::Path qw(mkpath);
     use File::Compare qw(compare);
-    use File::Spec;
 
-    my(%hash) = %$hash;
+    my(%from_to) = %$from_to;
     my(%pack, $dir, $warn_permissions);
     my($packlist) = ExtUtils::Packlist->new();
     # -w doesn't work reliably on FAT dirs
     $warn_permissions++ if $^O eq 'MSWin32';
     local(*DIR);
     for (qw/read write/) {
-	$pack{$_}=$hash{$_};
-	delete $hash{$_};
+	$pack{$_}=$from_to{$_};
+	delete $from_to{$_};
     }
     my($source_dir_or_file);
-    foreach $source_dir_or_file (sort keys %hash) {
+    foreach $source_dir_or_file (sort keys %from_to) {
 	#Check if there are files, and if yes, look if the corresponding
 	#target directory is writable for us
 	opendir DIR, $source_dir_or_file or next;
 	for (readdir DIR) {
-	    next if $_ eq "." || $_ eq ".." || $_ eq ".exists";
-		my $targetdir = install_rooted_dir($hash{$source_dir_or_file});
+	    next if $_ eq $Curdir || $_ eq $Updir || $_ eq ".exists";
+            my $targetdir = install_rooted_dir($from_to{$source_dir_or_file});
 	    if (-w $targetdir ||
 		mkpath($targetdir)) {
 		last;
 	    } else {
 		warn "Warning: You do not have permissions to " .
-		    "install into $hash{$source_dir_or_file}"
+		    "install into $from_to{$source_dir_or_file}"
 		    unless $warn_permissions++;
 	    }
 	}
@@ -121,7 +122,7 @@ sub install {
     $packlist->read($tmpfile) if (-f $tmpfile);
     my $cwd = cwd();
 
-    MOD_INSTALL: foreach my $source (sort keys %hash) {
+    MOD_INSTALL: foreach my $source (sort keys %from_to) {
 	#copy the tree to the target directory without altering
 	#timestamp and permission and remember for the .packlist
 	#file. The packlist file contains the absolute paths of the
@@ -132,13 +133,15 @@ sub install {
 	#there are any files in arch. So we depend on having ./blib/arch
 	#hardcoded here.
 
-	my $targetroot = install_rooted_dir($hash{$source});
+	my $targetroot = install_rooted_dir($from_to{$source});
 
-	if ($source eq "blib/lib" and
-	    exists $hash{"blib/arch"} and
-	    directory_not_empty("blib/arch")) {
-	    $targetroot = install_rooted_dir($hash{"blib/arch"});
-            print "Files found in blib/arch: installing files in blib/lib into architecture dependent library tree\n";
+        my $blib_lib  = File::Spec->catdir('blib', 'lib');
+        my $blib_arch = File::Spec->catdir('blib', 'arch');
+	if ($source eq $blib_lib and
+	    exists $from_to{$blib_arch} and
+	    directory_not_empty($blib_arch)) {
+	    $targetroot = install_rooted_dir($from_to{$blib_arch});
+            print "Files found in $blib_arch: installing files in $blib_lib into architecture dependent library tree\n";
 	}
 
         chdir $source or next;
@@ -192,7 +195,7 @@ sub install {
 
             # File::Find can get confused if you chdir in here.
             chdir $save_cwd;
-	}, File::Spec->curdir);
+	}, $Curdir);
 	chdir($cwd) or Carp::croak("Couldn't chdir to $cwd: $!");
     }
     if ($pack{'write'}) {
@@ -329,7 +332,7 @@ sub inc_uninstall {
 						  privlibexp
 						  sitearchexp
 						  sitelibexp)}) {
-	next if $dir eq ".";
+	next if $dir eq $Curdir;
 	next if $seen_dir{$dir}++;
 	my($targetfile) = File::Spec->catfile($dir,$libdir,$file);
 	next unless -f $targetfile;
@@ -351,7 +354,10 @@ sub inc_uninstall {
 	    if ($verbose) {
 		$Inc_uninstall_warn_handler ||= new ExtUtils::Install::Warn;
 		$libdir =~ s|^\./||s ; # That's just cosmetics, no need to port. It looks prettier.
-		$Inc_uninstall_warn_handler->add("$libdir/$file",$targetfile);
+		$Inc_uninstall_warn_handler->add(
+                                     File::Spec->catfile($libdir, $file),
+                                     $targetfile
+                                    );
 	    }
 	    # if not verbose, we just say nothing
 	} else {
@@ -481,20 +487,20 @@ sub add {
 }
 
 sub DESTROY {
-	unless(defined $INSTALL_ROOT) {
-		my $self = shift;
-		my($file,$i,$plural);
-		foreach $file (sort keys %$self) {
-		$plural = @{$self->{$file}} > 1 ? "s" : "";
-		print "## Differing version$plural of $file found. You might like to\n";
-		for (0..$#{$self->{$file}}) {
-			print "rm ", $self->{$file}[$_], "\n";
-			$i++;
-		}
-		}
-		$plural = $i>1 ? "all those files" : "this file";
-		print "## Running 'make install UNINST=1' will unlink $plural for you.\n";
-	}
+    unless(defined $INSTALL_ROOT) {
+        my $self = shift;
+        my($file,$i,$plural);
+        foreach $file (sort keys %$self) {
+            $plural = @{$self->{$file}} > 1 ? "s" : "";
+            print "## Differing version$plural of $file found. You might like to\n";
+            for (0..$#{$self->{$file}}) {
+                print "rm ", $self->{$file}[$_], "\n";
+                $i++;
+            }
+        }
+        $plural = $i>1 ? "all those files" : "this file";
+        print "## Running 'make install UNINST=1' will unlink $plural for you.\n";
+    }
 }
 
 =back
