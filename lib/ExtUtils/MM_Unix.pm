@@ -344,7 +344,7 @@ NOOP_FRAG
 
     for my $dir (@{$self->{DIR}}) {
         my $subclean = $self->oneliner(sprintf <<'CODE', $dir);
-if( -f '$(FIRST_MAKEFILE)' ) { chdir '%s'; system '$(MAKE) clean' }
+chdir '%s';  system '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
 CODE
 
         $clean .= "\t$subclean\n";
@@ -2590,10 +2590,10 @@ sub installbin {
     my($self) = shift;
 
     return "" unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
-    my @exefiles = @{$self->{EXE_FILES};
+    my @exefiles = @{$self->{EXE_FILES}};
     return "" unless @exefiles;
 
-    @exefiles = map { vmsify($_) } @exefiles if $Is_VMS;
+    @exefiles = map vmsify($_), @exefiles if $Is_VMS;
 
     my %fromto;
     for my $from (@{$self->{EXE_FILES}}) {
@@ -2630,13 +2630,13 @@ realclean ::
 });
 
     # realclean can get rather large.
-    push @m, map { "\t$_\n" } $self->split_command('$(RM_F)', @to);
+    push @m, map "\t$_\n", $self->split_command('$(RM_F)', @to);
 
 
     # A target for each exe file.
-    while (($from,$to) = each %fromto) {
+    while (my($from,$to) = each %fromto) {
 	last unless defined $from;
-	my $todir = _todir($to);
+	my $todir = $self->_todir($to);
 
 	push @m, "
 $to : $from \$(FIRST_MAKEFILE) blibdirs.ts
@@ -2651,10 +2651,10 @@ $to : $from \$(FIRST_MAKEFILE) blibdirs.ts
 
 
 sub _todir {
-    my $to = shift;
+    my($self, $to) = @_;
     my $todir;
 
-    if( $IsVMS ) {
+    if( $Is_VMS ) {
         # XXX I'm not quite sure what this is all about
 	if ($to =~ m#[/>:\]]#) {
             $todir = dirname($to); 
@@ -3614,8 +3614,8 @@ NOOP_FRAG
 
     foreach my $dir (@{$self->{DIR}}) {
         foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
-            my $rclean .= $self->oneliner(sprintf <<'CODE', $makefile, $dir, $makefile);
-if( -f '%s' ) { chdir '%s'; system '$(MAKE) $(USEMAKEFILE) %s realclean' }
+            my $rclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
+chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
 CODE
 
             $rclean .= sprintf <<'RCLEAN', $rclean;
