@@ -436,8 +436,6 @@ sub constants {
     }
     $self->{PERL_VMS} = File::Spec->catdir($self->{PERL_SRC},q(VMS))
 	if ($self->{PERL_SRC});
-                        
-
 
     # Fix up file specs
     foreach $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKE_APERL_FILE MYEXTLIB] ) {
