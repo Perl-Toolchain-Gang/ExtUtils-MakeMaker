@@ -3406,6 +3406,8 @@ sub prefixify {
     my $path = $self->{uc $var} || 
                $Config_Override{lc $var} || $Config{lc $var} || '';
 
+    $rprefix .= '/' if $sprefix =~ m|/$|;
+
     print STDERR "  prefixify $var => $path\n" if $Verbose >= 2;
     print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
 

@@ -1,4 +1,7 @@
 6.12
+    - Should any of your prefixes be /, MakeMaker might lose this and
+      prepend your prefix as "prefixyour/directory" rather than
+      "prefix/your/directory" (Ed Moy bleadperl 20283)
     - Reversing "realclean was duplicating work already done by clean"
       (CVS 1.124 MM_Unix.pm).  Turns out it wasn't a duplication and this
       was causing INST_* files to be left behind if your INST_LIB wasn't
