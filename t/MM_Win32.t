@@ -16,7 +16,7 @@ use Test::More;
 
 BEGIN {
 	if ($^O =~ /MSWin32/i) {
-		plan tests => 44;
+		plan tests => 42;
 	} else {
 		plan skip_all => 'This is not Win32';
 	}
@@ -25,25 +25,21 @@ BEGIN {
 use Config;
 use File::Spec;
 use File::Basename;
-use ExtUtils::MakeMaker;
+use ExtUtils::MM;
 
 require_ok( 'ExtUtils::MM_Win32' );
 
-# test import of $Verbose and &neatvalue
-can_ok( 'MM', 'neatvalue' );
-() = $ExtUtils::MM_Win32::Verbose;
-() = $ExtUtils::MakeMaker::Verbose;
-is( $ExtUtils::MM_Win32::Verbose, $ExtUtils::MakeMaker::Verbose, 
-	'ExtUtils::MM_Win32 should import $Verbose from ExtUtils::MakeMaker' );
+# Dummy MM object until we have a real MM init method.
+my $MM = bless {
+                DIR => []
+               }, 'MM';
 
-
-##### Start new tests at the top of MM_Win32
 
 # replace_manpage_separator() => tr|/|.|s ?
 {
     my $man = 'a/path/to//something';
     ( my $replaced = $man ) =~ tr|/|.|s;
-    is( MM->replace_manpage_separator( $man ),
+    is( $MM->replace_manpage_separator( $man ),
         $replaced, 'replace_manpage_separator()' );
 }
 
@@ -52,24 +48,24 @@ SKIP: {
     skip( '$ENV{COMSPEC} not set', 2 )
         unless $ENV{COMSPEC} =~ m!((?:[a-z]:)?[^|<>]+)!i;
     my $comspec = $1;
-    is( MM->maybe_command( $comspec ), 
+    is( $MM->maybe_command( $comspec ), 
         $comspec, 'COMSPEC is a maybe_command()' );
     ( my $comspec2 = $comspec ) =~ s|\..{3}$||;
-    like( MM->maybe_command( $comspec2 ), 
+    like( $MM->maybe_command( $comspec2 ), 
           qr/\Q$comspec/i, 
           'maybe_command() without extension' );
 }
 {
     local $ENV{PATHEXT} = '.exe';
-    ok( ! MM->maybe_command( 'not_a_command.com' ), 
+    ok( ! $MM->maybe_command( 'not_a_command.com' ), 
         'not a maybe_command()' );
 }
 
 # file_name_is_absolute() [Does not support UNC-paths]
 {
-    ok( MM->file_name_is_absolute( 'C:/' ), 
+    ok( $MM->file_name_is_absolute( 'C:/' ), 
         'file_name_is_absolute()' );
-    ok( ! MM->file_name_is_absolute( 'some/path/' ),
+    ok( ! $MM->file_name_is_absolute( 'some/path/' ),
         'not file_name_is_absolute()' );
 
 }
@@ -79,7 +75,7 @@ SKIP: {
 {
     my $my_perl = $1 if $^X  =~ /(.*)/; # are we in -T or -t?
     my( $perl, $path ) = fileparse( $my_perl );
-    like( MM->find_perl( $], [ $perl ], [ $path ] ), 
+    like( $MM->find_perl( $], [ $perl ], [ $path ] ), 
           qr/^\Q$my_perl\E$/i, 'find_perl() finds this perl' );
 }
 
@@ -87,19 +83,19 @@ SKIP: {
 {
     my @path_eg = qw( c: trick dir/now_OK );
 
-    is( MM->catdir( @path_eg ), 
+    is( $MM->catdir( @path_eg ), 
          'C:\\trick\\dir\\now_OK', 'catdir()' );
-    is( MM->catdir( @path_eg ), 
+    is( $MM->catdir( @path_eg ), 
         File::Spec->catdir( @path_eg ), 
         'catdir() eq File::Spec->catdir()' );
 
 # catfile() (calls MM_Win32->catdir)
     push @path_eg, 'file.ext';
 
-    is( MM->catfile( @path_eg ),
+    is( $MM->catfile( @path_eg ),
         'C:\\trick\\dir\\now_OK\\file.ext', 'catfile()' );
 
-    is( MM->catfile( @path_eg ), 
+    is( $MM->catfile( @path_eg ), 
         File::Spec->catfile( @path_eg ), 
         'catfile() eq File::Spec->catfile()' );
 }
@@ -149,7 +145,7 @@ SKIP: {
 {
     my @path_eg = ( qw( . .. ), 'C:\\Program Files' );
     local $ENV{PATH} = join ';', @path_eg;
-    ok( eq_array( [ MM->path() ], [ @path_eg ] ),
+    ok( eq_array( [ $MM->path() ], [ @path_eg ] ),
         'path() [preset]' );
 }
 
@@ -160,14 +156,14 @@ SKIP: {
 # clean()
 {
     my $clean = $Config{cc} =~ /^gcc/i ? 'dll.base dll.exp' : '*.pdb';
-    like( MM->clean(), qr/^clean ::\s+\Q-$(RM_F) $clean\E\s+$/m,
+    like( $MM->clean(), qr/^clean ::\s+\Q-$(RM_F) $clean\E\s+$/m,
           'clean() Makefile target' );
 }
 
 # perl_archive()
 {
     my $libperl = $Config{libperl} || 'libperl.a';
-    is( MM->perl_archive(), File::Spec->catfile('$(PERL_INC)', $libperl ),
+    is( $MM->perl_archive(), File::Spec->catfile('$(PERL_INC)', $libperl ),
 	    'perl_archive() should respect libperl setting' );
 }
 
@@ -180,7 +176,7 @@ SKIP: {
 # canonpath()
 {
     my $path = 'c:\\Program Files/SomeApp\\Progje.exe';
-    is( MM->canonpath( $path ), File::Spec->canonpath( $path ),
+    is( $MM->canonpath( $path ), File::Spec->canonpath( $path ),
 	    'canonpath() eq File::Spec->canonpath' );
 }
 
@@ -198,29 +194,29 @@ EOSCRIPT
     skip( "Can't write to temp file: $!", 4 )
         unless close SCRIPT;
     # now start tests:
-    is( MM->perl_script( $script_name ), 
+    is( $MM->perl_script( $script_name ), 
         "${script_name}$script_ext", "perl_script ($script_ext)" );
 
     skip( "Can't rename temp file: $!", 3 )
         unless rename $script_name, "${script_name}.pl";
     $script_ext = '.pl';
-    is( MM->perl_script( $script_name ), 
+    is( $MM->perl_script( $script_name ), 
         "${script_name}$script_ext", "perl_script ($script_ext)" );
 
     skip( "Can't rename temp file: $!", 2 )
         unless rename "${script_name}$script_ext", "${script_name}.bat";
     $script_ext = '.bat';
-    is( MM->perl_script( $script_name ), 
+    is( $MM->perl_script( $script_name ), 
         "${script_name}$script_ext", "perl_script ($script_ext)" );
 
     skip( "Can't rename temp file: $!", 1 )
         unless rename "${script_name}$script_ext", "${script_name}.noscript";
     $script_ext = '.noscript';
 
-    isnt( MM->perl_script( $script_name ),
+    isnt( $MM->perl_script( $script_name ),
           "${script_name}$script_ext", 
           "not a perl_script anymore ($script_ext)" );
-    is( MM->perl_script( $script_name ), undef,
+    is( $MM->perl_script( $script_name ), undef,
         "perl_script ($script_ext) returns empty" );
 }
 unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
@@ -228,14 +224,14 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 
 # pm_to_blib()
 {
-    like( MM->pm_to_blib(),
+    like( $MM->pm_to_blib(),
           qr/^pm_to_blib: \Q$(TO_INST_PM)\E.+\Q$(TOUCH) \E\$@\s+$/ms,
           'pm_to_blib' );
 }
 
 # test_via_harness()
 {
-    like( MM->test_via_harness( $^X, 'MM_Win32.t' ),
+    like( $MM->test_via_harness( $^X, 'MM_Win32.t' ),
           qr/^\t\Q$^X\E \-Mblib.+"use Test::Harness.+MM_Win32.t\n$/,
           'test_via_harness()' );
 }
@@ -243,7 +239,7 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 # tool_autosplit()
 {
     my %attribs = ( MAXLEN => 255 );
-    like( MM->tool_autosplit( %attribs ),
+    like( $MM->tool_autosplit( %attribs ),
           qr/^\#\ Usage:\ \$\(AUTOSPLITFILE\)
              \ FileToSplit\ AutoDirToSplitInto.+
              AUTOSPLITFILE\ =\ \$\(PERL\)\ 
@@ -309,7 +305,7 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 # pasthru()
 {
     my $pastru = "PASTHRU = " . ($Config{make} =~ /^nmake/i ? "-nologo" : "");
-    is( MM->pasthru(), $pastru, 'pasthru()' );
+    is( $MM->pasthru(), $pastru, 'pasthru()' );
 }
 
 package FakeOut;
