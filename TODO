@@ -40,8 +40,6 @@ fixpath() is useful.
 Eliminate eliminate_macros() from inside FS::VMS->catfile and catdir.
 Make into MM_VMS wrappers.
 
-Add "NO_META" to stop autogeneration (and auto overwrite) of META.yml.
-
 Test ExtUtils::Command::MM
 
 Finish ExtUtils::MakeMaker::Tutorial
@@ -66,8 +64,6 @@ Add target to generate native Win32 help files (or whatever Win32 likes
 to use for help files these days)
 
 Add target to generate native VMS help files.
-
-Add "What's this META.yml thing?" to the FAQ.
 
 On VMS, write PM_FILTERs to a temp file and run from there avoiding command
 line lengths.  Worth the trouble given the Unixy nature of PM_FILTER?
