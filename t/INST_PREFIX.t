@@ -62,7 +62,7 @@ isa_ok( $mm, 'ExtUtils::MakeMaker' );
 is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
-is( $mm->{PREFIX}, $PREFIX,   'PREFIX' );
+is( $mm->{PREFIX}, '$(DESTDIR)'.$PREFIX,   'PREFIX' );
 
 is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );
 

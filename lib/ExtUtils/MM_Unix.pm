@@ -426,6 +426,7 @@ sub constants {
               XS_VERSION XS_VERSION_MACRO             XS_DEFINE_VERSION
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
               INSTALLDIRS
+              DESTDIR
               PREFIX          SITEPREFIX      VENDORPREFIX
               INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
               INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
@@ -1975,7 +1976,7 @@ sub init_INST {
     $mm->init_INSTALL;
 
 Called by init_main.  Sets up all INSTALL_* variables (except
-INSTALLDIRS) and PREFIX.
+INSTALLDIRS) and *PREFIX.
 
 =cut
 
@@ -2027,6 +2028,12 @@ sub init_INSTALL {
     $self->{PREFIX}       ||= $u_prefix  || $iprefix;
     $self->{SITEPREFIX}   ||= $u_sprefix || $sprefix;
     $self->{VENDORPREFIX} ||= $u_vprefix || $vprefix;
+
+    # Add DESTDIR.
+    $self->{DESTDIR} = '' unless defined $self->{DESTDIR};
+    foreach my $prefix (qw(PREFIX SITEPREFIX VENDORPREFIX)) {
+        $self->{$prefix} = '$(DESTDIR)'.$self->{$prefix};
+    }
 
     my $arch    = $Config{archname};
     my $version = $Config{version};
