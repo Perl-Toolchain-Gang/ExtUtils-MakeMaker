@@ -1816,6 +1816,8 @@ usually solves this kind of problem.
 	unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
         $self->{NAME} eq "ExtUtils::MakeMaker";
 
+    $self->init_VERSION();
+
     # Determine VERSION and VERSION_FROM
     ($self->{DISTNAME}=$self->{NAME}) =~ s#(::)#-#g unless $self->{DISTNAME};
 
