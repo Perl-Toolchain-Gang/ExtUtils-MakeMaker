@@ -1,13 +1,13 @@
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         ExtUtils-MakeMaker
-version:      6.10_01
+version:      6.10_02
 version_from: lib/ExtUtils/MakeMaker.pm
 installdirs:  perl
 requires:
-    Pod::Man:                      0
-    File::Spec:                    0.8
     File::Basename:                0
+    File::Spec:                    0.8
     DirHandle:                     0
+    Pod::Man:                      0
 
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.10_01
+generated_by: ExtUtils::MakeMaker version 6.10_02
