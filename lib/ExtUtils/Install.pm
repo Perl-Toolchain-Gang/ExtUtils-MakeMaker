@@ -37,8 +37,6 @@ sub install_rooted_dir {
     }
 }
 
-#our(@EXPORT, @ISA, $Is_VMS);
-#use strict;
 
 sub forceunlink {
     chmod 0666, $_[0];
@@ -156,7 +154,7 @@ sub install {
 	    # Record the full pathname.
 	    $packlist->{$targetfile}++;
 
-	}, ".");
+	}, File::Spec->curdir);
 	chdir($cwd) or Carp::croak("Couldn't chdir to $cwd: $!");
     }
     if ($pack{'write'}) {
