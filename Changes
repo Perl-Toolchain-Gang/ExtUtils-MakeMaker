@@ -17,6 +17,8 @@
       sometimes don't get installed.
     - ExtUtils::Install was making a few directories even with the
       "don't really do it" switch on (Slaven Rezic)
+    * can build static linked perl binaries again.  Probably damaged in
+      6.06_01 when $self->{MAKEFILE} became FIRST_MAKEFILE. (Nick Clark)
 
 6.10_03 Fri Apr 11 00:21:25 PDT 2003
     * Added NO_META WriteMakefile() option to suppress generation of
