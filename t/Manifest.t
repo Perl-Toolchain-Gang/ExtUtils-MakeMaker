@@ -215,7 +215,7 @@ SKIP: {
     eval {
         maniadd({ 'grrrwoof' => 'yippie' });
     };
-    like( $@, qr/^Could not open MANIFEST/,  
+    like( $@, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
                  "maniadd() dies if it can't open the MANIFEST" );
 
 }
