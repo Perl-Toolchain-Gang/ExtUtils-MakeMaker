@@ -58,10 +58,15 @@ $Is{DOS}    = 1 if $^O eq 'dos';
 
 $Is{Unix}   = 1 if !keys %Is;
 
-delete $Is{Win32} if $Is{NW5};
+if( $Is{NW5} ) {
+    $^O = 'NetWare';
+    delete $Is{Win32};
+}
 
 _assert( keys %Is == 1 );
 my($OS) = keys %Is;
+
+
 
 eval "require ExtUtils::MM_$OS";
 unshift @ISA, "ExtUtils::MM_$OS";
