@@ -9,6 +9,17 @@ require ExtUtils::MM_Win32;
 
 # a few workarounds for command.com (very basic)
 
+sub dist_test {
+    my($self) = shift;
+    return q{
+disttest : distdir
+        cd $(DISTVNAME)
+        $(ABSPERLRUN) Makefile.PL
+        $(MAKE)
+        $(MAKE) test
+        cd ..
+};
+
 sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();

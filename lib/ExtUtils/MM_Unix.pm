@@ -3146,14 +3146,14 @@ realclean purge ::  clean
     my $sub;
     if( $Is_Win32  &&  Win32::IsWin95() ) {
         $sub = <<'REALCLEAN';
-        -cd %s
-        -$(TEST_F) -e "system q{$(MAKE) realclean}" %s
-        -cd ..
+	-cd %s
+	-$(TEST_F) -e "system q{$(MAKE) realclean}" %s
+	-cd ..
 REALCLEAN
     }
     else {
         $sub = <<'REALCLEAN';
-        -cd %s && $(TEST_F) %s && $(MAKE) %s realclean
+	-cd %s && $(TEST_F) %s && $(MAKE) %s realclean
 REALCLEAN
     }
 
@@ -3409,8 +3409,14 @@ testdb :: testdb_\$(LINKTYPE)
 
 test :: \$(TEST_TYPE)
 ");
-    push(@m, map("\t$self->{NOECHO}cd $_ && \$(TEST_F) $self->{MAKEFILE} && \$(MAKE) test \$(PASTHRU)\n",
-		 @{$self->{DIR}}));
+
+    if ($Is_Win32 && Win32::IsWin95()) {
+        push(@m, map(qq{\t$self->{NOECHO}\$(TEST_F) -e "chdir '$_'; system q{\$(MAKE) test \$(PASTHRU)}"\n}, @{$self->{DIR}}));
+    }
+    else {
+        push(@m, map("\t$self->{NOECHO}cd $_ && \$(TEST_F) $self->{MAKEFILE} && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
+    }
+
     push(@m, "\t$self->{NOECHO}echo 'No tests defined for \$(NAME) extension.'\n")
 	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
