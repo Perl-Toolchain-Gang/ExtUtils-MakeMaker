@@ -1,7 +1,5 @@
 #   MM_VMS.pm
 #   MakeMaker default methods for VMS
-#   This package is inserted into @ISA of MakeMaker's MM before the
-#   built-in ExtUtils::MM_Unix methods if MakeMaker.pm is run under VMS.
 #
 #   Author:  Charles Bailey  bailey@newman.upenn.edu
 
@@ -16,7 +14,7 @@ use VMS::Filespec;
 use File::Basename;
 use File::Spec;
 use vars qw($Revision @ISA $VERSION);
-($VERSION) = $Revision = '5.57_01';
+($VERSION) = $Revision = '5.58_01';
 
 require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Unix File::Spec );
@@ -30,7 +28,9 @@ ExtUtils::MM_VMS - methods to override UN*X behaviour in ExtUtils::MakeMaker
 
 =head1 SYNOPSIS
 
- use ExtUtils::MM_VMS; # Done internally by ExtUtils::MakeMaker if needed
+  Do not use this directly.
+  Instead, use ExtUtils::MM and it will figure out which MM_*
+  class to use for you.
 
 =head1 DESCRIPTION
 
@@ -66,82 +66,6 @@ sub wraplist {
     $line;
 }
 
-package ExtUtils::MM_VMS;
-
-sub ExtUtils::MM_VMS::ext;
-sub ExtUtils::MM_VMS::guess_name;
-sub ExtUtils::MM_VMS::find_perl;
-sub ExtUtils::MM_VMS::path;
-sub ExtUtils::MM_VMS::maybe_command;
-sub ExtUtils::MM_VMS::maybe_command_in_dirs;
-sub ExtUtils::MM_VMS::perl_script;
-sub ExtUtils::MM_VMS::file_name_is_absolute;
-sub ExtUtils::MM_VMS::replace_manpage_separator;
-sub ExtUtils::MM_VMS::init_others;
-sub ExtUtils::MM_VMS::constants;
-sub ExtUtils::MM_VMS::cflags;
-sub ExtUtils::MM_VMS::const_cccmd;
-sub ExtUtils::MM_VMS::pm_to_blib;
-sub ExtUtils::MM_VMS::tool_autosplit;
-sub ExtUtils::MM_VMS::tool_xsubpp;
-sub ExtUtils::MM_VMS::xsubpp_version;
-sub ExtUtils::MM_VMS::tools_other;
-sub ExtUtils::MM_VMS::dist;
-sub ExtUtils::MM_VMS::c_o;
-sub ExtUtils::MM_VMS::xs_c;
-sub ExtUtils::MM_VMS::xs_o;
-sub ExtUtils::MM_VMS::top_targets;
-sub ExtUtils::MM_VMS::dlsyms;
-sub ExtUtils::MM_VMS::dynamic_lib;
-sub ExtUtils::MM_VMS::dynamic_bs;
-sub ExtUtils::MM_VMS::static_lib;
-sub ExtUtils::MM_VMS::manifypods;
-sub ExtUtils::MM_VMS::processPL;
-sub ExtUtils::MM_VMS::installbin;
-sub ExtUtils::MM_VMS::subdir_x;
-sub ExtUtils::MM_VMS::clean;
-sub ExtUtils::MM_VMS::realclean;
-sub ExtUtils::MM_VMS::dist_basics;
-sub ExtUtils::MM_VMS::dist_core;
-sub ExtUtils::MM_VMS::dist_dir;
-sub ExtUtils::MM_VMS::dist_test;
-sub ExtUtils::MM_VMS::install;
-sub ExtUtils::MM_VMS::perldepend;
-sub ExtUtils::MM_VMS::makefile;
-sub ExtUtils::MM_VMS::test;
-sub ExtUtils::MM_VMS::test_via_harness;
-sub ExtUtils::MM_VMS::test_via_script;
-sub ExtUtils::MM_VMS::makeaperl;
-sub ExtUtils::MM_VMS::ext;
-sub ExtUtils::MM_VMS::nicetext;
-
-our $AUTOLOAD;
-sub AUTOLOAD {
-    my $code;
-    if (defined fileno(DATA)) {
-	my $fh = select DATA;
-	my $o = $/;			# For future reads from the file.
-	$/ = "\n__END__\n";
-	$code = <DATA>;
-	$/ = $o;
-	select $fh;
-	close DATA;
-	eval $code;
-	if ($@) {
-	    $@ =~ s/ at .*\n//;
-	    Carp::croak $@;
-	}
-    } else {
-	warn "AUTOLOAD called unexpectedly for $AUTOLOAD"; 
-    }
-    defined(&$AUTOLOAD) or die "Myloader inconsistency error";
-    goto &$AUTOLOAD;
-}
-
-1;
-
-#__DATA__
-
 
 # This isn't really an override.  It's just here because ExtUtils::MM_VMS
 # appears in @MM::ISA before ExtUtils::Liblist::Kid, so if there isn't an ext()
@@ -155,7 +79,7 @@ sub ext {
 
 =back
 
-=head2 SelfLoaded methods
+=head2 Methods
 
 Those methods which override default MM_Unix methods are marked
 "(override)", while methods unique to MM_VMS are marked "(specific)".
@@ -193,7 +117,11 @@ sub guess_name {
       if (@pm == 1) { ($defpm = $pm[0]) =~ s/.pm$//; }
       elsif (@pm) {
         %xs = map { s/.xs$//; ($_,1) } glob('*.xs');
-        if (%xs) { foreach $pm (@pm) { $defpm = $pm, last if exists $xs{$pm}; } }
+        if (keys %xs) { 
+            foreach $pm (@pm) { 
+                $defpm = $pm, last if exists $xs{$pm}; 
+            } 
+        }
       }
     }
     if (open(PM,"${defpm}.pm")){
@@ -425,7 +353,8 @@ sub init_others {
     $self->{CP} = 'Copy/NoConfirm';
     $self->{MV} = 'Rename/NoConfirm';
     $self->{UMASK_NULL} = '! ';  
-    &ExtUtils::MM_Unix::init_others;
+    
+    $self->SUPER::init_others;
 }
 
 =item constants (override)
@@ -1011,7 +940,7 @@ sub dist {
     $attribs{VERSION} =~ s/[^\w\$]/_/g;
     $attribs{NAME} =~ s/[^\w\$]/-/g;
 
-    return ExtUtils::MM_Unix::dist($self,%attribs);
+    return $self->SUPER::dist(%attribs);
 }
 
 =item c_o (override)
