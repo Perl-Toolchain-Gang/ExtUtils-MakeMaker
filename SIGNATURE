@@ -15,9 +15,9 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 6a417d4d3df26fe87f0a755af7b13dfe14cf7eed .patch
-SHA1 e0e580788c54c6eaf9f1618fa1d81268ec50039e Changes
+SHA1 2e0c1909adbf6b9f9d265e72adc3b5fe982e6ac9 Changes
 SHA1 48d4d61ef13a011113ea1ed6bb29047b9c7a6b91 MANIFEST
-SHA1 9c1de942454b2056fdaf6b37dc09d0cfede37298 MANIFEST.SKIP
+SHA1 a61b9aa4655eb498906b3ff0babf01d3aea244af MANIFEST.SKIP
 SHA1 685c4f8dc9b7cb5263a258068a1781558c740ae0 META.yml
 SHA1 064e6ca78be0856ffddcebf1b6e274e2bb092bbc Makefile.PL
 SHA1 a6c4bf92600b1c43b5e1ed721fd6a45494da6e6c NOTES
@@ -31,7 +31,7 @@ SHA1 a335f25f3a17c20c78dbe9e10a60d384c743d613 lib/ExtUtils/Install.pm
 SHA1 7d74c6a0911c18264bc0fe744a440e14d9e58ab3 lib/ExtUtils/Installed.pm
 SHA1 f8eda8ce72cf783b201b30ea7de318e7cb42575d lib/ExtUtils/Liblist.pm
 SHA1 e6163cf5e7e240eaf5e78fbf5b3f3a386212cc6b lib/ExtUtils/Liblist/Kid.pm
-SHA1 bbcea84f79b1a5dd2991a48fc4c03aa1e4aacac8 lib/ExtUtils/MANIFEST.SKIP
+SHA1 49327e65aeea05e2c1bdd672788c8ae81b861ae8 lib/ExtUtils/MANIFEST.SKIP
 SHA1 9c717f82625853163f6f5949ce355046d489869d lib/ExtUtils/MM.pm
 SHA1 b7ee4086a97b8c3bab44d843cea5115a75aeec66 lib/ExtUtils/MM_Any.pm
 SHA1 3586e4d48ab36bc57f27f414871cdbf376d4e575 lib/ExtUtils/MM_BeOS.pm
@@ -41,12 +41,12 @@ SHA1 7eed153d0aae182d035739604f78fc8e454b5644 lib/ExtUtils/MM_MacOS.pm
 SHA1 de38d740614d3340a87be2bf585aec5ef7367836 lib/ExtUtils/MM_NW5.pm
 SHA1 441da7524783ae12ce40f26353adbf4696a8f5b4 lib/ExtUtils/MM_OS2.pm
 SHA1 02b916060571fd20ced334ba4f2d1542d1590023 lib/ExtUtils/MM_UWIN.pm
-SHA1 ee6fbf150a3f05469a780b3a125afc59f9a07554 lib/ExtUtils/MM_Unix.pm
+SHA1 556590f086e4cf7b678a5fd4cee5cde00dd9e3d7 lib/ExtUtils/MM_Unix.pm
 SHA1 04d940beb921b0ef9c43d9c91a1b03df1af78b53 lib/ExtUtils/MM_VMS.pm
 SHA1 c6ab78ae156669adf7bab2ac2a1906340f29c457 lib/ExtUtils/MM_Win32.pm
 SHA1 43bb17685c2499a285c645a0e9b71b0c079e56f7 lib/ExtUtils/MM_Win95.pm
 SHA1 0f51f0dce4cb33bac94c85c86d19ae361e59597a lib/ExtUtils/MY.pm
-SHA1 82e0cf69cd1ffd26e5a1dda838327a0e74152b13 lib/ExtUtils/MakeMaker.pm
+SHA1 2e6e4e2b83352235ea848ca978d312aca350528d lib/ExtUtils/MakeMaker.pm
 SHA1 2941c3d867595a9b6aef2ffa71f1ab85848bf236 lib/ExtUtils/MakeMaker/FAQ.pod
 SHA1 34d8c354eea23b0b7f467b476069a5180826eafc lib/ExtUtils/MakeMaker/Tutorial.pod
 SHA1 4685bb3361c2b9c42094ef68454e849edaf6f549 lib/ExtUtils/MakeMaker/bytes.pm
@@ -103,7 +103,7 @@ SHA1 8f21b6971b81f650e4ec7eb1dc62037afb1f1587 t/zz_cleanup_dummy.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQE/oND6T4Li3Cw/PzQRAjpTAJwOoW6KK6ZpUgnjorC4EB3XzMAVuwCgoip7
-vInRArsRbg4w8FI4ZE0FMc0=
-=AeOo
+iD8DBQE/oNXVT4Li3Cw/PzQRAvaCAKCgTUs+UOJudE58DXWoq0LT7r0+WQCfTggo
+qjzPZ0oZD2/t/49+dFDcth4=
+=wbBB
 -----END PGP SIGNATURE-----
