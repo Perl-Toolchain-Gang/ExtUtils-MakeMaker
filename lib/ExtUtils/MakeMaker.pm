@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.55_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.27 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.28 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -326,7 +326,7 @@ sub new {
     if (defined $Parent[-2]){
         $self->{PARENT} = $Parent[-2];
         my $key;
-        for $key (@Prepend_dot_dot) {
+        for $key (@Prepend_parent) {
             next unless defined $self->{PARENT}{$key};
             $self->{$key} = $self->{PARENT}{$key};
             unless ($^O eq 'VMS' && $key =~ /PERL$/) {
@@ -1753,7 +1753,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.27 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.28 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
