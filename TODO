@@ -25,3 +25,7 @@ Merge 14902, 14690, 14688, 14680, 14677, 14658, 14655, 14648,
 
 Handle config files (ie. /etc) and their special PREFIX needs
 (ie. PREFIX=/usr, INSTALLCONFIGDIR=/etc).
+
+Add SITEPREFIX
+
+Add INSTALLDIRS=vendor (see Debian patch)
