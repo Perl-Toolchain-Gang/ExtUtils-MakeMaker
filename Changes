@@ -14,6 +14,8 @@
 
     [[ Bug Fixes ]]
     - nmake syntax nits from Mattia Barbon
+    - ExtUtils::Packlist fix for files with spaces in them from Jan Dubois
+      (bleadperl@15800)
 
 5.55_03 Sat Apr  6 21:57:01 EST 2002
     - Reversing "fix" for RT 444.  It wasn't really fixed and it
