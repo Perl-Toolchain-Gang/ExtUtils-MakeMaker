@@ -2,10 +2,10 @@ BEGIN {require 5.004;}
 
 package ExtUtils::MakeMaker;
 
-$VERSION = "5.54_01";
+$VERSION = "5.55_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.23 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.24 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -47,7 +47,10 @@ sub WriteMakefile {
 
     require ExtUtils::MY;
     my %att = @_;
-    MM->new(\%att)->flush;
+    my $mm = MM->new(\%att);
+    $mm->flush;
+
+    return $mm;
 }
 
 sub prompt ($;$) {
@@ -123,7 +126,7 @@ sub full_setup {
     INC INCLUDE_EXT INSTALLARCHLIB INSTALLBIN INSTALLDIRS
     INSTALLMAN1DIR
     INSTALLMAN3DIR INSTALLPRIVLIB INSTALLSCRIPT INSTALLSITEARCH
-    INSTALLSITELIB INST_ARCHLIB INST_BIN INST_EXE INST_LIB
+    INSTALLSITELIB INST_ARCHLIB INST_BIN INST_LIB
     INST_MAN1DIR INST_MAN3DIR INST_SCRIPT LDFROM LIB LIBPERL_A LIBS
     LINKTYPE MAKEAPERL MAKEFILE MAN1PODS MAN3PODS MAP_TARGET MYEXTLIB
     PERL_MALLOC_OK
@@ -211,7 +214,7 @@ sub full_setup {
     # all files to be installed end up below OUR ./blib
     #
     @Prepend_dot_dot = qw(
-           INST_BIN INST_EXE INST_LIB INST_ARCHLIB INST_SCRIPT
+           INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT
            MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
            PERL FULLPERL
     );
@@ -391,6 +394,7 @@ END
 
     $self->init_dirscan();
     $self->init_others();
+    $self->init_PERM();
     my($argv) = neatvalue(\@ARGV);
     $argv =~ s/^\[/(/;
     $argv =~ s/\]$/)/;
@@ -1356,11 +1360,6 @@ Same as INST_LIB for architecture dependent files.
 Directory to put real binary files during 'make'. These will be copied
 to INSTALLBIN during 'make install'
 
-=item INST_EXE
-
-Old name for INST_SCRIPT. Deprecated. Please use INST_SCRIPT if you
-need to use it.
-
 =item INST_LIB
 
 Directory where we put library files of this extension while building
@@ -1761,7 +1760,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.23 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.24 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2078,7 +2077,7 @@ ExtUtils::Embed
 
 =head1 AUTHORS
 
-Andy Dougherty <F<doughera@lafcol.lafayette.edu>>, Andreas KE<ouml>nig
+Andy Dougherty <F<doughera@lafayette.edu>>, Andreas KE<ouml>nig
 <F<andreas.koenig@mind.de>>, Tim Bunce <F<Tim.Bunce@ig.co.uk>>.  VMS
 support by Charles Bailey <F<bailey@newman.upenn.edu>>.  OS/2 support
 by Ilya Zakharevich <F<ilya@math.ohio-state.edu>>.
