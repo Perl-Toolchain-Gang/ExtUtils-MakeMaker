@@ -410,6 +410,7 @@ sub init_others {
 
     $self->{MACROSTART}         ||= '/Macro=(';
     $self->{MACROEND}           ||= ')';
+    $self->{USEMAKEFILE}        ||= '/Descrip=';
 
     $self->{ECHO}     ||= '$(ABSPERLRUN) -le "print qq{@ARGV}"';
     $self->{ECHO_N}   ||= '$(ABSPERLRUN) -e  "print qq{@ARGV}"';
@@ -801,11 +802,6 @@ sub tools_other {
     # than just typing the literal string.
     my $extra_tools = <<'EXTRA_TOOLS';
 
-# Assumes $(MMS) invokes MMS or MMK
-# (It is assumed in some cases later that the default makefile name
-# (Descrip.MMS for MM[SK]) is used.)
-USEMAKEFILE = /Descrip=
-
 # Just in case anyone is using the old macro.
 USEMACROS = $(MACROSTART)
 SAY = $(ECHO)
@@ -1183,26 +1179,6 @@ $to : $from \$(FIRST_MAKEFILE) blibdirs.ts
     join "", @m;
 }
 
-=item subdir_x (override)
-
-Use VMS commands to change default directory.
-
-=cut
-
-sub subdir_x {
-    my($self, $subdir) = @_;
-    my(@m,$key);
-    $subdir = $self->fixpath($subdir,1);
-    push @m, '
-
-subdirs ::
-	olddef = F$Environment("Default")
-	Set Default ',$subdir,'
-	- $(MAKE) all $(USEMACROS)$(PASTHRU)$(MACROEND)
-	Set Default \'olddef\'
-';
-    join('',@m);
-}
 
 =item clean (override)
 
@@ -1382,24 +1358,6 @@ shdist : distdir
 MAKE_FRAG
 }
 
-=item dist_test (override)
-
-Use VMS commands to change default directory, and use VMS-style
-quoting on command line.
-
-=cut
-
-sub dist_test {
-    my($self) = @_;
-q{
-disttest : distdir
-	startdir = F$Environment("Default")
-	Set Default [.$(DISTVNAME)]
-	$(MAKE)
-	$(MAKE) test
-	Set Default 'startdir'
-};
-}
 
 # --- Test and Installation Sections ---
 
