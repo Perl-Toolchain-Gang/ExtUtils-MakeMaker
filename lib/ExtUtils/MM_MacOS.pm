@@ -830,11 +830,10 @@ realclean purge ::  clean
 	Set Echo \{OldEcho\}
 	";
     foreach(@{$self->{DIR}}){
-	push(@m, sprintf($sub,$_,'$(MAKEFILE_OLD)','-f $(MAKEFILE_OLD)"));
+	push(@m, sprintf($sub,$_,'$(MAKEFILE_OLD)','-f $(MAKEFILE_OLD)'));
 	push(@m, sprintf($sub,$_,'$(MAKEFILE)',''));
     }
-    my(@otherfiles) = ('$(MAKEFILE),
-		       '$(MAKEFILE_OLD)'); # Makefiles last
+    my(@otherfiles) = ('$(MAKEFILE)', '$(MAKEFILE_OLD)'); # Makefiles last
     push(@otherfiles, patternify($attribs{FILES})) if $attribs{FILES};
     push(@m, "\t\$(RM_RF) @otherfiles\n") if @otherfiles;
     push(@m, "\t$attribs{POSTOP}\n")       if $attribs{POSTOP};
