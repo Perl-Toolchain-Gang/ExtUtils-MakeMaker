@@ -57,6 +57,3 @@ Give typemap location its own macro.
 Only look for typemaps in the core library.
 
 Fix ExtUtils::Installed on VMS.
-
-Figure out some cross-platform version of $out = `$make target 2>&1` for
-easier testing.
