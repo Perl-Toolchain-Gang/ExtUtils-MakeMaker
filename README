@@ -6,6 +6,7 @@ do not install in a production environment.
 Known Good:
 
 Linux                   5.6.0, 5.6.1, 5.7.3
+Tru64                   5.6.0, 5.7.3
 OpenVMS                 5.6.1
 Cygwin                  5.6.1
 ActivePerl/Win32        5.6.1 build 631 with nmake
