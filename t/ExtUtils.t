@@ -1,10 +1,12 @@
-#!./perl -w
+#!/usr/bin/perl -w
 
 print "1..27\n";
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
+    if( $ENV{PERL_CORE} ) {
+        chdir 't' if -d 't';
+        @INC = '../lib';
+    }
 }
 
 # use warnings;
@@ -447,7 +449,7 @@ if ($?) {
   print "not ok $test # $maketest failed: $?\n";
   print "# $_" foreach @makeout;
 } else {
-  print "ok $test\n";
+  print "ok $test - maketest\n";
 }
 $test++;
 
@@ -455,7 +457,7 @@ my $regen = `$runperl $package.xs`;
 if ($?) {
   print "not ok $test # $runperl $package.xs failed: $?\n";
 } else {
-  print "ok $test\n";
+  print "ok $test - regen\n";
 }
 $test++;
 
@@ -463,9 +465,9 @@ my $expect = $constant_types . $C_constant .
   "\n#### XS Section:\n" . $XS_constant;
 
 if ($expect eq $regen) {
-  print "ok $test\n";
+  print "ok $test - regen worked\n";
 } else {
-  print "not ok $test\n";
+  print "not ok $test - regen worked\n";
   # open FOO, ">expect"; print FOO $expect;
   # open FOO, ">regen"; print FOO $regen; close FOO;
 }
