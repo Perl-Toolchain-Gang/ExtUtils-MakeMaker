@@ -24,6 +24,17 @@ ExtUtils::MM_Win95 - method to customize MakeMaker for Win9X
 This is a subclass of ExtUtils::MM_Win32 containing changes necessary
 to get MakeMaker playing nice with command.com and other Win9Xisms.
 
+=head2 Overriden methods
+
+Most of these make up for limitations in the Win9x command shell.
+
+=over 4
+
+=item dist_test
+
+command.com has no &&, so we must chdir at the top of the target and
+chdir back at the end.
+
 =cut
 
 sub dist_test {
@@ -38,6 +49,13 @@ disttest : distdir
 };
 }
 
+=item subdir_x
+
+The && problem.
+
+Also, dmake has an odd way of making a command series silent.
+
+=cut
 
 sub subdir_x {
     my($self, $subdir) = @_;
@@ -66,35 +84,49 @@ EOT
     }
 }
 
+=item xs_c
+
+The && problem.
+
+=cut
 
 sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();
     '
 .xs.c:
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) \\
-	    $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
+	$(PERLRUN) $(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
 	'
 }
+
+
+=item xs_cpp
+
+The && problem
+
+=cut
 
 sub xs_cpp {
     my($self) = shift;
     return '' unless $self->needs_linking();
     '
 .xs.cpp:
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) \\
-	    $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.cpp
+	$(PERLRUN) $(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.cpp
 	';
 }
 
-# many makes are too dumb to use xs_c then c_o
+=item xs_o 
+
+The && problem.
+
+=cut
+
 sub xs_o {
     my($self) = shift;
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT):
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) \\
-	    $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
+	$(PERLRUN) $(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
 	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.c
 	';
 }
