@@ -1,8 +1,8 @@
 package ExtUtils::MM_Any;
 
 use strict;
-use vars qw($VERSION);
-$VERSION = 0.03;
+use vars qw($VERSION @ISA);
+$VERSION = 0.04;
 
 use Config;
 use File::Spec;
@@ -18,9 +18,10 @@ ExtUtils::MM_Any - Platform agnostic MM methods
 
   package ExtUtils::MM_SomeOS;
 
-  # For the moment, you get at MM_Any via MM_Unix
+  # Temporarily, you have to subclass both.  Put MM_Any first.
+  require ExtUtils::MM_Any;
   require ExtUtils::MM_Unix;
-  @ISA = qw(ExtUtils::MM_Unix);
+  @ISA = qw(ExtUtils::MM_Any ExtUtils::Unix);
 
 =head1 DESCRIPTION
 
@@ -30,8 +31,10 @@ ExtUtils::MM_Any is a superclass for the ExtUtils::MM_* set of
 modules.  It contains methods which are either inherently
 cross-platform or are written in a cross-platform manner.
 
-B<THIS MAY BE TEMPORARY!> Do not subclass or use ExtUtils::MM_Any
-directly.  Instead, subclass from ExtUtils::MM_Unix.
+Subclass off of ExtUtils::MM_Any I<and> ExtUtils::MM_Unix.  This is a
+temporary solution.
+
+B<THIS MAY BE TEMPORARY!>
 
 =head1 Inherently Cross-Platform Methods
 
@@ -72,7 +75,7 @@ sub catdir {
 
 sub catfile {
     shift;
-    return File::Spec->catdir(@_);
+    return File::Spec->catfile(@_);
 }
 
 =item curdir
@@ -134,7 +137,7 @@ Used on the t/*.t files.
 sub test_via_harness {
     my($self, $perl, $tests) = @_;
 
-    return qq{\t$perl \$(TEST_LIBS) "-MExtUtils::Command::MM" }.
+    return qq{\t$perl "-MExtUtils::testlib" "-MExtUtils::Command::MM" }.
            qq{"-e" "test_harness(\$(TEST_VERBOSE))" $tests\n};
 }
 
