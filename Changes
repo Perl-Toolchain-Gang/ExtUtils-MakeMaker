@@ -1,4 +1,4 @@
-6.10_08
+6.10_08 Mon Jul 21 18:17:06 PDT 2003
     * $Config{installvendorman*dir} was being ignored and our default
       always used. [rt.cpan.org #2949]
     * Setting NORECUS to true was still resulting in a Makefile which
