@@ -161,6 +161,35 @@ MAKE_FRAG
 
     return $clean;
 }
+
+
+=item realclean_subdirs_target
+
+&& and chdir problem.
+
+=cut
+
+sub realclean_subdirs_target {
+    my $self = shift;
+
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+realclean_subdirs :
+	$(NOECHO)$(NOOP)
+NOOP_FRAG
+
+    my $rclean = "realclean_subdirs :\n";
+
+    foreach my $dir (@{$self->{DIR}}){
+        $rclean .= sprintf <<'RCLEAN', $dir;
+	-cd %s
+	-$(PERLRUN) -e "exit unless -f shift; system q{$(MAKE) realclean}" $(MAKEFILE)
+	-cd ..
+RCLEAN
+
+    }
+
+    return $rclean;
+}
     
 =back
 
