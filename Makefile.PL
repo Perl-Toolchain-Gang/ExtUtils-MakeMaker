@@ -26,13 +26,20 @@ are upgrading from a version older than $LAST_API_CHANGE.
 CHANGE_WARN
 }
 
+# Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
+# when a test had -T.  This made it too long.  So we need a Test::Harness
+# > 2.00 on VMS for t/testlib.t
+my %prereq = ( File::Spec         => 0.8,
+               File::Basename     => 0,
+               DirHandle          => 0,
+             );
+$prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
+
+
 WriteMakefile(
     NAME            => $PACKAGE,
     VERSION_FROM    => "lib/$PACKAGE_FILE.pm", # finds $VERSION
-    PREREQ_PM       => { File::Spec         => 0.8,
-                         File::Basename     => 0,
-                         DirHandle          => 0,
-                       },
+    PREREQ_PM       => \%prereq,
     INSTALLDIRS     => 'perl',
     EXE_FILES       => [qw(bin/instmodsh)],
 );
