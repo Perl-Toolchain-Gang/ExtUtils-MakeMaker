@@ -1,3 +1,7 @@
+6.25_12
+    - Use the generic dmake search.cpan.org URL in the README so the newest
+      version is found.
+
 6.25_11 Tue Mar 15 02:00:20 PST 2005
     - Fixed minor parent class dependency loop in ExtUtils::MM_Any.
     - Fixed a circular dependency on processed PL files introduced as part
