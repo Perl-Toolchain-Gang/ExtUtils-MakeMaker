@@ -1,6 +1,7 @@
 6.25
     - Build.PL was being considered like Module_pm.PL.  Build.PL is now 
       ignored.  [radek@karnet.pl] [rt.cpan.org 8809]
+    - Devel::Cover cover_db/ directory now ignored by MANIFEST.SKIP
 
 6.24_01 Thu Dec  9 00:44:48 EST 2004
     - Docs encouraged possibly insecure use of /tmp [CAN-2004-0976 via Debian]
