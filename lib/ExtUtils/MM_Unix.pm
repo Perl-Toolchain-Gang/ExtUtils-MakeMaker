@@ -14,7 +14,7 @@ use vars qw($VERSION @ISA
             $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos $Is_VOS
             $Is_QNX $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
             $Is_SunOS4 $Is_Solaris $Is_SunOS
-            $Verbose %pm %static
+            $Verbose %pm
             %Config_Override
            );
 
@@ -2773,7 +2773,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
     $linkcmd =~ s,(perl\.exp),\$(PERL_INC)/$1,;
 
     # Which *.a files could we make use of...
-    local(%static);
+    my %static;
     require File::Find;
     File::Find::find(sub {
 	return unless m/\Q$self->{LIB_EXT}\E$/;
