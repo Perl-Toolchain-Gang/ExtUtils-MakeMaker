@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.86 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.87 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -716,7 +716,8 @@ sub tool_xsubpp {
         }
     }
 
-    my(@tmdeps) = '$(XSUBPPDIR)typemap';
+    my $tmdir   = File::Spec->catdir($self->{PERL_LIB},"ExtUtils");
+    my(@tmdeps) = $self->catfile($tmdir,'typemap');
     if( $self->{TYPEMAPS} ){
 	my $typemap;
 	foreach $typemap (@{$self->{TYPEMAPS}}){

@@ -3910,7 +3910,8 @@ sub tool_xsubpp {
         }
     }
 
-    my(@tmdeps) = $self->catdir('$(XSUBPPDIR)','typemap');
+    my $tmdir   = File::Spec->catdir($self->{PERL_LIB},"ExtUtils");
+    my(@tmdeps) = $self->catfile($tmdir,'typemap');
     if( $self->{TYPEMAPS} ){
 	my $typemap;
 	foreach $typemap (@{$self->{TYPEMAPS}}){
@@ -3945,11 +3946,9 @@ sub tool_xsubpp {
 	}
     }
 
-    my $xsubpp = "xsubpp";
-
     return qq{
 XSUBPPDIR = $xsdir
-XSUBPP = \$(XSUBPPDIR)/$xsubpp
+XSUBPP = \$(XSUBPPDIR)/xsubpp
 XSPROTOARG = $self->{XSPROTOARG}
 XSUBPPDEPS = @tmdeps \$(XSUBPP)
 XSUBPPARGS = @tmargs
