@@ -41,9 +41,8 @@ Define TO_UNIX to convert OS2 linefeeds to Unix style.
 sub init_dist {
     my($self) = @_;
 
-    $self->{TO_UNIX} ||= <<'MAKE_TEXT';
-$(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
-MAKE_TEXT
+    $self->{TO_UNIX} ||= 
+      q{$(NOECHO) $(PERLRUN) -MExtUtils::Command -e 'dos2unix' $(DISTVNAME)};
 
     $self->SUPER::init_dist;
 }

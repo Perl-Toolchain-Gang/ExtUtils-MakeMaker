@@ -23,7 +23,7 @@ BEGIN {
 }
 
 BEGIN {
-    use Test::More tests => 26;
+    use Test::More tests => 27;
     use File::Spec;
 }
 
@@ -208,7 +208,23 @@ BEGIN {
     ok( ! -e $dir, "removed $dir successfully" );
 }
 
+{
+    mkdir 'd2utest';
+    open(FILE, '>d2utest/foo');
+    print FILE "stuff\015\012";
+    print FILE "and thing\015\012";
+    close FILE;
+
+    local @ARGV = 'd2utest';
+    ExtUtils::Command::dos2unix();
+
+    open(FILE, 'd2utest/foo');
+    is( join('', <FILE>), "stuff\012and thing\012", 'dos2unix' );
+    close FILE;
+}
+
 END {
     1 while unlink $Testfile, 'newfile';
     File::Path::rmtree( 'ecmddir' );
+    File::Path::rmtree( 'd2utest' );
 }

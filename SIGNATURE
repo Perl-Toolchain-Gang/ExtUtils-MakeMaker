@@ -14,7 +14,7 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 6a417d4d3df26fe87f0a755af7b13dfe14cf7eed .patch
+SHA1 6118f486b26ee180f2da4bb2109eb344b4df9bad .patch
 SHA1 2e0c1909adbf6b9f9d265e72adc3b5fe982e6ac9 Changes
 SHA1 48d4d61ef13a011113ea1ed6bb29047b9c7a6b91 MANIFEST
 SHA1 a61b9aa4655eb498906b3ff0babf01d3aea244af MANIFEST.SKIP
@@ -103,7 +103,7 @@ SHA1 8f21b6971b81f650e4ec7eb1dc62037afb1f1587 t/zz_cleanup_dummy.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQE/oNXVT4Li3Cw/PzQRAvaCAKCgTUs+UOJudE58DXWoq0LT7r0+WQCfTggo
-qjzPZ0oZD2/t/49+dFDcth4=
-=wbBB
+iD8DBQE/oNfJT4Li3Cw/PzQRAunHAJ9UlmBAgr66ymOYQjtRX/MPGap2qgCeJZk2
+wc9y12HKKST3NfQ3YL4HCMo=
+=qvdD
 -----END PGP SIGNATURE-----

@@ -8,10 +8,11 @@ use File::Compare;
 use File::Basename;
 use File::Path qw(rmtree);
 require Exporter;
-use vars qw(@ISA @EXPORT $VERSION);
-@ISA     = qw(Exporter);
-@EXPORT  = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f);
-$VERSION = '1.05';
+use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+@ISA       = qw(Exporter);
+@EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f chmod 
+                dos2unix);
+$VERSION = '1.06';
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -30,7 +31,8 @@ ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.
   perl -MExtUtils::Command       -e mkpath directories...
   perl -MExtUtils::Command       -e eqtime source destination
   perl -MExtUtils::Command       -e test_f file
-  perl -MExtUtils::Command=chmod -e chmod mode files...
+  perl -MExtUtils::Command       -e chmod mode files...
+  ...
 
 =head1 DESCRIPTION
 
@@ -197,9 +199,29 @@ sub test_f
  exit !-f shift(@ARGV);
 }
 
+=item dos2unix
 
-1;
-__END__ 
+Converts DOS and OS/2 linefeeds to Unix style recursively.
+
+=cut
+
+sub dos2unix {
+    require File::Find;
+    File::Find::find(sub {
+        return if -d $_;
+        return unless -w $_;
+
+        local @ARGV = $_;
+        local $^I = '';
+        local $\;
+
+        while (<>) { 
+            s/\015\012/\012/g;
+            print;
+        }
+
+    }, @ARGV);
+}
 
 =back
 
