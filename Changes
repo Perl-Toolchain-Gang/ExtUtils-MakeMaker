@@ -1,4 +1,6 @@
 6.20
+    - Fixing dos2unix on Cygwin.  In-place editing doesn't work 100% so we
+      take a more conservative approach.
     - Small postamble.t test temp file cleanup fix for Cygwin and Windows.
     - Small Command.t test fix for 5.5.3.  No real bug [rt 4290]
     - Small Liblist fix for Cygwin and import libraries [Gerrit P. Haase]
