@@ -249,9 +249,11 @@ sub run {
     require ExtUtils::MM;
 
     # Unix can handle 2>&1 and from 5.8 on `` emulates 2>&1 except
-    # MacPerl.
+    # MacPerl (or VMS, where the emulation only happens when the command
+    # is perl, not for other commands).
     if( MM->os_flavor_is('Unix') or
-        ($] >= 5.008 and !MM->os_flavor_is('MacOS Classic'))
+        ($] >= 5.008 and 
+         !MM->os_flavor_is('MacOS Classic', 'VMS')
       ) 
     {
         return `$cmd 2>&1`;
