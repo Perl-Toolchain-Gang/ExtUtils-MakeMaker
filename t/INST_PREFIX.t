@@ -88,6 +88,9 @@ my @Vend_Install = qw(vendorarch vendorlib vendorbin
 
 foreach my $var (@Perl_Install) {
     my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
+
+    # support for man page skipping
+    $prefix = 'none' if $var =~ /man/ && !$Config{"install$var"};
     like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, "PREFIX + $var" );
 }
 
