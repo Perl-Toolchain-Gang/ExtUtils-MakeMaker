@@ -4034,8 +4034,6 @@ config :: $(FIRST_MAKEFILE) blibdirs
 	$(NOECHO) $(NOOP)
 ';
 
-    push @m, $self->blibdirs_target;
-
     push @m, '
 $(O_FILES): $(H_FILES)
 ' if @{$self->{O_FILES} || []} && @{$self->{H} || []};
