@@ -3,9 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.05";
-$Version_OK = "5.49";   # Makefiles older than $Version_OK will die
-                        # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.84 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.85 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -13,10 +11,9 @@ use Carp ();
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
-            $Revision $VERSION $Verbose $Version_OK %Config 
-            %Keep_after_flush %MM_Sections @Prepend_parent
+            $Revision $VERSION $Verbose %Config 
+            @Prepend_parent @Parent
             %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
-            @Parent $PACKNAME
            );
 use strict;
 
@@ -186,11 +183,12 @@ sub eval_in_x {
     }
 }
 
+
+# package name for the classes into which the first object will be blessed
+my $PACKNAME = 'PACK000';
+
 sub full_setup {
     $Verbose ||= 0;
-
-    # package name for the classes into which the first object will be blessed
-    $PACKNAME = "PACK000";
 
     my @attrib_help = qw/
 
@@ -307,11 +305,6 @@ sub full_setup {
            MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
            PERL FULLPERL
     );
-
-    my @keep = qw/
-        NEEDS_LINKING HAS_LINK_CODE
-        /;
-    @Keep_after_flush{@keep} = (1) x @keep;
 }
 
 sub writeMakefile {
@@ -833,9 +826,11 @@ sub flush {
     rename("MakeMaker.tmp", $finalname);
     chmod 0644, $finalname unless $Is_VMS;
 
+    my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
+
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
         foreach (keys %$self) { # safe memory
-            delete $self->{$_} unless $Keep_after_flush{$_};
+            delete $self->{$_} unless $keep{$_};
         }
     }
 
@@ -1970,7 +1965,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.84 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.85 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
