@@ -2,7 +2,7 @@ package ExtUtils::MM_Any;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.10_10';
+$VERSION = '0.10_11';
 
 use File::Spec;
 BEGIN { @ISA = qw(File::Spec); }
