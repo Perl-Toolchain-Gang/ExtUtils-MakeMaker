@@ -20,7 +20,7 @@ use File::Path;
 use File::Basename;
 use File::Spec;
 
-use Test::More tests => 42;
+use Test::More tests => 45;
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
@@ -79,49 +79,45 @@ my @under = qw( boo bar baz );
 ok( !$ei->_is_under('foo', @under), '... should find no file not under dirs');
 ok( $ei->_is_under('baz', @under),  '... should find file under dir' );
 
-# new
-my $realei = ExtUtils::Installed->new();
-
-isa_ok( $realei, 'ExtUtils::Installed' );
-isa_ok( $realei->{Perl}{packlist}, 'ExtUtils::Packlist' );
-is( $realei->{Perl}{version}, $Config{version}, 
-	'new() should set Perl version from %Config' );
 
 my $wrotelist;
-if (mkpath('auto/FakeMod')) {
-	if (open(PACKLIST, '>'.'auto/FakeMod/.packlist')) {
-		print PACKLIST 'list';
-		close PACKLIST;
-		if (open(FAKEMOD, '>'.'auto/FakeMod/FakeMod.pm')) {
-			print FAKEMOD <<'FAKE';
+ok(mkpath('auto/FakeMod'));
+END { rmtree 'auto/FakeMod' }
+
+ok(open(PACKLIST, '>auto/FakeMod/.packlist'));
+print PACKLIST 'list';
+close PACKLIST;
+
+ok(open(FAKEMOD, '>auto/FakeMod/FakeMod.pm'));
+
+print FAKEMOD <<'FAKE';
 package FakeMod;
 use vars qw( $VERSION );
 $VERSION = '1.1.1';
 1;
 FAKE
 
-			close FAKEMOD;
-			$wrotelist = 1;
-		}
-	}
-}
+close FAKEMOD;
 
-
-SKIP: {
-	skip("could not write packlist: $!", 3 ) unless $wrotelist;
-
-	# avoid warning and death by localizing glob
-	local *ExtUtils::Installed::Config;
-	my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
-	%ExtUtils::Installed::Config = (
-		archlibexp	   => cwd(),
-		sitearchexp	   => $fake_mod_dir,
-	);
+{
+    # avoid warning and death by localizing glob
+    local *ExtUtils::Installed::Config;
+    my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
+    %ExtUtils::Installed::Config = (
+        %Config,
+        archlibexp	   => cwd(),
+        sitearchexp	   => $fake_mod_dir,
+    );
 
 	# necessary to fool new()
 	push @INC, $fake_mod_dir;
 
 	my $realei = ExtUtils::Installed->new();
+    isa_ok( $realei, 'ExtUtils::Installed' );
+    isa_ok( $realei->{Perl}{packlist}, 'ExtUtils::Packlist' );
+    is( $realei->{Perl}{version}, $Config{version}, 
+        'new() should set Perl version from %Config' );
+
 	ok( exists $realei->{FakeMod}, 'new() should find modules with .packlists');
 	isa_ok( $realei->{FakeMod}{packlist}, 'ExtUtils::Packlist' );
 	is( $realei->{FakeMod}{version}, '1.1.1', 
