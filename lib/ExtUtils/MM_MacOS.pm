@@ -12,7 +12,7 @@ require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
 
 use vars qw($VERSION);
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 use Config;
 use Cwd 'cwd';
@@ -20,6 +20,8 @@ require Exporter;
 use File::Basename;
 use File::Spec;
 use vars qw(%make_data);
+
+my $Mac_FS = eval { require Mac::FileSpec::Unixish };
 
 use ExtUtils::MakeMaker qw($Verbose &neatvalue);
 
@@ -48,7 +50,7 @@ sub new {
     }
 
     mkdir("Obj", 0777) unless -d "Obj";
-    
+
     $self = {} unless (defined $self);
 
     my(%initial_att) = %$self; # record initial attributes
@@ -240,22 +242,19 @@ Translate relative path names into Mac names.
 =cut
 
 sub macify {
-    # mmm, better ... and this condition should always be satisified,
-    # as the module is now distributed with MacPerl, but leave in anyway
-    if (do 'Mac/FileSpec/Unixish.pm') {
-        return Mac::FileSpec::Unixish::nativize($_[0]);
-    }
-
     my($unix) = @_;
     my(@mac);
 
-    $unix =~ s|^\./||;
-
     foreach (split(/[ \t\n]+/, $unix)) {
 	if (m|/|) {
-	    $_ = ":$_";
-	    s|/|:|g;
-	} 
+	    if ($Mac_FS) { # should always be true
+		$_ = Mac::FileSpec::Unixish::nativize($_);
+	    } else {
+		s|^\./||;
+		s|/|:|g;
+		$_ = ":$_";
+	    }
+	}
 	push(@mac, $_);
     }
     
@@ -606,7 +605,11 @@ sub constants {
 	      XSPROTOARG MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED SOURCE TYPEMAPS
 	      / ) {
 	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
+	if ($tmp eq 'TYPEMAPS' && ref $self->{$tmp}) {
+	    push @m, sprintf "$tmp = %s\n", join " ", @{$self->{$tmp}};
+	} else {
+	    push @m, "$tmp = $self->{$tmp}\n";
+	}
     }
 
     push @m, q{

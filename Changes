@@ -2,6 +2,7 @@
     - ExtUtils::Installed->modules() was broken in scalar context
     - Sync bleadperl 16922:  Netware updates from Ananth Kesari.
     - Sync bleadperl 16922:  MM_NW5 tests
+    - Sync bleadperl 16938 & 16974:  MM_MacOS->macify fixes from pudge.
 
 6.01 Thu May 30 14:48:57 EDT 2002
     - MacOS Classic fixes from Pudge: recursive make repair,
