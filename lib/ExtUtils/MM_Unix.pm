@@ -2044,7 +2044,7 @@ sub init_INSTALL {
     my $version = $Config{version};
 
     # default style
-    my $libstyle = 'lib/perl5';
+    my $libstyle = $Config{installstyle} || 'lib/perl5';
     my $manstyle = '';
 
     if( $self->{LIBSTYLE} ) {
