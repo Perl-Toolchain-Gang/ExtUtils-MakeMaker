@@ -669,8 +669,8 @@ sub dir_target {
     my($self,@dirs) = @_;
     my(@m,$dir,$targdir);
     foreach $dir (@dirs) {
-	my($src) = File::Spec->catfile($self->{PERL_INC},'perl.h');
-	my($targ) = File::Spec->catfile($dir,'.exists');
+	my($src) = $self->catfile($self->{PERL_INC},'perl.h');
+	my($targ) = $self->catfile($dir,'.exists');
 	# catfile may have adapted syntax of $dir to target OS, so...
 	if ($Is_VMS) { # Just remove file name; dirspec is often in macro
 	    ($targdir = $targ) =~ s:/?\.exists\z::;
@@ -1078,9 +1078,9 @@ in these dirs:
 	    if (File::Spec->file_name_is_absolute($name)) { # /foo/bar
 		$abs = $name;
 	    } elsif (File::Spec->canonpath($name) eq File::Spec->canonpath(basename($name))) { # foo
-		$abs = File::Spec->catfile($dir, $name);
+		$abs = $self->catfile($dir, $name);
 	    } else { # foo/bar
-		$abs = File::Spec->canonpath(File::Spec->catfile($Curdir, $name));
+		$abs = $self->catfile($Curdir, $name);
 	    }
 	    print "Checking $abs\n" if ($trace >= 2);
 	    next unless $self->maybe_command($abs);
@@ -1160,7 +1160,7 @@ sub fixin { # stolen from the pink Camel book, more or less
 	    foreach $dir (@absdirs) {
 		if ($self->maybe_command($cmd)) {
 		    warn "Ignoring $interpreter in $file\n" if $Verbose && $interpreter;
-		    $interpreter = File::Spec->catfile($dir,$cmd);
+		    $interpreter = $self->catfile($dir,$cmd);
 		}
 	    }
 	}
@@ -1296,7 +1296,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	next unless $self->libscan($name);
 	if (-d $name){
 	    next if -l $name; # We do not support symlinks at all
-	    $dir{$name} = $name if (-f File::Spec->catfile($name,"Makefile.PL"));
+	    $dir{$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
 	} elsif ($name =~ /\.xs\z/){
 	    my($c); ($c = $name) =~ s/\.xs\z/.c/;
 	    $xs{$name} = $c;
@@ -1316,10 +1316,10 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 		($pl_files{$name} = $name) =~ s/[._]pl\z//i ;
 	    }
 	    else { 
-                $pm{$name} = File::Spec->catfile($self->{INST_LIBDIR},$name); 
+                $pm{$name} = $self->catfile($self->{INST_LIBDIR},$name); 
             }
 	} elsif ($name =~ /\.(p[ml]|pod)\z/){
-	    $pm{$name} = File::Spec->catfile($self->{INST_LIBDIR},$name);
+	    $pm{$name} = $self->catfile($self->{INST_LIBDIR},$name);
 	}
     }
 
@@ -1391,7 +1391,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    $prefix =  $self->{INST_LIB} 
                 if ($striplibpath = $path) =~ s:^(\W*)lib\W:$1:i;
 
-	    my($inst) = File::Spec->catfile($prefix,$striplibpath);
+	    my($inst) = $self->catfile($prefix,$striplibpath);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
@@ -1426,7 +1426,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 		my($ispod)=0;
 		if (open(FH,"<$name")) {
 		    while (<FH>) {
-			if (/^=(head|item|pod)\b/) {
+			if (/^=(?:head\d+|item|pod)\b/) {
 			    $ispod=1;
 			    last;
 			}
@@ -1439,7 +1439,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 		next unless $ispod;
 		if ($pods{MAN1}) {
 		    $self->{MAN1PODS}->{$name} =
-		      File::Spec->catfile("\$(INST_MAN1DIR)", basename($name).".\$(MAN1EXT)");
+		      $self->catfile("\$(INST_MAN1DIR)", basename($name).".\$(MAN1EXT)");
 		}
 	    }
 	}
@@ -1482,14 +1482,14 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    $manpagename =~ s/\.p(od|m|l)\z//;
            # everything below lib is ok
 	    if($self->{PARENT_NAME} && $manpagename !~ s!^\W*lib\W+!!s) {
-		$manpagename = File::Spec->catfile(
+		$manpagename = $self->catfile(
                                 split(/::/,$self->{PARENT_NAME}),$manpagename
                                );
 	    }
 	    if ($pods{MAN3}) {
 		$manpagename = $self->replace_manpage_separator($manpagename);
 		$self->{MAN3PODS}->{$name} =
-		  File::Spec->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
+		  $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
 	    }
 	}
     }
@@ -1559,11 +1559,11 @@ sub init_main {
                       File::Spec->catdir($Updir,$Updir,$Updir,$Updir,$Updir))
         {
 	    if (
-		-f File::Spec->catfile($dir,"config_h.SH")
+		-f $self->catfile($dir,"config_h.SH")
 		&&
-		-f File::Spec->catfile($dir,"perl.h")
+		-f $self->catfile($dir,"perl.h")
 		&&
-		-f File::Spec->catfile($dir,"lib","Exporter.pm")
+		-f $self->catfile($dir,"lib","Exporter.pm")
 	       ) {
 		$self->{PERL_SRC}=$dir ;
 		last;
@@ -1592,11 +1592,11 @@ sub init_main {
 
 	# catch a situation that has occurred a few times in the past:
 	unless (
-		-s File::Spec->catfile($self->{PERL_SRC},'cflags')
+		-s $self->catfile($self->{PERL_SRC},'cflags')
 		or
 		$Is_VMS
 		&&
-		-s File::Spec->catfile($self->{PERL_SRC},'perlshr_attr.opt')
+		-s $self->catfile($self->{PERL_SRC},'perlshr_attr.opt')
 		or
 		$Is_Mac
 		or
@@ -1624,7 +1624,7 @@ from the perl source tree.
 	$self->{PERL_INC}     = File::Spec->catdir("$self->{PERL_ARCHLIB}","CORE"); # wild guess for now
 	my $perl_h;
 
-	if (not -f ($perl_h = File::Spec->catfile($self->{PERL_INC},"perl.h"))
+	if (not -f ($perl_h = $self->catfile($self->{PERL_INC},"perl.h"))
 	    and not $old){
 	    # Maybe somebody tries to build an extension with an
 	    # uninstalled Perl outside of Perl build tree
@@ -1646,7 +1646,7 @@ EOP
 	    }
 	}
 	
-	unless(-f ($perl_h = File::Spec->catfile($self->{PERL_INC},"perl.h")))
+	unless(-f ($perl_h = $self->catfile($self->{PERL_INC},"perl.h")))
         {
 	    die qq{
 Error: Unable to locate installed Perl libraries or Perl source code.
@@ -1715,7 +1715,7 @@ usually solves this kind of problem.
     # make a simple check if we find Exporter
     warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
         (Exporter.pm not found)"
-	unless -f File::Spec->catfile("$self->{PERL_LIB}","Exporter.pm") ||
+	unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
         $self->{NAME} eq "ExtUtils::MakeMaker";
 
     # Determine VERSION and VERSION_FROM
@@ -2250,8 +2250,8 @@ doc__install : doc_site_install
 
 pure_perl_install ::
 	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
-		read }.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.File::Spec->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
+		read }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
+		write }.$self->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLPRIVLIB) \
 		$(INST_ARCHLIB) $(INSTALLARCHLIB) \
 		$(INST_BIN) $(INSTALLBIN) \
@@ -2264,8 +2264,8 @@ pure_perl_install ::
 
 pure_site_install ::
 	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
-		read }.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.File::Spec->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{ \
+		read }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
+		write }.$self->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLSITELIB) \
 		$(INST_ARCHLIB) $(INSTALLSITEARCH) \
 		$(INST_BIN) $(INSTALLSITEBIN) \
@@ -2277,8 +2277,8 @@ pure_site_install ::
 
 pure_vendor_install ::
 	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
-		read }.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.File::Spec->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{ \
+		read }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
+		write }.$self->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLVENDORLIB) \
 		$(INST_ARCHLIB) $(INSTALLVENDORARCH) \
 		$(INST_BIN) $(INSTALLVENDORBIN) \
@@ -2295,7 +2295,7 @@ doc_perl_install ::
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.File::Spec->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
+		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
 
 doc_site_install ::
 	}.$self->{NOECHO}.q{echo Appending installation info to $(INSTALLSITEARCH)/perllocal.pod
@@ -2306,7 +2306,7 @@ doc_site_install ::
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.File::Spec->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
+		>> }.$self->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
 
 doc_vendor_install ::
 	}.$self->{NOECHO}.q{echo Appending installation info to $(INSTALLVENDORLIB)/perllocal.pod
@@ -2317,7 +2317,7 @@ doc_vendor_install ::
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.File::Spec->catfile('$(INSTALLVENDORARCH)','perllocal.pod').q{
+		>> }.$self->catfile('$(INSTALLVENDORARCH)','perllocal.pod').q{
 
 };
 
@@ -2326,15 +2326,15 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 
 uninstall_from_perldirs ::
 	}.$self->{NOECHO}.
-	q{$(UNINSTALL) }.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{
+	q{$(UNINSTALL) }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{
 
 uninstall_from_sitedirs ::
 	}.$self->{NOECHO}.
-	q{$(UNINSTALL) }.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{
+	q{$(UNINSTALL) }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{
 
 uninstall_from_vendordirs ::
 	}.$self->{NOECHO}.
-        q{$(UNINSTALL) }.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{
+        q{$(UNINSTALL) }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{
 };
 
     join("",@m);
@@ -2353,7 +2353,7 @@ sub installbin {
     my(@m, $from, $to, %fromto, @to);
     push @m, $self->dir_target(qw[$(INST_SCRIPT)]);
     for $from (@{$self->{EXE_FILES}}) {
-	my($path)= File::Spec->catfile('$(INST_SCRIPT)', basename($from));
+	my($path)= $self->catfile('$(INST_SCRIPT)', basename($from));
 	local($_) = $path; # for backwards compatibility
 	$to = $self->libscan($path);
 	print "libscan($from) => '$to'\n" if ($Verbose >=2);
@@ -2684,7 +2684,7 @@ doc_inst_perl:
 		MAP_STATIC "$(MAP_STATIC)" \
 		MAP_EXTRA "`cat $(INST_ARCHAUTODIR)/extralibs.all`" \
 		MAP_LIBPERL "$(MAP_LIBPERL)" \
-		>> }.File::Spec->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
+		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
 
 };
 
@@ -2692,7 +2692,7 @@ doc_inst_perl:
 inst_perl: pure_inst_perl doc_inst_perl
 
 pure_inst_perl: $(MAP_TARGET)
-	}.$self->{CP}.q{ $(MAP_TARGET) }.File::Spec->catfile('$(INSTALLBIN)','$(MAP_TARGET)').q{
+	}.$self->{CP}.q{ $(MAP_TARGET) }.$self->catfile('$(INSTALLBIN)','$(MAP_TARGET)').q{
 
 clean :: map_clean
 
@@ -2752,13 +2752,13 @@ sub manifypods {
     my($dist);
     my($pod2man_exe);
     if (defined $self->{PERL_SRC}) {
-	$pod2man_exe = File::Spec->catfile($self->{PERL_SRC},'pod','pod2man');
+	$pod2man_exe = $self->catfile($self->{PERL_SRC},'pod','pod2man');
     } else {
-	$pod2man_exe = File::Spec->catfile($Config{scriptdirexp},'pod2man');
+	$pod2man_exe = $self->catfile($Config{scriptdirexp},'pod2man');
     }
     unless ($pod2man_exe = $self->perl_script($pod2man_exe)) {
       # Maybe a build by uninstalled Perl?
-      $pod2man_exe = File::Spec->catfile($self->{PERL_INC}, "pod", "pod2man");
+      $pod2man_exe = $self->catfile($self->{PERL_INC}, "pod", "pod2man");
     }
     unless ($pod2man_exe = $self->perl_script($pod2man_exe)) {
 	# No pod2man but some MAN3PODS to be installed
@@ -2820,9 +2820,9 @@ sub maybe_command_in_dirs {	# $ver is optional argument if looking for perl
 	    if (File::Spec->file_name_is_absolute($name)) { # /foo/bar
 		$abs = $name;
 	    } elsif (File::Spec->canonpath($name) eq File::Spec->canonpath(basename($name))) { # bar
-		$abs = File::Spec->catfile($dir, $name);
+		$abs = $self->catfile($dir, $name);
 	    } else { # foo/bar
-		$abs = File::Spec->catfile($Curdir, $name);
+		$abs = $self->catfile($Curdir, $name);
 	    }
 	    print "Checking $abs for $name\n" if ($trace >= 2);
 	    next unless $tryabs = $self->maybe_command($abs);
@@ -3507,7 +3507,7 @@ sub staticmake {
     # And as it's not yet built, we add the current extension
     # but only if it has some C code (or XS code, which implies C code)
     if (@{$self->{C}}) {
-	@static = File::Spec->catfile($self->{INST_ARCHLIB},
+	@static = $self->catfile($self->{INST_ARCHLIB},
 				 "auto",
 				 $self->{FULLEXT},
 				 "$self->{BASEEXT}$self->{LIB_EXT}"
@@ -3806,7 +3806,7 @@ sub tool_xsubpp {
     }
 
 
-    my $xsubpp_version = $self->xsubpp_version(File::Spec->catfile($xsdir,"xsubpp"));
+    my $xsubpp_version = $self->xsubpp_version($self->catfile($xsdir,"xsubpp"));
 
     # What are the correct thresholds for version 1 && 2 Paul?
     if ( $xsubpp_version > 1.923 ){
