@@ -146,7 +146,7 @@ sub test_via_harness {
     my($self, $perl, $tests) = @_;
 
     return qq{\t$perl "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCH)')" $tests\n};
+           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
 }
 
 =item test_via_script
