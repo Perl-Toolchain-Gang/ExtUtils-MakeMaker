@@ -3055,10 +3055,21 @@ sub ppd {
     $author =~ s/>/&gt;/g;
     $author =~ s/@/\\@/g;
 
-    my $make_ppd = sprintf <<'PPD_OUT', $pack_ver, $abstract, $author;
+    my $ppd_html = sprintf <<'PPD_HTML', $pack_ver, $abstract, $author;
+<SOFTPKG NAME="$(DISTNAME)" VERSION="%s">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>%s</ABSTRACT>\n\t<AUTHOR>%s</AUTHOR>
+PPD_HTML
+
+    # strip off that trailing newline.
+    chomp $ppd_html;
+
+    # Abstracts sometimes have quotes in them which can interfere
+    # with the code below (RT 1473)
+    $ppd_html =~ s{"}{\\"}g;
+
+    my $make_ppd = sprintf <<'PPD_OUT', $ppd_html;
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	@$(PERL) -e "print qq{<SOFTPKG NAME=\"$(DISTNAME)\" VERSION=\"%s\">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>%s</ABSTRACT>\n\t<AUTHOR>%s</AUTHOR>\n}" > $(DISTNAME).ppd
+	@$(PERL) -e "print qq{%s\n}" > $(DISTNAME).ppd
 PPD_OUT
 
 
