@@ -7,6 +7,11 @@
     - fixin() was assuming that rename() can overwrite the target (Ilya)
     - manifypods target was empty if there are no pods to manify.  Put in
       at least $(NOECHO) $(NOOP)
+    - Cygwin test to check for finding pod2man when building the perl core
+      removed.  No longer relevent.
+    - Small fixes for dmake (Mattia Barbon)
+    * Added "Reporting bugs" section to the PATCHING doc.
+    - Minor bug in compile test missed ExtUtils::Liblist::Kid
 
 # There was no 6.06, I jumped straight to 6.10_XX because there's been
 # so much change between 6.05 and now.
