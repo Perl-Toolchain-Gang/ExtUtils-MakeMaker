@@ -36,8 +36,8 @@ sub _unix_os2_ext {
     return ("", "", "", "", ($give_libs ? [] : ())) unless $potential_libs;
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
 
-    my($so)   = $Config{'so'};
-    my($libs) = $Config{'perllibs'};
+    my($so)   = $Config{so};
+    my($libs) = defined $Config{perllibs} ? $Config{perllibs} : $Config{libs};
     my $Config_libext = $Config{lib_ext} || ".a";
 
 
@@ -159,7 +159,7 @@ sub _unix_os2_ext {
 
 	    # what do we know about this library...
 	    my $is_dyna = ($fullname !~ /\Q$Config_libext\E\z/);
-	    my $in_perl = ($libs =~ /\B-l\Q$ {thislib}\E\b/s);
+	    my $in_perl = ($libs =~ /\B-l\Q${thislib}\E\b/s);
 
 	    # Do not add it into the list if it is already linked in
 	    # with the main perl executable.
