@@ -21,6 +21,10 @@ use Cwd;
 use File::Spec;
 use File::Path;
 
+# We're going to be chdir'ing and modules are sometimes loaded on the
+# fly in this test, so we need an absolute @INC.
+@INC = map { File::Spec->rel2abs($_) } @INC;
+
 # keep track of everything added so it can all be deleted
 my %files;
 sub add_file {
@@ -137,9 +141,9 @@ ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 
 $files = maniread();
 eval { (undef, $warn) = catch_warning( sub {
-		manicopy( $files, 'copy', 'cp' ) }) 
+ 		manicopy( $files, 'copy', 'cp' ) }) 
 };
-like( $@, qr/^Can't read none: /, 'carped about none' );
+like( $@, qr/^Can't read none: /, 'croaked about none' );
 
 # a newline comes through, so get rid of it
 chomp($warn);

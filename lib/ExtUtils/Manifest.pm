@@ -268,7 +268,7 @@ sub cp_if_diff {
     -f $from or carp "$0: $from not found";
     my($diff) = 0;
     local(*F,*T);
-    open(F,"< $from\0") or croak "Can't read $from: $!\n";
+    open(F,"< $from\0") or die "Can't read $from: $!\n";
     if (open(T,"< $to\0")) {
 	while (<F>) { $diff++,last if $_ ne <T>; }
 	$diff++ unless eof(T);
