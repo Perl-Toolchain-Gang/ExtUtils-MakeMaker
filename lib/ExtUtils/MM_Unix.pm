@@ -1199,8 +1199,11 @@ WARNING
             # To avoid using the unportable 2>&1 to supress STDERR,
             # we close it before running the command.
             close STDERR if $stderr_duped;
-            $val = `$abs -e "require $ver; print qq{VER_OK\n}"`;
+            my $version_check = qq{$abs -e "require $ver; print qq{VER_OK\n}"};
+            $val = `$version_check`;
             open STDERR, '>&STDERR_COPY' if $stderr_duped;
+            print STDERR "Perl version check failed: '$version_check'\n"
+                unless defined $val;
 
             if ($val =~ /^VER_OK/) {
                 print "Using PERL=$abs\n" if $trace;
