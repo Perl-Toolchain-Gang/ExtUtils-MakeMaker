@@ -1,3 +1,6 @@
+6.10_06
+    - Whoops, Liblist.t busted on VMS after I turned strict on in
+      ExtUtils::Liblist::Kid.  Merely a test bug, not a real bug.
 6.10_05 Fri Jun  6 18:15:30 PDT 2003
     * Documenting META.yml, NO_META
     * Documenting the fact that distdir will auto generate META.yml and 
