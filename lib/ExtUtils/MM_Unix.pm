@@ -125,6 +125,7 @@ sub maybe_command;
 sub maybe_command_in_dirs;
 sub needs_linking;
 sub nicetext;
+sub parse_abstract;
 sub parse_version;
 sub pasthru;
 sub perl_archive;
@@ -132,10 +133,10 @@ sub perl_archive_after;
 sub perl_script;
 sub perldepend;
 sub pm_to_blib;
+sub ppd;
 sub post_constants;
 sub post_initialize;
 sub postamble;
-sub ppd;
 sub prefixify;
 sub processPL;
 sub quote_paren;
@@ -2402,8 +2403,12 @@ MAP_PRELIBS   = $Config::Config{perllibs} $Config::Config{cryptlib}
 		unless (-f $lperl || defined($self->{PERL_SRC}));
     }
 
+    # SUNOS ld does not take the full path to a shared library
+    my $llibperl = $libperl ? '$(MAP_LIBPERL)' : '-lperl';
+
     push @m, "
 MAP_LIBPERL = $libperl
+LLIBPERL    = $llibperl
 ";
 
     push @m, "
@@ -2416,12 +2421,10 @@ MAP_LIBPERL = $libperl
     foreach $catfile (@$extra){
 	push @m, "\tcat $catfile >> \$\@\n";
     }
-    # SUNOS ld does not take the full path to a shared library
-    $self->{LLIBPERL} = ($libperl)?'$(MAP_LIBPERL)':'-lperl';
 
 push @m, "
 \$(MAP_TARGET) :: $tmp/perlmain\$(OBJ_EXT) \$(MAP_LIBPERL) \$(MAP_STATIC) \$(INST_ARCHAUTODIR)/extralibs.all
-	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) $self->{LLIBPERL} `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
+	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) \$(LLIBPERL) `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
 	$self->{NOECHO}echo 'To install the new \"\$(MAP_TARGET)\" binary, call'
 	$self->{NOECHO}echo '    make -f $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
 	$self->{NOECHO}echo 'To remove the intermediate files say'
@@ -2656,6 +2659,33 @@ sub nicetext {
     $text;
 }
 
+=item parse_abstract
+
+parse a file and return what you think is the ABSTRACT
+
+=cut
+
+sub parse_abstract {
+    my($self,$parsefile) = @_;
+    my $result;
+    local *FH;
+    local $/ = "\n";
+    open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+    my $inpod = 0;
+    my $package = $self->{DISTNAME};
+    $package =~ s/-/::/g;
+    while (<FH>) {
+        $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
+        next if !$inpod;
+        chop;
+        next unless /^($package\s-\s)(.*)/;
+        $result = $2;
+        last;
+    }
+    close FH;
+    return $result;
+}
+
 =item parse_version
 
 parse a file and return what you think is $VERSION in this file set to.
@@ -2697,32 +2727,6 @@ sub parse_version {
     return $result;
 }
 
-=item parse_abstract
-
-parse a file and return what you think is the ABSTRACT
-
-=cut
-
-sub parse_abstract {
-    my($self,$parsefile) = @_;
-    my $result;
-    local *FH;
-    local $/ = "\n";
-    open(FH,$parsefile) or die "Could not open '$parsefile': $!";
-    my $inpod = 0;
-    my $package = $self->{DISTNAME};
-    $package =~ s/-/::/g;
-    while (<FH>) {
-        $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
-        next if !$inpod;
-        chop;
-        next unless /^($package\s-\s)(.*)/;
-        $result = $2;
-        last;
-    }
-    close FH;
-    return $result;
-}
 
 =item pasthru (o)
 
@@ -2839,68 +2843,13 @@ PERL_HDRS = \
 	$(PERL_INC)/warnings.h
 
 $(OBJECT) : $(PERL_HDRS)
-} if $self->{OBJECT};
+    } if $self->{OBJECT};
 
     push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
 
     join "\n", @m;
 }
 
-=item ppd
-
-Defines target that creates a PPD (Perl Package Description) file
-for a binary distribution.
-
-=cut
-
-sub ppd {
-    my($self) = @_;
-    my(@m);
-    if ($self->{ABSTRACT_FROM}){
-        $self->{ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
-            Carp::carp "WARNING: Setting ABSTRACT via file '$self->{ABSTRACT_FROM}' failed\n";
-    }
-    my ($pack_ver) = join ",", (split (/\./, $self->{VERSION}), (0) x 4) [0 .. 3];
-    push(@m, "# Creates a PPD (Perl Package Description) for a binary distribution.\n");
-    push(@m, "ppd:\n");
-    push(@m, "\t\@\$(PERL) -e \"print qq{<SOFTPKG NAME=\\\"$self->{DISTNAME}\\\" VERSION=\\\"$pack_ver\\\">\\n}");
-    push(@m, ". qq{\\t<TITLE>$self->{DISTNAME}</TITLE>\\n}");
-    my $abstract = $self->{ABSTRACT};
-    $abstract =~ s/\n/\\n/sg;
-    $abstract =~ s/</&lt;/g;
-    $abstract =~ s/>/&gt;/g;
-    push(@m, ". qq{\\t<ABSTRACT>$abstract</ABSTRACT>\\n}");
-    my ($author) = $self->{AUTHOR};
-    $author =~ s/</&lt;/g;
-    $author =~ s/>/&gt;/g;
-    $author =~ s/@/\\@/g;
-    push(@m, ". qq{\\t<AUTHOR>$author</AUTHOR>\\n}");
-    push(@m, ". qq{\\t<IMPLEMENTATION>\\n}");
-    my ($prereq);
-    foreach $prereq (sort keys %{$self->{PREREQ_PM}}) {
-        my $pre_req = $prereq;
-        $pre_req =~ s/::/-/g;
-        my ($dep_ver) = join ",", (split (/\./, $self->{PREREQ_PM}{$prereq}), (0) x 4) [0 .. 3];
-        push(@m, ". qq{\\t\\t<DEPENDENCY NAME=\\\"$pre_req\\\" VERSION=\\\"$dep_ver\\\" />\\n}");
-    }
-    push(@m, ". qq{\\t\\t<OS NAME=\\\"\$(OSNAME)\\\" />\\n}");
-    push(@m, ". qq{\\t\\t<ARCHITECTURE NAME=\\\"$Config{'archname'}\\\" />\\n}");
-    my ($bin_location) = $self->{BINARY_LOCATION};
-    $bin_location =~ s/\\/\\\\/g;
-    if ($self->{PPM_INSTALL_SCRIPT}) {
-        if ($self->{PPM_INSTALL_EXEC}) {
-            push(@m, " . qq{\\t\\t<INSTALL EXEC=\\\"$self->{PPM_INSTALL_EXEC}\\\">$self->{PPM_INSTALL_SCRIPT}</INSTALL>\\n}");
-        }
-        else {
-            push(@m, " . qq{\\t\\t<INSTALL>$self->{PPM_INSTALL_SCRIPT}</INSTALL>\\n}");
-        }
-    }
-    push(@m, ". qq{\\t\\t<CODEBASE HREF=\\\"$bin_location\\\" />\\n}");
-    push(@m, ". qq{\\t</IMPLEMENTATION>\\n}");
-    push(@m, ". qq{</SOFTPKG>\\n}\" > $self->{DISTNAME}.ppd");
-
-    join("", @m);   
-}
 
 =item perm_rw (o)
 
@@ -2956,7 +2905,7 @@ pm_to_blib: $(TO_INST_PM)
 };
     my %pm_to_blib = %{$self->{PM}};
     my @a;
-    my $l;
+    my $l = 0;
     while (my ($pm, $blib) = each %pm_to_blib) {
 	my $la = length $pm;
 	my $lb = length $blib;
@@ -3004,6 +2953,82 @@ text to the Makefile at the end.
 sub postamble {
     my($self) = shift;
     "";
+}
+
+=item ppd
+
+Defines target that creates a PPD (Perl Package Description) file
+for a binary distribution.
+
+=cut
+
+sub ppd {
+    my($self) = @_;
+
+    if ($self->{ABSTRACT_FROM}){
+        $self->{ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
+            Carp::carp "WARNING: Setting ABSTRACT via file ".
+                       "'$self->{ABSTRACT_FROM}' failed\n";
+    }
+
+    my ($pack_ver) = join ",", (split (/\./, $self->{VERSION}), (0)x4)[0..3];
+
+    my $abstract = $self->{ABSTRACT} || '';
+    $abstract =~ s/\n/\\n/sg;
+    $abstract =~ s/</&lt;/g;
+    $abstract =~ s/>/&gt;/g;
+
+    my $author = $self->{AUTHOR} || '';
+    $author =~ s/</&lt;/g;
+    $author =~ s/>/&gt;/g;
+    $author =~ s/@/\\@/g;
+
+    my $make_ppd = sprintf <<'PPD_OUT', $pack_ver, $abstract, $author;
+# Creates a PPD (Perl Package Description) for a binary distribution.
+ppd:
+	@$(PERL) -e "print qq{<SOFTPKG NAME=\"$(DISTNAME)\" VERSION=\"%s\">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>%s</ABSTRACT>\n\t<AUTHOR>%s</AUTHOR>\n}" > $(DISTNAME).ppd
+PPD_OUT
+
+
+    $make_ppd .= '	@$(PERL) -e "print qq{\t<IMPLEMENTATION>\n';
+    foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
+        my $pre_req = $prereq;
+        $pre_req =~ s/::/-/g;
+        my ($dep_ver) = join ",", (split (/\./, $self->{PREREQ_PM}{$prereq}), 
+                                  (0) x 4) [0 .. 3];
+        $make_ppd .= sprintf q{\t\t<DEPENDENCY NAME=\"%s\" VERSION=\"%s\" />\n}, $pre_req, $dep_ver;
+    }
+    $make_ppd .= qq[}" >> \$(DISTNAME).ppd\n];
+
+
+    $make_ppd .= sprintf <<'PPD_OUT', $Config{archname};
+	@$(PERL) -e "print qq{\t\t<OS NAME=\"$(OSNAME)\" />\n\t\t<ARCHITECTURE NAME=\"%s\" />\n
+PPD_OUT
+
+    chomp $make_ppd;
+
+
+    if ($self->{PPM_INSTALL_SCRIPT}) {
+        if ($self->{PPM_INSTALL_EXEC}) {
+            $make_ppd .= sprintf q{\t\t<INSTALL EXEC=\"%s\">%s</INSTALL>\n},
+                  $self->{PPM_INSTALL_EXEC}, $self->{PPM_INSTALL_SCRIPT};
+        }
+        else {
+            $make_ppd .= sprintf q{\t\t<INSTALL>%s</INSTALL>\n}, 
+                  $self->{PPM_INSTALL_SCRIPT};
+        }
+    }
+
+    my ($bin_location) = $self->{BINARY_LOCATION} || '';
+    $bin_location =~ s/\\/\\\\/g;
+
+    $make_ppd .= sprintf q{\t\t<CODEBASE HREF=\"%s\" />\n}, $bin_location;
+    $make_ppd .= q{\t</IMPLEMENTATION>\n};
+    $make_ppd .= q{</SOFTPKG>\n};
+
+    $make_ppd .= '}" >> $(DISTNAME).ppd';
+
+    return $make_ppd;
 }
 
 =item prefixify
@@ -3079,8 +3104,6 @@ Defines the realclean target.
 sub realclean {
     my($self, %attribs) = @_;
     my(@m);
-
-    push(@m,'LLIBPERL = '.$self->{LLIBPERL}."\n");
 
     push(@m,'
 # Delete temporary files (via clean) and also delete installed files
