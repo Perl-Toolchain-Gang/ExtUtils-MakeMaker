@@ -15,7 +15,7 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 11;
 use MakeMaker::Test::Utils;
 use File::Spec;
 use TieOut;
@@ -53,3 +53,10 @@ my $make = make();
 
 my $test_out = `$make test`;
 like( $test_out, qr/All tests successful/, 'make test' );
+is( $?, 0 );
+
+my $dist_test_out = `$make disttest`;
+is( $?, 0, 'disttest' );
+
+`$make realclean`;
+is( $?, 0, 'realclean' );
