@@ -1,6 +1,8 @@
-6.25_03
+6.25_03  Mon Dec 20 23:04:22 EST 2004
     - dir_target() is back.  Now each directory to be created has its own 
-      target like before, but no more .exists or blibdirs.ts files.
+      target like before, but no more .exists or blibdirs.ts files.  This
+      ensures that each blib directory is created as necessary and fixes
+      things like SVN's perl bindings.
 
 6.25_02  Mon Dec 20 03:31:49 EST 2004
     - Set PM_FILTER as late as possible so it can see all the earlier
