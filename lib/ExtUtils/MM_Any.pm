@@ -3,6 +3,7 @@ package ExtUtils::MM_Any;
 use strict;
 use vars qw($VERSION @ISA);
 $VERSION = 0.04;
+@ISA = qw(File::Spec);
 
 use Config;
 use File::Spec;
@@ -41,91 +42,23 @@ B<THIS MAY BE TEMPORARY!>
 These are methods which are by their nature cross-platform and should
 always be cross-platform.
 
-=head2 File::Spec wrappers  B<DEPRECATED>
+=head2 File::Spec wrappers
 
-The following methods are deprecated wrappers around File::Spec
-functions.  They exist from before File::Spec did and in fact are from
-which File::Spec sprang.
-
-With the exception of catfile(), they are all deprecated.  Please use
-File::Spec directly.
+ExtUtils::MM_Any is a subclass of File::Spec.  The methods noted here
+override File::Spec.
 
 =over 4
 
-=item canonpath
-
-=cut
-
-sub canonpath {
-    shift;
-    return File::Spec->canonpath(@_);;
-}
-
-=item catdir
-
-=cut
-
-sub catdir {
-    shift;
-    return File::Spec->catdir(@_);
-}
-
 =item catfile
 
-This catfile() fixes a bug in File::Spec <= 0.83.  Please use it inside
-MakeMaker instead of using File::Spec's directly.
+File::Spec <= 0.83 has a bug where the file part of catfile is not
+canonicalized.  This override fixes that bug.
 
 =cut
 
 sub catfile {
-    shift;
-    # File::Spec <= 0.83 has a bug where the file part of catfile is
-    # not canonicalized.
-    return File::Spec->canonpath(File::Spec->catfile(@_));
-}
-
-=item curdir
-
-=cut
-
-my $Curdir = File::Spec->curdir;
-sub curdir {
-    return $Curdir;
-}
-
-=item file_name_is_absolute
-
-=cut
-
-sub file_name_is_absolute {
-    shift;
-    return File::Spec->file_name_is_absolute(@_);
-}
-
-=item path
-
-=cut
-
-sub path {
-    return File::Spec->path();
-}
-
-=item rootdir
-
-=cut
-
-my $Rootdir = File::Spec->rootdir;
-sub rootdir {
-    return $Rootdir;
-}
-
-=item updir
-
-=cut
-
-my $Updir = File::Spec->updir;
-sub updir {
-    return $Updir;
+    my $self = shift;
+    return $self->canonpath($self->SUPER::catfile(@_));
 }
 
 =back

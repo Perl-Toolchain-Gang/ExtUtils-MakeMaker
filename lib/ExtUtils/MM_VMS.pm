@@ -20,13 +20,12 @@ BEGIN {
 }
 
 use File::Basename;
-use File::Spec;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = $Revision = '5.66';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix File::Spec );
+@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
