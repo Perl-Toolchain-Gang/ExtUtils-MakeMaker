@@ -1,3 +1,14 @@
+5.48_03 Thu Jan 17 23:44:38 EST 2002
+    * moved bin/inst to bin/instmodsh
+    * Some Win32 backporting fixes.  The -x switch doesn't seem to
+      work on Win32/5.6.1.
+    * Bug on Win32.  MAKEMAKER variable not set properly.
+    * _02 broke hints files.  Now fixed.
+    - Minor prereq error formatting glitch
+    - ExtUtils::testlib no longer a thin wrapper around blib, now a 
+      thin wrapper around lib like it was.  blib is noisy on 5.6.1.
+    - Nick and chromatic found and fixed some warnings in the tests
+
 5.48_02 Wed Jan 16 19:11:26 EST 2002
     - Fixed some Win32 warnings.  Needs more work.
 
