@@ -71,7 +71,7 @@ WriteMakefile(
                 );
             push @perls, 
               map "PERL5LIB=$lib$Config{path_sep}$tlib /usr/local/bin/$_", 
-                'perl5.005_03';
+                'perl5.5.3';
         }
 
         my $out;

@@ -1,3 +1,7 @@
+5.94_01
+    - worked around 5.005_03's lack of a $Config{siteprefix} and
+      $Config{sitebin}.
+
 5.93_01 Mon May  6 00:54:39 EDT 2002
     - fixed basic.t for limited depth VMS systems
     * MM_BeOS was totally hosed by a typo.
