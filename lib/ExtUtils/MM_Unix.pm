@@ -714,15 +714,13 @@ Defines a check in target for RCS.
 
 sub dist_ci {
     my($self) = shift;
-    my @m;
-    push @m, q{
+    return q{
 ci :
 	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
-		-e "@all = keys %{ maniread() };" \\
-		-e 'print("Executing $(CI) @all\n"); system("$(CI) @all");' \\
-		-e 'print("Executing $(RCS_LABEL) ...\n"); system("$(RCS_LABEL) @all");'
+	  -e "@all = keys %{ maniread() };" \\
+	  -e "print("Executing $(CI) @all\n"); system(qq{$(CI) @all});" \\
+	  -e "print("Executing $(RCS_LABEL) ...\n"); system(qq{$(RCS_LABEL) @all});"
 };
-    join "", @m;
 }
 
 =item dist_core (o)
@@ -736,8 +734,7 @@ sub dist_core {
     my @m;
     push @m, q{
 dist : $(DIST_DEFAULT)
-	$(NOECHO) $(PERL) -le 'print "Warning: Makefile possibly out of date with $$vf" if ' \
-	    -e '-e ($$vf="$(VERSION_FROM)") and -M $$vf < -M "$(MAKEFILE)";'
+	$(NOECHO) $(PERL) -le "print 'Warning: Makefile possibly out of date with $(VERSION_FROM)' if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(MAKEFILE)';"
 
 tardist : $(DISTVNAME).tar$(SUFFIX)
 
