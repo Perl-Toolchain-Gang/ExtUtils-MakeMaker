@@ -71,14 +71,18 @@ WriteMakefile(
 
         my @perls = ($orig_perl);
         if( $ENV{PERL_TEST_ALL} ) {
-            push @perls, map "PERL5LIB=$lib /usr/local/bin/$_", 
-              qw(bleadperl
-                 perl5.6.1
-                 perl5.6.0
-                );
             push @perls, 
-              map "PERL5LIB=$lib$Config{path_sep}$tlib /usr/local/bin/$_", 
+              map "PERL5LIB=$lib$Config{path_sep}$tlib /usr/local/bin/$_",
                 'perl5.5.3';
+
+            push @perls, map "PERL5LIB=$lib /usr/local/bin/$_", 
+              qw(perl5.6.0
+                 perl5.6.1
+                 perl
+                 perl5.8.0
+                 perl5.8.0-ithreads
+                 bleadperl
+                );
         }
 
         my $out;
