@@ -550,7 +550,7 @@ sub distdir {
     my($self) = shift;
 
     my $meta_target = $self->{NO_META} ? '' : 'distmeta';
-    my $sign_target = !$self->{SIGN}   ? '' : 'distsign';
+    my $sign_target = !$self->{SIGN}   ? '' : 'distsignature';
 
     return sprintf <<'MAKE_FRAG', $meta_target, $sign_target;
 create_distdir :
@@ -862,16 +862,16 @@ MAKE_FRAG
 }
 
 
-=head3 distsign_target
+=head3 distsignature_target
 
-    my $make_frag = $mm->distsign_target;
+    my $make_frag = $mm->distsignature_target;
 
-Generates the distsign target to add SIGNATURE to the MANIFEST in the
+Generates the distsignature target to add SIGNATURE to the MANIFEST in the
 distdir.
 
 =cut
 
-sub distsign_target {
+sub distsignature_target {
     my $self = shift;
 
     my $add_sign = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
@@ -887,7 +887,7 @@ CODE
     my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $add_sign );
 
     return sprintf <<'MAKE', $add_sign_to_dist, $touch_sig, $sign_dist
-distsign : create_distdir
+distsignature : create_distdir
 	$(NOECHO) %s
 	$(NOECHO) %s
 	%s

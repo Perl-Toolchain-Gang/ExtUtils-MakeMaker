@@ -11,6 +11,8 @@
     - Fix .exists files accidentally getting caught in static builds.
     - Older versions of MMS cannot handle directory targets at all.
     - Add Interix support (bleadperl@33892)
+    - distsign target changed to distsignature to avoid clash with
+      Module::Install
 
 6.25_07  Fri Dec 31 03:47:20 EST 2004
     - perllocal on VMS was inserting executables twice.
