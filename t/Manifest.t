@@ -26,14 +26,14 @@ use File::Path;
 @INC = map { File::Spec->rel2abs($_) } @INC;
 
 # keep track of everything added so it can all be deleted
-my %files;
+my %Files;
 sub add_file {
     my ($file, $data) = @_;
     $data ||= 'foo';
-    unlink $file;  # or else we'll get multiple versions on VMS
+    1 while unlink $file;  # or else we'll get multiple versions on VMS
     open( T, '>'.$file) or return;
     print T $data;
-    ++$files{$file};
+    ++$Files{$file};
     close T;
 }
 
@@ -160,7 +160,7 @@ like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' );
 	like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
 	
 	# add the new file to the list of files to be deleted
-	$files{'albatross'}++;
+	$Files{'albatross'}++;
 }
 
 
@@ -193,14 +193,16 @@ is( $files->{foobar}, '',    '          preserved old entries' );
 add_file('MANIFEST'   => 'Makefile.PL');
 maniadd({ 'META.yml'  => 'Module meta-data (added by MakeMaker)' });
 $files = maniread;
-my %expect = ( 'Makefile.PL' => '',
-               'META.yml'    => 'Module meta-data (added by MakeMaker)' 
+# VMS downcases the MANIFEST.  We normalize it here to match.
+%$files = map { (lc $_ => $files->{$_}) } keys %$files;
+my %expect = ( 'makefile.pl' => '',
+               'meta.yml'    => 'Module meta-data (added by MakeMaker)' 
              );
 is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline');
 
 END {
 	# the args are evaluated in scalar context
-	is( unlink( keys %files ), keys %files, 'remove all added files' );
+	is( unlink( keys %Files ), keys %Files, 'remove all added files' );
 	remove_dir( 'moretest', 'copy' );
 
 	# now get rid of the parent directory
