@@ -485,7 +485,8 @@ sub constants {
 	      PERL_ARCHLIB SITELIBEXP SITEARCHEXP LIBPERL_A MYEXTLIB
 	      FIRST_MAKEFILE MAKE_APERL_FILE PERLMAINCC PERL_SRC
 	      PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
-              FULLPERLRUNINST FULL_AR PERL_CORE NOOP NOECHO
+              FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
+              FULL_AR PERL_CORE NOOP NOECHO
 
 	      / ) {
 	next unless defined $self->{$tmp};
@@ -849,7 +850,7 @@ sub dist_test {
     my @m;
     push @m, q{
 disttest : distdir
-	cd $(DISTVNAME) && $(PERLRUN) Makefile.PL
+	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL
 	cd $(DISTVNAME) && $(MAKE)
 	cd $(DISTVNAME) && $(MAKE) test
 };
@@ -1346,7 +1347,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
                 if ($_ eq "CVS" || $_ eq "RCS"){
                     $File::Find::prune = 1;
                 }
-                return;i
+                return;
             }
             return if /\#/;
             return if /~$/;    # emacs temp files
@@ -1933,11 +1934,12 @@ sub init_INSTALL {
 
     $mm->init_PERL;
 
-Called by init_main.  Sets up PERL, FULLPERL, PERLRUN, PERLRUNINST,
-FULLPERLRUN and FULLPERLRUNINST.
+Called by init_main.  Sets up ABSPERL, PERL, FULLPERL and all the
+*PERLRUN* permutations.
 
     PERL is allowed to be miniperl
     FULLPERL must be a complete perl
+    ABSPERL is PERL converted to an absolute path
 
     *PERLRUN contains everything necessary to run perl, find it's
          libraries, etc...
@@ -1983,11 +1985,15 @@ sub init_PERL {
     ($self->{FULLPERL} = $self->{PERL}) =~ s/miniperl/perl/i
 	unless $self->{FULLPERL};
 
+    $self->{ABSPERL} = File::Spec->file_name_is_absolute($self->{PERL})
+                                    ? '$(PERL)'
+                                    : File::Spec->rel2abs($self->{PERL});
+
     # Are we building the core?
     $self->{PERL_CORE} = 0 unless exists $self->{PERL_CORE};
 
     # How do we run perl?
-    foreach my $perl (qw(PERL FULLPERL)) {
+    foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
         $self->{$perl.'RUN'}  = "\$($perl)";
 
         # Make sure perl can find itself before it's installed.
@@ -1995,7 +2001,7 @@ sub init_PERL {
           if $self->{UNINSTALLED_PERL} || $self->{PERL_CORE};
 
         $self->{$perl.'RUNINST'} = 
-          q{$(PERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"};
+          sprintf q{$(%sRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"}, $perl;
     }
 
     return 1;
