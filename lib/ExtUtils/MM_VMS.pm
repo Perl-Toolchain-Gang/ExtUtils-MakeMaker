@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.67';
-($Revision = substr(q$Revision: 1.89 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.90 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1603,7 +1603,7 @@ uninstall_from_perldirs ::
 	$(NOECHO) $(ECHO) "the appropriate files.  Sorry for the inconvenience."
 
 uninstall_from_sitedirs ::
-	$(NOECHO) $(UNINSTALL) ],$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist'),"\n",q[
+	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
 	$(NOECHO) $(ECHO) "Uninstall is now deprecated and makes no actual changes."
 	$(NOECHO) $(ECHO) "Please check the list above carefully for errors, and manually remove"
 	$(NOECHO) $(ECHO) "the appropriate files.  Sorry for the inconvenience."

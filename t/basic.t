@@ -16,7 +16,7 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 48;
+use Test::More tests => 52;
 use MakeMaker::Test::Utils;
 use File::Find;
 use File::Spec;
@@ -187,12 +187,20 @@ my $manifest = maniread();
 _normalize($manifest);
 is( $manifest->{'meta.yml'}, 'Module meta-data in YAML' );
 
+# Test NO_META META.yml suppression
+unlink 'META.yml';
+ok( !-f 'META.yml',   'META.yml deleted' );
+@mpl_out = run(qq{$perl Makefile.PL "NO_META=1"});
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
+my $metafile_out = run("$make metafile");
+is( $?, 0, 'metafile' ) || diag($metafile_out);
+ok( !-f 'META.yml',   'META.yml generation suppressed by NO_META' );
+
 
 # Make sure init_dirscan doesn't go into the distdir
 @mpl_out = run(qq{$perl Makefile.PL "PREFIX=dummy-install"});
 
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag(@mpl_out);
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
 
 ok( grep(/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
                                 'init_dirscan skipped distdir') || 
