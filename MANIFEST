@@ -55,4 +55,5 @@ t/lib/TieOut.pm
 t/prefixify.t
 t/problems.t
 t/testlib.t
+t/VERSION_FROM.t
 t/zz_cleanup_dummy.t
