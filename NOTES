@@ -1,0 +1,22 @@
+The MakeMaker class hierarchy (subclasses on top).
+
+        MY (created by ExtUtils::MY)
+        |
+    ExtUtils::MY         MM (created by ExtUtils::MM)
+              |          |
+              ExtUtils::MM
+                    |
+[ExtUtils::MM_NonUnix  ExtUtils::Liblist::Kid  ExtUtils::MakeMaker]
+            |
+ ExtUtils::MM_Unix
+
+
+The MM_* hierarchy
+
+                                        MM_Win95   MM_NW5
+                                              \      /
+MM_BeOS     MM_Cygwin   MM_OS2    MM_VMS      MM_Win32
+      \             |      |         |        /
+       ---------------------------------------
+                           |
+                        MM_Unix

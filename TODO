@@ -1,0 +1,23 @@
+Create a way to init MM objects.
+
+Move instmodsh to utils/ in the core.
+
+Document prompt()
+
+Fix Win32 & VMS bugs.
+
+MakeMaker's warnhandler has to go away.
+
+Normalize test_via_harness.
+
+Decide of ExtUtils::Miniperl is useful outside of the core.
+
+Fix INSTALLMAN*DIR to honor PREFIX.
+
+Fix prefixify to use $(PREFIX) instead of cut & pasting the prefix
+directly into the Makefile.
+
+Make the libs honor PREFIX.
+
+Don't assume everything is in $Config{PREFIX}/lib and
+$Config{PREFIX}/man.
