@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.74 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.75 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -1355,9 +1355,10 @@ again.
 
 =item FIRST_MAKEFILE
 
-The name of the Makefile to be produced. Defaults to the contents of
-MAKEFILE, but can be overridden. This is used for the second Makefile
-that will be produced for the MAP_TARGET.
+The name of the Makefile to be produced.  This is used for the second
+Makefile that will be produced for the MAP_TARGET.
+
+Defaults to $(MAKEFILE).
 
 =item FULLPERL
 
@@ -1641,9 +1642,12 @@ this boolean variable yourself.
 
 =item NOECHO
 
-Defaults to C<@>. By setting it to an empty string you can generate a
-Makefile that echos all commands. Mainly used in debugging MakeMaker
-itself.
+Command so make does not print the literal commands its running.
+
+By setting it to an empty string you can generate a Makefile that
+prints all commands. Mainly used in debugging MakeMaker itself.
+
+Defaults to C<@>.
 
 =item NORECURS
 
@@ -1938,7 +1942,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.74 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.75 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
