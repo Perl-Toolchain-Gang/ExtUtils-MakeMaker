@@ -14,7 +14,7 @@ chdir 't';
 use strict;
 
 # these files help the test run
-use Test::More tests => 37;
+use Test::More tests => 38;
 use Cwd;
 
 # these files are needed for the module itself
@@ -188,6 +188,13 @@ is( $files->{wibble}, '',    'maniadd() with undef comment' );
 is( $files->{yarrow}, 'hock','          with comment' );
 is( $files->{foobar}, '',    '          preserved old entries' );
 
+add_file('MANIFEST'   => 'Makefile.PL');
+maniadd({ 'META.yml'  => 'Module meta-data (added by MakeMaker)' });
+$files = maniread;
+my %expect = ( 'Makefile.PL' => '',
+               'META.yml'    => 'Module meta-data (added by MakeMaker)' 
+             );
+is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline');
 
 END {
 	# the args are evaluated in scalar context
