@@ -3954,7 +3954,12 @@ sub tool_xsubpp {
     return "" unless $self->needs_linking;
 
     my $xsdir;
-    foreach my $dir (@INC) {
+    my @xsubpp_dirs = @INC;
+
+    # Make sure we pick up the new xsubpp if we're building perl.
+    unshift @xsubpp_dirs, $self->{PERL_LIB} if $self->{PERL_CORE};
+
+    foreach my $dir (@xsubpp_dirs) {
         $xsdir = $self->catdir($dir, 'ExtUtils');
         if( -r $self->catfile($xsdir, "xsubpp") ) {
             last;

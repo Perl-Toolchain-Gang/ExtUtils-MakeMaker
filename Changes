@@ -16,6 +16,8 @@
       and "How do I keep from installing man pages?" [Joe Cromie]
     - Fixed finding the default MANIFEST.SKIP if its on a different volume
       [Ilya Zakharevich]
+    - When building Perl, we had a chance of picking up the old installed
+      xsubpp from @INC [Andreas Koenig]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 
