@@ -1,4 +1,5 @@
 6.20
+    - Small Liblist fix for Cygwin and import libraries [Gerrit P. Haase]
     - metafile error message slightly mangled [rt 4285]
 
 6.19 Mon Nov  3 22:53:56 PST 2003
