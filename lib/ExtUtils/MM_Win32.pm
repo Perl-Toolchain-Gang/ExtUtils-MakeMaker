@@ -725,6 +725,23 @@ sub pasthru {
 }
 
 
+=item perl_oneliner (o)
+
+=cut
+
+sub perl_oneliner {
+    my($self,$cmd) = @_;
+
+    # I don't know if this is correct, but it seems to work on
+    # Win98's command.com
+    $cmd =~ s{"}{\\"}g;
+
+    # And, of course, what if there's a space in the path to perl?
+    # So we quote that, too.
+    return qq{"\$(PERLRUN)" -e "$cmd"};
+}
+
+
 1;
 __END__
 

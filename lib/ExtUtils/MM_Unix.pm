@@ -988,6 +988,7 @@ in these dirs:
     }
 
     my $stderr_duped = 0;
+    local *STDERR_COPY;
     if( open(STDERR_COPY, '>&STDERR') ) {
         $stderr_duped = 1;
     }
@@ -3281,6 +3282,24 @@ sub replace_manpage_separator {
     $man =~ s,/+,::,g;
     return $man;
 }
+
+
+=item perl_oneliner (o)
+
+=cut
+
+sub perl_oneliner {
+    my($self,$cmd) = @_;
+
+    # I think all we have to quote is single quotes and I think
+    # this is a safe way to do it.
+    $cmd =~ s{'}{'\\''}g;
+
+    # And, of course, what if there's a space in the path to perl?
+    # So we quote that.
+    return qq{'\$(PERLRUN)' -e '$cmd'};   
+}
+
 
 =item static (o)
 

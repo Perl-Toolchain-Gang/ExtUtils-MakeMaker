@@ -2201,6 +2201,21 @@ sub _catprefix {
 }
 
 
+=item perl_oneliner (o)
+
+=cut
+
+sub perl_oneliner {
+    my($self,$cmd) = @_;
+
+    # I believe this is all we should need.
+    $cmd =~ s{"}{""}g;
+
+    # And, of course, what if there's a space in the path to perl?
+    # So we quote that, too.
+    return qq{"\$(PERLRUN)" -e "$cmd"};
+}
+
 =back
 
 =cut

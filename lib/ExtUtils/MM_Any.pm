@@ -137,7 +137,7 @@ having been written in a way to avoid incompatibilities.
 
 =over 4
 
-=item manifypods (o)
+=item manifypods
 
 Defines targets and routines to translate the pods into manpages and
 put them into the INST_* directories.
@@ -163,6 +163,15 @@ END_OF_TARGET
 
 }
 
+
+=item manifypods_target
+
+  my $manifypods_target = $self->manifypods_target;
+
+Generates the manifypods target.  This target generates man pages from
+all POD files in MAN1PODS and MAN3PODS.
+
+=cut
 
 sub manifypods_target {
     my($self) = shift;
@@ -247,6 +256,34 @@ sub test_via_script {
     my($self, $perl, $script) = @_;
     return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" $script\n};
 }
+
+=back
+
+=head1 Abstract methods
+
+Methods which cannot be made cross-platform and each subclass will
+have to do their own implementation.
+
+=over 4
+
+=item perl_oneliner
+
+  my $oneliner = $MM->perl_oneliner($perl_code);
+
+This will generate a perl one-liner safe for the particular platform
+you're on based on the given $perl_code and suitable for using in a
+make target.  It will use the proper shell quoting and escapes.
+
+$(PERLRUN) will be used as perl.
+
+Usage might be something like:
+
+    # an echo emulation
+    $oneliner = $MM->perl_oneliner('print "Foo\n"');
+    $make = '$oneliner > somefile';
+
+Its currently very simple and may be expanded sometime in the figure
+to include more flexible code and switches.
 
 =back
 
