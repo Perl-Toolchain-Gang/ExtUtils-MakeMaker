@@ -223,6 +223,7 @@ arguments.  In most cases this is simply something like:
 =cut
 
 sub wraplist {
+    my $self = shift;
     return join " \\\n\t", @_;
 }
 
