@@ -137,6 +137,81 @@ having been written in a way to avoid incompatibilities.
 
 =over 4
 
+=item manifypods (o)
+
+Defines targets and routines to translate the pods into manpages and
+put them into the INST_* directories.
+
+=cut
+
+sub manifypods {
+    my $self          = shift;
+
+    my $POD2MAN_EXE_macro = $self->POD2MAN_EXE_macro();
+    my $manifypods_target = $self->manifypods_target();
+
+    return <<END_OF_TARGET;
+
+# --- Begin manifypods section:
+$POD2MAN_EXE_macro
+
+$manifypods_target
+
+# --- End manifypods section --- #
+
+END_OF_TARGET
+
+}
+
+
+sub manifypods_target {
+    my($self) = shift;
+
+    my $man1pods      = '';
+    my $man3pods      = '';
+    my $dependencies  = '';
+
+    # populate manXpods & dependencies:
+    foreach my $name (keys %{$self->{MAN1PODS}}) {
+        $man1pods     .= " \\\n\t  $name \\\n\t    $self->{MAN1PODS}->{$name}";
+        $dependencies .= " \\\n\t$name";
+    }
+
+    foreach my $name (keys %{$self->{MAN3PODS}}) {
+        $man3pods     .= " \\\n\t  $name \\\n\t    $self->{MAN3PODS}->{$name}";
+        $dependencies .= " \\\n\t$name"
+    }
+
+    return <<END_OF_TARGET;
+manifypods : pure_all $dependencies
+	\$(NOECHO)\$(POD2MAN_EXE) --section=1 --perm_rw=\$(PERM_RW) $man1pods
+	\$(NOECHO)\$(POD2MAN_EXE) --section=3 --perm_rw=\$(PERM_RW) $man3pods
+END_OF_TARGET
+}
+
+=item POD2MAN_EXE_macro
+
+  my $pod2man_exe_macro = $self->POD2MAN_EXE_macro
+
+Returns a definition for the POD2MAN_EXE macro.  This is a program
+which emulates the pod2man utility.  You can add more switches to the
+command by simply appending them on the macro.
+
+Typical usage:
+
+    $(POD2MAN_EXE) --section=3 --perm_rw=$(PERM_RW) podfile man_page
+
+=cut
+
+sub POD2MAN_EXE_macro {
+    my $self = shift;
+    return <<'END_OF_DEF';
+# Need the trailing '--' so perl stops gobbling arguments
+POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e "pod2man @ARGV" --
+END_OF_DEF
+}
+
+
 =item test_via_harness
 
   my $command = $mm->test_via_harness($perl, $tests);
