@@ -20,6 +20,7 @@ the semantics.
 
 use Config;
 use File::Spec;
+require ExtUtils::MM_Unix;
 
 use vars qw(@ISA $VERSION);
 @ISA = qw( ExtUtils::MM_Unix );
