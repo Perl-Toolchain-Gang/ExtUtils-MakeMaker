@@ -15,7 +15,7 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 11;
+use Test::More tests => 14;
 use MakeMaker::Test::Utils;
 use File::Spec;
 use TieOut;
@@ -57,6 +57,12 @@ END { unlink 'MANIFEST'; }
 
 my $test_out = `$make test`;
 like( $test_out, qr/All tests successful/, 'make test' );
+is( $?, 0 );
+
+# Test 'make test TEST_VERBOSE=1'
+$test_out = `$make test TEST_VERBOSE=1`;
+like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
+like( $test_out, qr/All tests successful/, '  successful' );
 is( $?, 0 );
 
 my $dist_test_out = `$make disttest`;
