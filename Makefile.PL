@@ -48,11 +48,11 @@ WriteMakefile(
 
     # Make sure PERLRUN uses the MakeMaker about to be installed
     # and not the currently installed one.
-    sub constants {
+    sub init_PERL {
         my($self) = shift;
+        $self->SUPER::init_PERL;
         $self->{PERLRUN} .= qq{ "-I$lib"};
-        $self->{PERLRUNINST} .= qq{ "-I$lib"};
-        $self->SUPER::constants;
+        $self->{FULLPERLRUN} .= qq{ "-I$lib"};
     }
 
     sub test_via_harness {
