@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.82 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.83 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -840,7 +840,7 @@ sub tools_other {
     # than just typing the literal string.
     my $extra_tools = <<'EXTRA_TOOLS';
 
-# Assumes \$(MMS) invokes MMS or MMK
+# Assumes $(MMS) invokes MMS or MMK
 # (It is assumed in some cases later that the default makefile name
 # (Descrip.MMS for MM[SK]) is used.)
 USEMAKEFILE = /Descrip=
