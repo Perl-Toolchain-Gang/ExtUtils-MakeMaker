@@ -1006,35 +1006,6 @@ $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
 }
 
 
-=item processPL (override)
-
-Use VMS-style quoting on command line.
-
-=cut
-
-sub processPL {
-    my($self) = @_;
-    return "" unless $self->{PL_FILES};
-    my(@m, $plfile);
-    foreach $plfile (sort keys %{$self->{PL_FILES}}) {
-        my $list = ref($self->{PL_FILES}->{$plfile})
-		? $self->{PL_FILES}->{$plfile}
-		: [$self->{PL_FILES}->{$plfile}];
-	foreach my $target (@$list) {
-	    my $vmsplfile = vmsify($plfile);
-	    my $vmsfile = vmsify($target);
-	    push @m, "
-all :: $vmsfile
-	\$(NOECHO) \$(NOOP)
-
-$vmsfile :: $vmsplfile
-",'	$(PERLRUNINST) '," $vmsplfile $vmsfile
-";
-	}
-    }
-    join "", @m;
-}
-
 =item installbin (override)
 
 Stay under DCL's 255 character command line limit once again by

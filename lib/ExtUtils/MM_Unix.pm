@@ -3460,25 +3460,36 @@ Defines targets to run *.PL files.
 =cut
 
 sub processPL {
-    my($self) = shift;
-    return "" unless $self->{PL_FILES};
-    my(@m, $plfile);
-    foreach $plfile (sort keys %{$self->{PL_FILES}}) {
-        my $list = ref($self->{PL_FILES}->{$plfile})
-		? $self->{PL_FILES}->{$plfile}
-		: [$self->{PL_FILES}->{$plfile}];
-	my $target;
-	foreach $target (@$list) {
-	push @m, "
-all :: $target
-	\$(NOECHO) \$(NOOP)
+    my $self = shift;
+    my $pl_files = $self->{PL_FILES};
 
-$target :: $plfile
-	\$(PERLRUNINST) $plfile $target
-";
+    return "" unless $pl_files;
+
+    my $m = '';
+    foreach my $plfile (sort keys %$pl_files) {
+        my $list = ref($pl_files->{$plfile})
+                     ?  $pl_files->{$plfile}
+		     : [$pl_files->{$plfile}];
+
+	foreach my $target (@$list) {
+            if( $Is_VMS ) {
+                $plfile = vmsify($plfile);
+                $target = vmsify($target);
+            }
+
+            $m .= sprintf <<'MAKE_FRAG', ($target) x 2, ($plfile) x 2, $target;
+
+all :: %s
+	$(NOECHO) $(NOOP)
+
+%s :: %s
+	$(PERLRUNINST) %s
+MAKE_FRAG
+
 	}
     }
-    join "", @m;
+
+    return $m;
 }
 
 =item quote_paren
