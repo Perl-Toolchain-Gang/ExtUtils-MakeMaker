@@ -41,6 +41,7 @@ t/INST_PREFIX.t
 t/Installed.t
 t/MM_BeOS.t
 t/MM_Cygwin.t
+t/MM_NW5.t
 t/MM_OS2.t
 t/MM_Unix.t
 t/MM_VMS.t
