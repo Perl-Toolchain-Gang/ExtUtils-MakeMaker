@@ -1490,32 +1490,32 @@ realclean :: clean
     join('', @m);
 }
 
+=item zipfile_target (o)
 
-=item dist_core (override)
+=item tarfile_target (o)
 
-Syntax for invoking F<VMS_Share> differs from that for Unix F<shar>,
-so C<shdist> target actions are VMS-specific.
+=item shdist_target (o)
+
+Syntax for invoking shar, tar and zip differs from that for Unix.
 
 =cut
 
-sub dist_core {
-    my($self) = @_;
-q[
-dist : $(DIST_DEFAULT)
-	$(NOECHO) $(PERL) -le "print 'Warning: $m older than $vf' if -e ($vf = '$(VERSION_FROM)') && -M $vf < -M ($m = '$(MAKEFILE)')"
+sub zipfile_target {
+    my($self) = shift;
 
-zipdist : $(DISTVNAME).zip
-	$(NOECHO) $(NOOP)
-
-tardist : $(DISTVNAME).tar$(SUFFIX)
-	$(NOECHO) $(NOOP)
-
+    return <<'MAKE_FRAG';
 $(DISTVNAME).zip : distdir
 	$(PREOP)
 	$(ZIP) "$(ZIPFLAGS)" $(MMS$TARGET) [.$(DISTVNAME)...]*.*;
 	$(RM_RF) $(DISTVNAME)
 	$(POSTOP)
+MAKE_FRAG
+}
 
+sub tarfile_target {
+    my($self) = shift;
+
+    return <<'MAKE_FRAG';
 $(DISTVNAME).tar$(SUFFIX) : distdir
 	$(PREOP)
 	$(TO_UNIX)
@@ -1523,13 +1523,19 @@ $(DISTVNAME).tar$(SUFFIX) : distdir
 	$(RM_RF) $(DISTVNAME)
 	$(COMPRESS) $(DISTVNAME).tar
 	$(POSTOP)
+MAKE_FRAG
+}
 
+sub shdist_target {
+    my($self) = shift;
+
+    return <<'MAKE_FRAG';
 shdist : distdir
 	$(PREOP)
 	$(SHAR) [.$(DISTVNAME...]*.*; $(DISTVNAME).share
 	$(RM_RF) $(DISTVNAME)
 	$(POSTOP)
-];
+MAKE_FRAG
 }
 
 =item dist_test (override)
