@@ -6,7 +6,7 @@ $VERSION = '0.03_01';
 require ExtUtils::MM_Win32;
 @ISA = qw(ExtUtils::MM_Win32);
 
-use Config;
+use ExtUtils::MakeMaker::Config;
 my $DMAKE = $Config{'make'} =~ /^dmake/i;
 my $NMAKE = $Config{'make'} =~ /^nmake/i;
 

@@ -1,7 +1,7 @@
 package ExtUtils::MM;
 
 use strict;
-use Config;
+use ExtUtils::MakeMaker::Config;
 use vars qw(@ISA $VERSION);
 $VERSION = '0.04_02';
 

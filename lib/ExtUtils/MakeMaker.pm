@@ -6,7 +6,7 @@ $VERSION = '6.25_02';
 ($Revision) = q$Revision: 1.147 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
-use Config;
+use ExtUtils::MakeMaker::Config;
 use Carp ();
 use File::Path;
 

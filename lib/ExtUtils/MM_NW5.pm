@@ -19,7 +19,7 @@ the semantics.
 =cut 
 
 use strict;
-use Config;
+use ExtUtils::MakeMaker::Config;
 use File::Basename;
 
 use vars qw(@ISA $VERSION);

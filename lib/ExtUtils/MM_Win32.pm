@@ -19,7 +19,7 @@ the semantics.
 
 =cut 
 
-use Config;
+use ExtUtils::MakeMaker::Config;
 use File::Basename;
 use File::Spec;
 use ExtUtils::MakeMaker qw( neatvalue );

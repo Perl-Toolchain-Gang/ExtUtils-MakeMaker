@@ -3,7 +3,7 @@ package ExtUtils::MM_Cygwin;
 use strict;
 use vars qw($VERSION @ISA);
 
-use Config;
+use ExtUtils::MakeMaker::Config;
 use File::Spec;
 
 require ExtUtils::MM_Any;

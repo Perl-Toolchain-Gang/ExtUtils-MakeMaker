@@ -8,7 +8,7 @@ $VERSION = '0.10_02';
 # We need $Verbose
 use ExtUtils::MakeMaker qw($Verbose);
 
-use Config;
+use ExtUtils::MakeMaker::Config;
 use File::Spec;
 
 

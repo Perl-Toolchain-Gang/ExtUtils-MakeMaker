@@ -7,7 +7,7 @@ package ExtUtils::MM_VMS;
 
 use strict;
 
-use Config;
+use ExtUtils::MakeMaker::Config;
 require Exporter;
 
 BEGIN {

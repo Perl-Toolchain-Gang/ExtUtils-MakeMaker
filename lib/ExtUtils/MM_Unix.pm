@@ -6,7 +6,7 @@ use strict;
 
 use Exporter ();
 use Carp;
-use Config         qw(%Config);
+use ExtUtils::MakeMaker::Config         qw(%Config);
 use File::Basename qw(basename dirname);
 use DirHandle;
 

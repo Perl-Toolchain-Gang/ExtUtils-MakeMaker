@@ -18,7 +18,7 @@ the semantics.
 
 =cut 
 
-use Config;
+use ExtUtils::MakeMaker::Config;
 use File::Spec;
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
