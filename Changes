@@ -1,4 +1,4 @@
-6.10_05
+6.10_05 Fri Jun  6 18:15:30 PDT 2003
     * Documenting META.yml, NO_META
     * Documenting the fact that distdir will auto generate META.yml and 
       alter your manifest.
