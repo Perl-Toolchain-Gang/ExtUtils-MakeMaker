@@ -1,4 +1,4 @@
-6.26_01
+6.26_01 Mon Mar 28 21:34:39 PST 2005
     * PL_FILES was broken in the last release.  The .PL files were not being
       passed the file they were to generate.
     * How PL_FILES runs the programs and what it does with the value is 
