@@ -52,6 +52,10 @@ SKIP: {
 
 # VMS 5.6.1 doesn't seem to have $Config{prefixexp}
 my $prefix = $Config{prefixexp} || $Config{prefix};
+
+# ActivePerl 5.6.1/631 has $Config{prefixexp} as 'p:' for some reason
+$prefix = $Config{prefix} if $prefix eq 'p:' && $^O eq 'MSWin32';
+
 is( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'), 1, 
 	"... should find prog file under $prefix" );
 
