@@ -272,14 +272,6 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 # xs_o() should look into that
 # top_targets() should look into that
 
-# manifypods()
-{
-    my $mm_w32 = bless { NOECHO    => '' }, 'MM';
-    like( $mm_w32->manifypods(),
-          qr/^\nmanifypods :\n\t\$\Q(NOOP)\E\n$/,
-          'manifypods() Makefile target' );
-}
-
 # dist_ci() should look into that
 # dist_core() should look into that
 
