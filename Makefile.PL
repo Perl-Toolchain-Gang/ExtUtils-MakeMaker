@@ -43,8 +43,11 @@ WriteMakefile(
 
     use File::Spec;
 
-    my $lib;
-    BEGIN { $lib = File::Spec->rel2abs('lib/'); }
+    my($lib, $tlib);
+    BEGIN { 
+        $lib  = File::Spec->rel2abs('lib/'); 
+        $tlib = File::Spec->rel2abs('t/lib/');
+    }
 
     # Make sure PERLRUN uses the MakeMaker about to be installed
     # and not the currently installed one.
@@ -55,17 +58,21 @@ WriteMakefile(
         $self->{FULLPERLRUN} .= qq{ "-I$lib"};
     }
 
+    use Config;
     sub test_via_harness {
         my($self, $orig_perl, $tests) = @_;
 
         my @perls = ($orig_perl);
-        push @perls, map "PERL5LIB=$lib /usr/local/bin/$_", 
-                        qw(bleadperl
-                           perl5.6.1
-                           perl5.6.0
-                           perl5.005_03
-                          )
-          if $ENV{PERL_TEST_ALL};
+        if( $ENV{PERL_TEST_ALL} ) {
+            push @perls, map "PERL5LIB=$lib /usr/local/bin/$_", 
+              qw(bleadperl
+                 perl5.6.1
+                 perl5.6.0
+                );
+            push @perls, 
+              map "PERL5LIB=$lib$Config{path_sep}$tlib /usr/local/bin/$_", 
+                'perl5.005_03';
+        }
 
         my $out;
         foreach my $perl (@perls) {
