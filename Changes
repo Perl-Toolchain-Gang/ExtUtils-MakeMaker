@@ -1,3 +1,7 @@
+6.05 Tue Aug 27 16:09:51 PDT 2002
+    - Output format of the hint file verbose diagnostic is now in
+      a format native to the OS, so it broke a test on non-Unixen.
+
 6.04 Mon Aug 26 18:31:11 PDT 2002 
     - Little fix for pre-5.8 Cygwin test to get the shared library names 
       right.
