@@ -18,7 +18,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 110;
+        plan tests => 111;
     }
 }
 
@@ -172,7 +172,11 @@ is ($t->libscan('Fatty'), 'Fatty', 'libscan on something not a VC file' );
 ###############################################################################
 # maybe_command
 
-is ($t->maybe_command('blargel'),undef,"'blargel' isn't a command");
+open(FILE, ">command"); print FILE "foo"; close FILE;
+ok (!$t->maybe_command('command') ,"non executable file isn't a command");
+chmod 0755, "command";
+ok ($t->maybe_command('command'),        "executable file is a command");
+unlink "command";
 
 ###############################################################################
 # nicetext (dummy method)
