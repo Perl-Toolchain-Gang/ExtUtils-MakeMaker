@@ -361,9 +361,11 @@ sub constants {
     my($self) = @_;
     my @m = ();
 
+    $self->{DFSEP} = '$(DIRFILESEP)';  # alias for internal use
+
     for my $macro (qw(
 
-              AR_STATIC_ARGS DIRFILESEP
+              AR_STATIC_ARGS DIRFILESEP DFSEP
               NAME NAME_SYM 
               VERSION    VERSION_MACRO    VERSION_SYM DEFINE_VERSION
               XS_VERSION XS_VERSION_MACRO             XS_DEFINE_VERSION
@@ -415,7 +417,7 @@ MM_REVISION = $self->{MM_REVISION}
     for my $macro (qw/
               MAKE
 	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
-	      LDFROM LINKTYPE BOOTDEP
+	      LDFROM LINKTYPE
 	      /	) 
     {
 	next unless defined $self->{$macro};
@@ -435,7 +437,7 @@ MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS}})."
 
     push @m, q{
 # Where is the Config information that we are using/depend on
-CONFIGDEP = $(PERL_ARCHLIB)$(DIRFILESEP)Config.pm $(PERL_INC)$(DIRFILESEP)config.h
+CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
 };
 
 
@@ -859,7 +861,7 @@ BOOTSTRAP = $(BASEEXT).bs
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)
+$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
@@ -867,7 +869,7 @@ $(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)
 	$(NOECHO) $(TOUCH) %s
 	$(CHMOD) $(PERM_RW) %s
 
-$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)
+$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(NOECHO) $(RM_RF) %s
 	$(IGNORE)$(CP) $(BOOTSTRAP) %s
 	$(CHMOD) $(PERM_RW) %s
@@ -902,7 +904,7 @@ OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 INST_DYNAMIC_FIX = '.$ld_fix.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR) $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
 ');
     if ($armaybe ne ':'){
 	$ldfrom = 'tmp$(LIB_EXT)';
@@ -2180,10 +2182,9 @@ realclean ::
     # A target for each exe file.
     while (my($from,$to) = each %fromto) {
 	last unless defined $from;
-	my $todir = $self->_todir($to);
 
 	push @m, "
-$to : $from \$(FIRST_MAKEFILE) \$(INST_SCRIPT) \$(INST_BIN)
+$to : $from \$(FIRST_MAKEFILE) \$(INST_SCRIPT)\$(DFSEP).exists \$(INST_BIN)\$(DFSEP).exists
 	\$(NOECHO) \$(RM_F) $to
 	\$(CP) $from $to
 	\$(FIXIN) $to
@@ -2191,28 +2192,6 @@ $to : $from \$(FIRST_MAKEFILE) \$(INST_SCRIPT) \$(INST_BIN)
 ";
     }
     join "", @m;
-}
-
-
-sub _todir {
-    my($self, $to) = @_;
-    my $todir;
-
-    if( $Is_VMS ) {
-        # XXX I'm not quite sure what this is all about
-	if ($to =~ m#[/>:\]]#) {
-            $todir = dirname($to); 
-        }
-	else { 
-            ($todir = $to) =~ s/[^\)]+$//; 
-        }
-	$todir = $self->fixpath($todir,1);
-    }
-    else {
-        $todir = dirname($to);
-    }
-
-    return $todir;
 }
 
 
@@ -2456,8 +2435,8 @@ MAP_LIBPERL = $libperl
 LLIBPERL    = $llibperl
 ";
 
-    push @m, "
-\$(INST_ARCHAUTODIR)/extralibs.all: $(INST_ARCHAUTODIR) ".join(" \\\n\t", @$extra).'
+    push @m, '
+$(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" \\\n\t", @$extra).'
 	$(NOECHO) $(RM_F)  $@
 	$(NOECHO) $(TOUCH) $@
 ';
@@ -2532,8 +2511,6 @@ sub makefile {
     # happen very rarely it is not a significant problem.
     $m = '
 $(OBJECT) : $(FIRST_MAKEFILE)
-	$(NOECHO) $(NOOP)
-
 ' if $self->{OBJECT};
 
     my $newer_than_target = $Is_VMS ? '$(MMS$SOURCE_LIST)' : '$?';
@@ -3224,7 +3201,7 @@ sub static_lib {
     my(@m);
     push(@m, <<'END');
 
-$(INST_STATIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)
+$(INST_STATIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(RM_RF) $@
 END
 
