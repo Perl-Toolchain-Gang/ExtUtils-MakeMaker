@@ -2,7 +2,7 @@ package ExtUtils::Install;
 
 use 5.00503;
 use vars qw(@ISA @EXPORT $VERSION);
-$VERSION = 1.32;
+$VERSION = '1.32_02';
 
 use Exporter;
 use Carp ();
