@@ -126,7 +126,7 @@ sub touch
  expand_wildcards();
  while (@ARGV)
   {
-   my $file = shift(@ARGV);               
+   my $file = shift(@ARGV);
    open(FILE,">>$file") || die "Cannot write $file:$!";
    close(FILE);
    utime($t,$t,$file);
