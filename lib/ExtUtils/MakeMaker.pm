@@ -2,10 +2,10 @@ BEGIN {require 5.002;} # MakeMaker 5.17 was the last MakeMaker that was compatib
 
 package ExtUtils::MakeMaker;
 
-$VERSION = "5.48_03";
+$VERSION = "5.48_04";
 $Version_OK = "5.17";	# Makefiles older than $Version_OK will die
 			# (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.4 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.5 $, 10)) =~ s/\s+$//;
 
 
 
@@ -406,12 +406,20 @@ sub ExtUtils::MakeMaker::new {
 	for $key (keys %Prepend_dot_dot) {
 	    next unless defined $self->{PARENT}{$key};
 	    $self->{$key} = $self->{PARENT}{$key};
-		# PERL and FULLPERL may be command verbs instead of full
-		# file specifications under VMS.  If so, don't turn them
-		# into a filespec.
-	    $self->{$key} = $self->catdir("..",$self->{$key})
-		unless $self->file_name_is_absolute($self->{$key})
-		|| ($^O eq 'VMS' and ($key =~ /PERL$/ && $self->{$key} =~ /^[\w\-\$]+$/));
+        unless ($^O eq 'VMS' && $key =~ /PERL$/) {
+            $self->{$key} = $self->catdir("..",$self->{$key})
+              unless $self->file_name_is_absolute($self->{$key});
+        } else {
+            # PERL or FULLPERL will be a command verb or even a command with
+            # an argument instead of a full file specification under VMS.  So, 
+            # don't turn the command into a filespec, but do add a level to 
+            # the path of the argument if not already absolute.
+
+            my @cmd = split /\s+/, $self->{$key};
+            $cmd[1] = $self->catfile('[-]',$cmd[1])
+              unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
+            $self->{$key} = join(' ', @cmd);
+        }
 	}
 	if ($self->{PARENT}) {
 	    $self->{PARENT}->{CHILDREN}->{$newclass} = $self;
@@ -680,14 +688,18 @@ sub check_hints {
 
     return unless -f $hint_file;    # really there
 
-    # execute the hintsfile:
+    _run_hintfile($self, $hint_file);
+}
+
+sub _run_hintfile {
+    our $self;
+    local($self) = shift;       # make $self available to the hint file.
+    my($hint_file) = shift;
+
     print STDERR "Processing hints file $hint_file\n";
-    {
-        local *HINT;
-        open(HINT, $hint_file) || die "Can't open $hint_file: $!";
-        eval join '', <HINT>;
-        close HINT;
-    }
+    eval {
+        do $hint_file;
+    };
     print STDERR $@ if $@;
 }
 
@@ -1857,7 +1869,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.4 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.5 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;	# new for perl5.6.0 
