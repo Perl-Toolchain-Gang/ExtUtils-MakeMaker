@@ -3389,7 +3389,7 @@ sub test {
 # --- Test and Installation Sections ---
 
     my($self, %attribs) = @_;
-    my $tests = $attribs{TESTS};
+    my $tests = $attribs{TESTS} || '';
     if (!$tests && -d 't') {
 	$tests = $Is_Win32 ? join(' ', <t\\*.t>) : 't/*.t';
     }
