@@ -829,7 +829,7 @@ sub xsubpp_version
 
     # first try the -v flag, introduced in 1.921 & 2.000a2
 
-    my $command = "$self->{PERLRUN} $xsubpp -v";
+    my $command = qq{$self->{PERL} "-I$self->{PERL_LIB}" $xsubpp -v};
     print "Running: $command\n" if $Verbose;
     $version = `$command` ;
     if ($?) {
@@ -1275,8 +1275,8 @@ END
     my(@m);
     push @m,
 qq[POD2MAN_EXE = $pod2man_exe\n],
-q[POD2MAN = $(PERL) -we "%m=@ARGV;for (keys %m){" -
--e "system(qq/$(PERLRUN) $(POD2MAN_EXE) $_ >$m{$_}/);}"
+q[POD2MAN = $(PERLRUN) "-MPod::Man" -we "%m=@ARGV;for(keys %m){" -
+-e "Pod::Man->new->parse_from_file($_,$m{$_}) }"
 ];
     push @m, "\nmanifypods : \$(MAN1PODS) \$(MAN3PODS)\n";
     if (%{$self->{MAN1PODS}} || %{$self->{MAN3PODS}}) {
