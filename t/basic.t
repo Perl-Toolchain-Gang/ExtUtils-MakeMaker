@@ -202,7 +202,7 @@ SKIP: {
 
 
 SKIP: {
-    skip "VMS install targets do not preserve $(PREFIX)", 9 if $Is_VMS;
+    skip 'VMS install targets do not preserve $(PREFIX)', 9 if $Is_VMS;
 
     $install_out = run("$make install PREFIX=elsewhere DESTDIR=other/");
     is( $?, 0, 'install with PREFIX override and DESTDIR' ) || 
