@@ -1,6 +1,8 @@
 5.94_01
+    - Small NetWare change from Novell.
     - worked around 5.005_03's lack of a $Config{siteprefix} and
       $Config{sitebin}.
+    - Small cross compilation changes (bleadperl 16582, 16548)
 
 5.93_01 Mon May  6 00:54:39 EDT 2002
     - fixed basic.t for limited depth VMS systems
