@@ -14,7 +14,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 12;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -60,4 +60,41 @@ WARNING: AUTHOR takes a string/number not a code reference.
 VERIFY
 
     is_deeply( $mm->{AUTHOR}, '' );
+
+
+    # LIBS accepts *both* a string or an array ref.  The first cut of
+    # our verification did not take this into account.
+    $warnings = '';
+    $mm = WriteMakefile(
+        NAME            => 'Big::Dummy',
+        VERSION_FROM    => 'lib/Big/Dummy.pm',
+        LIBS            => '-lwibble -lwobble',
+    );
+    
+    # We'll get warnings about the bogus libs, that's ok.
+    unlike( $warnings, qr/WARNING: .* takes/ );
+    is_deeply( $mm->{LIBS}, ['-lwibble -lwobble'] );
+
+    $warnings = '';
+    $mm = WriteMakefile(
+        NAME            => 'Big::Dummy',
+        VERSION_FROM    => 'lib/Big/Dummy.pm',
+        LIBS            => ['-lwibble', '-lwobble'],
+    );
+    
+    # We'll get warnings about the bogus libs, that's ok.
+    unlike( $warnings, qr/WARNING: .* takes/ );
+    is_deeply( $mm->{LIBS}, ['-lwibble', '-lwobble'] );
+
+    $warnings = '';
+    $mm = WriteMakefile(
+        NAME            => 'Big::Dummy',
+        VERSION_FROM    => 'lib/Big/Dummy.pm',
+        LIBS            => { wibble => "wobble" },
+    );
+    
+    # We'll get warnings about the bogus libs, that's ok.
+    like( $warnings, qr{^WARNING: LIBS takes a array reference or string/number not a hash reference}m );
+    is_deeply( $mm->{LIBS}, [] );
+
 }
