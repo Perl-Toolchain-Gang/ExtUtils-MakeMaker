@@ -102,16 +102,29 @@ sub split_command {
     # newline.
     chomp $cmd;
 
-    my $len_left = $self->max_exec_len - length $cmd;
-    $len_left = int($len_left * 0.80);  # set aside 20% for macro expansion.
+    # set aside 20% for macro expansion.
+    my $len_left = int($self->max_exec_len * 0.80);
+    $len_left -= length $self->_expand_macros($cmd);
 
     my @cmds = ();
 
     do {
         my $arg_str = '';
-        while( @args && $len_left > length $arg_str ) {
+        my @next_args;
+        while( @next_args = splice(@args, 0, 2) ) {
             # Two at a time to preserve pairs.
-            $arg_str .= "\t  ". join ' ', splice(@args, 0, 2), "\n";
+            my $next_arg_str = "\t  ". join ' ', @next_args, "\n";
+
+            if( !length $arg_str ) {
+                $arg_str .= $next_arg_str
+            }
+            elsif( length($arg_str) + length($next_arg_str) > $len_left ) {
+                push @args, @next_args;
+                last;
+            }
+            else {
+                $arg_str .= $next_arg_str;
+            }
         }
         chop $arg_str;
 
@@ -119,6 +132,16 @@ sub split_command {
     } while @args;
 
     return @cmds;
+}
+
+
+sub _expand_macros {
+    my($self, $cmd) = @_;
+
+    $cmd =~ s{\$\((\w+)\)}{
+        defined $self->{$1} ? $self->{$1} : "\$($1)"
+    }e;
+    return $cmd;
 }
 
 
