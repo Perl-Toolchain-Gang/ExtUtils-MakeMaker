@@ -1,6 +1,6 @@
 package ExtUtils::MakeMaker::FAQ;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 __END__
@@ -9,11 +9,55 @@ __END__
 
 ExtUtils::MakeMaker::FAQ - Frequently Asked Questions About MakeMaker
 
-=head1 SYNOPSIS
-
 =head1 DESCRIPTION
 
-Document tips and tricks for C<ExtUtils::MakeMaker>.
+FAQs, tricks and tips for C<ExtUtils::MakeMaker>.
+
+=head2 Philosophy and History
+
+=over 4
+
+=item Why not just use <insert other build config tool here>?
+
+Why did MakeMaker reinvent the build configuration wheel?  Why not
+just use autoconf or automake or ppm or Ant or ...
+
+There are many reasons, but the major one is cross-platform
+compatibility.
+
+Perl is one of the most ported pieces of software ever.  It works on
+operating systems I've never even heard of (see perlport for details).
+It needs a build tool that can work on all those platforms and with
+any wacky C compilers they might have.
+
+No such build tool existed at the time and I only know of one now
+(Module::Build).
+
+
+=item What's Module::Build and how does it relate to MakeMaker?
+
+Module::Build is a project by Ken Williams to supplant MakeMaker.
+Its primary advantages are:
+
+=over 8
+
+=item * pure perl.  no make, no shell commands
+
+=item * easier to customize
+
+=item * cleaner internals
+
+=item * less cruft
+
+=back
+
+Module::Build is the official heir apparent to MakeMaker and we
+encourage people to work on M::B rather than spending time improving
+MakeMaker.
+
+=back
+
+=head2 XS
 
 =over 4
 
@@ -29,7 +73,7 @@ C<Cool::Foo> and C<Cool::Bar> modules each having a separate XS
 file. First we use the following I<Makefile.PL>:
 
   use ExtUtils::MakeMaker;
-  
+
   WriteMakefile(
       NAME		=> 'Cool::Foo',
       VERSION_FROM	=> 'Foo.pm',
@@ -59,7 +103,7 @@ The only issue left is to how to bootstrap I<Bar.xs>. This is done
 from I<Foo.xs>:
 
   MODULE = Cool::Foo PACKAGE = Cool::Foo
-  
+
   BOOT:
   # boot the second XS file
   boot_Cool__Bar(aTHX_ cv);
@@ -72,21 +116,21 @@ The following four files sum up all the details discussed so far.
   Foo.pm:
   -------
   package Cool::Foo;
-  
+
   require DynaLoader;
-  
+
   our @ISA = qw(DynaLoader);
   our $VERSION = '0.01';
   bootstrap Cool::Foo $VERSION;
-  
+
   1;
-  
+
   Bar.pm:
   -------
   package Cool::Bar;
-  
+
   use Cool::Foo; # bootstraps Bar.xs
-  
+
   1;
 
   Foo.xs:
@@ -94,18 +138,18 @@ The following four files sum up all the details discussed so far.
   #include "EXTERN.h"
   #include "perl.h"
   #include "XSUB.h"
-  
+
   MODULE = Cool::Foo  PACKAGE = Cool::Foo
-  
+
   BOOT:
   # boot the second XS file
   boot_Cool__Bar(aTHX_ cv);
-  
+
   MODULE = Cool::Foo  PACKAGE = Cool::Foo  PREFIX = cool_foo_
-  
+
   void
   cool_foo_perl_rules()
-  
+
       CODE:
       fprintf(stderr, "Cool::Foo says: Perl Rules\n");
 
@@ -114,12 +158,12 @@ The following four files sum up all the details discussed so far.
   #include "EXTERN.h"
   #include "perl.h"
   #include "XSUB.h"
-  
+
   MODULE = Cool::Bar  PACKAGE = Cool::Bar PREFIX = cool_bar_
-  
+
   void
   cool_bar_perl_rules()
-  
+
       CODE:
       fprintf(stderr, "Cool::Bar says: Perl Rules\n");
 
