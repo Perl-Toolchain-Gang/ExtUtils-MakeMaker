@@ -1,4 +1,9 @@
 6.16
+    * Fixing the max exec length for Windows to account for old
+      versions of nmake (the one you can download for free from MS).
+    - Hack to normalize //foo//bar paths in ExtUtils::Installed.
+      [Sreeji K Das]
+    * Adding Module::Build utility files to MANIFEST.SKIP
     - PREREQ_PRINT is supposed to exit after dumping. (Wolfgang Friebel
       bleadperl@20530)
     - maniadd() was trying to open the MANIFEST even if it didn't need to
