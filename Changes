@@ -1,5 +1,6 @@
 6.22
     - Minor glitch in Command.t test on Win32 [thanks Steve Hay]
+    * Fixed MANIFEST.SKIP so it avoids all the new *.ts files.
     - Don't spuriously define pasthru arguments
 
 6.21_03

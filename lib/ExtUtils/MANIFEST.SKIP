@@ -10,7 +10,7 @@
 \bMakefile$
 \bblib/
 \bMakeMaker-\d
-\bpm_to_blib$
+\bpm_to_blib\.ts$
 \bblibdirs\.ts$
 
 # Avoid Module::Build generated and utility files.
