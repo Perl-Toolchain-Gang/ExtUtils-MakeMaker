@@ -1,4 +1,5 @@
-6.10_04
+6.10_04 Fri May 23 01:13:04 PDT 2003
+    - Working around BSD threaading bug in version check. [from bleadperl]
     - Added the Makefile to the dist dependencies. (Slaven Rezic)
     - Reversing the find_perl() version check failure warning introced in
       6.10_03.  Too talkative, warned when nothing was wrong.

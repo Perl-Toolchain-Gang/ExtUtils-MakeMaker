@@ -12,7 +12,7 @@ use DirHandle;
 
 use vars qw($VERSION @ISA
             $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Win95  $Is_Dos $Is_VOS
-            $Is_QNX $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD 
+            $Is_QNX $Is_AIX $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
             $Is_SunOS4 $Is_Solaris $Is_SunOS
             $Verbose %pm %static $Xsubpp_Version
             %Config_Override
@@ -40,6 +40,7 @@ $Is_NetBSD  = $^O eq 'netbsd';
 $Is_SunOS4  = $^O eq 'sunos';
 $Is_Solaris = $^O eq 'solaris';
 $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
+$Is_BSD     = $^O =~ /^(?:free|net|open)bsd|bsdos$/;
 
 
 =head1 NAME
@@ -1173,14 +1174,16 @@ in these dirs:
 
     my $stderr_duped = 0;
     local *STDERR_COPY;
-    if( open(STDERR_COPY, '>&STDERR') ) {
-        $stderr_duped = 1;
-    }
-    else {
-        warn <<WARNING;
+    unless ($Is_BSD) {
+        if( open(STDERR_COPY, '>&STDERR') ) {
+            $stderr_duped = 1;
+        }
+        else {
+            warn <<WARNING;
 find_perl() can't dup STDERR: $!
 You might see some garbage while we search for Perl
 WARNING
+        }
     }
 
     foreach $name (@$names){
@@ -1199,12 +1202,20 @@ WARNING
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace >= 2);
 
+            my $version_check = qq{$abs -e "require $ver; print qq{VER_OK\n}"};
             # To avoid using the unportable 2>&1 to supress STDERR,
             # we close it before running the command.
-            close STDERR if $stderr_duped;
-            my $version_check = qq{$abs -e "require $ver; print qq{VER_OK\n}"};
-            $val = `$version_check` || '';
-            open STDERR, '>&STDERR_COPY' if $stderr_duped;
+            # However, thanks to a thread library bug in many BSDs
+            # ( http://www.freebsd.org/cgi/query-pr.cgi?pr=51535 )
+            # we cannot use the fancier more portable way in here
+            # but instead need to use the traditional 2>&1 construct.
+            if ($Is_BSD) {
+                $val = `$version_check 2>&1`;
+            } else {
+                close STDERR if $stderr_duped;
+                $val = `$version_check`;
+                open STDERR, '>&STDERR_COPY' if $stderr_duped;
+            }
 
             if ($val =~ /^VER_OK/) {
                 print "Using PERL=$abs\n" if $trace;
