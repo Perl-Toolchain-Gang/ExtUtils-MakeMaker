@@ -166,8 +166,8 @@ sub find_perl {
     local *TCF;
     # Check in relative directories first, so we pick up the current
     # version of Perl if we're running MakeMaker as part of the main build.
-    @sdirs = sort { my($absa) = File::Spec->file_name_is_absolute($a);
-                    my($absb) = File::Spec->file_name_is_absolute($b);
+    @sdirs = sort { my($absa) = $self->file_name_is_absolute($a);
+                    my($absb) = $self->file_name_is_absolute($b);
                     if ($absa && $absb) { return $a cmp $b }
                     else { return $absa ? 1 : ($absb ? -1 : ($a cmp $b)); }
                   } @$dirs;
@@ -193,7 +193,7 @@ sub find_perl {
     }
     foreach $dir (@sdirs){
 	next unless defined $dir; # $self->{PERL_SRC} may be undefined
-	$inabs++ if File::Spec->file_name_is_absolute($dir);
+	$inabs++ if $self->file_name_is_absolute($dir);
 	if ($inabs == 1) {
 	    # We've covered relative dirs; everything else is an absolute
 	    # dir (probably an installed location).  First, we'll try potential
@@ -417,7 +417,7 @@ sub init_platform {
 
     $self->{MM_VMS_REVISION} = $Revision;
     $self->{MM_VMS_VERSION}  = $VERSION;
-    $self->{PERL_VMS} = File::Spec->catdir($self->{PERL_SRC}, 'VMS')
+    $self->{PERL_VMS} = $self->catdir($self->{PERL_SRC}, 'VMS')
       if $self->{PERL_SRC};
 }
 
@@ -697,9 +697,9 @@ Use VMS-style quoting on xsubpp command line.
 sub tool_xsubpp {
     my($self) = @_;
     return '' unless $self->needs_linking;
-    my($xsdir) = File::Spec->catdir($self->{PERL_LIB},'ExtUtils');
+    my($xsdir) = $self->catdir($self->{PERL_LIB},'ExtUtils');
     # drop back to old location if xsubpp is not in new location yet
-    $xsdir = File::Spec->catdir($self->{PERL_SRC},'ext') 
+    $xsdir = $self->catdir($self->{PERL_SRC},'ext') 
       unless (-f $self->catfile($xsdir,'xsubpp'));
     my(@tmdeps) = '$(XSUBPPDIR)typemap';
     if( $self->{TYPEMAPS} ){
@@ -1512,8 +1512,8 @@ doc__install : doc_site_install
 
 # This hack brought to you by DCL's 255-character command line limit
 pure_perl_install ::
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.$self->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLPRIVLIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLARCHLIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLBIN) '" >>.MM_tmp
@@ -1526,8 +1526,8 @@ pure_perl_install ::
 
 # Likewise
 pure_site_install ::
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.$self->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLSITELIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLSITEARCH) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLSITEBIN) '" >>.MM_tmp
@@ -1557,7 +1557,7 @@ q%	$(NOECHO) $(PERL) -e "print q[@ARGV=split(/\\|/,<STDIN>);]" >.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[print '=head2 ',scalar(localtime),': C<',shift,qq[>\\n\\n=over 4\\n\\n];]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[while(($key=shift) && ($val=shift)) ]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[{print qq[=item *\\n\\nC<$key: $val>\\n\\n];}print qq[=back\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.File::Spec->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.$self->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;,.MM2_tmp;
 
 # And again
@@ -1569,7 +1569,7 @@ q%	$(NOECHO) $(PERL) -e "print q[@ARGV=split(/\\|/,<STDIN>);]" >.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[print '=head2 ',scalar(localtime),': C<',shift,qq[>\\n\\n=over 4\\n\\n];]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[while(($key=shift) && ($val=shift)) ]" >>.MM2_tmp
 	$(NOECHO) $(PERL) -e "print q[{print qq[=item *\\n\\nC<$key: $val>\\n\\n];}print qq[=back\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.File::Spec->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.$self->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;,.MM2_tmp;
 
 doc_vendor_install ::
@@ -2070,7 +2070,7 @@ sub prefixify {
         print STDERR "  prefixify $var => $path\n"     if $Verbose >= 2;
         print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
 
-        my($path_vol, $path_dirs) = File::Spec->splitpath( $path );
+        my($path_vol, $path_dirs) = $self->splitpath( $path );
         if( $path_vol eq $Config{vms_prefix}.':' ) {
             print STDERR "  $Config{vms_prefix}: seen\n" if $Verbose >= 2;
 
@@ -2107,15 +2107,15 @@ sub _prefixify_default {
 sub _catprefix {
     my($self, $rprefix, $default) = @_;
 
-    my($rvol, $rdirs) = File::Spec->splitpath($rprefix);
+    my($rvol, $rdirs) = $self->splitpath($rprefix);
     if( $rvol ) {
-        return File::Spec->catpath($rvol,
-                                   File::Spec->catdir($rdirs, $default),
+        return $self->catpath($rvol,
+                                   $self->catdir($rdirs, $default),
                                    ''
                                   )
     }
     else {
-        return File::Spec->catdir($rdirs, $default);
+        return $self->catdir($rdirs, $default);
     }
 }
 

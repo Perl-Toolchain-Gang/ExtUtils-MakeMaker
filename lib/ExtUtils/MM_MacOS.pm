@@ -18,7 +18,6 @@ use Config;
 use Cwd 'cwd';
 require Exporter;
 use File::Basename;
-use File::Spec;
 use vars qw(%make_data);
 
 my $Mac_FS = eval { require Mac::FileSpec::Unixish };
@@ -337,7 +336,7 @@ sub init_main {
 	}
     }
     if ($self->{PERL_SRC}){
-	$self->{PERL_LIB}     ||= File::Spec->catdir("$self->{PERL_SRC}","lib");
+	$self->{PERL_LIB}     ||= $self->catdir("$self->{PERL_SRC}","lib");
 	$self->{PERL_ARCHLIB} = $self->{PERL_LIB};
 	$self->{PERL_INC}     = $self->{PERL_SRC};
     } else {
@@ -425,7 +424,7 @@ sub init_main {
     # will be working versions of perl 5. miniperl has priority over perl
     # for PERL to ensure that $(PERL) is usable while building ./ext/*
     my ($component,@defpath);
-    foreach $component ($self->{PERL_SRC}, File::Spec->path(), $Config::Config{binexp}) {
+    foreach $component ($self->{PERL_SRC}, $self->path(), $Config::Config{binexp}) {
 	push @defpath, $component if defined $component;
     }
     $self->{PERL} = "$self->{PERL_SRC}miniperl";
@@ -490,8 +489,8 @@ XXX Few are initialized.  How many of these are ever used?
 sub init_platform {
     my $self = shift;
 
-    $self->{MACPERL_SRC}  = File::Spec->catdir("$self->{PERL_SRC}","macos:");
-    $self->{MACPERL_LIB}  ||= File::Spec->catdir("$self->{MACPERL_SRC}","lib");
+    $self->{MACPERL_SRC}  = $self->catdir("$self->{PERL_SRC}","macos:");
+    $self->{MACPERL_LIB}  ||= $self->catdir("$self->{MACPERL_SRC}","lib");
     $self->{MACPERL_INC}  = $self->{MACPERL_SRC};
 }
 
