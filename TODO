@@ -41,8 +41,6 @@ Consider if shell escaping all macro data is a good idea.
 
 Have 'make distdir' spit out a META.yml file.
 
-Merge libscan() methods.
-
 Move Win32->init_others() ExtUtils::Command overrides into MM_Any.
 
 Figure out and document the 4th arg to ExtUtils::Install::install()
