@@ -1,14 +1,12 @@
 package ExtUtils::MM_Win95;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.03_01';
+$VERSION = '0.03_05';
 
 require ExtUtils::MM_Win32;
 @ISA = qw(ExtUtils::MM_Win32);
 
 use ExtUtils::MakeMaker::Config;
-my $DMAKE = $Config{'make'} =~ /^dmake/i;
-my $NMAKE = $Config{'make'} =~ /^nmake/i;
 
 
 =head1 NAME
@@ -77,30 +75,6 @@ sub xs_o {
 	$(XSUBPP) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
 	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.c
 	';
-}
-
-
-=item cd
-
-This cd can only go one level down.
-
-=cut
-
-sub cd {
-    my($self, $dir, @cmds) = @_;
-
-    my $cmd = join "\n\t", map "$_", @cmds;
-
-    # No leading tab and no trailing newline makes for easier embedding.
-    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
-cd %s
-	%s
-	cd ..
-MAKE_FRAG
-
-    chomp $make_frag;
-
-    return $make_frag;
 }
 
 

@@ -29,7 +29,7 @@ use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE);
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
-$VERSION = '1.10_04';
+$VERSION = '1.10_05';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
@@ -461,6 +461,41 @@ sub escape_newlines {
     $text =~ s{\n}{\\\n}g;
 
     return $text;
+}
+
+
+=item cd
+
+dmake can handle Unix style cd'ing but nmake (at least 1.5) cannot.  It
+wants:
+
+    cd dir
+    command
+    another_command
+    cd ..
+
+B<NOTE> This cd can only go one level down.  So far this sufficient for
+what MakeMaker needs.
+
+=cut
+
+sub cd {
+    my($self, $dir, @cmds) = @_;
+
+    return $self->SUPER::cd($dir, @cmds) unless $NMAKE;
+
+    my $cmd = join "\n\t", map "$_", @cmds;
+
+    # No leading tab and no trailing newline makes for easier embedding.
+    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
+cd %s
+	%s
+	cd ..
+MAKE_FRAG
+
+    chomp $make_frag;
+
+    return $make_frag;
 }
 
 
