@@ -7,7 +7,7 @@
     - Added Ken William's "speed up ExtUtils::Manifest" patch.
     - Added Nick Clark's return value of manifest routines patch
       (bleadperl@14978)
-    - Merging in bleadperl changes (14438)
+    - Merging in bleadperl changes (14438, 14453)
 
 
 5.50_01 Mon Mar  4 23:44:48 EST 2002
@@ -57,6 +57,7 @@
     - Gisle Aas fixed a warning in prompt when the user hits ctrl-D
       or pipes STDIN to /dev/null.
     - VMS's test is now a proper ->can check.
+    - Stray newline in Command.t causing havoc (bleadperl 14441)
 
     * Lots of internal changes.  Everything from here on is an internal
       change.
@@ -89,7 +90,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.9 $ based $VERSIONs.
+    - Stripped out $Revision: 1.10 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.
