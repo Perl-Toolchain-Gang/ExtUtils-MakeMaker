@@ -30,6 +30,7 @@
       This allows distclean to work with SDBM_File. [rt 5616]
     - realclean was using "rm -f" instead of "rm -rf" meaning directories
       wouldn't be properly cleaned.  Caused by bleadperl@7952. [rt 5208]
+    - fixpath() could undo wraplist() on VMS [rt 4955]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 

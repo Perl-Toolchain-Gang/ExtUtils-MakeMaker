@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71';
-($Revision) = q$Revision: 1.115 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.116 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2280,10 +2280,10 @@ sub fixpath {
     $self = bless {} unless ref $self;
     my($fixedpath,$prefix,$name);
 
-    if ($path =~ /\s/) {
+    if ($path =~ /[ \t]/) {
       return join ' ',
              map { $self->fixpath($_,$force_path) }
-	     split /\s+/, $path;
+	     split /[ \t]+/, $path;
     }
 
     if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) { 
