@@ -87,8 +87,10 @@ Better yet, provide a patch.
 
 Not all of the methods below are overridable in a
 Makefile.PL. Overridable methods are marked as (o). All methods are
-overridable by a platform specific MM_*.pm file (See
-L<ExtUtils::MM_VMS>) and L<ExtUtils::MM_OS2>).
+overridable by a platform specific MM_*.pm file.
+
+Cross-platform methods are being moved into MM_Any.  If you can't find
+something that used to be in here, look in MM_Any.
 
 =cut
 
@@ -3337,89 +3339,6 @@ sub quote_paren {
     $arg =~ s{\$\\\\\((.+?)\\\\\)}{\$($1)}g;	# unprotect $(...)
     return $arg;
 }
-
-=item realclean (o)
-
-Defines the realclean target.
-
-=cut
-
-sub realclean {
-    my($self, %attribs) = @_;
-
-    my @dirs  = qw($(DISTVNAME));
-    my @files = qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
-
-    if( $self->has_link_code ){
-        push @files, qw($(OBJECT));
-    }
-
-    if( $attribs{FILES} ) {
-        if( ref $attribs{FILES} ) {
-            push @dirs, @{ $attribs{FILES} };
-        }
-        else {
-            push @dirs, split /\s+/, $attribs{FILES};
-        }
-    }
-
-    # Occasionally files are repeated several times from different sources
-    { my(%f) = map { ($_ => 1) } @files;  @files = keys %f; }
-    { my(%d) = map { ($_ => 1) } @dirs;   @dirs  = keys %d; }
-
-    my $rm_cmd  = join "\n\t", map { "$_" } 
-                    $self->split_command('-$(RM_F)',  @files);
-    my $rmf_cmd = join "\n\t", map { "$_" } 
-                    $self->split_command('-$(RM_RF)', @dirs);
-
-    my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;
-# Delete temporary files (via clean) and also delete dist files
-realclean purge ::  clean realclean_subdirs
-	%s
-	%s
-MAKE
-
-    $m .= "\t$attribs{POSTOP}\n" if $attribs{POSTOP};
-
-    return $m;
-}
-
-
-=item realclean_subdirs_target
-
-  my $make_frag = $MM->realclean_subdirs_target;
-
-Returns the realclean_subdirs target.  This is used by the realclean
-target to call realclean on any subdirectories which contain Makefiles.
-
-=cut
-
-sub realclean_subdirs_target {
-    my $self = shift;
-
-    return <<'NOOP_FRAG' unless @{$self->{DIR}};
-realclean_subdirs :
-	$(NOECHO) $(NOOP)
-NOOP_FRAG
-
-    my $rclean = "realclean_subdirs :\n";
-
-    foreach my $dir (@{$self->{DIR}}) {
-        foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
-            my $rclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
-chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
-CODE
-
-            $rclean .= sprintf <<'RCLEAN', $rclean;
-	-%s
-RCLEAN
-
-        }
-    }
-
-    return $rclean;
-}
-
 
 =item replace_manpage_separator
 
