@@ -28,7 +28,7 @@ $mm->{_MAX_EXEC_LEN} = length($echo) + 15;
 is( $mm->max_exec_len, $mm->{_MAX_EXEC_LEN}, '  forced a short max_exec_len' );
 
 my @test_args = qw(foo bar baz yar car har ackapicklerootyjamboree);
-my @cmds = $mm->split_command($echo, \@test_args);
+my @cmds = $mm->split_command($echo, @test_args);
 isnt( @cmds, 0 );
 
 s{\$\(PERLRUN\)}{$^X} foreach @cmds;
@@ -37,7 +37,7 @@ is( join('', map { s/\n+$//; $_ } map { `$_` } @cmds), join('', @test_args));
 
 my %test_args = ( foo => 42, bar => 23, car => 'har' );
 $even_args = $mm->oneliner(q{print !(@ARGV % 2)});
-@cmds = $mm->split_command($even_args, \%test_args);
+@cmds = $mm->split_command($even_args, %test_args);
 isnt( @cmds, 0 );
 
 s{\$\(PERLRUN\)}{$^X} foreach @cmds;

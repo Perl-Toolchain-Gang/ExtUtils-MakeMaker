@@ -140,8 +140,7 @@ require partial overrides.
 
 =item B<split_command>
 
-    my @cmds = $MM->split_command($cmd, \@args);
-    my @cmds = $MM->split_command($cmd, \%args);
+    my @cmds = $MM->split_command($cmd, @args);
 
 Most OS have a maximum command length they can execute at once.  Large
 modules can easily generate commands well past that limit.  Its
@@ -154,19 +153,17 @@ $self->max_exec_len being careful to take into account macro expansion.
 
 $cmd should include any switches and repeated initial arguments.
 
-If @args is given, the argument list will be split at any point.
+Pairs of arguments will always be preserved in a single command, this
+is a heuristic for things like pm_to_blib and pod2man which work on
+pairs of arguments.  This makes things like this safe:
 
-If %args is given, the hash will be flattened into an argument list,
-but key/value pairs will not be split between arguments.  This is
-useful for things like pod2man and pm_to_blib.
+    $self->split_command($cmd, %pod2man);
+
 
 =cut
 
 sub split_command {
-    my($self, $cmd, $args) = @_;
-    my @args = ref $args eq 'ARRAY' ? @$args :
-               ref $args eq 'HASH'  ? %$args :
-                 die "split_command takes an array or hash ref";
+    my($self, $cmd, @args) = @_;
 
     my $len_left = $self->max_exec_len - length $cmd;
     $len_left = int($len_left * 0.80);  # set aside 20% for macro expansion.
@@ -177,11 +174,11 @@ sub split_command {
         my $arg_str = '';
         while( @args && $len_left > length $arg_str ) {
             # Two at a time to preserve pairs.
-            $arg_str .= join ' ', splice(@args, 0, 2), '';
+            $arg_str .= "\t". join ' ', splice(@args, 0, 2), "\n";
         }
         chop $arg_str;
 
-        push @cmds, "$cmd $arg_str";
+        push @cmds, $self->escape_newlines("$cmd\n$arg_str");
     } while @args;
 
     return @cmds;
