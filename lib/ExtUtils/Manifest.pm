@@ -539,7 +539,7 @@ sub maniadd {
     _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
-    my @needed = grep { !exists $manifest->{$_} } keys %additions;
+    my @needed = grep { !exists $manifest->{$_} } keys %$additions;
     return 1 unless @needed;
 
     open(MANIFEST, ">>$MANIFEST") or 
