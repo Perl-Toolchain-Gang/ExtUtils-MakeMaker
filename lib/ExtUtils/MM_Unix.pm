@@ -1064,34 +1064,53 @@ sub find_perl {
     my($self, $ver, $names, $dirs, $trace) = @_;
     my($name, $dir);
     if ($trace >= 2){
-	print "Looking for perl $ver by these names:
+        print "Looking for perl $ver by these names:
 @$names
 in these dirs:
 @$dirs
 ";
     }
+
+    my $stderr_duped = 0;
+    if( open(STDERR_COPY, '>&STDERR') ) {
+        $stderr_duped = 1;
+    }
+    else {
+        warn <<WARNING;
+find_perl() can't dup STDERR: $!
+You might see some garbage while we search for Perl
+WARNING
+    }
+
     foreach $name (@$names){
-	foreach $dir (@$dirs){
-	    next unless defined $dir; # $self->{PERL_SRC} may be undefined
-	    my ($abs, $val);
-	    if (File::Spec->file_name_is_absolute($name)) { # /foo/bar
-		$abs = $name;
-	    } elsif (File::Spec->canonpath($name) eq File::Spec->canonpath(basename($name))) { # foo
-		$abs = $self->catfile($dir, $name);
-	    } else { # foo/bar
-		$abs = $self->catfile($Curdir, $name);
-	    }
-	    print "Checking $abs\n" if ($trace >= 2);
-	    next unless $self->maybe_command($abs);
-	    print "Executing $abs\n" if ($trace >= 2);
-	    $val = `$abs -e 'require $ver; print "VER_OK\n" ' 2>&1`;
-	    if ($val =~ /VER_OK/) {
-	        print "Using PERL=$abs\n" if $trace;
-	        return $abs;
-	    } elsif ($trace >= 2) {
-		print "Result: `$val'\n";
-	    }
-	}
+        foreach $dir (@$dirs){
+            next unless defined $dir; # $self->{PERL_SRC} may be undefined
+            my ($abs, $val);
+            if (File::Spec->file_name_is_absolute($name)) {     # /foo/bar
+                $abs = $name;
+            } elsif (File::Spec->canonpath($name) eq 
+                     File::Spec->canonpath(basename($name))) {  # foo
+                $abs = $self->catfile($dir, $name);
+            } else {                                            # foo/bar
+                $abs = $self->catfile($Curdir, $name);
+            }
+            print "Checking $abs\n" if ($trace >= 2);
+            next unless $self->maybe_command($abs);
+            print "Executing $abs\n" if ($trace >= 2);
+
+            # To avoid using the unportable 2>&1 to supress STDERR,
+            # we close it before running the command.
+            close STDERR if $stderr_duped;
+            $val = `"$abs" -e "require $ver; print qq{VER_OK\n}"`;
+            open STDERR, '>&STDERR_COPY' if $stderr_duped;
+
+            if ($val =~ /^VER_OK/) {
+                print "Using PERL=$abs\n" if $trace;
+                return $abs;
+            } elsif ($trace >= 2) {
+                print "Result: '$val'\n";
+            }
+        }
     }
     print STDOUT "Unable to find a perl $ver (by these names: @$names, in these dirs: @$dirs)\n";
     0; # false and not empty

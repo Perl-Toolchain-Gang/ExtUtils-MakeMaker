@@ -95,49 +95,6 @@ sub maybe_command {
 }
 
 
-sub find_perl {
-    my($self, $ver, $names, $dirs, $trace) = @_;
-    $trace ||= 0;
-
-    my($name, $dir);
-    if ($trace >= 2){
-	print "Looking for perl $ver by these names:
-@$names
-in these dirs:
-@$dirs
-";
-    }
-    foreach $dir (@$dirs){
-	next unless defined $dir; # $self->{PERL_SRC} may be undefined
-	foreach $name (@$names){
-	    my ($abs, $val);
-	    if (File::Spec->file_name_is_absolute($name)) {  # /foo/bar
-		$abs = $name;
-	    } elsif (File::Spec->canonpath($name) eq 
-                     File::Spec->canonpath(basename($name))) # foo
-            {
-		$abs = $self->catfile($dir, $name);
-	    } else {                                         # foo/bar
-		$abs = $self->catfile(File::Spec->curdir, $name);
-	    }
-	    print "Checking $abs\n" if ($trace >= 2);
-	    next unless $self->maybe_command($abs);
-	    print "Executing $abs\n" if ($trace >= 2);
-            (my($safe_abs) = $abs) =~ s{(\s)}{\\$1}g;
-	    $val = `$safe_abs -e "require $ver;" 2>&1`;
-	    if ($? == 0) {
-	        print "Using PERL=$abs\n" if $trace;
-	        return $abs;
-	    } elsif ($trace >= 2) {
-		print "Result: `$val'\n";
-	    }
-	}
-    }
-    print STDOUT "Unable to find a perl $ver (by these names: @$names, in these dirs: @$dirs)\n";
-    0; # false and not empty
-}
-
-
 # This code was taken out of MM_Unix to avoid loading File::Glob
 # unless necessary.
 sub find_tests {
