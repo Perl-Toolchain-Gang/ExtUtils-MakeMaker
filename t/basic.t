@@ -64,7 +64,8 @@ like( $test_out, qr/All tests successful/, 'make test' );
 is( $?, 0 );
 
 # Test 'make test TEST_VERBOSE=1'
-$test_out = `$make test TEST_VERBOSE=1`;
+my $make_test_verbose = make_macro($make, 'test', TEST_VERBOSE => 1);
+$test_out = `$make_test_verbose`;
 like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
 like( $test_out, qr/All tests successful/, '  successful' );
 is( $?, 0 );

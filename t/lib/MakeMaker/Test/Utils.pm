@@ -12,7 +12,7 @@ require Exporter;
 $VERSION = 0.01;
 
 @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
-             make make_run
+             make make_run make_macro
             );
 
 my $Is_VMS = $^O eq 'VMS';
@@ -34,6 +34,7 @@ MakeMaker::Test::Utils - Utility routines for testing MakeMaker
 
   my $make          = make;
   my $make_run      = make_run;
+  make_macro($make, $targ, %macros);
 
 =head1 DESCRIPTION
 
@@ -162,6 +163,42 @@ sub make_run {
     $make .= ' -nologo' if $make eq 'nmake';
 
     return $make;
+}
+
+=item B<make_macro>
+
+    my $make_cmd = make_macro($make, $target, %macros);
+
+Returns the command necessary to run $make on the given $target using
+the given %macros.
+
+  my $make_test_verbose = make_macro(make_run(), 'test', 
+                                     TEST_VERBOSE => 1);
+
+This is important because VMS's make utilities have a completely
+different calling convention than Unix or Windows.
+
+%macros is actually a list of tuples, so the order will be preserved.
+
+=cut
+
+sub make_macro {
+    my($make, $target) = (shift, shift);
+
+    my $is_mms = $make =~ /^MM(K|S)/i;
+
+    my $cmd = $make;
+    my $macros = '';
+    while( my($key,$val) = splice(@_, 0, 2) ) {
+        if( $is_mms ) {
+            $macros .= qq{/macro="$key=$val"};
+        }
+        else {
+            $macros .= qq{ $key=$val};
+        }
+    }
+
+    return $is_mms ? "$make$macros $target" : "$make $target $macros";
 }
 
 =back
