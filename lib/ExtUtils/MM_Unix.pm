@@ -3461,20 +3461,20 @@ realclean purge ::  clean realclean_subdirs
     # Occasionally files are repeated several times from different sources
     { my(%f) = map { ($_,1) } @files; @files = keys %f; }
 
-    # Issue a several little RM_F commands rather than risk creating a
+    # Issue a several little RM_RF commands rather than risk creating a
     # very long command line (useful for extensions such as Encode
     # that have many files).
     my $line = "";
     foreach my $file (@files) {
         if (length($line) + length($file) > 200) {
-            push @m, "\t\$(RM_F) $line\n";
+            push @m, "\t\$(RM_RF) $line\n";
             $line = $file;
         }
         else {
             $line .= " $file"; 
         }
     }
-    push @m, "\t\$(RM_F) $line\n" if $line;
+    push @m, "\t\$(RM_RF) $line\n" if $line;
     push(@m, "\t$attribs{POSTOP}\n")      if $attribs{POSTOP};
 
     join("", @m);
