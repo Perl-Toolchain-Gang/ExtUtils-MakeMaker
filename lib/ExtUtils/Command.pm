@@ -21,16 +21,16 @@ ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.
 
 =head1 SYNOPSIS
 
-  perl -MExtUtils::Command -e cat files... > destination
-  perl -MExtUtils::Command -e mv source... destination
-  perl -MExtUtils::Command -e cp source... destination
-  perl -MExtUtils::Command -e touch files...
-  perl -MExtUtils::Command -e rm_f file...
-  perl -MExtUtils::Command -e rm_rf directories...
-  perl -MExtUtils::Command -e mkpath directories...
-  perl -MExtUtils::Command -e eqtime source destination
-  perl -MExtUtils::Command -e chmod mode files...
-  perl -MExtUtils::Command -e test_f file
+  perl -MExtUtils::Command       -e cat files... > destination
+  perl -MExtUtils::Command       -e mv source... destination
+  perl -MExtUtils::Command       -e cp source... destination
+  perl -MExtUtils::Command       -e touch files...
+  perl -MExtUtils::Command       -e rm_f file...
+  perl -MExtUtils::Command       -e rm_rf directories...
+  perl -MExtUtils::Command       -e mkpath directories...
+  perl -MExtUtils::Command       -e eqtime source destination
+  perl -MExtUtils::Command       -e test_f file
+  perl -MExtUtils::Command=chmod -e chmod mode files...
 
 =head1 DESCRIPTION
 
@@ -173,7 +173,7 @@ sub cp
 
 =item chmod mode files...
 
-Sets UNIX like permissions 'mode' on all the files.
+Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 
 =cut 
 
@@ -181,7 +181,7 @@ sub chmod
 {
  my $mode = shift(@ARGV);
  expand_wildcards();
- chmod($mode,@ARGV) || die "Cannot chmod ".join(' ',$mode,@ARGV).":$!";
+ chmod(oct $mode,@ARGV) || die "Cannot chmod ".join(' ',$mode,@ARGV).":$!";
 }
 
 =item mkpath directory...

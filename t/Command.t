@@ -23,13 +23,14 @@ BEGIN {
 	use File::Spec;
 }
 
-{
+BEGIN {
 	# bad neighbor, but test_f() uses exit()
-    *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
+        *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
 	*CORE::GLOBAL::exit = sub { return @_ };
-
 	use_ok( 'ExtUtils::Command' );
+}
 
+{
 	# get a file in the current directory, replace last char with wildcard 
 	my $file;
 	{
@@ -113,21 +114,21 @@ BEGIN {
         }
 
         # change a file to execute-only
-        @ARGV = ( 0100, 'ecmdfile' );
+        @ARGV = ( '0100', 'ecmdfile' );
         ExtUtils::Command::chmod();
 
         is( ((stat('ecmdfile'))[2] & 07777) & 0700,
             0100, 'change a file to execute-only' );
 
         # change a file to read-only
-        @ARGV = ( 0400, 'ecmdfile' );
+        @ARGV = ( '0400', 'ecmdfile' );
         ExtUtils::Command::chmod();
 
         is( ((stat('ecmdfile'))[2] & 07777) & 0700,
             ($^O eq 'vos' ? 0500 : 0400), 'change a file to read-only' );
 
         # change a file to write-only
-        @ARGV = ( 0200, 'ecmdfile' );
+        @ARGV = ( '0200', 'ecmdfile' );
         ExtUtils::Command::chmod();
 
         is( ((stat('ecmdfile'))[2] & 07777) & 0700,
@@ -135,7 +136,7 @@ BEGIN {
     }
 
     # change a file to read-write
-	@ARGV = ( 0600, 'ecmdfile' );
+	@ARGV = ( '0600', 'ecmdfile' );
 	ExtUtils::Command::chmod();
 
     is( ((stat('ecmdfile'))[2] & 07777) & 0700,
