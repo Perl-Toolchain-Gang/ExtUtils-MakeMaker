@@ -1,4 +1,4 @@
-6.10_03
+6.10_03 Fri Apr 11 00:21:25 PDT 2003
     * Added NO_META WriteMakefile() option to suppress generation of
       META.yml. (Spoon, rt.cpan.org 2359)
     - Spurious linebreak in uninstall_from_sitedirs on VMS (Craig Berry)
