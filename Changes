@@ -1,3 +1,6 @@
+5.94_02 Fri May 17 17:16:04 EDT 2002
+    - Fixing Manifest.t test for relative @INC when core testing.
+
 5.94_01 Fri May 17 14:53:54 EDT 2002
     - Small NetWare change from Novell.
     - worked around 5.005_03's lack of a $Config{siteprefix} and
