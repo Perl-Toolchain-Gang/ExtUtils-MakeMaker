@@ -36,3 +36,7 @@ Remove tar -I Sun-ism from instmodsh.
 find_perl has 2>&1-ism which will fail on Win95.
 
 Consider adding a timeout option to prompt() and env variable.
+
+Remove the dogmatic "always use h2xs" from the docs and replace with
+something a bit more sensible.  References to ModuleMaker and perhaps
+a small Makefile.PL tutorial.
