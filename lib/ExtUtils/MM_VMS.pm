@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.67';
-($Revision) = q$Revision: 1.93 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.94 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1195,6 +1195,9 @@ sub installbin {
     @to = values %fromto;
     push @m, "
 EXE_FILES = @exefiles
+
+pure_all :: @to
+	\$(NOECHO) \$(NOOP)
 
 realclean ::
 ";
