@@ -15,15 +15,13 @@ require Exporter;
 use VMS::Filespec;
 use File::Basename;
 use File::Spec;
-our($Revision, @ISA, $VERSION, $Verbose);
-# All on one line so MakeMaker can see it.
-($VERSION) = ($Revision = '5.56 (27-Apr-1999)') =~ /^([\d.]+)/;
+use vars qw($Revision @ISA $VERSION);
+($VERSION) = $Revision = '5.57_01';
 
-@ISA = qw( File::Spec );
-unshift @MM::ISA, 'ExtUtils::MM_VMS';
+@ISA = qw( ExtUtils::MM_Unix File::Spec );
 
-require ExtUtils::MakeMaker;
-ExtUtils::MakeMaker->import('$Verbose', '&neatvalue');
+use ExtUtils::MakeMaker qw($Verbose neatvalue);
+
 
 =head1 NAME
 
@@ -158,9 +156,10 @@ sub AUTOLOAD {
 # appears in @MM::ISA before ExtUtils::Liblist::Kid, so if there isn't an ext()
 # in MM_VMS, then AUTOLOAD is called, and bad things happen.  So, we just
 # mimic inheritance here and hand off to ExtUtils::Liblist::Kid.
+# XXX This hackery will die soon. --Schwern
 sub ext {
-  require ExtUtils::Liblist;
-  ExtUtils::Liblist::Kid::ext(@_);
+    require ExtUtils::Liblist::Kid;
+    goto &ExtUtils::Liblist::Kid::ext;
 }
 
 =back
