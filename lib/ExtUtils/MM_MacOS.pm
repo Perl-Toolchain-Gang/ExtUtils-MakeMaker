@@ -293,7 +293,7 @@ sub patternify {
 
 =item init_main
 
-Initializes some of NAME, FULLEXT, BASEEXT, ROOTEXT, DLBASE, PERL_SRC,
+Initializes some of NAME, FULLEXT, BASEEXT, DLBASE, PERL_SRC,
 PERL_LIB, PERL_ARCHLIB, PERL_INC, INSTALLDIRS, INST_*, INSTALL*,
 PREFIX, CONFIG, AR, AR_STATIC_ARGS, LD, OBJ_EXT, LIB_EXT, MAP_TARGET,
 LIBPERL_A, VERSION_FROM, VERSION, DISTNAME, VERSION_SYM.
@@ -308,14 +308,10 @@ sub init_main {
     # NAME    = The perl module name for this extension (eg DBD::Oracle).
     # FULLEXT = Pathname for extension directory (eg DBD/Oracle).
     # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT.
-    # ROOTEXT = Directory part of FULLEXT with trailing :.
     ($self->{FULLEXT} =
      $self->{NAME}) =~ s!::!:!g ;		     #eg. BSD:Foo:Socket
     ($self->{BASEEXT} =
      $self->{NAME}) =~ s!.*::!! ;		             #eg. Socket
-    ($self->{ROOTEXT} =
-     $self->{FULLEXT}) =~ s#:?\Q$self->{BASEEXT}\E$## ;      #eg. BSD:Foo
-    $self->{ROOTEXT} .= ":" if ($self->{ROOTEXT});
 
     # --- Initialize PERL_LIB, INST_LIB, PERL_SRC
 
@@ -341,12 +337,9 @@ sub init_main {
 	}
     }
     if ($self->{PERL_SRC}){
-	$self->{MACPERL_SRC}  = File::Spec->catdir("$self->{PERL_SRC}","macos:");
-	$self->{MACPERL_LIB}  ||= File::Spec->catdir("$self->{MACPERL_SRC}","lib");
 	$self->{PERL_LIB}     ||= File::Spec->catdir("$self->{PERL_SRC}","lib");
 	$self->{PERL_ARCHLIB} = $self->{PERL_LIB};
 	$self->{PERL_INC}     = $self->{PERL_SRC};
-	$self->{MACPERL_INC}  = $self->{MACPERL_SRC};
     } else {
 # hmmmmmmm ... ?
         $self->{PERL_LIB}    ||= "$ENV{MACPERL}site_perl";
@@ -373,6 +366,7 @@ sub init_main {
     # Determine VERSION and VERSION_FROM
     ($self->{DISTNAME}=$self->{NAME}) =~ s#(::)#-#g unless $self->{DISTNAME};
     if ($self->{VERSION_FROM}){
+        # XXX replace with parse_version() override
 	local *FH;
 	open(FH,macify($self->{VERSION_FROM})) or
 	    die "Could not open '$self->{VERSION_FROM}' (attribute VERSION_FROM): $!";
@@ -408,6 +402,22 @@ sub init_main {
     # corresponding *.xs file. The bottomline was, that we need an
     # XS_VERSION macro that defaults to VERSION:
     $self->{XS_VERSION} ||= $self->{VERSION};
+
+
+    $self->{DEFINE} .= " \$(XS_DEFINE_VERSION) \$(DEFINE_VERSION)";
+
+    # Preprocessor definitions may be useful
+    $self->{DEFINE} =~ s/-D/-d /g; 
+
+    # UN*X includes probably are not useful
+    $self->{DEFINE} =~ s/-I\S+/_include($1)/eg;
+
+
+    if ($self->{INC}) {
+        # UN*X includes probably are not useful
+    	$self->{INC} =~ s/-I(\S+)/_include($1)/eg;
+    }
+
 
     # --- Initialize Perl Binary Locations
 
@@ -463,6 +473,47 @@ sub init_others {	# --- Initialize Other Attributes
     return 1;
 }
 
+=item init_platform
+
+Add MACPERL_SRC MACPERL_LIB
+
+=item platform_constants
+
+Add MACPERL_SRC MACPERL_LIB MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC
+MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED
+
+XXX Few are initialized.  How many of these are ever used?
+
+=cut
+
+sub init_platform {
+    my $self = shift;
+
+    $self->{MACPERL_SRC}  = File::Spec->catdir("$self->{PERL_SRC}","macos:");
+    $self->{MACPERL_LIB}  ||= File::Spec->catdir("$self->{MACPERL_SRC}","lib");
+    $self->{MACPERL_INC}  = $self->{MACPERL_SRC};
+}
+
+
+
+sub platform_constants {
+    my $self = shift;
+
+    foreach my $macro (qw(MACPERL_SRC MACPERL_LIB MACLIBS_68K MACLIBS_PPC 
+                          MACLIBS_SC  MACLIBS_MRC MACLIBS_ALL_68K 
+                          MACLIBS_ALL_PPC MACLIBS_SHARED))
+    {
+        next unless defined $self->{$macro};
+        $make_frag .= "$macro = $self->{$macro}\n";
+    }
+
+    return $make_frag;
+}
+
+
+=cut
+
+sub 
 
 =item init_dirscan
 
@@ -527,8 +578,8 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     #
     # In this way the 'lib' directory is seen as the root of the actual
     # perl library whereas the others are relative to INST_LIBDIR
-    # (which includes ROOTEXT). This is a subtle distinction but one
-    # that's important for nested modules.
+    # This is a subtle distinction but one that's important for nested 
+    # modules.
 
     $self->{PMLIBDIRS} = ['lib', $self->{BASEEXT}]
 	unless $self->{PMLIBDIRS};
@@ -583,88 +634,38 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 }
 
 
-=item constants (o)
+=item init_VERSION (o)
 
-Initializes lots of constants and .SUFFIXES and .PHONY
+Change DEFINE_VERSION and XS_DEFINE_VERSION
 
 =cut
 
-sub constants {
-    my($self) = @_;
-    my(@m,$tmp);
+sub init_VERSION {
+    my $self = shift;
 
-    for $tmp (qw/
-	      NAME DISTNAME NAME_SYM VERSION VERSION_SYM XS_VERSION
-	      INST_LIB INST_ARCHLIB PERL_LIB PERL_SRC MACPERL_SRC MACPERL_LIB PERL FULLPERL
-	      XSPROTOARG MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED SOURCE TYPEMAPS
-          FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD
-	      / ) {
-	next unless defined $self->{$tmp};
-	if ($tmp eq 'TYPEMAPS' && ref $self->{$tmp}) {
-	    push @m, sprintf "$tmp = %s\n", join " ", @{$self->{$tmp}};
-	} else {
-	    push @m, "$tmp = $self->{$tmp}\n";
-	}
-    }
+    $self->SUPER::init_VERSION;
 
-    push @m, q{
-MODULES = }.join(" \\\n\t", sort keys %{$self->{PM}})."\n";
-    push @m, "PMLIBDIRS = @{$self->{PMLIBDIRS}}\n" if @{$self->{PMLIBDIRS}};
+    $self->{DEFINE_VERSION}    = '-d $(VERSION_MACRO)="¶"$(VERSION)¶""';
+    $self->{XS_DEFINE_VERSION} = '-d $(XS_VERSION_MACRO)="¶"$(XS_VERSION)¶""';
+}
 
-    push @m, '
 
-.INCLUDE : $(MACPERL_SRC)BuildRules.mk
+=item special_targets (o)
 
-';
+Add .INCLUDE
 
-    push @m, qq{
-VERSION_MACRO = VERSION
-DEFINE_VERSION = -d \$(VERSION_MACRO)="¶"\$(VERSION)¶""
-XS_VERSION_MACRO = XS_VERSION
-XS_DEFINE_VERSION = -d \$(XS_VERSION_MACRO)="¶"\$(XS_VERSION)¶""
-};
+=cut
 
-    $self->{DEFINE} .= " \$(XS_DEFINE_VERSION) \$(DEFINE_VERSION)";
+sub special_targets {
+    my $self = shift;
 
-    push @m, qq{
-MAKEMAKER = $INC{'ExtUtils/MakeMaker.pm'}
-MM_VERSION = $ExtUtils::MakeMaker::VERSION
-};
+    my $make_frag = $self->SUPER::special_targets;
 
-    push @m, q{
-# FULLEXT = Pathname for extension directory (eg DBD:Oracle).
-# BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT.
-# ROOTEXT = Directory part of FULLEXT (eg DBD)
-# DLBASE  = Basename part of dynamic library. May be just equal BASEEXT.
-};
+    return $make_frag . <<'MAKE_FRAG';
+.INCLUDE : $(MACPERL_SRC)BuildRules.mk $(MACPERL_SRC)ExtBuildRules.mk
 
-    if ($self->{DEFINE}) {
-    	$self->{DEFINE} =~ s/-D/-d /g; # Preprocessor definitions may be useful
-    	$self->{DEFINE} =~ s/-I\S+/_include($1)/eg; # UN*X includes probably are not useful
-    }
-    if ($self->{INC}) {
-    	$self->{INC} =~ s/-I(\S+)/_include($1)/eg; # UN*X includes probably are not useful
-    }
-    for $tmp (qw/
-	      FULLEXT BASEEXT ROOTEXT DEFINE INC
-	      /	) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
-    }
+MAKE_FRAG
 
-    push @m, "
-# Handy lists of source code files:
-XS_FILES= ".join(" \\\n\t", sort keys %{$self->{XS}})."
-C_FILES = ".join(" \\\n\t", @{$self->{C}})."
-H_FILES = ".join(" \\\n\t", @{$self->{H}})."
-";
-
-    push @m, '
-
-.INCLUDE : $(MACPERL_SRC)ExtBuildRules.mk
-';
-
-    join('',@m);
 }
 
 =item static (o)
