@@ -1,0 +1,28 @@
+Known Problems:
+
+Debian
+------
+
+Due to a glitch in the layout of the Debian perl packages, Debian
+users will have to either install the libperl-dev package (which
+installs libperl.a and the symlink below) or add the symlink manually:
+
+    cd /usr/lib/
+    ln -s libperl.so.5.6.1 libperl.so
+
+or else ExtUtils::Embed won't be able to find -lperl.
+
+Debian is aware of the problem.
+
+
+Win32
+-----
+
+Currently, ExtUtils::Installed isn't well.
+
+
+VMS
+---
+
+Currently, ExtUtils::Installed and possibly ExtUtils::Manifest are not
+well.
