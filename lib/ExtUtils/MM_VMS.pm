@@ -1579,7 +1579,7 @@ q{
 disttest : distdir
 	startdir = F$Environment("Default")
 	Set Default [.$(DISTVNAME)]
-	$(PERLRUN) Makefile.PL
+	$(ABSPERLRUN) Makefile.PL
 	$(MMS)$(MMSQUALIFIERS)
 	$(MMS)$(MMSQUALIFIERS) test
 	Set Default 'startdir'
