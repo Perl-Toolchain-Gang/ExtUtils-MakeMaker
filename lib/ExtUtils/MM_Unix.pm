@@ -3802,7 +3802,7 @@ test :: \$(TEST_TYPE)
         push(@m, map("\t\$(NOECHO) cd $_ && \$(TEST_F) \$(FIRST_MAKEFILE) && \$(MAKE) test \$(PASTHRU)\n", @{$self->{DIR}}));
     }
 
-    push(@m, "\t\$(NOECHO) $(ECHO) 'No tests defined for \$(NAME) extension.'\n")
+    push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
 	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 
