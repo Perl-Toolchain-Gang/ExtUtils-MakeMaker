@@ -1,4 +1,4 @@
-6.10_01
+6.10_01 Sun Apr  6 19:31:42 PDT 2003
     - Making install "Skip ... (unchanged)" message happen consistently
     - Checking file sizes as well as modification times when deciding
       to skip installing a file.
