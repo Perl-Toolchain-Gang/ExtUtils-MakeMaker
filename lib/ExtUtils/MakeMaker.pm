@@ -2,10 +2,10 @@ BEGIN {require 5.004;}
 
 package ExtUtils::MakeMaker;
 
-$VERSION = "5.49_01";
-$Version_OK = "5.17";   # Makefiles older than $Version_OK will die
+$VERSION = "5.50_01";
+$Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.7 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.8 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -16,7 +16,7 @@ use ExtUtils::MM;  # Things like CPAN assume loading ExtUtils::MakeMaker
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
             $ISA_TTY $Revision $VERSION $Verbose $Version_OK %Config 
-            %Keep_after_flush %MM_Sections %Prepend_dot_dot 
+            %Keep_after_flush %MM_Sections @Prepend_dot_dot 
             %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
             @Parent $PACKNAME
            );
@@ -113,12 +113,11 @@ sub full_setup {
     AUTHOR ABSTRACT ABSTRACT_FROM BINARY_LOCATION
     C CAPI CCFLAGS CONFIG CONFIGURE DEFINE DIR DISTNAME DL_FUNCS DL_VARS
     EXCLUDE_EXT EXE_FILES FIRST_MAKEFILE FULLPERL FUNCLIST H 
-    HTMLLIBPODS HTMLSCRIPTPODS IMPORTS
-    INC INCLUDE_EXT INSTALLARCHLIB INSTALLBIN INSTALLDIRS INSTALLHTMLPRIVLIBDIR
-    INSTALLHTMLSCRIPTDIR INSTALLHTMLSITELIBDIR INSTALLMAN1DIR
+    IMPORTS
+    INC INCLUDE_EXT INSTALLARCHLIB INSTALLBIN INSTALLDIRS
+    INSTALLMAN1DIR
     INSTALLMAN3DIR INSTALLPRIVLIB INSTALLSCRIPT INSTALLSITEARCH
     INSTALLSITELIB INST_ARCHLIB INST_BIN INST_EXE INST_LIB
-    INST_HTMLLIBDIR INST_HTMLSCRIPTDIR
     INST_MAN1DIR INST_MAN3DIR INST_SCRIPT LDFROM LIB LIBPERL_A LIBS
     LINKTYPE MAKEAPERL MAKEFILE MAN1PODS MAN3PODS MAP_TARGET MYEXTLIB
     PERL_MALLOC_OK
@@ -156,7 +155,7 @@ sub full_setup {
  pasthru
 
  c_o xs_c xs_o top_targets linkext dlsyms dynamic dynamic_bs
- dynamic_lib static static_lib htmlifypods manifypods processPL
+ dynamic_lib static static_lib manifypods processPL
  installbin subdirs
  clean realclean dist_basics dist_core dist_dir dist_test dist_ci
  install force perldepend makefile staticmake test ppd
@@ -205,14 +204,11 @@ sub full_setup {
     # us (the parent) for the values and will prepend "..", so that
     # all files to be installed end up below OUR ./blib
     #
-    %Prepend_dot_dot = 
-        qw(
-
-           INST_BIN 1 INST_EXE 1 INST_LIB 1 INST_ARCHLIB 1 INST_SCRIPT 1
-           MAP_TARGET 1 INST_HTMLLIBDIR 1 INST_HTMLSCRIPTDIR 1 
-           INST_MAN1DIR 1 INST_MAN3DIR 1 PERL_SRC 1 PERL 1 FULLPERL 1
-
-          );
+    @Prepend_dot_dot = qw(
+           INST_BIN INST_EXE INST_LIB INST_ARCHLIB INST_SCRIPT
+           MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
+           PERL FULLPERL
+    );
 
     my @keep = qw/
         NEEDS_LINKING HAS_LINK_CODE
@@ -330,23 +326,23 @@ sub new {
     if (defined $Parent[-2]){
         $self->{PARENT} = $Parent[-2];
         my $key;
-        for $key (keys %Prepend_dot_dot) {
+        for $key (@Prepend_dot_dot) {
             next unless defined $self->{PARENT}{$key};
             $self->{$key} = $self->{PARENT}{$key};
-        unless ($^O eq 'VMS' && $key =~ /PERL$/) {
-            $self->{$key} = $self->catdir("..",$self->{$key})
-              unless $self->file_name_is_absolute($self->{$key});
-        } else {
-            # PERL or FULLPERL will be a command verb or even a command with
-            # an argument instead of a full file specification under VMS.  So, 
-            # don't turn the command into a filespec, but do add a level to 
-            # the path of the argument if not already absolute.
-
-            my @cmd = split /\s+/, $self->{$key};
-            $cmd[1] = $self->catfile('[-]',$cmd[1])
-              unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
-            $self->{$key} = join(' ', @cmd);
-        }
+            unless ($^O eq 'VMS' && $key =~ /PERL$/) {
+                $self->{$key} = $self->catdir("..",$self->{$key})
+                  unless $self->file_name_is_absolute($self->{$key});
+            } else {
+                # PERL or FULLPERL will be a command verb or even a
+                # command with an argument instead of a full file
+                # specification under VMS.  So, don't turn the command
+                # into a filespec, but do add a level to the path of
+                # the argument if not already absolute.
+                my @cmd = split /\s+/, $self->{$key};
+                $cmd[1] = $self->catfile('[-]',$cmd[1])
+                  unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
+                $self->{$key} = join(' ', @cmd);
+            }
         }
         if ($self->{PARENT}) {
             $self->{PARENT}->{CHILDREN}->{$newclass} = $self;
@@ -913,12 +909,11 @@ want to specify some other option, set C<TESTDB_SW> variable:
 =head2 make install
 
 make alone puts all relevant files into directories that are named by
-the macros INST_LIB, INST_ARCHLIB, INST_SCRIPT, INST_HTMLLIBDIR,
-INST_HTMLSCRIPTDIR, INST_MAN1DIR, and INST_MAN3DIR.  All these default
-to something below ./blib if you are I<not> building below the perl
-source directory. If you I<are> building below the perl source,
-INST_LIB and INST_ARCHLIB default to ../../lib, and INST_SCRIPT is not
-defined.
+the macros INST_LIB, INST_ARCHLIB, INST_SCRIPT, INST_MAN1DIR and
+INST_MAN3DIR.  All these default to something below ./blib if you are
+I<not> building below the perl source directory. If you I<are>
+building below the perl source, INST_LIB and INST_ARCHLIB default to
+../../lib, and INST_SCRIPT is not defined.
 
 The I<install> target of the generated Makefile copies the files found
 below each of the INST_* directories to their INSTALL*
@@ -930,8 +925,6 @@ INSTALLDIRS according to the following table:
 
     INST_ARCHLIB        INSTALLARCHLIB        INSTALLSITEARCH
     INST_LIB            INSTALLPRIVLIB        INSTALLSITELIB
-    INST_HTMLLIBDIR     INSTALLHTMLPRIVLIBDIR INSTALLHTMLSITELIBDIR
-    INST_HTMLSCRIPTDIR            INSTALLHTMLSCRIPTDIR
     INST_BIN                      INSTALLBIN
     INST_SCRIPT                   INSTALLSCRIPT
     INST_MAN1DIR                  INSTALLMAN1DIR
@@ -1277,20 +1270,6 @@ names are passed through unaltered to the linker options file.
 
 Ref to array of *.h file names. Similar to C.
 
-=item HTMLLIBPODS
-
-Hashref of .pm and .pod files.  MakeMaker will default this to all
- .pod and any .pm files that include POD directives.  The files listed
-here will be converted to HTML format and installed as was requested
-at Configure time.
-
-=item HTMLSCRIPTPODS
-
-Hashref of pod-containing files.  MakeMaker will default this to all
-EXE_FILES files that include POD directives.  The files listed
-here will be converted to HTML format and installed as was requested
-at Configure time.
-
 =item IMPORTS
 
 This attribute is used to specify names to be imported into the
@@ -1330,22 +1309,6 @@ Determines which of the two sets of installation directories to
 choose: installprivlib and installarchlib versus installsitelib and
 installsitearch. The first pair is chosen with INSTALLDIRS=perl, the
 second with INSTALLDIRS=site. Default is site.
-
-=item INSTALLHTMLPRIVLIBDIR
-
-This directory gets the HTML pages at 'make install' time. Defaults to
-$Config{installhtmlprivlibdir}.
-
-=item INSTALLHTMLSCRIPTDIR
-
-This directory gets the HTML pages at 'make install' time. Defaults to
-$Config{installhtmlscriptdir}.
-
-=item INSTALLHTMLSITELIBDIR
-
-This directory gets the HTML pages at 'make install' time. Defaults to
-$Config{installhtmlsitelibdir}.
-
 
 =item INSTALLMAN1DIR
 
@@ -1390,14 +1353,6 @@ to INSTALLBIN during 'make install'
 
 Old name for INST_SCRIPT. Deprecated. Please use INST_SCRIPT if you
 need to use it.
-
-=item INST_HTMLLIBDIR
-
-Directory to hold the man pages in HTML format at 'make' time
-
-=item INST_HTMLSCRIPTDIR
-
-Directory to hold the man pages in HTML format at 'make' time
 
 =item INST_LIB
 
@@ -1798,7 +1753,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.7 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.8 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
