@@ -2588,17 +2588,25 @@ Defines targets to make and to install EXE_FILES.
 
 sub installbin {
     my($self) = shift;
+
     return "" unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
-    return "" unless @{$self->{EXE_FILES}};
-    my(@m, $from, $to, %fromto, @to);
-    for $from (@{$self->{EXE_FILES}}) {
+    my @exefiles = @{$self->{EXE_FILES};
+    return "" unless @exefiles;
+
+    @exefiles = map { vmsify($_) } @exefiles if $Is_VMS;
+
+    my %fromto;
+    for my $from (@{$self->{EXE_FILES}}) {
 	my($path)= $self->catfile('$(INST_SCRIPT)', basename($from));
+
 	local($_) = $path; # for backwards compatibility
-	$to = $self->libscan($path);
+	my $to = $self->libscan($path);
 	print "libscan($from) => '$to'\n" if ($Verbose >=2);
-	$fromto{$from}=$to;
+
+        $to = vmsify($to) if $Is_VMS;
+	$fromto{$from} = $to;
     }
-    @to   = values %fromto;
+    my @to   = values %fromto;
 
     my $fixin;
     if( $Is_Win32 ) {
@@ -2609,6 +2617,7 @@ sub installbin {
         $fixin = q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"};
     }
 
+    my @m;
     push(@m, qq{
 EXE_FILES = @{$self->{EXE_FILES}}
 
@@ -2618,12 +2627,17 @@ pure_all :: @to
 	\$(NOECHO) \$(NOOP)
 
 realclean ::
-	\$(RM_F) @to
 });
 
+    # realclean can get rather large.
+    push @m, map { "\t$_\n" } $self->split_command('$(RM_F)', @to);
+
+
+    # A target for each exe file.
     while (($from,$to) = each %fromto) {
 	last unless defined $from;
-	my $todir = dirname($to);
+	my $todir = _todir($to);
+
 	push @m, "
 $to : $from \$(FIRST_MAKEFILE) blibdirs.ts
 	\$(NOECHO) \$(RM_F) $to
@@ -2633,6 +2647,28 @@ $to : $from \$(FIRST_MAKEFILE) blibdirs.ts
 ";
     }
     join "", @m;
+}
+
+
+sub _todir {
+    my $to = shift;
+    my $todir;
+
+    if( $IsVMS ) {
+        # XXX I'm not quite sure what this is all about
+	if ($to =~ m#[/>:\]]#) {
+            $todir = dirname($to); 
+        }
+	else { 
+            ($todir = $to) =~ s/[^\)]+$//; 
+        }
+	$todir = $self->fixpath($todir,1);
+    }
+    else {
+        $todir = dirname($to);
+    }
+
+    return $todir;
 }
 
 

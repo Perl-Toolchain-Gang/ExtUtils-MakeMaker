@@ -1006,67 +1006,6 @@ $(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
 }
 
 
-=item installbin (override)
-
-Stay under DCL's 255 character command line limit once again by
-splitting potentially long list of files across multiple lines
-in C<realclean> target.
-
-=cut
-
-sub installbin {
-    my($self) = @_;
-    return '' unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
-    return '' unless @{$self->{EXE_FILES}};
-    my(@m, $from, $to, %fromto, @to);
-    my(@exefiles) = map { vmsify($_) } @{$self->{EXE_FILES}};
-    for $from (@exefiles) {
-	my($path) = '$(INST_SCRIPT)' . basename($from);
-	local($_) = $path;  # backward compatibility
-	$to = $self->libscan($path);
-	print "libscan($from) => '$to'\n" if ($Verbose >=2);
-	$fromto{$from} = vmsify($to);
-    }
-    @to = values %fromto;
-    push @m, "
-EXE_FILES = @exefiles
-
-pure_all :: @to
-	\$(NOECHO) \$(NOOP)
-
-realclean ::
-";
-
-    my $line = '';
-    foreach $to (@to) {
-	if (length($line) + length($to) > 80) {
-	    push @m, "\t\$(RM_F) $line\n";
-	    $line = $to;
-	}
-	else { $line .= " $to"; }
-    }
-    push @m, "\t\$(RM_F) $line\n\n" if $line;
-
-    while (($from,$to) = each %fromto) {
-	last unless defined $from;
-	my $todir;
-	if ($to =~ m#[/>:\]]#) {
-            $todir = dirname($to); 
-        }
-	else { 
-            ($todir = $to) =~ s/[^\)]+$//; 
-        }
-	$todir = $self->fixpath($todir,1);
-	push @m, "
-$to : $from \$(FIRST_MAKEFILE) blibdirs.ts
-	\$(CP) $from $to
-
-";
-    }
-    join "", @m;
-}
-
-
 =item clean (override)
 
 Split potentially long list of files across multiple commands (in
