@@ -12,6 +12,16 @@
     - Command.t now using its own temp directory when testing 
       expand_wildcards() so no stray files confuse it.
     * No longer warning about 'postamble' attribute.
+    - Added installvars() to list INSTALL* variables so we don't keep
+      repeating the list all over the code.
+    - Added init_DEST() to create DESTINSTALL* variables for installing
+      with DESTDIR set.
+    * DESTDIR + PREFIX now does not duplicate DESTDIR.  [Redhat #91892
+      and part of rt.cpan.org #2954]
+    * DESTDIR is now not directly prepended to the INSTALL* variables.
+      installation targets now use DESTINSTALL* instead.  This prevents
+      the DESTDIR from showing up in places it shouldn't like perllocal.pod.
+      DESTDIR is still appearing in .packlist (bug). [rt.cpan.org #2954]
 
 6.10_07 Sat Jul  5 16:12:52 PDT 2003
     * Fixing location of perllocal.pod so its always in INSTALLARCHLIB
