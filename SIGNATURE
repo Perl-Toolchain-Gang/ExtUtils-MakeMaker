@@ -14,7 +14,7 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 15825b15ef96949cd19a454f90b4af4b5ad884c4 .patch
+SHA1 e6baf1ef8a900a447d4cd29e4185bb9e15b8994f .patch
 SHA1 f659b5c251f83e1861549985a7b5a27b45ecd053 Changes
 SHA1 48d4d61ef13a011113ea1ed6bb29047b9c7a6b91 MANIFEST
 SHA1 a61b9aa4655eb498906b3ff0babf01d3aea244af MANIFEST.SKIP
@@ -51,7 +51,7 @@ SHA1 2941c3d867595a9b6aef2ffa71f1ab85848bf236 lib/ExtUtils/MakeMaker/FAQ.pod
 SHA1 34d8c354eea23b0b7f467b476069a5180826eafc lib/ExtUtils/MakeMaker/Tutorial.pod
 SHA1 4685bb3361c2b9c42094ef68454e849edaf6f549 lib/ExtUtils/MakeMaker/bytes.pm
 SHA1 c9b221c60380328eae6eec826efeb368b11b4f8f lib/ExtUtils/MakeMaker/vmsish.pm
-SHA1 581b03fad921a4db3eb3523e56206ecefd557fa5 lib/ExtUtils/Manifest.pm
+SHA1 0f2aa66166b5076b35faa236c9dda91f3282ce65 lib/ExtUtils/Manifest.pm
 SHA1 9d125f3e2d3d52e060f5da038f294f00ff5c6196 lib/ExtUtils/Mkbootstrap.pm
 SHA1 fab07df80a333281a360e21caf61eb4850f04305 lib/ExtUtils/Mksymlists.pm
 SHA1 49ec9b062163ecc527e66f190ad791395b6f1277 lib/ExtUtils/Packlist.pm
@@ -72,7 +72,7 @@ SHA1 22724675c8d81e966f859a823b1bca8583976c0b t/MM_OS2.t
 SHA1 ff632beae5d04a962d1b3bc21fecf7794a29b6f1 t/MM_Unix.t
 SHA1 05d7752742a8779152e8356cf96c11d66f5ba930 t/MM_VMS.t
 SHA1 71efde48651f8f3736f92b12720e620e8cd52d95 t/MM_Win32.t
-SHA1 c9613d35b0250c0459cc1eb2867f95a3d372d58d t/Manifest.t
+SHA1 2420351e7f66ec060f4cbff206b45e40001e21b2 t/Manifest.t
 SHA1 f384c878aa09e4c5745df052b083cf47f5c15e50 t/Mkbootstrap.t
 SHA1 eb257e4895dad4632691b1f71816b17a29b00534 t/Packlist.t
 SHA1 0ac9591b5de9a319042ee8c574b5e03e3ed52063 t/VERSION_FROM.t
@@ -103,7 +103,7 @@ SHA1 8f21b6971b81f650e4ec7eb1dc62037afb1f1587 t/zz_cleanup_dummy.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQE/pbelT4Li3Cw/PzQRAlzxAKCDMnjH6Em/3mCXFXlfVTK71UYH+wCdGTYd
-vzejZ4SkDWsxWun7uTvJ50c=
-=S0rr
+iD8DBQE/pcIVT4Li3Cw/PzQRAmCxAJ9XKMnwoVbGSFSbP9QECy3iZEdDeQCeOsSo
+Xx7DsJf0zrqObQnD8hpjtjs=
+=u7QJ
 -----END PGP SIGNATURE-----
