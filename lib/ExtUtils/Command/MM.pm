@@ -120,7 +120,7 @@ sub pod2man {
     $parser->parse_from_file($infile, $outfile)
       or do { warn("Could not install $outfile\n");  next };
 
-    if ($options{perm_rw}) {
+    if (length $options{perm_rw}) {
         chmod(oct($options{perm_rw}), $outfile)
           or do { warn("chmod $options{perm_rw} $outfile: $!\n"); next };
     }
