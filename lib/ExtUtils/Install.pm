@@ -108,10 +108,8 @@ sub install {
 	for (readdir DIR) {
 	    next if $_ eq $Curdir || $_ eq $Updir || $_ eq ".exists";
             my $targetdir = install_rooted_dir($from_to{$source_dir_or_file});
-	    if (-w $targetdir ||
-		mkpath($targetdir)) {
-		last;
-	    } else {
+            mkpath($targetdir) unless $nonono;
+	    if (!$nonono && !-w $targetdir) {
 		warn "Warning: You do not have permissions to " .
 		    "install into $from_to{$source_dir_or_file}"
 		    unless $warn_permissions++;
@@ -203,9 +201,9 @@ sub install {
     }
     if ($pack{'write'}) {
 	$dir = install_rooted_dir(dirname($pack{'write'}));
-	mkpath($dir,0,0755);
+	mkpath($dir,0,0755) unless $nonono;
 	print "Writing $pack{'write'}\n";
-	$packlist->write(install_rooted_file($pack{'write'}));
+	$packlist->write(install_rooted_file($pack{'write'})) unless $nonono;
     }
 }
 
