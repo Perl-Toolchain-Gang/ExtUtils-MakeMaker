@@ -3216,7 +3216,6 @@ within Makefile.PL after all constants have been defined.
 =cut
 
 sub post_constants{
-    my($self) = shift;
     "";
 }
 
@@ -3228,7 +3227,6 @@ chunk of text to the Makefile after the object is initialized.
 =cut
 
 sub post_initialize {
-    my($self) = shift;
     "";
 }
 
@@ -3240,7 +3238,6 @@ text to the Makefile at the end.
 =cut
 
 sub postamble {
-    my($self) = shift;
     "";
 }
 
