@@ -25,9 +25,7 @@ close($fh);
 $| = 1;
 my $cc = $Config{'cc'};
 
-unless( grep { -x File::Spec->catfile($_, $cc) } 
-             split /\Q$Config{path_sep}\E/, $ENV{PATH} ) 
-{
+unless( grep { -x File::Spec->catfile($_, $cc) } File::Spec->path ) {
     print "1..0 # Skip: Can't find your C compiler ($cc)\n";
     exit;
 }
