@@ -153,7 +153,7 @@ NOOP_FRAG
     for my $dir (@{$self->{DIR}}) {
         $clean .= sprintf <<'MAKE_FRAG', $dir;
 	cd %s
-	$(TEST_F) $(MAKEFILE)
+	$(TEST_F) $(FIRST_MAKEFILE)
 	$(MAKE) clean
 	cd ..
 MAKE_FRAG
@@ -182,7 +182,7 @@ NOOP_FRAG
     foreach my $dir (@{$self->{DIR}}){
         $rclean .= sprintf <<'RCLEAN', $dir;
 	-cd %s
-	-$(PERLRUN) -e "exit unless -f shift; system q{$(MAKE) realclean}" $(MAKEFILE)
+	-$(PERLRUN) -e "exit unless -f shift; system q{$(MAKE) realclean}" $(FIRST_MAKEFILE)
 	-cd ..
 RCLEAN
 

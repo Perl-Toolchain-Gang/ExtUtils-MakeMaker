@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.06_01";
-($Revision = substr(q$Revision: 1.92 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.93 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -212,7 +212,7 @@ sub full_setup {
     PERL_LIB        PERL_ARCHLIB 
     SITELIBEXP      SITEARCHEXP 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS
-    LINKTYPE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET 
+    LINKTYPE MAKEAPERL MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET 
     MYEXTLIB
     PERL_MALLOC_OK
     NAME NEEDS_LINKING NOECHO NORECURS NO_VC OBJECT OPTIMIZE PERL PERLMAINCC
@@ -1401,7 +1401,10 @@ again.
 The name of the Makefile to be produced.  This is used for the second
 Makefile that will be produced for the MAP_TARGET.
 
-Defaults to $(MAKEFILE).
+Defaults to 'Makefile' or 'Descrip.MMS' on VMS.
+
+(Note: we couldn't use MAKEFILE because dmake uses this for something
+else).
 
 =item FULLPERL
 
@@ -1632,18 +1635,12 @@ Boolean which tells MakeMaker, that it should include the rules to
 make a perl. This is handled automatically as a switch by
 MakeMaker. The user normally does not need it.
 
-=item MAKEFILE
-
-The name of the Makefile to be produced.
-
-Defaults to 'Makefile' or 'Descrip.MMS' on VMS.
-
 =item MAKEFILE_OLD
 
-When 'make clean' or similar is run, the $(MAKEFILE) will be backed up
-at this location.
+When 'make clean' or similar is run, the $(FIRST_MAKEFILE) will be
+backed up at this location.
 
-Defaults to $(MAKEFILE).old or $(MAKEFILE)_old on VMS.
+Defaults to $(FIRST_MAKEFILE).old or $(FIRST_MAKEFILE)_old on VMS.
 
 =item MAN1PODS
 
@@ -1997,7 +1994,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.92 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.93 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

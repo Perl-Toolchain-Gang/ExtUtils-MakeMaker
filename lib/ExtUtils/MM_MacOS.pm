@@ -465,8 +465,9 @@ sub init_others {	# --- Initialize Other Attributes
     }
     $self->{SOURCE} = $src;
     $self->{FULLPERL} = "$self->{PERL_SRC}perl";
-    $self->{MAKEFILE} = "Makefile.mk";
-    $self->{MAKEFILE_OLD} = $self->{MAKEFILE}.'.old';
+    $self->{MAKEFILE}       = "Makefile.mk";
+    $self->{FIRST_MAKEFILE} = $self->{MAKEFILE};
+    $self->{MAKEFILE_OLD}   = $self->{MAKEFILE}.'.old';
 
     $self->{'DEV_NULL'} ||= ' \xB3 Dev:Null';
 
@@ -764,7 +765,7 @@ clean :: clean_subdirs
     push @m, "\t\$(RM_RF) @otherfiles\n";
     # See realclean and ext/utils/make_ext for usage of Makefile.old
     push(@m,
-	 "\t\$(MV) \$(MAKEFILE) \$(MAKEFILE_OLD)\n");
+	 "\t\$(MV) \$(FIRST_MAKEFILE) \$(MAKEFILE_OLD)\n");
     push(@m,
 	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
     join("", @m);
@@ -794,7 +795,7 @@ NOOP_FRAG
 	Set OldEcho {Echo}
 	Set Echo 0
 	Directory %s
-	If "`Exists -f $(MAKEFILE)`" != ""
+	If "`Exists -f $(FIRST_MAKEFILE)`" != ""
 	    $(MAKE) clean
 	End
 	Set Echo {OldEcho}
@@ -820,7 +821,7 @@ sub realclean {
 realclean purge ::  clean
 ');
 
-    my(@otherfiles) = ('$(MAKEFILE)', '$(MAKEFILE_OLD)'); # Makefiles last
+    my(@otherfiles) = ('$(FIRST_MAKEFILE)', '$(MAKEFILE_OLD)'); # Makefiles last
     push(@otherfiles, patternify($attribs{FILES})) if $attribs{FILES};
     push(@m, "\t\$(RM_RF) @otherfiles\n") if @otherfiles;
     push(@m, "\t$attribs{POSTOP}\n")       if $attribs{POSTOP};
@@ -850,7 +851,7 @@ NOOP_FRAG
 	Set OldEcho \{Echo\}
 	Set Echo 0
 	Directory %s
-	If \"\`Exists -f $(MAKEFILE)\`\" != \"\"
+	If \"\`Exists -f $(FIRST_MAKEFILE)\`\" != \"\"
 	    \$(MAKE) realclean
 	End
 	Set Echo \{OldEcho\}

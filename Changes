@@ -27,8 +27,7 @@
     - Moved Win9x specific subdir_x() code from MM_Unix to MM_Win95
     * Craig Berry fixed hint files on VMS
     - Added the perl_onliner() method to generate portable, safe one-liners
-    - Added a MAKEFILE macro to the Makefile.  Mostly to avoid having
-      to hardcode $self->{MAKEFILE} internally
+    - Changing hardcoded $self->{MAKEFILE} to $(FIRST_MAKEFILE).
     * Rafael Garcia-Suarez made MakeMaker ignore Subversion control files
       by default.
     - Added MAKEFILE_OLD macro.
