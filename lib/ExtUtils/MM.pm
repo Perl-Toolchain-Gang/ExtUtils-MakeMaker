@@ -3,7 +3,7 @@ package ExtUtils::MM;
 use strict;
 use Config;
 use vars qw(@ISA $VERSION);
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 require ExtUtils::Liblist;
 require ExtUtils::MakeMaker;
@@ -67,10 +67,10 @@ _assert( keys %Is == 1 );
 my($OS) = keys %Is;
 
 
-
-eval "require ExtUtils::MM_$OS";
+my $class = "ExtUtils::MM_$OS";
+eval "require $class" unless $INC{"ExtUtils/MM_$OS.pm"};
 die $@ if $@;
-unshift @ISA, "ExtUtils::MM_$OS";
+unshift @ISA, $class;
 
 
 sub _assert {
