@@ -3171,21 +3171,6 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 =cut
 
-sub _pm_to_blib_flush {
-    my ($self, $autodir, $rr, $ra, $rl) = @_;
-
-    my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)')
-CODE
-
-    $$rr .= <<MAKE_FRAG;
-	\$(NOECHO) $pm_to_blib @$ra
-MAKE_FRAG
-
-    @$ra = ();
-    $$rl = 0;
-}
-
 sub pm_to_blib {
     my $self = shift;
     my($autodir) = File::Spec->catdir('$(INST_LIB)','auto');
@@ -3193,19 +3178,15 @@ sub pm_to_blib {
 pm_to_blib: $(TO_INST_PM)
 };
 
-    my @a;
-    my $l = 0;
-    while (my ($pm, $blib) = each %{$self->{PM}}) {
-	my $la = length $pm;
-	my $lb = length $blib;
-	if ($l + $la + $lb + @a / 2 > 200) { # limit line length
-	    $self->_pm_to_blib_flush($autodir, \$r, \@a, \$l);
-        }
-        push @a, $pm, $blib;
-	$l += $la + $lb;
-    }
-    $self->_pm_to_blib_flush($autodir, \$r, \@a, \$l);
-    return $r.q{	$(NOECHO) $(TOUCH) $@};
+    my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
+pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)')
+CODE
+
+    my @cmds = $self->split_command($pm_to_blib, $self->{PM});
+    $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
+    $r.q{	$(NOECHO) $(TOUCH) $@};
+
+    return $r;
 }
 
 =item post_constants (o)
