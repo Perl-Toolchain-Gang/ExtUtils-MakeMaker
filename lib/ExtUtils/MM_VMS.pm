@@ -15,6 +15,7 @@ BEGIN {
     # so we can compile the thing on non-VMS platforms.
     if( $^O eq 'VMS' ) {
         require VMS::Filespec;
+        VMS::Filespec->import;
     }
 }
 
@@ -374,9 +375,9 @@ sub init_others {
     $self->{NOECHO}             ||= '@ ';
 
     $self->{MAKEFILE}           ||= 'Descrip.MMS';
-    $self->{FIRST_MAKEFILE}     ||= '$(MAKEFILE)';
+    $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE};
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
-    $self->{MAKEFILE_OLD}       ||= '$(MAKEFILE)_old';
+    $self->{MAKEFILE_OLD}       ||= '$(FIRST_MAKEFILE)_old';
 
     $self->{'TOUCH'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e touch';
     $self->{'CHMOD'}    ||= '$(PERLRUN) "-MExtUtils::Command" -e chmod'; 
@@ -490,7 +491,7 @@ sub constants {
     }
 
     # Cleanup paths for files in MMS macros.
-    foreach my $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKEFILE MAKEFILE_OLD 
+    foreach my $macro ( qw[LIBPERL_A FIRST_MAKEFILE MAKEFILE_OLD 
                            MAKE_APERL_FILE MYEXTLIB] ) 
     {
         next unless defined $self->{$macro};
@@ -1072,7 +1073,7 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # As MakeMaker mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
+$(BOOTSTRAP) : $(FIRST_MAKEFILE) '."$self->{BOOTDEP}".' $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 	$(NOECHO) $(SAY) "Running mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) -
 	-e "use ExtUtils::Mkbootstrap; Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
@@ -1204,7 +1205,7 @@ realclean ::
 	else                   { ($todir = $to) =~ s/[^\)]+$//; }
 	$todir = $self->fixpath($todir,1);
 	push @m, "
-$to : $from \$(MAKEFILE) ${todir}\$(DIRFILESEP).exists
+$to : $from \$(FIRST_MAKEFILE) ${todir}\$(DIRFILESEP).exists
 	\$(CP) $from $to
 
 ", $self->dir_target($todir);
@@ -1315,7 +1316,7 @@ NOOP_FRAG
 	$dir = $self->fixpath($dir,1);
 
         $clean .= sprintf <<'MAKE_FRAG', $dir, $dir;
-	If F$Search("%s$(MAKEFILE)").nes."" Then \\
+	If F$Search("%s$(FIRST_MAKEFILE)").nes."" Then \\
 	    $(PERLRUN) -e "chdir '%s'; print `$(MMS)$(MMSQUALIFIERS) clean`;"
 MAKE_FRAG
     }
@@ -1339,7 +1340,7 @@ realclean :: clean
 ');
     foreach(@{$self->{DIR}}){
 	my($vmsdir) = $self->fixpath($_,1);
-	push(@m, '	If F$Search("'."$vmsdir".'$(MAKEFILE)").nes."" Then \\',"\n\t",
+	push(@m, '	If F$Search("'."$vmsdir".'$(FIRST_MAKEFILE)").nes."" Then \\',"\n\t",
 	      '$(PERL) -e "chdir ',"'$vmsdir'",'; print `$(MMS)$(MMSQUALIFIERS) realclean`;"',"\n");
     }
     push @m, "	\$(RM_RF) \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n";
@@ -1349,7 +1350,7 @@ realclean :: clean
     # combination of macros).  In order to stay below DCL's 255 char limit,
     # we put only 2 on a line.
     my($file,$fcnt);
-    my(@files) = qw{ $(MAKEFILE) $(MAKEFILE_OLD) };
+    my(@files) = qw{ $(FIRST_MAKEFILE) $(MAKEFILE_OLD) };
     if ($self->has_link_code) {
 	push(@files,qw{ $(INST_DYNAMIC) $(INST_STATIC) $(INST_BOOT) $(OBJECT) });
     }
@@ -1629,7 +1630,7 @@ $(OBJECT) : $(PERL_INC)util.h, $(PERL_INC)vmsish.h, $(PERL_INC)warnings.h
 
     if ($self->{PERL_SRC}) {
 	my(@macros);
-	my($mmsquals) = '$(USEMAKEFILE)[.vms]$(MAKEFILE)';
+	my($mmsquals) = '$(USEMAKEFILE)[.vms]$(FIRST_MAKEFILE)';
 	push(@macros,'__AXP__=1') if $Config{'archname'} eq 'VMS_AXP';
 	push(@macros,'DECC=1')    if $Config{'vms_cc_type'} eq 'decc';
 	push(@macros,'GNUC=1')    if $Config{'vms_cc_type'} eq 'gcc';
@@ -1683,14 +1684,14 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 
     push @m,q[
 # We take a very conservative approach here, but it\'s worth it.
-# We move $(MAKEFILE) to $(MAKEFILE)_old here to avoid gnu make looping.
-$(MAKEFILE) : Makefile.PL $(CONFIGDEP)
-	$(NOECHO) $(SAY) "$(MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
-	$(NOECHO) $(SAY) "Cleaning current config before rebuilding $(MAKEFILE) ..."
-	- $(MV) $(MAKEFILE) $(MAKEFILE)_old
+# We move $(FIRST_MAKEFILE) to $(MAKEFILE_OLD) here to avoid gnu make looping.
+$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
+	$(NOECHO) $(SAY) "$(FIRST_MAKEFILE) out-of-date with respect to $(MMS$SOURCE_LIST)"
+	$(NOECHO) $(SAY) "Cleaning current config before rebuilding $(FIRST_MAKEFILE) ..."
+	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
 	- $(MMS)$(MMSQUALIFIERS) $(USEMAKEFILE)$(MAKEFILE_OLD) clean
 	$(PERLRUN) Makefile.PL ],join(' ',map(qq["$_"],@ARGV)),q[
-	$(NOECHO) $(SAY) "$(MAKEFILE) has been rebuilt."
+	$(NOECHO) $(SAY) "$(FIRST_MAKEFILE) has been rebuilt."
 	$(NOECHO) $(SAY) "Please run $(MMS) to build the extension."
 ];
 
@@ -1731,7 +1732,7 @@ testdb :: testdb_\$(LINKTYPE)
 ";
     foreach(@{$self->{DIR}}){
       my($vmsdir) = $self->fixpath($_,1);
-      push(@m, '	If F$Search("',$vmsdir,'$(MAKEFILE)").nes."" Then $(PERL) -e "chdir ',"'$vmsdir'",
+      push(@m, '	If F$Search("',$vmsdir,'$(FIRST_MAKEFILE)").nes."" Then $(PERL) -e "chdir ',"'$vmsdir'",
            '; print `$(MMS)$(MMSQUALIFIERS) $(PASTHRU2) test`'."\n");
     }
     push(@m, "\t\$(NOECHO) \$(SAY) \"No tests defined for \$(NAME) extension.\"\n")
@@ -1798,7 +1799,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
 	$(NOECHO) $(SAY) "Writing ""$(MMS$TARGET)"" for this $(MAP_TARGET)"
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR=}, $dir, q{ \
-		MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
+		FIRST_MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
 		MAKEAPERL=1 NORECURS=1 };
 
 	push @m, map(q[ \\\n\t\t"$_"], @ARGV),q{
@@ -1972,11 +1973,11 @@ $(MAP_SHRTARGET) : $(MAP_LIBPERL) Makeaperl.Opt ',"${libperldir}Perlshr_Attr.Opt
 $(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmp}perlmain\$(OBJ_EXT) ${tmp}PerlShr.Opt",'
 	$(MAP_LINKCMD) ',"${tmp}perlmain\$(OBJ_EXT)",', PerlShr.Opt/Option
 	$(NOECHO) $(SAY) "To install the new ""$(MAP_TARGET)"" binary, say"
-	$(NOECHO) $(SAY) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
+	$(NOECHO) $(SAY) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
 	$(NOECHO) $(SAY) "To remove the intermediate files, say
-	$(NOECHO) $(SAY) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(MAKEFILE) map_clean"
+	$(NOECHO) $(SAY) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) map_clean"
 ';
-    push @m,"\n${tmp}perlmain.c : \$(MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmp}Writemain.tmp\n";
+    push @m,"\n${tmp}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmp}Writemain.tmp\n";
     push @m, "# More from the 255-char line length limit\n";
     foreach (@staticpkgs) {
 	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[}" >>${tmp}Writemain.tmp\n];
@@ -2008,7 +2009,7 @@ clean :: map_clean
 	\$(NOECHO) \$(NOOP)
 
 map_clean :
-	\$(RM_F) ${tmp}perlmain\$(OBJ_EXT) ${tmp}perlmain.c \$(MAKEFILE)
+	\$(RM_F) ${tmp}perlmain\$(OBJ_EXT) ${tmp}perlmain.c \$(FIRST_MAKEFILE)
 	\$(RM_F) ${tmp}Makeaperl.Opt ${tmp}PerlShr.Opt \$(MAP_TARGET)
 ";
 
