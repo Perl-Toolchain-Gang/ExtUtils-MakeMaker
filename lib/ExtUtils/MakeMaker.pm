@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.50_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.8 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.9 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -24,7 +24,7 @@ use strict;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
-@EXPORT_OK = qw($VERSION &Version_check &neatvalue &mkbootstrap &mksymlists);
+@EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists);
 
 # These will go away once the last of the Win32 & VMS specific code is 
 # purged.
@@ -965,8 +965,8 @@ C<$Config{install*}> values.
 Note, that in both cases the tilde expansion is done by MakeMaker, not
 by perl by default, nor by make.
 
-Conflicts between parameters LIB,
-PREFIX and the various INSTALL* arguments are resolved so that:
+Conflicts between parameters LIB, PREFIX and the various INSTALL*
+arguments are resolved so that:
 
 =over 4
 
@@ -983,10 +983,10 @@ set (but are set to still start with C<$Config{prefix}>).
 
 =back
 
-If the user has superuser privileges, and is not working on AFS
-or relatives, then the defaults for
-INSTALLPRIVLIB, INSTALLARCHLIB, INSTALLSCRIPT, etc. will be appropriate,
-and this incantation will be the best:
+If the user has superuser privileges, and is not working on AFS or
+relatives, then the defaults for INSTALLPRIVLIB, INSTALLARCHLIB,
+INSTALLSCRIPT, etc. will be appropriate, and this incantation will be
+the best:
 
     perl Makefile.PL; make; make test
     make install
@@ -1753,7 +1753,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.8 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.9 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
