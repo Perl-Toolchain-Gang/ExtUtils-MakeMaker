@@ -1,4 +1,4 @@
-6.25
+6.24_01 Thu Dec  9 00:44:48 EST 2004
     - Docs encouraged possibly insecure use of /tmp [CAN-2004-0976 via Debian]
     - Remove empty rpath from .so files [bleadperl@23183]
     - At long last the core man page title has its apostrophe.
