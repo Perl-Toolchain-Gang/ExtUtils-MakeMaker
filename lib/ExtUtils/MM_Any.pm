@@ -739,7 +739,6 @@ CODE
     my $add_meta_to_distdir = $self->cd('$(DISTVNAME)', $add_meta);
 
     return sprintf <<'MAKE', $add_meta_to_distdir;
-# Copy, do not move.  We don't know if one was already here.
 distmeta : create_distdir metafile
 	$(NOECHO) %s
 
