@@ -167,6 +167,11 @@ sub init_others {
     $self->{TEST_F}   ||= '$(ABSPERLRUN) -MExtUtils::Command -e test_f';
     $self->{DEV_NULL} ||= '> NUL';
 
+    $self->{FIXIN}    ||= $self->{PERL_CORE} ? 
+      '$(PERLRUN) ../../win32/bin/pl2bat.pl' : 
+      'pl2bat.bat';
+
+
     $self->{LD}     ||= $Config{ld} || 'link';
     $self->{AR}     ||= $Config{ar} || 'lib';
 

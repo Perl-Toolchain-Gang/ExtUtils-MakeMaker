@@ -1751,12 +1751,14 @@ sub init_others {	# --- Initialize Other Attributes
       $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
 install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
 CODE
-    $self->{DOC_INSTALL} ||= 
+    $self->{DOC_INSTALL}        ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
-    $self->{UNINSTALL}   ||= 
+    $self->{UNINSTALL}          ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e uninstall';
     $self->{WARN_IF_OLD_PACKLIST} ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
+    $self->{FIXIN}              ||= 
+      q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"};
 
     $self->{UMASK_NULL}         ||= "umask 0";
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
@@ -2154,20 +2156,9 @@ sub installbin {
     }
     my @to   = values %fromto;
 
-    my $fixin;
-    if( $Is_Win32 ) {
-        $fixin = $self->{PERL_CORE} ? '$(PERLRUN) ../../win32/bin/pl2bat.pl'
-                                    : 'pl2bat.bat';
-    }
-    else {
-        $fixin = q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"};
-    }
-
     my @m;
     push(@m, qq{
 EXE_FILES = @exefiles
-
-FIXIN = $fixin
 
 pure_all :: @to
 	\$(NOECHO) \$(NOOP)
@@ -2177,20 +2168,24 @@ realclean ::
 
     # realclean can get rather large.
     push @m, map "\t$_\n", $self->split_command('$(RM_F)', @to);
+    push @m, "\n";
 
 
     # A target for each exe file.
     while (my($from,$to) = each %fromto) {
 	last unless defined $from;
 
-	push @m, "
-$to : $from \$(FIRST_MAKEFILE) \$(INST_SCRIPT)\$(DFSEP).exists \$(INST_BIN)\$(DFSEP).exists
-	\$(NOECHO) \$(RM_F) $to
-	\$(CP) $from $to
-	\$(FIXIN) $to
-	-\$(NOECHO) \$(CHMOD) \$(PERM_RWX) $to
-";
+	push @m, sprintf <<'MAKE', $to, $from, $to, $from, $to, $to, $to;
+%s : %s $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) %s
+	$(CP) %s %s
+	$(FIXIN) %s
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) %s
+
+MAKE
+
     }
+
     join "", @m;
 }
 
@@ -3445,6 +3440,7 @@ sub tools_other {
                       MACROSTART MACROEND USEMAKEFILE
                       PM_FILTER
                       IGNORE
+                      FIXIN
                     } ) 
     {
         next unless defined $self->{$tool};
