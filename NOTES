@@ -54,14 +54,14 @@ The MM_* hierarchy
 MM_BeOS  MM_Cygwin  MM_OS2  MM_VMS  MM_Win32  MM_DOS  MM_MacOS  MM_UWIN
       \        |      |         |        /      /       /       /
        ---------------------------------------------------------
-                           |
-                        MM_Unix
-                           |
-                        MM_Any
+                           |       |
+                        MM_Unix    |
+                              |    |
+                              MM_Any
 
-NOTE: Each MM_* subclass is also an MM_Any subclass.  This is a
-temporary hack because MM_Unix overrides some MM_Any methods with Unix
-specific code.  It allows the non-Unix modules to see the original
-MM_Any implementations.
+NOTE: Each direct MM_Unix subclass is also an MM_Any subclass.  This
+is a temporary hack because MM_Unix overrides some MM_Any methods with
+Unix specific code.  It allows the non-Unix modules to see the
+original MM_Any implementations.
 
 NOTE: Modules like File::Spec and Exporter have been omitted for clarity.
