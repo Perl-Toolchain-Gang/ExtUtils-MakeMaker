@@ -47,3 +47,5 @@ Add "NO_META" to stop autogeneration (and auto overwrite) of META.yml.
 Test ExtUtils::Command::MM
 
 Finish ExtUtils::MakeMaker::Tutorial
+
+Fix NORECUSE bug continuing to set DIR
