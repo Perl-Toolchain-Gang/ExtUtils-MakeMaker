@@ -1,3 +1,6 @@
+5.95_02
+    - Fixed ExtUtils::testlib so it doesn't taint @INC.
+
 5.95_01 Sat May 18 14:40:12 EDT 2002
     - Fixed ExtUtils::testlib so it has a reasonable chance of working
       under taint mode.
