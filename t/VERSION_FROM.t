@@ -8,10 +8,17 @@ BEGIN {
     }
 }
 
+$ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
+
 use strict;
 use Test::More tests => 1;
 use ExtUtils::MakeMaker;
 use TieOut;
+use File::Path;
+
+mkdir 'Odd-Version';
+END { chdir File::Spec->updir;  rmtree 'Odd-Version' }
+chdir 'Odd-Version';
 
 open(MPL, ">Version") || die $!;
 print MPL "\$VERSION = 0\n";
