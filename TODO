@@ -56,6 +56,4 @@ MM_VMS wrappers.
 
 Make MM look for xsubpp through @INC.
 
-Have 'distdir' generate a Meta.yml file and add it to the MANIFEST.
-
 Add "NO_META" to stop autogeneration (and auto overwrite) of Meta.yml.

@@ -5,6 +5,9 @@
       MakeMaker.
     - Removed "always use h2xs" dogma.
     - Added compile & POD test
+    * 'make distdir' now generates Meta.yml module meta-data file.
+      Proof of concept.  Have to syncronize with Module::Build.
+    * Added maniadd() to ExtUtils::Manifest to add entries to the MANIFEST
 
 6.06_02 Mon Dec 23 20:39:57 PST 2002
     * Lots of Win32 fixes busted between 6.05 and 6.06_01.  

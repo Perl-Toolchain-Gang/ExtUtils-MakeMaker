@@ -3,7 +3,6 @@ Changes
 MANIFEST			This list of files
 MANIFEST.SKIP
 Makefile.PL
-Meta.yml
 NOTES
 PATCHING
 README
@@ -75,3 +74,4 @@ t/split_command.t
 t/testlib.t
 t/writemakefile_args.t
 t/zz_cleanup_dummy.t
+Meta.yml                                Module meta-data in YAML
