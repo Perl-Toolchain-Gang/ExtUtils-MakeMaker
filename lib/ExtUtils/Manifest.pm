@@ -10,9 +10,9 @@ use strict;
 
 our ($VERSION,@ISA,@EXPORT_OK,
 	    $Is_MacOS,$Is_VMS,
-	    $Debug,$Verbose,$Quiet,$MANIFEST,$found,$DEFAULT_MSKIP);
+	    $Debug,$Verbose,$Quiet,$MANIFEST,$DEFAULT_MSKIP);
 
-$VERSION = 1.35_00;
+$VERSION = 1.36_01;
 @ISA=('Exporter');
 @EXPORT_OK = ('mkmanifest', 'manicheck', 'fullcheck', 'filecheck', 
 	      'skipcheck', 'maniread', 'manicopy');
@@ -40,14 +40,19 @@ sub mkmanifest {
     local *M;
     rename $MANIFEST, "$MANIFEST.bak" unless $manimiss;
     open M, ">$MANIFEST" or die "Could not open $MANIFEST: $!";
-    my $matches = _maniskip();
+    my $skip = _maniskip();
     my $found = manifind();
     my($key,$val,$file,%all);
     %all = (%$found, %$read);
     $all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
     foreach $file (sort keys %all) {
-	next if &$matches($file);
+	if ($skip->($file)) {
+	    # Policy: only remove files if they're listed in MANIFEST.SKIP.
+	    # Don't remove files just because they don't exist.
+	    warn "Removed from $MANIFEST: $file\n" if $Verbose and exists $read->{$file};
+	    next;
+	}
 	if ($Verbose){
 	    warn "Added to $MANIFEST: $file\n" unless exists $read->{$file};
 	}
@@ -63,15 +68,27 @@ sub mkmanifest {
 }
 
 sub manifind {
-    local $found = {};
-    find(sub {return if -d $_;
-	      (my $name = $File::Find::name) =~ s|^\./||;
-	      $name =~ s/^:([^:]+)$/$1/ if $Is_MacOS;
-	      warn "Debug: diskfile $name\n" if $Debug;
-	      $name =~ s#(.*)\.$#\L$1# if $Is_VMS;
-	      $name = uc($name) if /^MANIFEST/i && $Is_VMS;
-	      $found->{$name} = "";}, $Is_MacOS ? ":" : ".");
-    $found;
+    my $p = shift || {};
+    my $skip = _maniskip(warn => $p->{warn_on_skip});
+    my $found = {};
+
+    my $wanted = sub {
+	return if $skip->($_) or -d $_;
+	
+	(my $name = $File::Find::name) =~ s|^\./||;
+	$name =~ s/^:([^:]+)$/$1/ if $Is_MacOS;
+	warn "Debug: diskfile $name\n" if $Debug;
+	$name =~ s#(.*)\.$#\L$1# if $Is_VMS;
+	$name = uc($name) if /^MANIFEST/i && $Is_VMS;
+	$found->{$name} = "";
+    };
+
+    find({wanted => $wanted,
+	  preprocess => sub {grep {!$skip->($_)} @_},
+	 },
+	 $Is_MacOS ? ":" : ".");
+
+    return $found;
 }
 
 sub fullcheck {
@@ -93,7 +110,8 @@ sub skipcheck {
 sub _manicheck {
     my($p) = @_;
     my $read = maniread();
-    my $found = manifind();
+    my $found = manifind($p);
+
     my $file;
     my $dosnames=(defined(&Dos::UseLFN) && Dos::UseLFN()==0);
     my(@missfile,@missentry);
@@ -170,12 +188,12 @@ sub maniread {
 
 # returns an anonymous sub that decides if an argument matches
 sub _maniskip {
-    my ($mfile) = @_;
-    my $matches = sub {0};
+    my (%args) = @_;
+
     my @skip ;
-    $mfile ||= "$MANIFEST.SKIP";
+    my $mfile ||= "$MANIFEST.SKIP";
     local *M;
-    open M, $mfile or open M, $DEFAULT_MSKIP or return $matches;
+    open M, $mfile or open M, $DEFAULT_MSKIP or return sub {0};
     while (<M>){
 	chomp;
 	next if /^#/;
@@ -183,14 +201,16 @@ sub _maniskip {
 	push @skip, _macify($_);
     }
     close M;
-    my $opts = $Is_VMS ? 'oi ' : 'o ';
-    my $sub = "\$matches = "
-	. "sub { my(\$arg)=\@_; return 1 if "
-	. join (" || ",  (map {s!/!\\/!g; "\$arg =~ m/$_/$opts"} @skip), 0)
-	. " }";
-    eval $sub;
-    print "Debug: $sub\n" if $Debug;
-    $matches;
+    my $opts = $Is_VMS ? 'oi' : 'o';
+
+    # Make sure each entry is isolated in its own parentheses, in case
+    # any of them contain alternations
+    my $regex = join '|', map "(?:$_)", @skip;
+
+    return ($args{warn}
+	    ? sub { $_[0] =~ qr{(?$opts)$regex} && warn "Skipping $_[0]\n" }
+	    : sub { $_[0] =~ qr{(?$opts)$regex} }
+	   );
 }
 
 sub manicopy {
