@@ -916,8 +916,10 @@ before tar-ing (or shar-ing).
 sub distdir {
     my($self) = shift;
 
-    return <<'MAKE_FRAG';
-distdir : metafile metafile_addtomanifest signature
+    my $signature = $self->{SIGN} ? 'signature' : '';
+
+    return sprintf <<'MAKE_FRAG', $signature;
+distdir : metafile metafile_addtomanifest %s
 	$(RM_RF) $(DISTVNAME)
 	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"

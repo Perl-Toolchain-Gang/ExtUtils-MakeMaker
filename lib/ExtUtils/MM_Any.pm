@@ -672,11 +672,6 @@ Writes the file SIGNATURE with "cpansign -s".
 sub signature_target {
     my $self = shift;
 
-    return <<'MAKE_FRAG' if !$self->{SIGN};
-signature :
-	$(NOECHO) $(NOOP)
-MAKE_FRAG
-
     return <<'MAKE_FRAG';
 signature :  signature_addtomanifest
 	cpansign -s
