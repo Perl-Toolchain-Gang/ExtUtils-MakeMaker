@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 40;
+use Test::More tests => 36;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -62,8 +62,6 @@ is( $mm->{VERSION}, 0.01,            'VERSION' );
 
 foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
     unlike( $mm->{$prefix}, qr/\$\(PREFIX\)/ );
-    like( $mm->{$prefix}, qr/^\$\(DESTDIR\)/, 
-                                   "\$(DESTDIR) prepended to $prefix" );
 }
 
 
@@ -85,11 +83,10 @@ like( $stdout->read, qr{
 undef $stdout;
 untie *STDOUT;
 
-is( $mm->{PREFIX}, '$(DESTDIR)'.$PREFIX,   'PREFIX' );
+is( $mm->{PREFIX}, $PREFIX,   'PREFIX' );
 
 foreach my $prefix (qw(PERLPREFIX SITEPREFIX VENDORPREFIX)) {
-    is( $mm->{$prefix}, '$(DESTDIR)$(PREFIX)', 
-                                       "\$(PREFIX) overrides $prefix" );
+    is( $mm->{$prefix}, '$(PREFIX)', "\$(PREFIX) overrides $prefix" );
 }
 
 is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );

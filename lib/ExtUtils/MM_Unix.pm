@@ -618,7 +618,7 @@ sub init_DEST {
     # Make DEST variables.
     foreach my $var ($self->installvars) {
         my $destvar = 'DESTINSTALL'.$var;
-        $self->{$destvar} ||= '$(DESTDIR)'.'$(INSTALL'.$var.')';
+        $self->{$destvar} ||= '$(DESTDIR)$(INSTALL'.$var.')';
     }
 }
 
@@ -2094,11 +2094,6 @@ sub init_INSTALL {
         $self->{VENDORPREFIX} ||= $vprefix;
     }
 
-    # Add DESTDIR.
-    foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
-        $self->{$prefix} = '$(DESTDIR)'.$self->{$prefix};
-    }
-
     my $arch    = $Config{archname};
     my $version = $Config{version};
 
@@ -2496,13 +2491,13 @@ doc__install : doc_site_install
 pure_perl_install ::
 	$(NOECHO) $(MOD_INSTALL) \
 		read }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.$self->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
-		$(INST_LIB) $(INSTALLPRIVLIB) \
-		$(INST_ARCHLIB) $(INSTALLARCHLIB) \
-		$(INST_BIN) $(INSTALLBIN) \
-		$(INST_SCRIPT) $(INSTALLSCRIPT) \
-		$(INST_MAN1DIR) $(INSTALLMAN1DIR) \
-		$(INST_MAN3DIR) $(INSTALLMAN3DIR)
+		write }.$self->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
+		$(INST_LIB) $(DESTINSTALLPRIVLIB) \
+		$(INST_ARCHLIB) $(DESTINSTALLARCHLIB) \
+		$(INST_BIN) $(DESTINSTALLBIN) \
+		$(INST_SCRIPT) $(DESTINSTALLSCRIPT) \
+		$(INST_MAN1DIR) $(DESTINSTALLMAN1DIR) \
+		$(INST_MAN3DIR) $(DESTINSTALLMAN3DIR)
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.$self->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{
 
@@ -2510,59 +2505,59 @@ pure_perl_install ::
 pure_site_install ::
 	$(NOECHO) $(MOD_INSTALL) \
 		read }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.$self->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{ \
-		$(INST_LIB) $(INSTALLSITELIB) \
-		$(INST_ARCHLIB) $(INSTALLSITEARCH) \
-		$(INST_BIN) $(INSTALLSITEBIN) \
-		$(INST_SCRIPT) $(INSTALLSCRIPT) \
-		$(INST_MAN1DIR) $(INSTALLSITEMAN1DIR) \
-		$(INST_MAN3DIR) $(INSTALLSITEMAN3DIR)
+		write }.$self->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{ \
+		$(INST_LIB) $(DESTINSTALLSITELIB) \
+		$(INST_ARCHLIB) $(DESTINSTALLSITEARCH) \
+		$(INST_BIN) $(DESTINSTALLSITEBIN) \
+		$(INST_SCRIPT) $(DESTINSTALLSCRIPT) \
+		$(INST_MAN1DIR) $(DESTINSTALLSITEMAN1DIR) \
+		$(INST_MAN3DIR) $(DESTINSTALLSITEMAN3DIR)
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.$self->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{
 
 pure_vendor_install ::
 	$(NOECHO) $(MOD_INSTALL) \
 		read }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.$self->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{ \
-		$(INST_LIB) $(INSTALLVENDORLIB) \
-		$(INST_ARCHLIB) $(INSTALLVENDORARCH) \
-		$(INST_BIN) $(INSTALLVENDORBIN) \
-		$(INST_SCRIPT) $(INSTALLSCRIPT) \
-		$(INST_MAN1DIR) $(INSTALLVENDORMAN1DIR) \
-		$(INST_MAN3DIR) $(INSTALLVENDORMAN3DIR)
+		write }.$self->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{ \
+		$(INST_LIB) $(DESTINSTALLVENDORLIB) \
+		$(INST_ARCHLIB) $(DESTINSTALLVENDORARCH) \
+		$(INST_BIN) $(DESTINSTALLVENDORBIN) \
+		$(INST_SCRIPT) $(DESTINSTALLSCRIPT) \
+		$(INST_MAN1DIR) $(DESTINSTALLVENDORMAN1DIR) \
+		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR)
 
 doc_perl_install ::
-	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLPRIVLIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
+		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
 
 doc_site_install ::
-	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLSITELIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
+		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
 
 doc_vendor_install ::
-	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLVENDORLIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
+		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
 
 };
 
@@ -2903,14 +2898,14 @@ $tmp/perlmain.c: $makefilename}, q{
 
     push @m, q{
 doc_inst_perl:
-	$(NOECHO) $(ECHO) Appending installation info to $(INSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
+	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Perl binary" "$(MAP_TARGET)" \
 		MAP_STATIC "$(MAP_STATIC)" \
 		MAP_EXTRA "`cat $(INST_ARCHAUTODIR)/extralibs.all`" \
 		MAP_LIBPERL "$(MAP_LIBPERL)" \
-		>> }.$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
+		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
 
 };
 
@@ -2918,7 +2913,7 @@ doc_inst_perl:
 inst_perl: pure_inst_perl doc_inst_perl
 
 pure_inst_perl: $(MAP_TARGET)
-	}.$self->{CP}.q{ $(MAP_TARGET) }.$self->catfile('$(INSTALLBIN)','$(MAP_TARGET)').q{
+	}.$self->{CP}.q{ $(MAP_TARGET) }.$self->catfile('$(DESTINSTALLBIN)','$(MAP_TARGET)').q{
 
 clean :: map_clean
 
