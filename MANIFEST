@@ -57,6 +57,7 @@ t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/lib/TieOut.pm
+t/perl_oneliner.t
 t/prefixify.t
 t/problems.t
 t/testlib.t
