@@ -1849,7 +1849,7 @@ testdb :: testdb_\$(LINKTYPE)
     push(@m, "\n");
 
     push(@m, "testdb_dynamic :: pure_all\n");
-    push(@m, $self->test_via_script('$(FULLPERL) "$(TESTDB_SW)"', '$(TEST_FILE)'));
+    push(@m, $self->test_via_script('$(PERLRUN) "$(TESTDB_SW)"', '$(TEST_FILE)'));
     push(@m, "\n");
 
     # Occasionally we may face this degenerate target:
