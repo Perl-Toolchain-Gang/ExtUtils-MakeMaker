@@ -30,6 +30,25 @@ Code formatting
 
 - Do not use indirect object syntax (ie. new Foo::Bar (@args))
 
+- make variables use dollar signs like Perl scalars.  This causes problems
+  when you have to mix them both in a string.  If you find yourself
+  backwacking lots of dollar signs because you have one interpolated
+  perl variable, like this:
+
+    return <<'EOT'
+
+subdirs ::
+	\$(NOECHO)cd $subdir && \$(MAKE) -f \$(FIRST_MAKEFILE) all \$(PASTHRU)
+EOT
+
+  consider using sprintf instead.
+
+    return sprintf <<'EOT', $subdir;
+
+subdirs ::
+	$(NOECHO)cd %s && $(MAKE) -f $(FIRST_MAKEFILE) all $(PASTHRU)
+EOT
+
 
 Refactoring and Cleanup
 
