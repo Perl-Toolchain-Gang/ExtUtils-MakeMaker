@@ -38,9 +38,9 @@ sub manifypods {
     my($dist);
     my($pod2man_exe);
     if (defined $self->{PERL_SRC}) {
-        $pod2man_exe = File::Spec->catfile($self->{PERL_SRC},'pod','pod2man');
+        $pod2man_exe = $self->catfile($self->{PERL_SRC},'pod','pod2man');
     } else {
-        $pod2man_exe = File::Spec->catfile($Config{scriptdirexp},'pod2man');
+        $pod2man_exe = $self->catfile($Config{scriptdirexp},'pod2man');
     }
     unless ($self->perl_script($pod2man_exe)) {
         # No pod2man but some MAN3PODS to be installed

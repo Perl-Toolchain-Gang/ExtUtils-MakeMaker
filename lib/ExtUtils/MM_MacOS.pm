@@ -367,7 +367,7 @@ sub init_main {
     # hm ... do we really care?  at all?
 #    warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
 #        (Exporter.pm not found)"
-#	unless -f File::Spec->catfile("$self->{PERL_LIB}","Exporter.pm") ||
+#	unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
 #        $self->{NAME} eq "ExtUtils::MakeMaker";
 
     # Determine VERSION and VERSION_FROM
@@ -473,7 +473,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     # in case we don't find it below!
     if ($self->{VERSION_FROM}) {
         my $version_from = macify($self->{VERSION_FROM});
-        $pm{$version_from} = File::Spec->catfile('$(INST_LIBDIR)',
+        $pm{$version_from} = $self->catfile('$(INST_LIBDIR)',
             $version_from);
     }
 
@@ -493,7 +493,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	} elsif ($name =~ /\.h$/i){
 	    $h{$name} = 1;
 	} elsif ($name =~ /\.(p[ml]|pod)$/){
-	    $pm{$name} = File::Spec->catfile('$(INST_LIBDIR)',$name);
+	    $pm{$name} = $self->catfile('$(INST_LIBDIR)',$name);
 	} elsif ($name =~ /\.PL$/ && $name ne "Makefile.PL") {
 	    ($pl_files{$name} = $name) =~ s/\.PL$// ;
 	}
@@ -552,7 +552,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    my($striplibpath,$striplibname);
 	    $prefix =  '$(INST_LIB)' if (($striplibpath = $path) =~ s:^(\W*)lib\W:$1:);
 	    ($striplibname,$striplibpath) = fileparse($striplibpath);
-	    my($inst) = File::Spec->catfile($prefix,$striplibpath,$striplibname);
+	    my($inst) = $self->catfile($prefix,$striplibpath,$striplibname);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);

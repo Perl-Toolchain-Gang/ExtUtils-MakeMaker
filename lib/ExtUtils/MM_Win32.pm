@@ -117,11 +117,9 @@ in these dirs:
 	    } elsif (File::Spec->canonpath($name) eq 
                      File::Spec->canonpath(basename($name))) # foo
             {
-		$abs = File::Spec->catfile($dir, $name);
+		$abs = $self->catfile($dir, $name);
 	    } else {                                         # foo/bar
-		$abs = File::Spec->canonpath(
-                           File::Spec->catfile(File::Spec->curdir, $name)
-                       );
+		$abs = $self->catfile(File::Spec->curdir, $name);
 	    }
 	    print "Checking $abs\n" if ($trace >= 2);
 	    next unless $self->maybe_command($abs);
