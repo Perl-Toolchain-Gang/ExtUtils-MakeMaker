@@ -5,6 +5,11 @@ BEGIN {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
+
+    if( $] < 5.006_001 ) {
+        print "1..0 # Skip: ExtUtils::Embed works on perl 5.6.1 and up\n";
+        exit;
+    }
 }
 chdir 't';
 
