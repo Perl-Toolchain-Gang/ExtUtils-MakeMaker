@@ -2,6 +2,8 @@
     - Added the Makefile to the dist dependencies. (Slaven Rezic)
     - Reversing the find_perl() version check failure warning introced in
       6.10_03.  Too talkative, warned when nothing was wrong.
+    * Fixing META.yml auto-addition when there's no newline at the end 
+      of the MANIFEST [rt.cpan.org 2444]
 
 6.10_03 Fri Apr 11 00:21:25 PDT 2003
     * Added NO_META WriteMakefile() option to suppress generation of

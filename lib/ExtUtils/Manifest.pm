@@ -534,6 +534,7 @@ sub maniadd {
     my($additions) = shift;
 
     _normalize($additions);
+    _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
     open(MANIFEST, ">>$MANIFEST") or die "Could not open $MANIFEST: $!";
@@ -544,6 +545,26 @@ sub maniadd {
     }
     close MANIFEST;
 }
+
+
+# Sometimes MANIFESTs are missing a trailing newline.  Fix this.
+sub _fix_manifest {
+    my $manifest_file = shift;
+
+    open MANIFEST, $MANIFEST or die "Could not open $MANIFEST: $!";
+
+    # Yes, we should be using seek(), but I'd like to avoid loading POSIX
+    # to get SEEK_*
+    my @manifest = <MANIFEST>;
+    close MANIFEST;
+
+    unless( $manifest[-1] =~ /\n\z/ ) {
+        open MANIFEST, ">>$MANIFEST" or die "Could not open $MANIFEST: $!";
+        print MANIFEST "\n";
+        close MANIFEST;
+    }
+}
+        
 
 # UNIMPLEMENTED
 sub _normalize {
