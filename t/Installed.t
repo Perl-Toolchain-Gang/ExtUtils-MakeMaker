@@ -1,4 +1,4 @@
-#!./perl
+#!/usr/bin/perl -w
 
 use strict;
 use warnings;
@@ -14,13 +14,16 @@ use File::Path;
 use File::Basename;
 
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
+    if( $ENV{PERL_CORE} ) {
+        chdir 't' if -d 't';
+        @INC = '../lib';
+    }
 }
+chdir 't';
 
 use Test::More tests => 43;
 
-use_ok( 'ExtUtils::Installed' );
+BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
 # saves having to qualify package name for class methods
 my $ei = bless( {}, 'ExtUtils::Installed' );
