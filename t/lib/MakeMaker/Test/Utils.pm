@@ -78,7 +78,7 @@ sub which_perl {
 
         foreach my $path (File::Spec->path) {
             $perlpath = File::Spec->catfile($path, $perl);
-            last if -x $perl;
+            last if -x $perlpath;
         }
     }
 
