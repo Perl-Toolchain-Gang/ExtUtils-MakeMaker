@@ -13,7 +13,6 @@ lib/ExtUtils/Install.pm
 lib/ExtUtils/Installed.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
-lib/ExtUtils/MANIFEST.SKIP
 lib/ExtUtils/MM.pm
 lib/ExtUtils/MM_Any.pm
 lib/ExtUtils/MM_BeOS.pm
