@@ -205,6 +205,9 @@ sub install_default {
 sub uninstall {
     use ExtUtils::Packlist;
     my($fil,$verbose,$nonono) = @_;
+    $verbose ||= 0;
+    $nonono  ||= 0;
+
     die "no packlist file found: $fil" unless -f $fil;
     # my $my_req = $self->catfile(qw(auto ExtUtils Install forceunlink.al));
     # require $my_req; # Hairy, but for the first
@@ -365,61 +368,132 @@ ExtUtils::Install - install files from here to there
 
 =head1 SYNOPSIS
 
-B<use ExtUtils::Install;>
+  use ExtUtils::Install;
 
-B<install($hashref,$verbose,$nonono);>
+  install({ 'blib/lib' => 'some/install/dir' } );
 
-B<uninstall($packlistfile,$verbose,$nonono);>
+  uninstall($packlist);
 
-B<pm_to_blib($hashref);>
+  pm_to_blib({ 'lib/Foo/Bar.pm' => 'blib/lib/Foo/Bar.pm' });
+
 
 =head1 DESCRIPTION
+
+Handles the installing and uninstalling of perl modules, scripts, man
+pages, etc...
 
 Both install() and uninstall() are specific to the way
 ExtUtils::MakeMaker handles the installation and deinstallation of
 perl modules. They are not designed as general purpose tools.
 
-install() takes three arguments. A reference to a hash, a verbose
-switch and a don't-really-do-it switch. The hash ref contains a
-mapping of directories: each key/value pair is a combination of
-directories to be copied. Key is a directory to copy from, value is a
-directory to copy to. The whole tree below the "from" directory will
-be copied preserving timestamps and permissions.
+
+=over 4
+
+=item B<install>
+
+    install(\%from_to);
+    install(\%from_to, $verbose, $dont_execute);
+
+Copies each directory tree of %from_to to its corresponding value
+preserving timestamps and permissions.
 
 There are two keys with a special meaning in the hash: "read" and
-"write". After the copying is done, install will write the list of
-target files to the file named by C<$hashref-E<gt>{write}>. If there is
-another file named by C<$hashref-E<gt>{read}>, the contents of this file will
-be merged into the written file. The read and the written file may be
-identical, but on AFS it is quite likely that people are installing to a
-different directory than the one where the files later appear.
+"write".  These contain packlist files.  After the copying is done,
+install() will write the list of target files to $from_to{write}. If
+$from_to{read} is given the contents of this file will be merged into
+the written file. The read and the written file may be identical, but
+on AFS it is quite likely that people are installing to a different
+directory than the one where the files later appear.
 
-install_default() takes one or less arguments.  If no arguments are 
-specified, it takes $ARGV[0] as if it was specified as an argument.  
-The argument is the value of MakeMaker's C<FULLEXT> key, like F<Tk/Canvas>.  
-This function calls install() with the same arguments as the defaults 
-the MakeMaker would use.
+If $verbose is true, will print out each file removed.  Default is
+false.
 
-The argument-less form is convenient for install scripts like
+If $dont_execute is true it will only print what it was going to do
+without actually doing it.  Default is false.
 
-  perl -MExtUtils::Install -e install_default Tk/Canvas
 
-Assuming this command is executed in a directory with a populated F<blib> 
-directory, it will proceed as if the F<blib> was build by MakeMaker on 
-this machine.  This is useful for binary distributions.
+=item B<uninstall>
 
-uninstall() takes as first argument a file containing filenames to be
-unlinked. The second argument is a verbose switch, the third is a
-no-don't-really-do-it-now switch.
+    uninstall($packlist_file);
+    uninstall($packlist_file, $verbose, $dont_execute);
 
-pm_to_blib() takes a hashref as the first argument and copies all keys
-of the hash to the corresponding values efficiently. Filenames with
-the extension pm are autosplit. Second argument is the autosplit
-directory.  If third argument is not empty, it is taken as a filter command
-to be ran on each .pm file, the output of the command being what is finally
-copied, and the source for auto-splitting.
+Removes the files listed in a $packlist_file.
+
+If $verbose is true, will print out each file removed.  Default is
+false.
+
+If $dont_execute is true it will only print what it was going to do
+without actually doing it.  Default is false.
+
+
+=item B<pm_to_blib>
+
+    pm_to_blib(\%from_to, $autosplit_dir);
+    pm_to_blib(\%from_to, $autosplit_dir, $filter_cmd);
+
+Copies each key of %from_to to its corresponding value efficiently.
+Filenames with the extension .pm are autosplit into the $autosplit_dir.
+
+$filter_cmd is an optional shell command to run each .pm file through
+prior to splitting and copying.  Input is the contents of the module,
+output the new module contents.
 
 You can have an environment variable PERL_INSTALL_ROOT set which will
 be prepended as a directory to each installed file (and directory).
+
+
+=item B<install_default> I<DISCOURAGED>
+
+    install_default();
+    install_default($fullext);
+
+Calls install() with arguments to copy a module from blib/ to the
+default site installation location.
+
+$fullext is the name of the module converted to a directory
+(ie. Foo::Bar would be Foo/Bar).  If $fullext is not specified, it
+will attempt to read it from @ARGV.
+
+This is primarily useful for install scripts.
+
+B<NOTE> This function is not really useful because of the hard-coded
+install location with no way to control site vs core vs vendor
+directories and the strange way in which the module name is given.
+Consider its use discouraged.
+
+=back
+
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item B<PERL_INSTALL_ROOT>
+
+Will be prepended to each install path.
+
+=back
+
+=head1 AUTHOR
+
+Original author lost in the mists of time.  Probably the same as Makemaker.
+
+Currently maintained by Michael G Schwern <F<schwern@pobox.com>>
+
+Send patches and ideas to <F<makemaker@perl.org>>.
+
+Send bug reports via http://rt.cpan.org/.  Please send your
+generated Makefile along with your report.
+
+For more up-to-date information, see http://www.makemaker.org.
+
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See F<http://www.perl.com/perl/misc/Artistic.html>
+
 
 =cut

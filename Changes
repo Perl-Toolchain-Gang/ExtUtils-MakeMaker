@@ -140,6 +140,9 @@
     - Ilya fixed ExtUtils::Liblist->ext when called outside MakeMaker.
     - realclean was duplicating work already done by clean
     - Adding an explicit LICENSE
+    - Cleaning up ExtUtils::Install docs.
+    - ExtUtils::Install::uninstall() now has default verbose and
+      dont_execute arguments.
 
 6.05 Tue Aug 27 16:09:51 PDT 2002
     - Output format of the hint file verbose diagnostic is now in
