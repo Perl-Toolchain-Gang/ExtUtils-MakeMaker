@@ -21,6 +21,10 @@ use MakeMaker::Test::Utils;
 use File::Find;
 use File::Spec;
 
+# 'make disttest' sets a bunch of environment variables which interfere
+# with our testing.
+delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
+
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
