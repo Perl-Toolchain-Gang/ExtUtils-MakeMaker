@@ -14,7 +14,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 17;
 use MakeMaker::Test::Utils;
 use File::Spec;
 use TieOut;
@@ -89,6 +89,18 @@ is( $?, 0 );
 
 my $dist_test_out = `$make disttest`;
 is( $?, 0, 'disttest' ) || diag($dist_test_out);
+
+
+# Make sure init_dirscan doesn't go into the distdir
+@mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
+
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
+  diag(@mpl_out);
+
+ok( grep(/^Writing $makefile for Big::Fat::Dummy/, 
+         @mpl_out) == 1,
+                                'init_dirscan skipped distdir');
+
 
 my $realclean_out = `$make realclean`;
 is( $?, 0, 'realclean' ) || diag($realclean_out);

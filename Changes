@@ -6,6 +6,8 @@
     - $mm->{PERM_*} were not being set
     - fixin() redundantly chmod'ing scripts.  Let the Makefile do that.
     - The above means MM_Unix will now compile cleanly under strict
+    * init_dirscan's search for Makefile.PL's will no longer look
+      inside a distdir.
 
     [[ Internals ]]
     - INST_* constants moved to init_INST exept for INST_MAN* which
@@ -177,7 +179,7 @@
 5.48_04 Mon Jan 21 19:28:38 EST 2002
     - No longer requiring Test::More
     - Now tested to work with a clean 5.6.1
-    - Stripped out $Revision: 1.29 $ based $VERSIONs.
+    - Stripped out $Revision: 1.30 $ based $VERSIONs.
     - Rolled in patches from p5p, vmsperl & VOS (14325, 14338, 14360, 14364)
     * hint files now run in a safer context.  Only $self is available.
     - ExtUtils::testlib now provides absolute paths into @INC.

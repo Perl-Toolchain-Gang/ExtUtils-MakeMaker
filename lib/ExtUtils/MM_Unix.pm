@@ -1251,8 +1251,14 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my($self) = @_;
     my($name, %dir, %xs, %c, %h, %ignore, %pl_files, %manifypods);
     local(%pm); #the sub in find() has to see this hash
-    @ignore{qw(Makefile.PL test.pl)} = (1,1);
+
+    @ignore{qw(Makefile.PL test.pl t)} = (1,1,1);
+
+    # ignore the distdir
+    $ignore{$self->{DISTVNAME}} = 1;
+
     $ignore{'makefile.pl'} = 1 if $Is_VMS;
+
     foreach $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
 	next if $name eq $Curdir or $name eq $Updir or $ignore{$name};
@@ -1787,6 +1793,7 @@ usually solves this kind of problem.
 	$self->{VERSION} = $self->parse_version($self->{VERSION_FROM}) or
 	    Carp::carp "WARNING: Setting VERSION via file '$self->{VERSION_FROM}' failed\n"
     }
+    $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION}";
 
     # strip blanks
     if ($self->{VERSION}) {

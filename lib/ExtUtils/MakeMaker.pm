@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.55_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.25 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.26 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -831,7 +831,7 @@ that can be individually overridden.  Each subroutine returns the text
 it wishes to have written to the Makefile.
 
 MakeMaker is object oriented. Each directory below the current
-directory that contains a Makefile.PL. Is treated as a separate
+directory that contains a Makefile.PL is treated as a separate
 object. This makes it possible to write an unlimited number of
 Makefiles with a single invocation of WriteMakefile().
 
@@ -1760,7 +1760,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.25 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.26 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
