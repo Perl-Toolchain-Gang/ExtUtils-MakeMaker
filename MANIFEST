@@ -1,7 +1,7 @@
 Changes
 MANIFEST
 Makefile.PL
-bin/inst
+bin/instmodsh
 bin/xsubpp
 lib/ExtUtils/Command.pm
 lib/ExtUtils/Constant.pm
