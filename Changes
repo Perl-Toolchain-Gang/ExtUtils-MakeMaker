@@ -1,3 +1,8 @@
+6.12
+    - Eliminating xsubpp_version().  No longer relevant.  It was checking
+      for a feature added to xsubpp before 5.003_07 and doing it in a
+      really bizarre way.
+
 6.11 Thu Jul 24 01:24:37 PDT 2003
     - Small grammatical doc touch up by Sean Burke
     - Making basic.t clean up better after itself so it can be run

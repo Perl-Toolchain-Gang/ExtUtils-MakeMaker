@@ -127,7 +127,6 @@ foreach ( qw /
   xs_c
   xs_cpp
   xs_o
-  xsubpp_version 
   / )
   {
       can_ok($class, $_);

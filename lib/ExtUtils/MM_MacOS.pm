@@ -877,11 +877,6 @@ install install_static install_dynamic ::
 ';
 }
 
-sub xsubpp_version
-{
-    return $ExtUtils::MakeMaker::Version;
-}
-
 
 =item processPL (o)
 
