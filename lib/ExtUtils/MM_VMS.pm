@@ -745,10 +745,13 @@ sub pm_to_blib {
 pm_to_blib : pm_to_blib.ts
 	$(NOECHO) $(NOOP)
 
+};
+
+    push @m, <<'MAKE_FRAG', 
 # As always, keep under DCL's 255-char limit
 pm_to_blib.ts : $(TO_INST_PM)
-	$(NOECHO) $(PERL) -e "print '},shift(@files),q{ },shift(@files),q{'" >.MM_tmp
-};
+	$(NOECHO) $(RM_F) .MM_tmp
+MAKE_FRAG
 
     $line = '';  # avoid uninitialized var warning
     while ($from = shift(@files),$to = shift(@files)) {
