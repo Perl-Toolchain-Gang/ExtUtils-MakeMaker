@@ -12,6 +12,7 @@
       value than what was documented.
     - Partially reversing Ken's "speed up ExtUtils::Manifest" patch
       from 5.51_01 so MANIFEST overrides MANIFEST.SKIP.
+    * Fixed PREFIXification so it works on Win32.
 
     [[ Test Changes ]]
     - Shortening directory levels to accomodate old VMS's
