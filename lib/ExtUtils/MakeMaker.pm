@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.57 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.58 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -111,7 +111,7 @@ sub _verify_att {
             my $has   = $given ne 'string' ? "$given reference"
                                            : "string/number";
             warn "WARNING: $key takes a $takes not a $has.\n".
-                 "Please inform the author.\n";
+                 "         Please inform the author.\n";
             $att->{$key} = $Default_Att{$sig};
         }
     }
@@ -1886,7 +1886,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.57 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.58 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

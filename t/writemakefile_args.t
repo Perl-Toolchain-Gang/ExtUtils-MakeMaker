@@ -43,7 +43,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 
     is( $warnings, <<VERIFY );
 WARNING: MAN3PODS takes a hash reference not a string/number.
-Please inform the author.
+         Please inform the author.
 VERIFY
     is_deeply( $mm->{MAN3PODS}, {}, 'Wrong argument type corrected' );
 
@@ -56,7 +56,7 @@ VERIFY
     
     is( $warnings, <<VERIFY );
 WARNING: AUTHOR takes a string/number not a code reference.
-Please inform the author.
+         Please inform the author.
 VERIFY
 
     is_deeply( $mm->{AUTHOR}, '' );
