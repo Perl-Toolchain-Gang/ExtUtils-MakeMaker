@@ -1695,7 +1695,7 @@ sub cd {
     my($self, $dir, @cmds) = @_;
 
     # Translate a Unix directory to a relative VMS dir.
-    $dir .= "[.$dir]" unless /^\[.*\]$/;
+    $dir .= "[.$dir]" unless $dir =~ /^\[.*\]$/;
 
     my $cmd = join "\n\t", map "$_", @cmds;
 
