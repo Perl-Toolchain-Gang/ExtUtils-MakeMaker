@@ -201,15 +201,15 @@ sub _maniskip {
 	push @skip, _macify($_);
     }
     close M;
-    my $opts = $Is_VMS ? 'oi' : 'o';
+    my $opts = $Is_VMS ? '(?i)' : '';
 
     # Make sure each entry is isolated in its own parentheses, in case
     # any of them contain alternations
     my $regex = join '|', map "(?:$_)", @skip;
 
     return ($args{warn}
-	    ? sub { $_[0] =~ qr{(?$opts)$regex} && warn "Skipping $_[0]\n" }
-	    : sub { $_[0] =~ qr{(?$opts)$regex} }
+	    ? sub { $_[0] =~ qr{$opts$regex}o && warn "Skipping $_[0]\n" }
+	    : sub { $_[0] =~ qr{$opts$regex}o }
 	   );
 }
 
