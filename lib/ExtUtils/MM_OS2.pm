@@ -32,6 +32,10 @@ the semantics.
 
 =over 4
 
+=item dist (o)
+
+Define TO_UNIX to convert OS2 linefeeds to Unix style.
+
 =cut
 
 sub dist {

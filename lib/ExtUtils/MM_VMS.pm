@@ -930,26 +930,31 @@ UNINSTALL = \$(PERLRUN) "-MExtUtils::Install" -e "uninstall(\$ARGV[0],1,1);"
 
 =item dist (override)
 
-Provide VMSish defaults for some values, then hand off to
-default MM_Unix method.
+VMSish defaults for some values.
+
+  macro         description                     default
+
+  ZIPFLAGS      flags to pass to ZIP            -Vu
+
+  COMPRESS      compression command to          gzip
+                use for tarfiles
+  SUFFIX        suffix to put on                -gz 
+                compressed files
+
+  SHAR          shar command to use             vms_share
+
+  DIST_DEFAULT  default target to use to        tardist
+                create a distribution
 
 =cut
 
 sub dist {
     my($self, %attribs) = @_;
-    $attribs{VERSION}      ||= $self->{VERSION_SYM};
-    $attribs{NAME}         ||= $self->{DISTNAME};
     $attribs{ZIPFLAGS}     ||= '-Vu';
     $attribs{COMPRESS}     ||= 'gzip';
     $attribs{SUFFIX}       ||= '-gz';
     $attribs{SHAR}         ||= 'vms_share';
     $attribs{DIST_DEFAULT} ||= 'zipdist';
-
-    # Sanitize these for use in $(DISTVNAME) filespec
-    $attribs{VERSION} =~ s/[^\w\$]/_/g;
-    $attribs{NAME} =~ s/[^\w\$]/-/g;
-
-    $attribs{DISTVNAME} ||= '$(DISTNAME)-$(VERSION_SYM)';
 
     return $self->SUPER::dist(%attribs);
 }

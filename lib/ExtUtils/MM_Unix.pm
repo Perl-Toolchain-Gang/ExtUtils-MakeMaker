@@ -601,7 +601,49 @@ $targ :: $src
 
 =item dist (o)
 
-Defines a lot of macros for distribution support.
+  my $dist_macros = $mm->dist(%overrides);
+
+Defines a lot of macros for distribution support.  The result is a
+make fragment defining all the following macros.
+
+  macro         description                     default
+
+  TAR           tar command to use              tar
+  TARFLAGS      flags to pass to TAR            cvf
+
+  ZIP           zip command to use              zip
+  ZIPFLAGS      flags to pass to ZIP            -r
+
+  COMPRESS      compression command to          gzip --best
+                use for tarfiles
+  SUFFIX        suffix to put on                .gz 
+                compressed files
+
+  SHAR          shar command to use             shar
+
+  PREOP         extra commands to run before
+                making the archive 
+  POSTOP        extra commands to run after
+                making the archive
+
+  TO_UNIX       a command to convert linefeeds
+                to Unix style in your archive 
+
+  CI            command to checkin your         ci -u
+                sources to version control
+  RCS_LABEL     command to label your sources   rcs -Nv$(VERSION_SYM): -q
+                just after CI is run
+
+  DIST_CP       $how argument to manicopy()     best
+                when the distdir is created
+
+  DIST_DEFAULT  default target to use to        tardist
+                create a distribution
+
+  DISTVNAME     name of the resulting archive   $(DISTNAME)-$(VERSION)
+                (minus suffixes)
+
+%overrides can be used to override any of the above.
 
 =cut
 
@@ -609,8 +651,6 @@ sub dist {
     my($self, %attribs) = @_;
 
     # VERSION should be sanitised before use as a file name
-    $attribs{VERSION}  ||= '$(VERSION)';
-    $attribs{NAME}     ||= '$(DISTNAME)';
     $attribs{TAR}      ||= 'tar';
     $attribs{TARFLAGS} ||= 'cvf';
     $attribs{ZIP}      ||= 'zip';
@@ -627,11 +667,7 @@ sub dist {
     $attribs{DIST_CP}  ||= 'best';
     $attribs{DIST_DEFAULT} ||= 'tardist';
 
-    $attribs{DISTVNAME} ||= "$attribs{NAME}-$attribs{VERSION}";
-
-    # We've already printed out VERSION and NAME variables.
-    delete $attribs{VERSION};
-    delete $attribs{NAME};
+    $attribs{DISTVNAME} ||= '$(DISTNAME)-$(VERSION)';
 
     my $make = '';
     while(my($var, $value) = each %attribs) {
