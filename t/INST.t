@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 25;
+use Test::More tests => 27;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
 use File::Spec;
@@ -122,6 +122,7 @@ $mm = WriteMakefile(
     INSTALLMAN1DIR       => 'none',
     INSTALLSITEMAN3DIR   => 'none',
     INSTALLVENDORMAN1DIR => 'none',
+    INST_MAN1DIR         => 'none',
 );
 like( $stdout->read, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
@@ -141,3 +142,5 @@ isnt( $mm->{INSTALLSITEMAN1DIR},    'none' );
 is  ( $mm->{INSTALLSITEMAN3DIR},    'none' );
 is  ( $mm->{INSTALLVENDORMAN1DIR},  'none' );
 isnt( $mm->{INSTALLVENDORMAN3DIR},  'none' );
+is  ( $mm->{INST_MAN1DIR},          'none' );
+isnt( $mm->{INST_MAN3DIR},          'none' );
