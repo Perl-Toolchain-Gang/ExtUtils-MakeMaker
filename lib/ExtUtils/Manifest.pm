@@ -29,9 +29,8 @@ $Verbose = defined $ENV{PERL_MM_MANIFEST_VERBOSE} ?
 $Quiet = 0;
 $MANIFEST = 'MANIFEST';
 
-my $manifest_mod = $INC{"ExtUtils/Manifest.pm"} ||
-                   ($Is_VMS ? $INC{'extutils/manifest.pm'} : '');
-$DEFAULT_MSKIP = (File::Spec->splitpath($manifest_mod))[1].
+my $Filename = __FILE__;
+$DEFAULT_MSKIP = (File::Spec->splitpath($Filename))[1].
                  "$MANIFEST.SKIP";
 
 
