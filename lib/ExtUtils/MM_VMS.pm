@@ -2183,16 +2183,29 @@ sub oneliner {
     $cmd =~ s{^\n+}{};
     $cmd =~ s{\n+$}{};
 
-    # Escape newlines.
+    # Escape newlines.  XXX Necessary?
     $cmd =~ s{\n}{-\n}g;
 
-    # I believe this is all we should need.
-    $cmd =~ s{"}{""}g;
+    $cmd = $self->quote_literal($cmd);
 
     # Switches must be quoted else they will be lowercased.
     $switches = join ' ', map { qq{"$_"} } @$switches;
 
-    return qq{\$(PERLRUN) $switches -e "$cmd"};
+    return qq{\$(PERLRUN) $switches -e $cmd};
+}
+
+
+=item quote_literal
+
+=cut
+
+sub quote_literal {
+    my($self, $text) = @_;
+
+    # I believe this is all we should need.
+    $cmd =~ s{"}{""}g;
+
+    return qq{"$cmd"};
 }
 
 =item init_linker (o)

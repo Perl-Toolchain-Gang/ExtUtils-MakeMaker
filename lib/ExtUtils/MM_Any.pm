@@ -505,6 +505,15 @@ bareword.  For example:
 Its currently very simple and may be expanded sometime in the figure
 to include more flexible code and switches.
 
+=item B<quote_literal>
+
+    my $safe_text = $MM->quote_literal($text);
+
+This will quote $text so it is interpreted literally in the shell.
+
+For example, on Unix this would escape any single-quotes in $text and
+put single-quotes around the whole thing.
+
 
 =item B<init_others>
 

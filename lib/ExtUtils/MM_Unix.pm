@@ -2318,7 +2318,7 @@ sub init_PERL {
         my $safe = $perl.'SAFE';
         my $run  = $perl.'RUN';
 
-        $self->{$safe} = "'\$($perl)'";
+        $self->{$safe} = $self->quote_literal("\$($perl)");
         $self->{$run}  = "\$($safe)";
 
         # Make sure perl can find itself before it's installed.
@@ -3528,16 +3528,29 @@ sub oneliner {
     $cmd =~ s{^\n+}{};
     $cmd =~ s{\n+$}{};
 
-    # Escape newlines
-    $cmd =~ s{\n}{\\\n}g;
-
-    # I think all we have to quote is single quotes and I think
-    # this is a safe way to do it.
-    $cmd =~ s{'}{'\\''}g;
+    $cmd = $self->quote_literal($cmd);
 
     $switches = join ' ', @$switches;
 
-    return qq{\$(PERLRUN) $switches -e '$cmd'};   
+    return qq{\$(PERLRUN) $switches -e $cmd};   
+}
+
+
+=item quote_literal
+
+=cut
+
+sub quote_literal {
+    my($self, $text) = @_;
+
+    # I think all we have to quote is single quotes and I think
+    # this is a safe way to do it.
+    $text =~ s{'}{'\\''}g;
+
+    # Escape newlines
+    $text =~ s{\n}{\\\n}g;
+
+    return "'$text'";
 }
 
 

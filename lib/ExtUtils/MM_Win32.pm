@@ -467,6 +467,17 @@ sub oneliner {
     # Escape newlines
     $cmd =~ s{\n}{\\\n}g;
 
+    $cmd = $self->quote_literal($cmd);
+
+    $switches = join ' ', @$switches;    
+
+    return qq{\$(PERLRUN) $switches -e $cmd};
+}
+
+
+sub quote_literal {
+    my($self, $text) = @_;
+
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
     $cmd =~ s{"}{\\"}g;
@@ -476,9 +487,7 @@ sub oneliner {
     $cmd =~ s{\\\\}{\\\\\\\\}g;
     $cmd =~ s{\\"}{\\\\"}g;
 
-    $switches = join ' ', @$switches;    
-
-    return qq{\$(PERLRUN) $switches -e "$cmd"};
+    return qq{"$cmd"};
 }
 
 
