@@ -2,7 +2,7 @@ package ExtUtils::MM_Any;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = 0.09;
+$VERSION = '0.10';
 @ISA = qw(File::Spec);
 
 use Config;
@@ -88,7 +88,7 @@ sub os_flavor_is {
 }
 
 
-=item dir_targets B<DEPRECATED>
+=item dir_target B<DEPRECATED>
 
     my $make_frag = $mm->dir_target(@directories);
 
@@ -99,7 +99,7 @@ create its own directories anyway.
 
 =cut
 
-sub dir_targets {}
+sub dir_target {}
 
 
 =item blibdirs_target (o)

@@ -1,3 +1,11 @@
+6.24 Tue Nov 30 15:35:13 EST 2004
+    - dir_target() was accidentally named dir_targets() causing problems
+      installing some Tk modules.
+
+6.23 Fri Nov 26 16:01:50 EST 2004
+    - MM_MacOS lost its $VERSION causing some CPAN indexing problems.  Enough
+      people noticed this to warrant a quick release.
+
 6.22 Tue Nov 23 22:22:22 EST 2004
     - Minor glitch in Command.t test on Win32 [thanks Steve Hay]
     * Fixed MANIFEST.SKIP so it avoids all the new *.ts files.

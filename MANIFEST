@@ -45,6 +45,7 @@ t/backwards.t
 t/basic.t
 t/bytes.t
 t/Command.t
+t/dir_target.t
 t/hints.t
 t/INST.t
 t/INST_PREFIX.t
