@@ -25,22 +25,23 @@ $VERSION = '1.46_01';
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
 
-$Is_OS2     = $^O eq 'os2';
-$Is_Win32   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
-$Is_Win95   = $Is_Win32 && Win32::IsWin95();
-$Is_Dos     = $^O eq 'dos';
-$Is_VOS     = $^O eq 'vos';
-$Is_VMS     = $^O eq 'VMS';
-$Is_QNX     = $^O eq 'qnx';
-$Is_AIX     = $^O eq 'aix';
-$Is_OSF     = $^O eq 'dec_osf';
-$Is_IRIX    = $^O eq 'irix';
-$Is_NetBSD  = $^O eq 'netbsd';
-$Is_SunOS4  = $^O eq 'sunos';
-$Is_Solaris = $^O eq 'solaris';
-$Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
-$Is_BSD     = $^O =~ /^(?:free|net|open)bsd|bsdos$/;
-
+BEGIN { 
+    $Is_OS2     = $^O eq 'os2';
+    $Is_Win32   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
+    $Is_Win95   = $Is_Win32 && Win32::IsWin95();
+    $Is_Dos     = $^O eq 'dos';
+    $Is_VOS     = $^O eq 'vos';
+    $Is_VMS     = $^O eq 'VMS';
+    $Is_QNX     = $^O eq 'qnx';
+    $Is_AIX     = $^O eq 'aix';
+    $Is_OSF     = $^O eq 'dec_osf';
+    $Is_IRIX    = $^O eq 'irix';
+    $Is_NetBSD  = $^O eq 'netbsd';
+    $Is_SunOS4  = $^O eq 'sunos';
+    $Is_Solaris = $^O eq 'solaris';
+    $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
+    $Is_BSD     = $^O =~ /^(?:free|net|open)bsd|bsdos$/;
+}
 
 BEGIN {
     if( $Is_VMS ) {
