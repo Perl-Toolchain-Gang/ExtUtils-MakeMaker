@@ -30,7 +30,7 @@ if( $^O eq 'VMS' ) {
     # in a DCL subprocess and put it in the job table so the parent sees it.
     open( BFDTMP, '>bfdtesttmp.com' ) || die "Error creating command file; $!";
     print BFDTMP <<'COMMAND';
-$ IF F$SEARCH("t.DIR") .NES. ""
+$ IF F$TRNLNM("PERL_CORE") .EQS. "" .AND. F$TYPE(PERL_CORE) .EQS. ""
 $ THEN
 $!  building CPAN version
 $   BFD_TEST_ROOT = F$PARSE("[.t]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
