@@ -1,27 +1,16 @@
-Create a way to init MM objects.
-
-Move instmodsh to utils/ in the core.
-
 Document prompt()
 
-MakeMaker's warnhandler has to go away.
-
 Fix INSTALLMAN*DIR to honor PREFIX.
-
-Fix prefixify to use $(PREFIX) instead of cut & pasting the prefix
-directly into the Makefile.
 
 Make the libs honor PREFIX.
 
 Don't assume everything is in $Config{PREFIX}/lib and
 $Config{PREFIX}/man.  Debian puts stuff in /usr/share/{perl,man}
 
-Investigate one method per make target.
-
-Handle config files (ie. /etc) and their special PREFIX needs
-(ie. PREFIX=/usr, INSTALLCONFIGDIR=/etc).
-
 Add SITEPREFIX
+
+Fix prefixify to use $(PREFIX) instead of cut & pasting the prefix
+directly into the Makefile.
 
 Add INSTALLDIRS=vendor (see Debian patch)
 
@@ -32,4 +21,17 @@ Cleanup manifypods so it uses Pod::Man instead of pod2man.
 
 Rethink MM_Win32 tests.
 
+Investigate one method per make target.
+
 Test MM_Any and pull some redundant tests out of MM_*.t
+
+MakeMaker's warnhandler has to go away.
+
+Create a way to init MM objects.
+
+Move instmodsh to utils/ in the core.
+
+Handle config files (ie. /etc) and their special PREFIX needs
+(ie. PREFIX=/usr, INSTALLCONFIGDIR=/etc).
+
+Fix Win32 when perl is installed in C:\Program Files
