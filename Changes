@@ -2,6 +2,7 @@
     [[ API Changes ]]
     * A failing Makefile.PL in a subdir will now kill the whole
       makefile making process.
+    * "make install PREFIX=something" will no longer work.  Sorry.
     - Now supporting the usevendorprefix %Config setting
     - Tests now guaranteed to run in alphabetical order.
     - Allowing $VERSION = 0.
@@ -21,6 +22,9 @@
     [[ Test Changes ]]
     - Shortening directory levels to accomodate old VMS's
     - was using a slightly wrong prefix for the prefix tests
+
+    [[ Doc Fixes ]]
+    - Documenting VERBINST
 
 5.90_01 Thu Apr 11 01:11:54 EDT 2002
     [[ API Changes ]]

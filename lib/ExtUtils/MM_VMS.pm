@@ -2206,10 +2206,6 @@ sub prefixify {
     my $path = $self->{uc $var} || $Config{lc $var} || 
                $Config{lc $var_no_install};
 
-    # VMS can't append paths wantonly like other OS's.  We have to
-    # hardcode and File::Spec->catdir.
-    $rprefix =~ s/^\$\((.*)\)$/$self->{$1}/;
-
     if( !$path ) {
         print STDERR "  no Config found for $var.\n" if $Verbose >= 2;
         $path = $self->_prefixify_default($rprefix, $default);

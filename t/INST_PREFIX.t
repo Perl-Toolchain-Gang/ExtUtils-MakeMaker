@@ -87,18 +87,18 @@ my @Vend_Install = qw(vendorarch vendorlib vendorbin
                       vendorman1dir vendorman3dir);
 
 foreach my $var (@Perl_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : '$(PREFIX)';
+    my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
     like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, "PREFIX + $var" );
 }
 
 foreach my $var (@Site_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : '$(SITEPREFIX)';
+    my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
     like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/, 
                                                     "SITEPREFIX + $var" );
 }
 
 foreach my $var (@Vend_Install) {
-    my $prefix = $Is_VMS ? '[.foo.bar' : '$(VENDORPREFIX)';
+    my $prefix = $Is_VMS ? '[.foo.bar' : 'foo/bar/';
     like( $mm->{uc "install$var"}, qr/^\Q$prefix\E/,
                                                     "VENDORPREFIX + $var" );
 }
