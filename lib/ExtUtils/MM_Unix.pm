@@ -3572,9 +3572,9 @@ but handles simple ones.
 
 sub quote_paren {
     my $arg = shift;
-    $arg =~ s/\$\((.+?)\)/\$\\\\($1\\\\)/g;	# protect $(...)
-    $arg =~ s/(?<!\\)([()])/\\$1/g;		# quote unprotected
-    $arg =~ s/\$\\\\\((.+?)\\\\\)/\$($1)/g;	# unprotect $(...)
+    $arg =~ s{\$\((.+?)\)}{\$\\\\($1\\\\)}g;	# protect $(...)
+    $arg =~ s{(?<!\\)([()])}{\\$1}g;		# quote unprotected
+    $arg =~ s{\$\\\\\((.+?)\\\\\)}{\$($1)}g;	# unprotect $(...)
     return $arg;
 }
 
