@@ -2,6 +2,13 @@ This is a short set of guidelines for those patching
 ExtUtils::MakeMaker.  Its not an iron-clad set of rules, but just
 things which make life easier when reading and integrating a patch.
 
+Lots of information can be found in makemaker.org.
+
+MakerMaker is being maintained until something else can replace it.
+Bugs will be fixed and compatibility improved, but I would like to
+avoid new features.  If you want to add something to MakeMaker,
+consider instead working on Module::Build, MakeMaker's heir apparent.
+
 
 Patching details
 
@@ -40,6 +47,13 @@ Code formatting
 subdirs ::
 	\$(NOECHO)cd $subdir && \$(MAKE) -f \$(FIRST_MAKEFILE) all \$(PASTHRU)
 EOT
+
+  or are switching quoting contexts:
+
+    return <<q{
+subdirs ::
+	$(NOECHO)cd }.$subdir.q{ && $(MAKE) -f $(FIRST_MAKEFILE) all $(PASTHRU)
+};
 
   consider using sprintf instead.
 
@@ -102,6 +116,9 @@ Cross-Platform Compatibility
   files.  If your command is just too long, consider making it an
   ExtUtils::Command::MM function.
 
+- Most shells quote differently.  If you need to put a perl one-liner
+  in the Makefile, please use perl_oneliner() to generate it.
+
 
 Tests
 
@@ -133,3 +150,6 @@ Documentation
 
     sub _foo_bar {
        ...
+
+- If you're overriding a method, document that its an override and
+  *why* its being overridden.  Don't repeat the original documentation.
