@@ -14,9 +14,9 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 22d0c15efb4d56b5cf171ba4280f8f2d4cb72d8c .patch
-SHA1 45614586ad216080f9cca5a02e93860bef9236cb Changes
-SHA1 7265a124b6dd9d5be49aec1806997026e08c1b1f MANIFEST
+SHA1 d93b3d80ab3c1eee1896e41fb9c74529c83afcac .patch
+SHA1 554ce1e1f0c4b0ace45aa07c4b9afb479c116521 Changes
+SHA1 9a5818da277e4c4d34dbb5011d3073b495ee37e8 MANIFEST
 SHA1 a61b9aa4655eb498906b3ff0babf01d3aea244af MANIFEST.SKIP
 SHA1 685c4f8dc9b7cb5263a258068a1781558c740ae0 META.yml
 SHA1 064e6ca78be0856ffddcebf1b6e274e2bb092bbc Makefile.PL
@@ -41,12 +41,12 @@ SHA1 7eed153d0aae182d035739604f78fc8e454b5644 lib/ExtUtils/MM_MacOS.pm
 SHA1 de38d740614d3340a87be2bf585aec5ef7367836 lib/ExtUtils/MM_NW5.pm
 SHA1 441da7524783ae12ce40f26353adbf4696a8f5b4 lib/ExtUtils/MM_OS2.pm
 SHA1 02b916060571fd20ced334ba4f2d1542d1590023 lib/ExtUtils/MM_UWIN.pm
-SHA1 b1fae73fde4dad115a4c4ec8514c4fd56d34e400 lib/ExtUtils/MM_Unix.pm
+SHA1 f463b92a22cf7bc59f71519fb47159d66074f330 lib/ExtUtils/MM_Unix.pm
 SHA1 6b35a5f292fcd62075f696762d233937b0a17a67 lib/ExtUtils/MM_VMS.pm
 SHA1 c6ab78ae156669adf7bab2ac2a1906340f29c457 lib/ExtUtils/MM_Win32.pm
 SHA1 e3142ac122edbb45f899435084c84f58219bae73 lib/ExtUtils/MM_Win95.pm
 SHA1 0f51f0dce4cb33bac94c85c86d19ae361e59597a lib/ExtUtils/MY.pm
-SHA1 8516736f34642da09f915540a749ef9f3b616c94 lib/ExtUtils/MakeMaker.pm
+SHA1 6c35ebb448d42408c654c70800a09cd4797f4220 lib/ExtUtils/MakeMaker.pm
 SHA1 2941c3d867595a9b6aef2ffa71f1ab85848bf236 lib/ExtUtils/MakeMaker/FAQ.pod
 SHA1 34d8c354eea23b0b7f467b476069a5180826eafc lib/ExtUtils/MakeMaker/Tutorial.pod
 SHA1 4685bb3361c2b9c42094ef68454e849edaf6f549 lib/ExtUtils/MakeMaker/bytes.pm
@@ -59,7 +59,7 @@ SHA1 5c92e4618ac1650bbf8eb155d8747190ff1aea8d lib/ExtUtils/testlib.pm
 SHA1 c2b85995a302ab6ee8827f62b868040c3c39950b t/00compile.t
 SHA1 e71be8c9a329f6299bf70f2049749591cb0e31a8 t/Command.t
 SHA1 1083ee5036f1afe80e62459729511f184d5eea58 t/INST.t
-SHA1 b50e497fdc26da8cbb0dbc0db69cb214a655327a t/INST_PREFIX.t
+SHA1 6360a20b7a15514619d2bece4c5952dd901b68d4 t/INST_PREFIX.t
 SHA1 753b1d5a390dcd2e560d7ca6c13974b547dfea71 t/Install.t
 SHA1 c9318720059bc277a91412bc4188f63b7cff7508 t/Installed.t
 SHA1 e30cd896f7b148d91482ea2aaa64c897b0a22a3a t/Liblist.t
@@ -79,6 +79,8 @@ SHA1 a81882d0264b9cfa86514336b261aa6b75eabfa0 t/backwards.t
 SHA1 5da809abfb6b801e2f9e6d49a11309d7478ba003 t/basic.t
 SHA1 80b3341f11cefd4cf79533198b3ecedf3faa7a1c t/bytes.t
 SHA1 20e4f3e535fd75ba854685a817ad9fcc07732325 t/hints.t
+SHA1 0242fa709862833c95d0c9857c43c0561e72a994 t/lib/MakeMaker/Test/Setup/BFD.pm
+SHA1 d4aaf51818b382548975dfb18cfb81f1c1e16828 t/lib/MakeMaker/Test/Setup/Problem.pm
 SHA1 6efd694cae9f736dee01199b7914ecc60b50640d t/lib/MakeMaker/Test/Setup/Recurs.pm
 SHA1 d6a9974d14483cdeaa7f87a7564cb2b36a9c1116 t/lib/MakeMaker/Test/Utils.pm
 SHA1 ac71c8f750b30ce30a2889860a12e737faa1bee1 t/lib/Test/Builder.pm
@@ -101,7 +103,7 @@ SHA1 4a7685da6367a7a79ecfac76f96adf2aeac46514 t/writemakefile_args.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQE/p0UYT4Li3Cw/PzQRAoZqAJ9ETTut1A++yxeeUyX45GSJr45+JQCfTbmC
-UMrYBIjcXroQVl9ndO3I/9c=
-=khn2
+iD8DBQE/p007T4Li3Cw/PzQRAhJUAJwMthFo0pbRTm8YRdNHFWomXBLqiQCfeao5
+JuhxvwhSeIsrSteJTFmtX7o=
+=BdA2
 -----END PGP SIGNATURE-----
