@@ -22,7 +22,8 @@
       messages (perlbug ID 20020709.001)
     - Removed unfinished and unused maybe_command_in_dirs()
     - Removed dead SelfLoader cruft from MM_Unix.
-    - Fixed PPD generation when ABSTRACT contains quotes (RT1473)
+    - Fixed PPD generation when the ppd contains quotes (RT1473)
+    - Fixed PPD generation on VMS
     - Moved Win9x specific subdir_x() code from MM_Unix to MM_Win95
     * Craig Berry fixed hint files on VMS
     - Added the perl_onliner() method to generate portable, safe one-liners
