@@ -185,30 +185,6 @@ sub split_command {
 }
 
 
-=item max_exec_len
-
-    my $max_exec_len = $MM->max_exec_len;
-
-Calculates the maximum command size the OS can exec.  Effectively,
-this is the max size of a shell command line.
-
-=cut
-
-sub max_exec_len {
-    my $self = shift;
-
-    if (!defined $self->{_MAX_EXEC_LEN}) {
-        if (my $arg_max = eval { require POSIX;  &POSIX::ARG_MAX }) {
-            $self->{_MAX_EXEC_LEN} = $arg_max;
-        }
-        else {      # POSIX minimum exec size
-            $self->{_MAX_EXEC_LEN} = 4096;
-        }
-    }
-
-    return $self->{_MAX_EXEC_LEN};
-}
-
 =item init_VERSION
 
     $mm->init_VERSION
@@ -593,6 +569,16 @@ put single-quotes around the whole thing.
 
 Shell escapes newlines in $text.
 
+
+=item max_exec_len
+
+    my $max_exec_len = $MM->max_exec_len;
+
+Calculates the maximum command size the OS can exec.  Effectively,
+this is the max size of a shell command line.
+
+=for _private
+$self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
 
 =item B<init_others>
 

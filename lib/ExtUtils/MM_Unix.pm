@@ -3548,6 +3548,28 @@ sub escape_newlines {
 }
 
 
+=item max_exec_len
+
+Using POSIX::ARG_MAX.  Otherwise falling back to 4096.
+
+=cut
+
+sub max_exec_len {
+    my $self = shift;
+
+    if (!defined $self->{_MAX_EXEC_LEN}) {
+        if (my $arg_max = eval { require POSIX;  &POSIX::ARG_MAX }) {
+            $self->{_MAX_EXEC_LEN} = $arg_max;
+        }
+        else {      # POSIX minimum exec size
+            $self->{_MAX_EXEC_LEN} = 4096;
+        }
+    }
+
+    return $self->{_MAX_EXEC_LEN};
+}
+
+
 =item static (o)
 
 Defines the static target.

@@ -498,6 +498,20 @@ sub escape_newlines {
     return $text;
 }
 
+
+=item max_exec_len
+
+Using 31K, a safe number gotten from Windows 2000.
+
+=cut
+
+sub max_exec_len {
+    my $self = shift;
+
+    return $self->{_MAX_EXEC_LEN} ||= 31 * 1024;
+}
+
+
 1;
 __END__
 

@@ -2224,6 +2224,18 @@ sub escape_newlines {
     return $text;
 }
 
+=item max_exec_len
+
+256 characters.
+
+=cut
+
+sub max_exec_len {
+    my $self = shift;
+
+    return $self->{_MAX_EXEC_LEN} ||= 256;
+}
+
 =item init_linker (o)
 
 =cut
