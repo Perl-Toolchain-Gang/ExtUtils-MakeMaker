@@ -1136,13 +1136,13 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 
         chmod 0666, $file_bak;
         unlink $file_bak;
-	unless ( rename($file, $file_bak) ) {	
+	unless ( _rename($file, $file_bak) ) {	
 	    warn "Can't rename $file to $file_bak: $!";
 	    next;
 	}
-	unless ( rename($file_new, $file) ) {	
+	unless ( _rename($file_new, $file) ) {	
 	    warn "Can't rename $file_new to $file: $!";
-	    unless ( rename($file_bak, $file) ) {
+	    unless ( _rename($file_bak, $file) ) {
 	        warn "Can't rename $file_bak back to $file either: $!";
 		warn "Leaving $file renamed as $file_bak\n";
 	    }
@@ -1154,6 +1154,22 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 	system("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';;
     }
 }
+
+
+sub _rename {
+    my($old, $new) = @_;
+
+    foreach my $file ($old, $new) {
+        if( $Is_VMS and basename($file) !~ /\./ ) {
+            # rename() in 5.8.0 on VMS will not rename a file if it
+            # does not contain a dot yet it returns success.
+            $file = "$file.";
+        }
+    }
+
+    return rename($old, $new);
+}
+
 
 =item force (o)
 

@@ -16,7 +16,7 @@ use strict;
 use File::Path;
 use Config;
 
-use Test::More tests => 19;
+use Test::More tests => 21;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
@@ -57,6 +57,7 @@ ok( -r '../dummy-install',      '  install dir created' );
 my @installed_files = 
   ('../dummy-install/lib/perl5/Big/Dummy.pm',
    '../dummy-install/lib/perl5/Big/Liar.pm',
+   '../dummy-install/bin/program',
    "../dummy-install/lib/perl5/$Config{archname}/perllocal.pod",
    "../dummy-install/lib/perl5/$Config{archname}/auto/Big/Dummy/.packlist"
   );
@@ -67,5 +68,13 @@ foreach my $file (@installed_files) {
 }
 
 
+# nmake outputs its damned logo
+# Send STDERR off to oblivion.
+open(SAVERR, ">&STDERR") or die $!;
+open(STDERR, ">".File::Spec->devnull) or die $!;
+
 my $realclean_out = run("$make realclean");
 is( $?, 0, 'realclean' ) || diag($realclean_out);
+
+open(STDERR, ">&SAVERR") or die $!;
+close SAVERR;

@@ -33,10 +33,23 @@ printf "Current package is: %s\n", __PACKAGE__ unless "@ARGV" =~ /PREREQ/;
 WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
+    EXE_FILES     => [qw(bin/program)],
     PREREQ_PM     => { strict => 0 },
     ABSTRACT_FROM => 'lib/Big/Dummy.pm',
     AUTHOR        => 'Michael G Schwern <schwern@pobox.com>',
 );
+END
+
+             'Big-Dummy/bin/program'          => <<'END',
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+program - this is a program
+
+=cut
+
+1;
 END
 
              'Big-Dummy/t/compile.t'          => <<'END',

@@ -16,7 +16,7 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 76;
+use Test::More tests => 80;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -134,16 +134,22 @@ ok( -r '../dummy-install',     '  install dir created' );
 my %files = ();
 find( sub { 
     # do it case-insensitive for non-case preserving OSs
-    $files{lc $_} = $File::Find::name; 
+    my $file = lc $_;
+
+    # VMS likes to put dots on the end of things that don't have them.
+    $file =~ s/\.$// if $Is_VMS;
+
+    $files{$file} = $File::Find::name; 
 }, '../dummy-install' );
 ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
 ok( $files{'liar.pm'},      '  Liar.pm installed'  );
+ok( $files{'program'},      '  program installed'  );
 ok( $files{'.packlist'},    '  packlist created'   );
 ok( $files{'perllocal.pod'},'  perllocal.pod created' );
 
 
 SKIP: {
-    skip "VMS install targets do not preserve $(PREFIX)", 8 if $Is_VMS;
+    skip 'VMS install targets do not preserve $(PREFIX)', 9 if $Is_VMS;
 
     $install_out = run("$make install PREFIX=elsewhere");
     is( $?, 0, 'install with PREFIX override' ) || diag $install_out;
@@ -155,6 +161,7 @@ SKIP: {
     find( sub { $files{$_} = $File::Find::name; }, 'elsewhere' );
     ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
     ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
+    ok( $files{'program'},      '  program installed'  );
     ok( $files{'.packlist'},    '  packlist created'   );
     ok( $files{'perllocal.pod'},'  perllocal.pod created' );
     rmtree('elsewhere');
@@ -162,7 +169,7 @@ SKIP: {
 
 
 SKIP: {
-    skip "VMS install targets do not preserve $(DESTDIR)", 10 if $Is_VMS;
+    skip 'VMS install targets do not preserve $(DESTDIR)', 11 if $Is_VMS;
 
     $install_out = run("$make install PREFIX= DESTDIR=other");
     is( $?, 0, 'install with DESTDIR' ) || 
@@ -178,6 +185,7 @@ SKIP: {
     }, 'other' );
     ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
     ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
+    ok( $files{'program'},      '  program installed'  );
     ok( $files{'.packlist'},    '  packlist created'   );
     ok( $files{'perllocal.pod'},'  perllocal.pod created' );
 
@@ -202,7 +210,7 @@ SKIP: {
 
 
 SKIP: {
-    skip 'VMS install targets do not preserve $(PREFIX)', 9 if $Is_VMS;
+    skip 'VMS install targets do not preserve $(PREFIX)', 10 if $Is_VMS;
 
     $install_out = run("$make install PREFIX=elsewhere DESTDIR=other/");
     is( $?, 0, 'install with PREFIX override and DESTDIR' ) || 
@@ -216,6 +224,7 @@ SKIP: {
     find( sub { $files{$_} = $File::Find::name; }, 'other/elsewhere' );
     ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
     ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
+    ok( $files{'program'},      '  program installed'  );
     ok( $files{'.packlist'},    '  packlist created'   );
     ok( $files{'perllocal.pod'},'  perllocal.pod created' );
     rmtree('other');
