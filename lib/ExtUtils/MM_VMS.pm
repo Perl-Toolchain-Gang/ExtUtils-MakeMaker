@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.77 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.78 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -380,7 +380,7 @@ sub init_others {
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
     $self->{MAKEFILE_OLD}       ||= '$(FIRST_MAKEFILE)_old';
 
-    $self->{ECHO}     ||= 'Write Sys\\$Output';
+    $self->{ECHO}     ||= '$(PERLRUN) -e "print qq{@ARGV}"';
     $self->{TOUCH}    ||= '$(PERLRUN) "-MExtUtils::Command" -e touch';
     $self->{CHMOD}    ||= '$(PERLRUN) "-MExtUtils::Command" -e chmod'; 
     $self->{RM_F}     ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_f';
@@ -1476,18 +1476,18 @@ VMS-style command line quoting in a few cases.
 
 sub install {
     my($self, %attribs) = @_;
-    my(@m,@docfiles);
+    my(@m,@exe_files);
 
     if ($self->{EXE_FILES}) {
 	my($line,$file) = ('','');
 	foreach $file (@{$self->{EXE_FILES}}) {
 	    $line .= "$file ";
 	    if (length($line) > 128) {
-		push(@docfiles,qq[\t\$(NOECHO) \$(PERL) -e "print '$line'" >>.MM_tmp\n]);
+		push(@exe_files,qq[\t\$(NOECHO) \$(ECHO) "$line" >>.MM_tmp\n]);
 		$line = '';
 	    }
 	}
-	push(@docfiles,qq[\t\$(NOECHO) \$(PERL) -e "print '$line'" >>.MM_tmp\n]) if $line;
+	push(@exe_files,qq[\t\$(NOECHO) \$(ECHO) "$line" >>.MM_tmp\n]) if $line;
     }
 
     push @m, q[
@@ -1504,7 +1504,7 @@ pure_install :: pure_$(INSTALLDIRS)_install
 	$(NOECHO) $(NOOP)
 
 doc_install :: doc_$(INSTALLDIRS)_install
-	$(NOECHO) $(ECHO) "Appending installation info to $(INSTALLARCHLIB)perllocal.pod"
+        $(NOECHO) $(NOOP)
 
 pure__install : pure_site_install
 	$(NOECHO) $(ECHO) "INSTALLDIRS not defined, defaulting to INSTALLDIRS=site"
@@ -1516,65 +1516,70 @@ doc__install : doc_site_install
 pure_perl_install ::
 	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
 	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLPRIVLIB) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLARCHLIB) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLBIN) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_SCRIPT) $(INSTALLSCRIPT) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_MAN1DIR) $(INSTALLMAN1DIR) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_MAN3DIR) $(INSTALLMAN3DIR) '" >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_LIB) $(INSTALLPRIVLIB) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_ARCHLIB) $(INSTALLARCHLIB) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_BIN) $(INSTALLBIN) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_SCRIPT) $(INSTALLSCRIPT) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_MAN1DIR) $(INSTALLMAN1DIR) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_MAN3DIR) $(INSTALLMAN3DIR) " >>.MM_tmp
 	$(MOD_INSTALL) <.MM_tmp
-	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;
+	$(NOECHO) $(RM_F) .MM_tmp
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
 
 # Likewise
 pure_site_install ::
 	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
 	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLSITELIB) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLSITEARCH) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLSITEBIN) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_SCRIPT) $(INSTALLSCRIPT) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_MAN1DIR) $(INSTALLSITEMAN1DIR) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_MAN3DIR) $(INSTALLSITEMAN3DIR) '" >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_LIB) $(INSTALLSITELIB) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_ARCHLIB) $(INSTALLSITEARCH) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_BIN) $(INSTALLSITEBIN) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_SCRIPT) $(INSTALLSCRIPT) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_MAN1DIR) $(INSTALLSITEMAN1DIR) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_MAN3DIR) $(INSTALLSITEMAN3DIR) " >>.MM_tmp
 	$(MOD_INSTALL) <.MM_tmp
-	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;
+	$(NOECHO) $(RM_F) .MM_tmp
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
 
 pure_vendor_install ::
-	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLVENDORLIB) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLVENDORARCH) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLVENDORBIN) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_SCRIPT) $(INSTALLSCRIPT) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_MAN1DIR) $(INSTALLVENDORMAN1DIR) '" >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print '$(INST_MAN3DIR) $(INSTALLVENDORMAN3DIR) '" >>.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_LIB) $(INSTALLVENDORLIB) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_ARCHLIB) $(INSTALLVENDORARCH) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_BIN) $(INSTALLVENDORBIN) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_SCRIPT) $(INSTALLSCRIPT) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_MAN1DIR) $(INSTALLVENDORMAN1DIR) " >>.MM_tmp
+	$(NOECHO) $(ECHO) "$(INST_MAN3DIR) $(INSTALLVENDORMAN3DIR) " >>.MM_tmp
 	$(MOD_INSTALL) <.MM_tmp
-	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;
+	$(NOECHO) $(RM_F) .MM_tmp
 
 # Ditto
 doc_perl_install ::
-	$(NOECHO) $(PERL) -e "print 'Module $(NAME)|installed into|$(INSTALLPRIVLIB)|'" >.MM_tmp
-	$(NOECHO) $(PERL) -e "print 'LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES)|'" >>.MM_tmp
-],@docfiles,
-q%	$(NOECHO) $(PERL) -e "print q[@ARGV=split(/\\|/,<STDIN>);]" >.MM2_tmp
-	$(NOECHO) $(PERL) -e "print q[print '=head2 ',scalar(localtime),': C<',shift,qq[>\\n\\n=over 4\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) -e "print q[while(($key=shift) && ($val=shift)) ]" >>.MM2_tmp
-	$(NOECHO) $(PERL) -e "print q[{print qq[=item *\\n\\nC<$key: $val>\\n\\n];}print qq[=back\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.$self->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
-	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;,.MM2_tmp;
+	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{INSTALLARCHLIB}, 'perllocal.pod').q["
+	$(NOECHO) $(MKPATH) $(INSTALLARCHLIB)
+	$(NOECHO) $(ECHO) "installed into|$(INSTALLPRIVLIB)|" >.MM_tmp
+	$(NOECHO) $(ECHO) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
+],@exe_files,
+q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(RM_F) .MM_tmp
 
 # And again
 doc_site_install ::
-	$(NOECHO) $(PERL) -e "print 'Module $(NAME)|installed into|$(INSTALLSITELIB)|'" >.MM_tmp
-	$(NOECHO) $(PERL) -e "print 'LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES)|'" >>.MM_tmp
-],@docfiles,
-q%	$(NOECHO) $(PERL) -e "print q[@ARGV=split(/\\|/,<STDIN>);]" >.MM2_tmp
-	$(NOECHO) $(PERL) -e "print q[print '=head2 ',scalar(localtime),': C<',shift,qq[>\\n\\n=over 4\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) -e "print q[while(($key=shift) && ($val=shift)) ]" >>.MM2_tmp
-	$(NOECHO) $(PERL) -e "print q[{print qq[=item *\\n\\nC<$key: $val>\\n\\n];}print qq[=back\\n\\n];]" >>.MM2_tmp
-	$(NOECHO) $(PERL) .MM2_tmp <.MM_tmp >>%.$self->catfile($self->{INSTALLARCHLIB},'perllocal.pod').q[
-	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;,.MM2_tmp;
+	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{INSTALLSITEARCH}, 'perllocal.pod').q["
+	$(NOECHO) $(MKPATH) $(INSTALLSITEARCH)
+	$(NOECHO) $(ECHO) "installed into|$(INSTALLSITELIB)|" >.MM_tmp
+	$(NOECHO) $(ECHO) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
+],@exe_files,
+q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{INSTALLSITEARCH},'perllocal.pod').q[
+	$(NOECHO) $(RM_F) .MM_tmp
 
 doc_vendor_install ::
+	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{INSTALLVENDORARCH}, 'perllocal.pod').q["
+	$(NOECHO) $(MKPATH) $(INSTALLVENDORARCH)
+	$(NOECHO) $(ECHO) "installed into|$(INSTALLVENDORLIB)|" >.MM_tmp
+	$(NOECHO) $(ECHO) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
+],@exe_files,
+q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{INSTALLVENDORARCH},'perllocal.pod').q[
+	$(NOECHO) $(RM_F) .MM_tmp
 
 ];
 
@@ -1783,7 +1788,7 @@ use vars qw(%olbs);
 
 sub makeaperl {
     my($self, %attribs) = @_;
-    my($makefilename, $searchdirs, $static, $extra, $perlinc, $target, $tmp, $libperl) = 
+    my($makefilename, $searchdirs, $static, $extra, $perlinc, $target, $tmpdir, $libperl) = 
       @attribs{qw(MAKE DIRS STAT EXTRA INCL TARGET TMP LIBPERL)};
     my(@m);
     push @m, "
@@ -1925,8 +1930,8 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     $shrtarget =~ s/^([^.]*)/$1Shr/;
     $shrtarget = $targdir . $shrtarget;
     $target = "Perlshr.$Config{'dlext'}" unless $target;
-    $tmp = "[]" unless $tmp;
-    $tmp = $self->fixpath($tmp,1);
+    $tmpdir = "[]" unless $tmpdir;
+    $tmpdir = $self->fixpath($tmpdir,1);
     if (@optlibs) { $extralist = join(' ',@optlibs); }
     else          { $extralist = ''; }
     # Let ExtUtils::Liblist find the necessary libs for us (but skip PerlShr)
@@ -1961,41 +1966,43 @@ MAP_LIBPERL = ",$self->fixpath($libperl,0),'
 ';
 
 
-    push @m,"\n${tmp}Makeaperl.Opt : \$(MAP_EXTRA)\n";
+    push @m,"\n${tmpdir}Makeaperl.Opt : \$(MAP_EXTRA)\n";
     foreach (@optlibs) {
 	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,'}" >>$(MMS$TARGET)',"\n";
     }
-    push @m,"\n${tmp}PerlShr.Opt :\n\t";
+    push @m,"\n${tmpdir}PerlShr.Opt :\n\t";
     push @m,'$(NOECHO) $(PERL) -e "print q{$(MAP_SHRTARGET)}" >$(MMS$TARGET)',"\n";
 
-push @m,'
+    push @m,'
 $(MAP_SHRTARGET) : $(MAP_LIBPERL) Makeaperl.Opt ',"${libperldir}Perlshr_Attr.Opt",'
 	$(MAP_LINKCMD)/Shareable=$(MMS$TARGET) $(MAP_LIBPERL), Makeaperl.Opt/Option ',"${libperldir}Perlshr_Attr.Opt/Option",'
-$(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmp}perlmain\$(OBJ_EXT) ${tmp}PerlShr.Opt",'
-	$(MAP_LINKCMD) ',"${tmp}perlmain\$(OBJ_EXT)",', PerlShr.Opt/Option
+$(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmpdir}perlmain\$(OBJ_EXT) ${tmpdir}PerlShr.Opt",'
+	$(MAP_LINKCMD) ',"${tmpdir}perlmain\$(OBJ_EXT)",', PerlShr.Opt/Option
 	$(NOECHO) $(ECHO) "To install the new ""$(MAP_TARGET)"" binary, say"
 	$(NOECHO) $(ECHO) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
 	$(NOECHO) $(ECHO) "To remove the intermediate files, say
 	$(NOECHO) $(ECHO) "    $(MMS)$(MMSQUALIFIERS)$(USEMAKEFILE)$(FIRST_MAKEFILE) map_clean"
 ';
-    push @m,"\n${tmp}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmp}Writemain.tmp\n";
+    push @m,"\n${tmpdir}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmpdir}Writemain.tmp\n";
     push @m, "# More from the 255-char line length limit\n";
     foreach (@staticpkgs) {
-	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[}" >>${tmp}Writemain.tmp\n];
+	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[}" >>${tmpdir}Writemain.tmp\n];
     }
-	push @m,'
-	$(NOECHO) $(PERL) $(MAP_PERLINC) -ane "use ExtUtils::Miniperl; writemain(@F)" ',$tmp,'Writemain.tmp >$(MMS$TARGET)
-	$(NOECHO) $(RM_F) ',"${tmp}Writemain.tmp\n";
+
+    push @m, sprintf <<'MAKE_FRAG', $tmpdir, $tmpdir;
+	$(NOECHO) $(PERL) $(MAP_PERLINC) -ane "use ExtUtils::Miniperl; writemain(@F)" %sWritemain.tmp >$(MMS$TARGET)
+	$(NOECHO) $(RM_F) %sWritemain.tmp
+MAKE_FRAG
 
     push @m, q[
 # Still more from the 255-char line length limit
 doc_inst_perl :
-	$(NOECHO) $(PERL) -e "print 'Perl binary $(MAP_TARGET)|'" >.MM_tmp
-	$(NOECHO) $(PERL) -e "print 'MAP_STATIC|$(MAP_STATIC)|'" >>.MM_tmp
+	$(NOECHO) $(ECHO) "Perl binary $(MAP_TARGET)|" >.MM_tmp
+	$(NOECHO) $(ECHO) "MAP_STATIC|$(MAP_STATIC)|" >>.MM_tmp
 	$(NOECHO) $(PERL) -pl040 -e " " ].$self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'),q[ >>.MM_tmp
-	$(NOECHO) $(PERL) -e "print 'MAP_LIBPERL|$(MAP_LIBPERL)|'" >>.MM_tmp
-	$(DOC_INSTALL) <.MM_tmp >>].$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q[
-	$(NOECHO) Delete/NoLog/NoConfirm .MM_tmp;
+	$(NOECHO) $(ECHO) -e "MAP_LIBPERL|$(MAP_LIBPERL)|" >>.MM_tmp
+	$(NOECHO) $(DOC_INSTALL) <.MM_tmp >>].$self->catfile('$(INSTALLARCHLIB)','perllocal.pod').q[
+	$(NOECHO) $(RM_F) .MM_tmp
 ];
 
     push @m, "
@@ -2010,8 +2017,8 @@ clean :: map_clean
 	\$(NOECHO) \$(NOOP)
 
 map_clean :
-	\$(RM_F) ${tmp}perlmain\$(OBJ_EXT) ${tmp}perlmain.c \$(FIRST_MAKEFILE)
-	\$(RM_F) ${tmp}Makeaperl.Opt ${tmp}PerlShr.Opt \$(MAP_TARGET)
+	\$(RM_F) ${tmpdir}perlmain\$(OBJ_EXT) ${tmpdir}perlmain.c \$(FIRST_MAKEFILE)
+	\$(RM_F) ${tmpdir}Makeaperl.Opt ${tmpdir}PerlShr.Opt \$(MAP_TARGET)
 ";
 
     join '', @m;
@@ -2221,6 +2228,9 @@ sub eliminate_macros {
     }
 
     my($npath) = unixify($path);
+    # sometimes unixify will return a string with an off-by-one trailing null
+    $npath =~ s{\0$}{};
+
     my($complex) = 0;
     my($head,$macro,$tail);
 
