@@ -23,7 +23,8 @@ require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
-$Revision$ExtUtils::MakeMaker::Revision;
+$Revision = # Can't be on the same line or SVN/K gets confused
+    $ExtUtils::MakeMaker::Revision;
 
 
 =head1 NAME
