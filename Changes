@@ -1,4 +1,10 @@
 6.06_03
+    - split_command() was off-by-one when calculating max command line
+      lengths causing it to run over on VMS
+    - made split_command() a bit smarter, taking into account some macro
+      expansion
+    - Fixed initialization of OBJECT, DISTNAME and LDFROM on VMS
+    - Fixed *_install target uses of File::Spec.
     - Added ExtUtils::MakeMaker::vmsish wrapper around vmsish so MM_VMS
       can be compiled on non-VMS machines.  For testing.
     * Added ExtUtils::MakeMaker::Tutorial about writing modules with
