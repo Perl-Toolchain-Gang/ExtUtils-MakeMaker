@@ -1,20 +1,13 @@
 package ExtUtils::MM_OS2;
 
 use strict;
+use vars qw($VERSION @ISA);
 
-our $VERSION = '1.00';
-
-#use Config;
-#use Cwd;
-#use File::Basename;
-require Exporter;
-
-require ExtUtils::MakeMaker;
-ExtUtils::MakeMaker->import(qw( $Verbose &neatvalue));
-
+use ExtUtils::MakeMaker qw(neatvalue);
 use File::Spec;
 
-unshift @MM::ISA, 'ExtUtils::MM_OS2';
+$VERSION = '1.01_01';
+@ISA = qw(ExtUtils::MM_Unix);
 
 =pod
 
