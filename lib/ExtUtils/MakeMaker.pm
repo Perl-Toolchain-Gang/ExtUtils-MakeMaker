@@ -2,10 +2,10 @@ BEGIN {require 5.004;}
 
 package ExtUtils::MakeMaker;
 
-$VERSION = "5.53_02";
+$VERSION = "5.54_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.22 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.23 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -617,11 +617,12 @@ sub _run_hintfile {
     local($self) = shift;       # make $self available to the hint file.
     my($hint_file) = shift;
 
+    local $@;
     print STDERR "Processing hints file $hint_file\n";
-    local($!, $@);
-    do "./$hint_file";
-    print STDERR "Couldn't open hint file: $!" if $!;
-    print STDERR $@ if $@;
+    my $ret = do "./$hint_file";
+    unless( defined $ret ) {
+        print STDERR $@ if $@;
+    }
 }
 
 sub mv_all_methods {
@@ -1760,7 +1761,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.22 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.23 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
