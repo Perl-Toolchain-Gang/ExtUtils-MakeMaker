@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.05";
-($Revision = substr(q$Revision: 1.87 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.88 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -580,9 +580,10 @@ sub WriteEmptyMakefile {
       chmod 0666, $self->{MAKEFILE_OLD};
       unlink $self->{MAKEFILE_OLD} or warn "unlink $self->{MAKEFILE_OLD}: $!";
     }
-    _rename $self->{MAKEFILE}, $self->{MAKEFILE_OLD}
-      or warn "rename $self->{MAKEFILE} => $self->{MAKEFILE_OLD}: $!"
-        if -f $self->{MAKEFILE};
+    if ( -f $self->{MAKEFILE} ) {
+        _rename($self->{MAKEFILE}, $self->{MAKEFILE_OLD})
+          or warn "rename $self->{MAKEFILE} => $self->{MAKEFILE_OLD}: $!"
+    }
     open MF, '>'.$self->{MAKEFILE} or die "open $self->{MAKEFILE} for write: $!";
     print MF <<'EOP';
 all:
@@ -1990,7 +1991,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.87 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.88 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
