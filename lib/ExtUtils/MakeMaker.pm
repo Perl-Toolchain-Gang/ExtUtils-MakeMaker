@@ -4,7 +4,7 @@ package ExtUtils::MakeMaker;
 #	   Andreas Koenig	<k@franz.ww.TU-Berlin.DE>
 #	   Tim Bunce		<Tim.Bunce@ig.co.uk>
 
-# Last Revision: Sep 24, 1994
+# Last Revision: 12 Oct 1994
 
 # This utility is designed to write a Makefile for an extension 
 # module from a Makefile.PL. It is based on the excellent Makefile.SH
@@ -12,7 +12,7 @@ package ExtUtils::MakeMaker;
 
 # It splits the task of generating the Makefile into several
 # subroutines that can be individually overridden.
-# Each subroutines returns the text it wishes to have written to
+# Each subroutine returns the text it wishes to have written to
 # the Makefile.
 
 use Config;
@@ -42,8 +42,12 @@ $^W=1;
 #
 @recognized_att_keys=qw(
     TOP INC DISTNAME VERSION DEFINE OBJECT LDTARGET ARMAYBE
-    BACKUP_LIBS  AUTOSPLITMAXLEN	
+    BACKUP_LIBS  AUTOSPLITMAXLEN LINKTYPE
+    potential_libs otherldflags perl fullperl
+    distclean_tarflags
+    clean_files realclean_files
 );
+
 #
 # TOP      is the directory above lib/ and ext/ (normally ../..)
 #          (MakeMaker will normally work this out for itself)
@@ -62,6 +66,7 @@ $^W=1;
 #          'BACKUP_LIBS' => [ "-ldbm -lfoo", "-ldbm.nfs" ]
 # AUTOSPLITMAXLEN defaults to 8 and is used when autosplit is done
 #          (can be set higher on a case-by-case basis)
+# defaults to `dynamic', can be set to `static'
 
 #
 # `make distclean'  builds $(DISTNAME)-$(VERSION).tar.Z after a clean
@@ -78,15 +83,15 @@ $^W=1;
 # MY->dynamic
 # etc. (see function writeMakefile, for the current breakpoints)
 #
-# if you still need a different solution, try to develop another 
-# subroutine, that fits your needs and submit the diffs to 
-# perl5-porters or comp.lang.perl as appropriate.
-#
 # Each subroutines returns the text it wishes to have written to
 # the Makefile. To override a section of the Makefile you can
 # either say: 	sub MY::co { "new literal text" }
 # or you can edit the default by saying something like:
 #	sub MY::co { $_=MM->co; s/old text/new text/; $_ }
+#
+# If you still need a different solution, try to develop another 
+# subroutine, that fits your needs and submit the diffs to 
+# perl5-porters or comp.lang.perl as appropriate.
 
 sub writeMakefile {
     %att = @_;
@@ -96,7 +101,7 @@ sub writeMakefile {
 	$att{$1}=$2 if m/(.*)=(.*)/;
     }
     print STDOUT "MakeMaker" if $Verbose;
-    print STDOUT '     %att=("', join('", "', %att), '")' if $Verbose && %att;
+    print STDOUT map("	$_ = '$att{$_}'\n", sort keys %att) if ($Verbose && %att);
 
     MY->initialize();
 
@@ -129,11 +134,14 @@ sub writeMakefile {
 
     close MAKE;
 
+    1;
 }
+
 
 sub mkbootstrap{
     MY->mkbootstrap(@_)
 }
+
 
 sub avoid_typo_warnings{
     local($t) = "$t
@@ -143,7 +151,7 @@ sub avoid_typo_warnings{
 	$DynaLoader::dl_resolve_using
 	$ExtUtils::MakeMaker::Config
 	$DynaLoader::Config
-";
+    ";
 }
 
 
@@ -154,9 +162,30 @@ package MM;
 use Config;
 require Exporter;
 
-Exporter::import('ExtUtils::MakeMaker',
-	qw(%att @recognized_att_keys $Verbose)
-);
+Exporter::import('ExtUtils::MakeMaker', qw(%att @recognized_att_keys));
+
+# These attributes cannot be overridden
+@other_att_keys=qw(extralibs dynaloadlibs statloadlibs bootdep);
+
+
+sub find_perl{
+    my($self, $ver, $names, $dirs, $trace) = @_;
+    my($name, $dir);
+    print "Looking for perl $ver by these names: @$names, in these dirs: @$dirs\n"
+	if ($trace);
+    foreach $dir (@$dirs){
+	foreach $name (@$names){
+	    print "checking $dir/$name\n" if ($trace >= 2);
+	    next unless -x "$dir/$name";
+	    print "executing $dir/$name\n" if ($trace);
+	    my($out) = `$dir/$name -e 'require $ver; print "5OK\n" ' 2>&1`;
+	    return "$dir/$name" if $out =~ /5OK/;
+	}
+    }
+    warn "Unable to find a perl $ver (by these names: @$names, in these dirs: @$dirs)\n";
+    0; # false and not empty
+}
+
 
 sub initialize {
     # Find out directory name.  This is also the extension name.
@@ -168,46 +197,34 @@ sub initialize {
 	}
 	die "Can't find config.sh" unless -f "$top/config.sh";
     }
-    chdir $top or die "Couldn't chdir $top";
+    chdir $top or die "Couldn't chdir $top: $!";
     chop($abstop=`pwd`);
     chdir $pwd;
 
     # EXTMODNAME = The perl module name for this extension.
     # FULLEXT = Full pathname to extension directory.
     # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT.
+    # ROOTEXT = Directory part of FULLEXT. May be empty.
     my($p) = $pwd; $p =~ s:^\Q$abstop/ext/\E::;
     ($att{EXTMODNAME}=$p) =~ s#/#::#g ;		#eg. BSD::Foo::Socket
     ($att{FULLEXT}   =$p);			#eg. BSD/Foo/Socket
     ($att{BASEEXT}   =$p) =~ s:.*/:: ;		#eg. Socket
+    ($att{ROOTEXT}   =$p) =~ s:/?\Q$att{BASEEXT}\E$:: ; #eg. BSD/Foo
 
-    #determine, which perl called us
-    if ($^X =~ m:^/:){
-       $perl=$^X;
-    } elsif ($^X =~ m:(.*/)(.*):){
-       chdir $1;
-       chop($perldir=`pwd`);
-       $perl="$perldir/$2";
-       chdir $pwd;
-    } else {
-       foreach $dir (split ":", $ENV{PATH}){
-           last if (-x ($perl="$dir/$^X") and ! -d $perl);
-       }
-    }
+    # Find Perl 5. The only contract here is that both 'perl' and 'fullperl'
+    # will be working versions of perl 5.
+    $att{'perl'} = MY->find_perl(5.0, [ qw(perl5 perl miniperl) ],
+			    [ $abstop, split(":", $ENV{PATH}) ], 0 )
+	    unless ($att{'perl'} && -x $att{'perl'});
 
-    # For the test target we probably will need a different perl
-    ($fullperl = $perl) =~ s/miniperl$/perl/ ;
+    # Define 'fullperl' to be a non-miniperl (used in test: target)
+    ($att{'fullperl'} = $att{'perl'}) =~ s/miniperl$/perl/
+	unless ($att{'fullperl'} && -x $att{'fullperl'});
 
-    for $key (@recognized_att_keys, 
-	      qw(extralibs dynaloadlibs statloadlibs 
-		 potential_libs)){
+    for $key (@recognized_att_keys, @other_att_keys){
 	# avoid warnings for uninitialized vars
 	$att{$key} = "" unless defined $att{$key};
     }
-
-    # This extension might have its own typemap
-    $exttypemap= (-f "typemap") ? "typemap" : "";
-
-    $eunicefix = $Config{'eunicefix'};
 
     # compute extralibs, dynaloadlibs and statloadlibs from
     # $att{'potential_libs'}
@@ -218,9 +235,8 @@ sub initialize {
            last if  &run_extliblist($_);
        }
     }
-
-    $att{BOOTSTRAP}="$att{BASEEXT}.bs";
 }
+
 
 sub run_extliblist {
     my($potential_libs)=@_;
@@ -257,46 +273,46 @@ sub post_initialize{
 sub constants {
     my(@m);
 
-    # This extension might need bootstrap support
-    $att{BOOTDEP} = (-f "$att{BASEEXT}_BS")  ? "$att{BASEEXT}_BS" : "";
+    $att{BOOTDEP}  = (-f "$att{BASEEXT}_BS") ? "$att{BASEEXT}_BS" : "";
+    $att{OBJECT}   = '$(BASEEXT).o' unless $att{OBJECT};
+    $att{LDTARGET} = '$(OBJECT)'    unless $att{LDTARGET};
+    $att{ARMAYBE}  = ":"            unless $att{ARMAYBE};
+    $att{AUTOSPLITMAXLEN} = 8       unless $att{AUTOSPLITMAXLEN};
+    $att{LINKTYPE} = ($Config{'usedl'}) ? 'dynamic' : 'static'
+	unless $att{LINKTYPE};
 
-    $att{OBJECT} = '$(BASEEXT).o' unless  $att{OBJECT};
-    $att{LDTARGET} = '$(OBJECT)' unless  $att{LDTARGET};
-    $att{ARMAYBE} = ":" unless  $att{ARMAYBE};
-    $att{AUTOSPLITMAXLEN} = 8 unless  $att{AUTOSPLITMAXLEN};
 
     push @m, "
 #
 # This Makefile is for the $att{FULLEXT} extension to perl.
 # It was written by Makefile.PL, so don't edit it, edit
-# Makefile.PL instead
+# Makefile.PL instead. ANY CHANGES MADE HERE WILL BE LOST!
 # 
 
-#shellflags seems not to be needed anywhere except unicos
-shellflags = $Config{'shellflags'}
+DISTNAME = $att{DISTNAME}
+VERSION = $att{VERSION}
+
 TOP = $top
 ABSTOP = $abstop
-PERL = $perl
-FULLPERL = $fullperl
+PERL = $att{'perl'}
+FULLPERL = $att{'fullperl'}
 INC = $att{INC}
 DEFINE = $att{DEFINE}
 OBJECT = $att{OBJECT}
 LDTARGET = $att{LDTARGET}
-ARMAYBE = $att{ARMAYBE}
-DISTNAME = $att{DISTNAME}
-VERSION = $att{VERSION}
-AUTOSPLITMAXLEN = $att{AUTOSPLITMAXLEN}
 ";
 
     push @m, "
-LDFLAGS = $Config{'ldflags'}
-CLDFLAGS = $Config{'ldflags'}
 CC = $Config{'cc'}
 LIBC = $Config{'libc'}
+LDFLAGS = $Config{'ldflags'}
+CLDFLAGS = $Config{'ldflags'}
+LINKTYPE = $att{LINKTYPE}
+ARMAYBE = $att{ARMAYBE}
 RANLIB = $Config{'ranlib'}
+
 SMALL = $Config{'small'}
 LARGE = $Config{'large'} $Config{'split'}
-DLSRC = $Config{'dlsrc'}
 # The following are used to build and install shared libraries for
 # dynamic loading.
 LDDLFLAGS = $Config{'lddlflags'}
@@ -304,30 +320,14 @@ CCDLFLAGS = $Config{'ccdlflags'}
 CCCDLFLAGS = $Config{'cccdlflags'}
 SO = $Config{'so'}
 DLEXT = $Config{'dlext'}
-";
-
-    push @m, "
-# EXTMODNAME = The perl module name for this extension.
-# FULLEXT = Full pathname to extension directory.
-# BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT.
-EXTMODNAME = $att{EXTMODNAME}
-FULLEXT = $att{FULLEXT}
-BASEEXT = $att{BASEEXT}
-# and for backward compatibility and for AIX support (due to change!)
-EXT = $att{BASEEXT}
-
-# $att{FULLEXT} might have its own typemap
-EXTTYPEMAP = $exttypemap
-# $att{FULLEXT} might have its own bootstrap support
-BOOTSTRAP = $att{BOOTSTRAP}
-BOOTDEP = $att{BOOTDEP}
+DLSRC = $Config{'dlsrc'}
 ";
 
     push @m, "
 # $att{FULLEXT} might need to be linked with some extra libraries.
 # EXTRALIBS =  full list of libraries needed for static linking.
 #		Only those libraries that actually exist are included.
-# DYNLOADLIBS = list of those libraries that are needed but can be
+# DYNALOADLIBS = list of those libraries that are needed but can be
 #		linked in dynamically on this platform.  On SunOS, for
 #		example, this would be .so* libraries, but not archive
 #		libraries.  The bootstrap file is installed only if
@@ -339,6 +339,26 @@ BOOTDEP = $att{BOOTDEP}
 EXTRALIBS = $att{'extralibs'}
 DYNALOADLIBS = $att{'dynaloadlibs'}
 STATLOADLIBS = $att{'statloadlibs'}
+
+";
+
+    push @m, "
+# EXTMODNAME = The perl module name for this extension.
+# FULLEXT = Full pathname to extension directory.
+# BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT.
+# ROOTEXT = Directory part of FULLEXT. May be empty.
+EXTMODNAME = $att{EXTMODNAME}
+FULLEXT = $att{FULLEXT}
+BASEEXT = $att{BASEEXT}
+ROOTEXT = $att{ROOTEXT}
+# and for backward compatibility and for AIX support (due to change!)
+EXT = $att{BASEEXT}
+
+# $att{FULLEXT} might have its own typemap
+EXTTYPEMAP = ".(-f "typemap" ? "typemap" : "")."
+# $att{FULLEXT} might have its own bootstrap support
+BOOTSTRAP = $att{BASEEXT}.bs
+BOOTDEP = $att{BOOTDEP}
 ";
 
     push @m, '
@@ -355,19 +375,17 @@ INSTALLPRIVLIB = $Config{'installprivlib'}
 INSTALLARCHLIB = $Config{'installarchlib'}
 ";
 
+    push @m, "\nshellflags = $Config{'shellflags'}" if $Config{'shellflags'};
+
     push @m, q{
 # Tools
-XSUBPP = $(TOP)/ext/xsubpp
-CCCMD = `sh $(shellflags) $(ABSTOP)/cflags $@`
 SHELL = /bin/sh
+CCCMD = `sh $(shellflags) $(ABSTOP)/cflags $@`
+XSUBPP = $(TOP)/ext/xsubpp
 # the following is a portable way to say mkdir -p
-MKPATH = $(PERL) -we '$$"="/"; foreach(split(/\//,$$ARGV[0])){ \
-	push(@p, $$_); next if -d "@p"; print "mkdir @p\n"; \
-	mkdir("@p",0777)||die "mkdir @p: $$!" } exit 0;'
+MKPATH = $(PERL) -we '$$"="/"; foreach(split(/\//,$$ARGV[0])){ push(@p, $$_); next if -d "@p"; print "mkdir @p\n"; mkdir("@p",0777)||die "mkdir @p: $$!" } exit 0;'
 AUTOSPLITLIB = cd $(TOP); \
-	$(PERL) -Ilib -e 'use AutoSplit; \
-	$$AutoSplit::Verbose=1; $$AutoSplit::Maxlen=$(AUTOSPLITMAXLEN); \
-	autosplit_lib_modules(@ARGV) ;'
+	$(PERL) -Ilib -e 'use AutoSplit; $$AutoSplit::Maxlen=}.$att{AUTOSPLITMAXLEN}.q{; autosplit_lib_modules(@ARGV) ;'
 };
 
     push @m, '
@@ -375,11 +393,12 @@ AUTOSPLITLIB = cd $(TOP); \
 all :: 
 
 config :: Makefile
-	$(MKPATH) $(AUTOEXT)
+	@$(MKPATH) $(AUTOEXT)
 
 install ::
 
 ';
+
     join('',@m);
 }
 
@@ -428,22 +447,22 @@ FORCE:
 
 sub dynamic {
     '
-all::	dynamic
+all::	$(LINKTYPE)
 
 # Target for Dynamic Loading:
 dynamic::	$(INST_DYNAMIC) $(INST_PM) $(INST_BOOT)
 
 $(INST_DYNAMIC): $(OBJECT)
-	$(MKPATH) $(AUTOEXT)
+	@$(MKPATH) $(AUTOEXT)
 	$(ARMAYBE) cr $(EXTMODNAME).a $(OBJECT) 
-	ld $(LDDLFLAGS) -o $@ $(LDTARGET) $(STATLOADLIBS)
+	ld $(LDDLFLAGS) -o $@ $(LDTARGET) '.$att{'otherldflags'}.' $(STATLOADLIBS)
 
 $(BOOTSTRAP): $(BOOTDEP)
 	$(PERL) -I$(TOP)/lib -e \'use ExtUtils::MakeMaker; &mkbootstrap("$(DYNALOADLIBS)");\'
 	touch $(BOOTSTRAP)
 
 $(INST_BOOT): $(BOOTSTRAP)
-	test ! -s $(BOOTSTRAP) || cp $(BOOTSTRAP) $@
+	@test ! -s $(BOOTSTRAP) || cp $(BOOTSTRAP) $@
 ';
 }
 
@@ -473,23 +492,19 @@ $(BASEEXT).c:	$(BASEEXT).xs $(XSUBPP) $(TOP)/ext/typemap $(EXTTYPEMAP) $(TOP)/cf
 sub installpm {
     '
 $(INST_PM):	$(BASEEXT).pm
-	$(MKPATH) $(TOP)/lib/$(FULLEXT)
+	@$(MKPATH) $(TOP)/lib/$(ROOTEXT)
 	rm -f $@
 	cp $(BASEEXT).pm $@
-	$(AUTOSPLITLIB) $(EXTMODNAME)
+	@$(AUTOSPLITLIB) $(EXTMODNAME)
 ';
 }
-#old AutoSplit:
-# cd $(TOP); $(PERL) -Ilib
-#	-e \'use AutoSplit; $$AutoSplit::Verbose='.$Verbose.';
-#	autosplit_lib_modules("$(EXTMODNAME)") ;\'
 
 
 sub clean {
     '
 clean::
 	rm -f *.o *.a mon.out core $(BASEEXT).c so_locations
-	rm -f makefile Makefile $(BOOTSTRAP) $(BASEEXT).bso
+	rm -f makefile Makefile $(BOOTSTRAP) $(BASEEXT).bso '.$att{'clean_files'}.'
 ';
 }
 
@@ -498,7 +513,7 @@ sub realclean {
     '
 realclean:: 	clean
 	rm -f $(INST_DYNAMIC) $(INST_STATIC) $(INST_BOOT)
-	rm -rf $(INST_PM) $(AUTOEXT)
+	rm -rf $(INST_PM) $(AUTOEXT) '.$att{'realclean_files'}.'
 
 purge:	realclean
 ';
@@ -508,7 +523,7 @@ purge:	realclean
 sub test {
     '
 test: all
-	$(FULLPERL) -I$(TOP)/lib -e \'use TestHarness; runtests @ARGV;\' t/*.t
+	$(FULLPERL) -I$(TOP)/lib -e \'use Test::Harness; runtests @ARGV;\' t/*.t
 ';
 }
 
@@ -523,10 +538,11 @@ install:: all
 
 
 sub distclean {
+    my($tarflags) = $att{'distclean_tarflags'} || 'cvf';
     '
 distclean:     clean
 	rm -f Makefile *~ t/*~
-	cd ..; tar cvf "$(DISTNAME)-$(VERSION).tar" $(BASEEXT)
+	cd ..; tar '.$tarflags.' "$(DISTNAME)-$(VERSION).tar" $(BASEEXT)
 	cd ..; compress "$(DISTNAME)-$(VERSION).tar"
 ';
 }
@@ -578,8 +594,8 @@ sub postamble{
 
 
 sub finish {
-    chmod 0755, "Makefile";
-    system("$eunicefix Makefile") unless $eunicefix eq ":";
+    chmod 0644, "Makefile";
+    system("$Config{'eunicefix'} Makefile") unless $Config{'eunicefix'} eq ":";
 }
 
 
@@ -622,7 +638,7 @@ sub mkbootstrap {
     import DynaLoader;  # we don't say `use', so if DynaLoader is not 
 	          # yet built MakeMaker works nonetheless except here
 
-    &initialize unless defined $att{BOOTSTRAP};
+    &initialize unless defined $att{'perl'};
 
     rename "$att{BASEEXT}.bs", "$att{BASEEXT}.bso";
 
@@ -630,7 +646,7 @@ sub mkbootstrap {
 	$_ = "$att{BASEEXT}_BS";
 	package DynaLoader; # execute code as if in DynaLoader
 	local($osname, $dlsrc) = (); # avoid warnings
-	local($osname, $dlsrc) = @Config{qw(osname dlsrc)};
+	($osname, $dlsrc) = @Config{qw(osname dlsrc)};
 	$bscode = "";
 	unshift @INC, ".";
 	require $_;
@@ -649,8 +665,8 @@ sub mkbootstrap {
 	print STDOUT "Writing $att{BASEEXT}.bs\n";
 	print STDOUT "	containing: @all" if $Verbose;
 	print BS "# $att{BASEEXT} DynaLoader bootstrap file for $Config{'osname'} architecture.\n";
-	print BS "# Do not edit this file, changes will be lost.";
-	print BS "# This file was automatically generated by the";
+	print BS "# Do not edit this file, changes will be lost.\n";
+	print BS "# This file was automatically generated by the\n";
 	print BS "# mkbootstrap routine in ExtUtils/MakeMaker.pm.\n";
 	print BS "\@DynaLoader::dl_resolve_using = ";
 	if (" @all" =~ m/ -[lL]/){
@@ -666,12 +682,12 @@ sub mkbootstrap {
 
     if ($Config{'dlsrc'} =~ /^dl_aix/){
        open AIX, ">$att{BASEEXT}.exp";
-       print AIX "#!\nboot_$att{BASEEXT}";
+       print AIX "#!\nboot_$att{BASEEXT}\n";
        close AIX;
     }
 }
 
-# the following makes AutSplit happy (bug in perl5b3e)
+# the following makes AutoSplit happy (bug in perl5b3e)
 package ExtUtils::MakeMaker;
 1;
 
