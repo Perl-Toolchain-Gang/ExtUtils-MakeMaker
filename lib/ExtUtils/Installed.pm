@@ -9,12 +9,20 @@ use Config;
 use File::Find;
 use File::Basename;
 use File::Spec;
-our $VERSION = '0.04';
+require VMS::Filespec if $^O eq 'VMS';
+
+our $VERSION = '0.05';
 
 my $DOSISH = ($^O =~ /^(MSWin\d\d|os2|dos|mint)$/);
 
 sub _is_prefix {
     my ($self, $path, $prefix) = @_;
+    return unless defined $prefix && defined $path;
+
+    if( $^O eq 'VMS' ) {
+        $prefix = VMS::Filespec::unixify($prefix);
+        $path   = VMS::Filespec::unixify($path);
+    }
     return 1 if substr($path, 0, length($prefix)) eq $prefix;
 
     if ($DOSISH) {
@@ -42,7 +50,7 @@ sub _is_type {
     return($self->_is_doc($path)) if $type eq "doc";
 
     if ($type eq "prog") {
-        return($self->_is_prefix($path, $Config{prefixexp})
+        return($self->_is_prefix($path, $Config{prefix} || $Config{prefixexp})
                &&
                !($self->_is_doc($path))
                ? 1 : 0);
@@ -68,6 +76,12 @@ sub new {
     my $archlib = $Config{archlibexp};
     my $sitearch = $Config{sitearchexp};
 
+    # File::Find does not know how to deal with VMS filepaths.
+    if( $^O eq 'VMS' ) {
+        $archlib  = VMS::Filespec::unixify($archlib);
+        $sitearch = VMS::Filespec::unixify($sitearch);
+    }
+
     if ($DOSISH) {
         $archlib =~ s|\\|/|g;
         $sitearch =~ s|\\|/|g;
@@ -85,8 +99,9 @@ sub new {
 
         # Hack of the leading bits of the paths & convert to a module name
         my $module = $File::Find::name;
-        $module =~ s!\Q$archlib\E/auto/(.*)/.packlist!$1!s;
-        $module =~ s!\Q$sitearch\E/auto/(.*)/.packlist!$1!s;
+
+        $module =~ s!\Q$archlib\E/?auto/(.*)/.packlist!$1!s  or
+        $module =~ s!\Q$sitearch\E/?auto/(.*)/.packlist!$1!s;
         my $modfile = "$module.pm";
         $module =~ s!/!::!g;
 
@@ -106,7 +121,8 @@ sub new {
           ExtUtils::Packlist->new($File::Find::name);
     };
 
-    find($sub, $archlib, $sitearch);
+    my(@dirs) = grep { -e } ($archlib, $sitearch);
+    find($sub, @dirs);
 
     return(bless($self, $class));
 }
