@@ -53,7 +53,7 @@ cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
 my $makefile = makefile_name();
 
 ok( -e $makefile, 'Makefile written' );
-ok( -e File::Spec->catdir('prj2',$makefile), 'sub Makefile written' );
+ok( -e File::Spec->catfile('prj2',$makefile), 'sub Makefile written' );
 
 my $make = make_run();
 
@@ -76,7 +76,7 @@ cmp_ok( $?, '==', 0, 'Makefile.PL NORECURS=1 exited with zero' ) ||
 $makefile = makefile_name();
 
 ok( -e $makefile, 'Makefile written' );
-ok( !-e File::Spec->catdir('prj2',$makefile), 'sub Makefile not written' );
+ok( !-e File::Spec->catfile('prj2',$makefile), 'sub Makefile not written' );
 
 $make = make_run();
 
@@ -99,7 +99,7 @@ cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
 $makefile = makefile_name();
-my $submakefile = File::Spec->catdir('prj2',$makefile);
+my $submakefile = File::Spec->catfile('prj2',$makefile);
 
 ok( -e $makefile,    'Makefile written' );
 ok( -e $submakefile, 'sub Makefile written' );
@@ -107,6 +107,6 @@ ok( -e $submakefile, 'sub Makefile written' );
 my $inst_script = File::Spec->catdir(File::Spec->updir, 'cgi');
 ok( open(MAKEFILE, $submakefile) ) || diag("Can't open $submakefile: $!");
 { local $/;  
-  like( <MAKEFILE>, qr/^\s*INST_SCRIPT\s*=\s*$inst_script/m, 
+  like( <MAKEFILE>, qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
         'prepend .. not stomping WriteMakefile args' ) 
 }

@@ -133,6 +133,8 @@ while( my($type, $vars) = each %Install_Vars) {
     undef *ExtUtils::MM_Unix::Config;
     undef *ExtUtils::MM_Unix::Config_Override;
     %ExtUtils::MM_Unix::Config = %Config;
+    *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
+
     $ExtUtils::MM_Unix::Config{installman1dir} = '';
     $ExtUtils::MM_Unix::Config{installman3dir} = '';
 
@@ -156,20 +158,29 @@ while( my($type, $vars) = each %Install_Vars) {
 {
     undef *ExtUtils::MM_Unix::Config;
     undef *ExtUtils::MM_Unix::Config_Override;
+    undef *ExtUtils::MM_VMS::Config;
+
     %ExtUtils::MM_Unix::Config = %Config;
+    *ExtUtils::MM_VMS::Config = \%ExtUtils::MM_Unix::Config;
+
     $ExtUtils::MM_Unix::Config{installvendorman1dir} = 'foo/bar';
     $ExtUtils::MM_Unix::Config{installvendorman3dir} = '';
     $ExtUtils::MM_Unix::Config{usevendorprefix} = 1;
+    $ExtUtils::MM_Unix::Config{vendorprefixexp} = 'something';
 
     my $stdout = tie *STDOUT, 'TieOut' or die;
     my $mm = WriteMakefile(
-                           NAME          => 'Big::Dummy',
-                           VERSION_FROM  => 'lib/Big/Dummy.pm',
-                           PREREQ_PM     => {},
-                           PERL_CORE     => $ENV{PERL_CORE},
-                          );
+                   NAME          => 'Big::Dummy',
+                   VERSION_FROM  => 'lib/Big/Dummy.pm',
+                   PREREQ_PM     => {},
+                   PERL_CORE     => $ENV{PERL_CORE},
 
-    is( $mm->{INSTALLVENDORMAN1DIR}, 'foo/bar', 
+                   # In case the local installation doesn't have man pages.
+                   INSTALLMAN1DIR=> 'foo/bar/baz',
+                   INSTALLMAN3DIR=> 'foo/bar/baz',
+                  );
+
+    is( $mm->{INSTALLVENDORMAN1DIR}, File::Spec->catdir('foo','bar'), 
                       'installvendorman1dir (in %Config) not modified' );
     isnt( $mm->{INSTALLVENDORMAN3DIR}, '', 
                       'installvendorman3dir (not in %Config) set'  );
