@@ -22,6 +22,7 @@ use File::Find;
 use File::Spec;
 
 my $perl = which_perl();
+my $Is_VMS = $^O eq 'VMS';
 
 my $root_dir = 't';
 
@@ -142,26 +143,32 @@ like( $install_out, qr/^Writing /m );
 
 ok( -r 'dummy-install',     '  install dir created' );
 my %files = ();
-find( sub { $files{$_} = $File::Find::name; }, 'dummy-install' );
-ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
+find( sub { 
+    # do it case-insensitive for non-case preserving OSs
+    $files{lc $_} = $File::Find::name; 
+}, 'dummy-install' );
+ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
+ok( $files{'liar.pm'},      '  Liar.pm installed'  );
 ok( $files{'.packlist'},    '  packlist created'   );
 ok( $files{'perllocal.pod'},'  perllocal.pod created' );
 
 
-$install_out = `$make install PREFIX=elsewhere`;
-is( $?, 0, 'install with PREFIX override' ) || diag $install_out;
-like( $install_out, qr/^Installing /m );
-like( $install_out, qr/^Writing /m );
+SKIP: {
+    skip "VMS install targets do not preserve PREFIX", 8 if $Is_VMS;
 
-ok( -r 'elsewhere',     '  install dir created' );
-%files = ();
-find( sub { $files{$_} = $File::Find::name; }, 'elsewhere' );
-ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
-ok( $files{'.packlist'},    '  packlist created'   );
-ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    $install_out = `$make install PREFIX=elsewhere`;
+    is( $?, 0, 'install with PREFIX override' ) || diag $install_out;
+    like( $install_out, qr/^Installing /m );
+    like( $install_out, qr/^Writing /m );
 
+    ok( -r 'elsewhere',     '  install dir created' );
+    %files = ();
+    find( sub { $files{$_} = $File::Find::name; }, 'elsewhere' );
+    ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
+    ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
+    ok( $files{'.packlist'},    '  packlist created'   );
+    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+}
 
 
 my $dist_test_out = `$make disttest`;
