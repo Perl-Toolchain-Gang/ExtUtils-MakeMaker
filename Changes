@@ -1,4 +1,4 @@
-6.04
+6.04 Mon Aug 26 18:19:41 PDT 2002
     - Little fix for pre-5.8 Cygwin test to get the shared library names 
       right.
     * disttest on Win9X broken because of forgotten tabs
