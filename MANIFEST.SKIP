@@ -16,3 +16,5 @@ merge_bleadperl$
 .DS_Store
 \#
 ^bleadperl\.patch$
+^ExtUtils-MakeMaker
+^bleadperl.patch
