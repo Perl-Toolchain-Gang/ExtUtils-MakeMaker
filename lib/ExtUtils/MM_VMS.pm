@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.66';
-($Revision = substr(q$Revision: 1.85 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.86 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -707,10 +707,15 @@ Use VMS-style quoting on xsubpp command line.
 sub tool_xsubpp {
     my($self) = @_;
     return '' unless $self->needs_linking;
-    my($xsdir) = $self->catdir($self->{PERL_LIB},'ExtUtils');
-    # drop back to old location if xsubpp is not in new location yet
-    $xsdir = $self->catdir($self->{PERL_SRC},'ext') 
-      unless (-f $self->catfile($xsdir,'xsubpp'));
+
+    my $xsdir;
+    foreach my $dir (@INC) {
+        $xsdir = $self->catdir($dir, 'ExtUtils');
+        if( -r $self->catfile($xsdir, "xsubpp") ) {
+            last;
+        }
+    }
+
     my(@tmdeps) = '$(XSUBPPDIR)typemap';
     if( $self->{TYPEMAPS} ){
 	my $typemap;
