@@ -70,6 +70,7 @@ t/MM_VMS.t
 t/MM_Win32.t
 t/oneliner.t
 t/Packlist.t
+t/postamble.t
 t/prefixify.t
 t/problems.t
 t/prompt.t

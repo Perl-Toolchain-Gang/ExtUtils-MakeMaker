@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.10_08';
-($Revision) = q$Revision: 1.119 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.120 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -92,6 +92,7 @@ my %Special_Sigs = (
  dynamic_lib=> 'hash',
  linkext    => 'hash',
  macro      => 'hash',
+ postamble  => 'hash',
  realclean  => 'hash',
  test       => 'hash',
  tool_autosplit => 'hash',
@@ -2034,7 +2035,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.119 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.120 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2094,7 +2095,8 @@ to the value of the VERSION attribute.
 =head2 Additional lowercase attributes
 
 can be used to pass parameters to the methods which implement that
-part of the Makefile.
+part of the Makefile.  Parameters are specified as a hash ref but are
+passed to the method as a hash.
 
 =over 2
 
@@ -2140,6 +2142,10 @@ be linked.
 =item macro
 
   {ANY_MACRO => ANY_VALUE, ...}
+
+=item postamble
+
+Anything put here will be passed to MY::postamble() if you have one.
 
 =item realclean
 

@@ -11,6 +11,7 @@
       of prepending a .. onto it.
     - Command.t now using its own temp directory when testing 
       expand_wildcards() so no stray files confuse it.
+    * No longer warning about 'postamble' attribute.
 
 6.10_07 Sat Jul  5 16:12:52 PDT 2003
     * Fixing location of perllocal.pod so its always in INSTALLARCHLIB
