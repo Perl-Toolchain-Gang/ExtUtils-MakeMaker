@@ -86,6 +86,8 @@ $self->max_exec_len being careful to take into account macro expansion.
 
 $cmd should include any switches and repeated initial arguments.
 
+If no @args are given, no @cmds will be returned.
+
 Pairs of arguments will always be preserved in a single command, this
 is a heuristic for things like pm_to_blib and pod2man which work on
 pairs of arguments.  This makes things like this safe:
@@ -98,6 +100,9 @@ pairs of arguments.  This makes things like this safe:
 sub split_command {
     my($self, $cmd, @args) = @_;
 
+    my @cmds = ();
+    return(@cmds) unless @args;
+
     # If the command was given as a here-doc, there's probably a trailing
     # newline.
     chomp $cmd;
@@ -105,8 +110,6 @@ sub split_command {
     # set aside 20% for macro expansion.
     my $len_left = int($self->max_exec_len * 0.80);
     $len_left -= length $self->_expand_macros($cmd);
-
-    my @cmds = ();
 
     do {
         my $arg_str = '';
@@ -290,15 +293,15 @@ sub manifypods_target {
 manifypods : pure_all $dependencies
 END
 
-    my @man1_cmds = $self->split_command(<<'CMD', %{$self->{MAN1PODS}});
-	$(NOECHO) $(POD2MAN_EXE) --section=1 --perm_rw=$(PERM_RW)
+    my @man_cmds;
+    foreach my $section (qw(1 3)) {
+        my $pods = $self->{"MAN${section}PODS"};
+        push @man_cmds, $self->split_command(<<CMD, %$pods);
+	\$(NOECHO) \$(POD2MAN_EXE) --section=$section --perm_rw=\$(PERM_RW)
 CMD
+    }
 
-    my @man3_cmds = $self->split_command(<<'CMD', %{$self->{MAN3PODS}});
-	$(NOECHO) $(POD2MAN_EXE) --section=3 --perm_rw=$(PERM_RW)
-CMD
-
-    $manify .= join '', map { "$_\n" } @man1_cmds, @man3_cmds;
+    $manify .= join '', map { "$_\n" } @man_cmds;
 
     return $manify;
 }
