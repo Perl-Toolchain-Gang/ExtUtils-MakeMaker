@@ -1,3 +1,6 @@
+6.13
+    - extralibs.ld (for static builds) wasn't being cleaned up
+
 6.12 Tue Jul 29 22:19:38 PDT 2003
     - Should any of your prefixes be /, MakeMaker might lose this and
       prepend your prefix as "prefixyour/directory" rather than
