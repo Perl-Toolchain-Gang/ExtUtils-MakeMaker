@@ -3347,33 +3347,35 @@ Defines the realclean target.
 sub realclean {
     my($self, %attribs) = @_;
 
-    my @files = qw($(INST_AUTODIR) $(INST_ARCHAUTODIR) $(DISTVNAME));
-
-    push @files, values %{$self->{PM}}, 
-                 qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
+    my @dirs  = qw($(DISTVNAME));
+    my @files = qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
 
     if( $self->has_link_code ){
-        push @files, qw($(INST_DYNAMIC) $(INST_BOOT) $(INST_STATIC) $(OBJECT));
+        push @files, qw($(OBJECT));
     }
 
     if( $attribs{FILES} ) {
         if( ref $attribs{FILES} ) {
-            push @files, @{ $attribs{FILES} };
+            push @dirs, @{ $attribs{FILES} };
         }
         else {
-            push @files, split /\s+/, $attribs{FILES};
+            push @dirs, split /\s+/, $attribs{FILES};
         }
     }
 
     # Occasionally files are repeated several times from different sources
     { my(%f) = map { ($_ => 1) } @files;  @files = keys %f; }
+    { my(%d) = map { ($_ => 1) } @dirs;   @dirs  = keys %d; }
 
-    my $rm_cmd = join "\n\t", map { "$_" } 
-                   $self->split_command('$(RM_RF)', @files);
+    my $rm_cmd  = join "\n\t", map { "$_" } 
+                    $self->split_command('-$(RM_F)',  @files);
+    my $rmf_cmd = join "\n\t", map { "$_" } 
+                    $self->split_command('-$(RM_RF)', @dirs);
 
-    my $m = sprintf <<'MAKE', $rm_cmd;
-# Delete temporary files (via clean) and also delete installed files
+    my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;
+# Delete temporary files (via clean) and also delete dist files
 realclean purge ::  clean realclean_subdirs
+	%s
 	%s
 MAKE
 

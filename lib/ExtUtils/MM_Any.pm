@@ -388,14 +388,26 @@ clean :: clean_subdirs
 ');
 
     my @files = values %{$self->{XS}}; # .c files from *.xs files
+    my @dirs  = qw(blib);
+
+    # Normally these are all under blib but they might have been
+    # redefined.
+    push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
+                   $(INST_BIN) $(INST_SCRIPT)
+                   $(INST_MAN1DIR) $(INST_MAN3DIR)
+                   $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
+                   $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
+                );
+                  
 
     if( $attribs{FILES} ) {
-        push @files, ref $attribs{FILES}                ?
-                         @{$attribs{FILES}}             :
-                         split /\s+/, $attribs{FILES}   ;
+        # Use @dirs because we don't know what's in here.
+        push @dirs, ref $attribs{FILES}                ?
+                        @{$attribs{FILES}}             :
+                        split /\s+/, $attribs{FILES}   ;
     }
 
-    push(@files, qw[blib $(MAKE_APERL_FILE) 
+    push(@files, qw[$(MAKE_APERL_FILE) 
                     perlmain.c tmon.out mon.out so_locations 
                     blibdirs.ts pm_to_blib.ts
                     *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
@@ -411,13 +423,16 @@ clean :: clean_subdirs
     push(@files, qw[core core.*perl.*.? *perl.core]);
     push(@files, map { "core." . "[0-9]"x$_ } (1..5));
 
-    # OS specific files to clean up
-    push @files, $self->extra_clean_files;
+    # OS specific things to clean up.  Use @dirs since we don't know
+    # what might be in here.
+    push @dirs, $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
     { my(%f) = map { ($_ => 1) } @files; @files = keys %f; }
+    { my(%d) = map { ($_ => 1) } @dirs;  @dirs  = keys %d; }
 
-    push @m, map "\t$_\n", $self->split_command('-$(RM_RF)', @files);
+    push @m, map "\t$_\n", $self->split_command('-$(RM_F)',  @files);
+    push @m, map "\t$_\n", $self->split_command('-$(RM_RF)', @dirs);
 
     # Leave Makefile.old around for realclean
     push @m, <<'MAKE';

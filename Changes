@@ -3,6 +3,8 @@
       macro definitions.  Necessary for challenged make implementations
       like nmake.  Should fix Mail::SpamAssassin installs on Win32.
       [rt.cpan.org 4545]
+    - clean and realclean are now more careful about accidentally deleting
+      directories instead of files.  [rt.cpan.org 6851]
 
 6.25_01  Fri Dec 17 21:29:04 EST 2004
     * *.bak added to the default MANIFEST.SKIP.
