@@ -16,7 +16,7 @@ use Test::More;
 
 BEGIN {
 	if ($^O =~ /MSWin32/i) {
-		plan tests => 42;
+		plan tests => 40;
 	} else {
 		plan skip_all => 'This is not Win32';
 	}
@@ -31,7 +31,12 @@ require_ok( 'ExtUtils::MM_Win32' );
 
 # Dummy MM object until we have a real MM init method.
 my $MM = bless {
-                DIR => []
+                DIR     => [],
+                NOECHO  => '@',
+                XS      => '',
+                MAKEFILE => 'Makefile',
+                RM_RF   => 'rm -rf',
+                MV      => 'mv',
                }, 'MM';
 
 
@@ -55,11 +60,15 @@ SKIP: {
           qr/\Q$comspec/i, 
           'maybe_command() without extension' );
 }
+
+my $had_pathext = exists $ENV{PATHEXT};
 {
     local $ENV{PATHEXT} = '.exe';
     ok( ! $MM->maybe_command( 'not_a_command.com' ), 
         'not a maybe_command()' );
 }
+# Bug in Perl.  local $ENV{FOO} won't delete the key afterward.
+delete $ENV{PATHEXT} unless $had_pathext;
 
 # file_name_is_absolute() [Does not support UNC-paths]
 {
@@ -142,12 +151,15 @@ SKIP: {
 }
 
 # path()
+my $had_path = exists $ENV{PATH};
 {
     my @path_eg = ( qw( . .. ), 'C:\\Program Files' );
     local $ENV{PATH} = join ';', @path_eg;
     ok( eq_array( [ $MM->path() ], [ @path_eg ] ),
         'path() [preset]' );
 }
+# Bug in Perl.  local $ENV{FOO} will not delete key afterwards.
+delete $ENV{PATH} unless $had_path;
 
 # static_lib() should look into that
 # dynamic_bs() should look into that
@@ -169,7 +181,7 @@ SKIP: {
 
 # export_list
 {
-    my $mm_w32 = bless { BASEEXT => 'someext' }, 'ExtUtils::MM_Win32';
+    my $mm_w32 = bless { BASEEXT => 'someext' }, 'MM';
     is( $mm_w32->export_list(), 'someext.def', 'export_list()' );
 }
 
@@ -229,21 +241,13 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
           'pm_to_blib' );
 }
 
-# test_via_harness()
-{
-    like( $MM->test_via_harness( $^X, 'MM_Win32.t' ),
-          qr/^\t\Q$^X\E \-Mblib.+"use Test::Harness.+MM_Win32.t\n$/,
-          'test_via_harness()' );
-}
-
 # tool_autosplit()
 {
     my %attribs = ( MAXLEN => 255 );
     like( $MM->tool_autosplit( %attribs ),
           qr/^\#\ Usage:\ \$\(AUTOSPLITFILE\)
              \ FileToSplit\ AutoDirToSplitInto.+
-             AUTOSPLITFILE\ =\ \$\(PERL\)\ 
-             "\-I\$\(PERL_ARCHLIB\)"\ "\-I\$\(PERL_LIB\)".+
+             AUTOSPLITFILE\ =\ \$\(PERLRUN\)\ .+
              \$AutoSplit::Maxlen=$attribs{MAXLEN};
           /xms,
           'tool_autosplit()' );
@@ -267,29 +271,6 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 
 # xs_o() should look into that
 # top_targets() should look into that
-
-# htmlify_pods()
-{
-    my $mm_w32 = bless {
-        HTMLLIBPODS    => { 'MM_Win32.pm' => 1 },
-        HTMLSCRIPTPODS => { 'MM_Win32.t'  => 1 },
-        PERL_SRC       => undef,
-    }, 'MM';
-    my $pods = join " \\\n\t", keys %{$mm_w32->{HTMLLIBPODS}}, 
-                               keys %{$mm_w32->{HTMLSCRIPTPODS}};
-
-    my $pod2html_exe = $mm_w32->catfile($Config{scriptdirexp},'pod2html');
-    unless ( $pod2html_exe = $mm_w32->perl_script( $pod2html_exe ) ) {
-        $pod2html_exe = '-S pod2html';
-    }
-
-    like( $mm_w32->htmlifypods(),
-          qr/^POD2HTML_EXE\ =\ \Q$pod2html_exe\E\n
-             POD2HTML\ =.+\n
-             htmlifypods\ :\ pure_all\ \Q$pods\E
-          /xs,
-          'htmlifypods() Makefile target' );
-}
 
 # manifypods()
 {
