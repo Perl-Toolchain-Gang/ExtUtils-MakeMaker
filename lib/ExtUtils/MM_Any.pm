@@ -47,7 +47,8 @@ The following methods are deprecated wrappers around File::Spec
 functions.  They exist from before File::Spec did and in fact are from
 which File::Spec sprang.
 
-They are all deprecated.  Please use File::Spec directly.
+With the exception of catfile(), they are all deprecated.  Please use
+File::Spec directly.
 
 =over 4
 
@@ -71,11 +72,16 @@ sub catdir {
 
 =item catfile
 
+This catfile() fixes a bug in File::Spec <= 0.83.  Please use it inside
+MakeMaker instead of using File::Spec's directly.
+
 =cut
 
 sub catfile {
     shift;
-    return File::Spec->catfile(@_);
+    # File::Spec <= 0.83 has a bug where the file part of catfile is
+    # not canonicalized.
+    return File::Spec->canonpath(File::Spec->catfile(@_));
 }
 
 =item curdir
