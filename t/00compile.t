@@ -24,7 +24,7 @@ my(@modules);
 chdir File::Spec->catdir(File::Spec->updir, 'lib');
 find( sub {
         return if /~$/;
-        if( $File::Find::dir =~ /^blib|t$/ ) {
+        if( $File::Find::dir =~ /^(blib|t)$/ ) {
             $File::Find::prune = 1;
             return;
         }
