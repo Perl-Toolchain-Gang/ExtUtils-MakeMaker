@@ -538,34 +538,20 @@ before tar-ing (or shar-ing).
 sub distdir {
     my($self) = shift;
 
-    my $mpl_args = join " ", map(qq["$_"], @ARGV);
-    my $metafile = $self->cd('$(DISTVNAME)', 
-            '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
-            '$(MAKE) metafile $(MACROSTART)$(PASTHRU)$(MACROEND)',
-            '$(MAKE) metafile_addtomanifest $(MACROSTART)$(PASTHRU)$(MACROEND)'
-    );
+    my $meta_target = $self->{NO_META} ? '' : 'distmeta';
+    my $sign_target = !$self->{SIGN}   ? '' : 'distsign';
 
-    my $distdir = sprintf <<'MAKE_FRAG', $metafile;
-distdir :
+    return sprintf <<'MAKE_FRAG', $meta_target, $sign_target;
+create_distdir :
 	$(RM_RF) $(DISTVNAME)
 	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
-	%s
+
+distdir : create_distdir %s %s
+	$(NOECHO) $(NOOP)
+
 MAKE_FRAG
 
-    if( $self->{SIGN} ) {
-	my $sign = $self->cd('$(DISTVNAME)', 
-                     '$(MAKE) signature $(MACROSTART)$(PASTHRU)$(MACROEND)'
-                   );
-
-	$distdir .= sprintf <<'MAKE_FRAG', $sign;
-	%s
-MAKE_FRAG
-    }
-
-    $distdir .= "\n";
-
-    return $distdir;
 }
 
 
@@ -580,7 +566,10 @@ subdirectory.
 sub dist_test {
     my($self) = shift;
 
+    my $mpl_args = join " ", map qq["$_"], @ARGV;
+
     my $test = $self->cd('$(DISTVNAME)',
+                         '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
                          '$(MAKE) $(MACROSTART)$(PASTHRU)$(MACROEND)',
                          '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)'
                         );
@@ -733,32 +722,31 @@ MAKE_FRAG
 }
 
 
-=head3 metafile_addtomanifest_target
+=head3 distmeta_target
 
-  my $target = $mm->metafile_addtomanifest_target
+    my $make_frag = $mm->distmeta_target;
 
-Adds the META.yml file to the MANIFEST.
+Generates the distmeta target to add META.yml to the MANIFEST in the
+distdir.
 
 =cut
 
-sub metafile_addtomanifest_target {
+sub distmeta_target {
     my $self = shift;
-
-    return <<'MAKE_FRAG' if $self->{NO_META};
-metafile_addtomanifest:
-	$(NOECHO) $(NOOP)
-MAKE_FRAG
 
     my $add_meta = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
 eval { maniadd({q{META.yml} => q{Module meta-data (added by MakeMaker)}}) } 
     or print "Could not add META.yml to MANIFEST: $${'@'}\n"
 CODE
 
-    return sprintf <<'MAKE_FRAG', $add_meta;
-metafile_addtomanifest:
-	$(NOECHO) $(ECHO) Adding META.yml to MANIFEST
+    my $add_meta_to_distdir = $self->cd('$(DISTVNAME)', $add_meta);
+
+    return sprintf <<'MAKE', $add_meta_to_distdir;
+distmeta : metafile
+	$(NOECHO) $(MV) META.yml $(DISTVNAME)
 	$(NOECHO) %s
-MAKE_FRAG
+
+MAKE
 
 }
 
@@ -860,39 +848,41 @@ sub signature_target {
     my $self = shift;
 
     return <<'MAKE_FRAG';
-signature : signature_addtomanifest
+signature :
 	cpansign -s
 MAKE_FRAG
 
 }
 
 
-=head3 signature_addtomanifest_target
+=head3 distsign_target
 
-  my $target = $mm->signature_addtomanifest_target
+    my $make_frag = $mm->distsign_target;
 
-Adds the META.yml file to the MANIFEST.
+Generates the distsign target to add SIGNATURE to the MANIFEST in the
+distdir.
 
 =cut
 
-sub signature_addtomanifest_target {
+sub distsign_target {
     my $self = shift;
-
-    return <<'MAKE_FRAG' if !$self->{SIGN};
-signature_addtomanifest :
-	$(NOECHO) $(NOOP)
-MAKE_FRAG
 
     my $add_sign = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
 eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } 
     or print "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
 CODE
 
-    return sprintf <<'MAKE_FRAG', $add_sign;
-signature_addtomanifest :
-	$(NOECHO) $(ECHO) Adding SIGNATURE to MANIFEST
+    my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s');
+    my $touch_sig        = $self->cd('$(DISTVNAME)' => '$(TOUCH) SIGNATURE');
+    my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $add_sign );
+
+    return sprintf <<'MAKE', $add_sign_to_dist, $touch_sig, $sign_dist
+distsign :
 	$(NOECHO) %s
-MAKE_FRAG
+	$(NOECHO) %s
+	%s
+
+MAKE
 
 }
 
