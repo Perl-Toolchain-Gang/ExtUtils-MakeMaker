@@ -13,6 +13,7 @@ our $VERSION = 1.28_01;
 use Config;
 use Cwd 'cwd';
 use File::Basename;
+use File::Spec;
 
 sub ext {
   if   ($^O eq 'VMS')     { return &_vms_ext;      }
@@ -429,7 +430,7 @@ sub _vms_ext {
       next;
     }
     warn "Resolving directory $dir\n" if $verbose;
-    if ($self->file_name_is_absolute($dir)) { 
+    if (File::Spec->file_name_is_absolute($dir)) { 
         $dir = $self->fixpath($dir,1); 
     }
     else { 
