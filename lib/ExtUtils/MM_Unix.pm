@@ -1870,11 +1870,25 @@ sub init_INSTALL {
     my $vprefix = $Config{usevendorprefix}  ? $Config{vendorprefixexp} : '';
     my $sprefix = $Config{siteprefixexp}    || '';
 
-    # There are no Config.pm defaults for these.
-    $Config_Override{installsiteman1dir} = 
-        File::Spec->catdir($sprefix, 'man', 'man$(MAN1EXT)');
-    $Config_Override{installsiteman3dir} = 
-        File::Spec->catdir($sprefix, 'man', 'man$(MAN3EXT)');
+    # 5.005_03 doesn't have a siteprefix.
+    $sprefix = $iprefix unless $sprefix;
+
+    # There are often no Config.pm defaults for these, but we can make
+    # it up.
+    unless( $Config{installsiteman1dir} ) {
+        $Config_Override{installsiteman1dir} = 
+          File::Spec->catdir($sprefix, 'man', 'man$(MAN1EXT)');
+    }
+
+    unless( $Config{installsiteman3dir} ) {
+        $Config_Override{installsiteman3dir} = 
+          File::Spec->catdir($sprefix, 'man', 'man$(MAN3EXT)');
+    }
+
+    unless( $Config{installsitebin} ) {
+        $Config_Override{installsitebin} =
+          File::Spec->catdir($sprefix, 'bin');
+    }
 
     my $u_prefix  = $self->{PREFIX}       || '';
     my $u_sprefix = $self->{SITEPREFIX}   || $u_prefix;

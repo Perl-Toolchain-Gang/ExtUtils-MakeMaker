@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "5.93_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.49 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.50 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -1766,7 +1766,9 @@ RedHatism for C<PREREQ_PRINT>.  The output format is different, though:
 
 Like PREFIX, but only for the site install locations.
 
-Defaults to PREFIX (if set) or $Config{siteprefixexp}
+Defaults to PREFIX (if set) or $Config{siteprefixexp}.  Perls prior to
+5.6.0 didn't have an explicit siteprefix in the Config.  In those
+cases $Config{installprefix} will be used.
 
 =item SKIP
 
@@ -1815,7 +1817,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.49 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.50 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
