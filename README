@@ -5,7 +5,7 @@ do not install in a production environment.
 
 Known Good:
 
-Linux                   5.6.0, 5.6.1, bleadperl
+Linux                   5.005_03, 5.6.0, 5.6.1, bleadperl
 Tru64                   5.6.0, bleadperl
 OpenVMS                 5.6.1
 Cygwin                  5.6.1
