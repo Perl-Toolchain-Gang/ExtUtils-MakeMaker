@@ -2612,7 +2612,7 @@ sub installbin {
     @exefiles = map vmsify($_), @exefiles if $Is_VMS;
 
     my %fromto;
-    for my $from (@$exefiles) {
+    for my $from (@exefiles) {
 	my($path)= $self->catfile('$(INST_SCRIPT)', basename($from));
 
 	local($_) = $path; # for backwards compatibility
@@ -2635,7 +2635,7 @@ sub installbin {
 
     my @m;
     push(@m, qq{
-EXE_FILES = @$exefiles
+EXE_FILES = @exefiles
 
 FIXIN = $fixin
 
