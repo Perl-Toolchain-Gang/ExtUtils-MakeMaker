@@ -130,7 +130,9 @@ sub new {
 
 sub modules {
     my ($self) = @_;
-    return sort keys %$self;
+
+    # Bug/feature of sort in scalar context requires this.
+    return wantarray ? sort keys %$self : keys %$self;
 }
 
 sub files {

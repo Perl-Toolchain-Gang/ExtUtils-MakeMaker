@@ -1,3 +1,6 @@
+6.02
+    - ExtUtils::Installed->modules() was broken in scalar context
+
 6.01 Thu May 30 14:48:57 EDT 2002
     - MacOS Classic fixes from Pudge: recursive make repair,
       post_initialize() now used, DEFINE & INC work with relative paths,

@@ -20,7 +20,7 @@ use File::Path;
 use File::Basename;
 use File::Spec;
 
-use Test::More tests => 45;
+use Test::More tests => 46;
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
@@ -128,6 +128,9 @@ close FAKEMOD;
 $ei->{$_} = 1 for qw( abc def ghi );
 is( join(' ', $ei->modules()), 'abc def ghi', 
 	'modules() should return sorted keys' );
+
+# This didn't work for a long time due to a sort in scalar context oddity.
+is( $ei->modules, 3,    'modules() in scalar context' );
 
 # files
 $ei->{goodmod} = { 
