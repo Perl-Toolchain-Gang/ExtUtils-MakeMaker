@@ -1,4 +1,9 @@
 6.06_03
+    * Pulling File::Spec::VMS::fixpath() and eliminate_macros() into MM_VMS
+      as the new cannonical location.  They never should have been in F::S
+      in the first place.
+    * ExtUtils::Command::eqtime() would truncate the file being equalized!
+      Holdover from exclusive .exists usage.
     - Cleaned up hard coded 'echo' and '@' to $(ECHO) and $(NOECHO)
     - $(SAY) is now $(ECHO) on VMS
     - Moved rogue initializations from tools_other() to init_others()
