@@ -1,10 +1,25 @@
-This is a CPAN distribution of the venerable MakeMaker module.
+This is a CPAN distribution of the venerable MakeMaker module.  It has been
+backported to work with Perl 5.005_03 and up.
 
 
 PLEASE NOTE: This distribution does not include the xsubpp or typemap
 programs.  They are extremely specific to your version or Perl, so
 MakeMaker will simply use the one which came with your copy of Perl.
-Do not delete your old ExtUtils/ directory.
+Do not delete your old ExtUtils/ directory.  An upgraded version of xsubpp
+can be found in the ExtUtils::ParseXS module.
+
+Known Good Systems:
+
+Every stable MakeMaker release is tested at least on:
+
+MacOS X
+Linux/x86
+ActivePerl on Windows 98
+Cygwin on Windows 98
+OpenVMS
+
+Covering the major portability flavors MakeMaker has to cover.
+(I'm always on the lookout for DJGPP, Solaris, *BSD and OS/2 users)
 
 
 Known Problems:
