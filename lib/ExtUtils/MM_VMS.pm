@@ -15,7 +15,8 @@ BEGIN {
 
 use File::Basename;
 
-use vars qw($Revision	# Can't be on the same line or SVN/K gets confused
+# $Revision can't be on the same line or SVN/K gets confused
+use vars qw($Revision
             $VERSION @ISA);
 $VERSION = '5.73';
 

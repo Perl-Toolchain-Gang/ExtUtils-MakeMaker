@@ -149,7 +149,7 @@ Makefile.
 
 sub makefile_backup {
     my $makefile = makefile_name;
-    return $Is_VMS ? "$makefile_old" : "$makefile.old";
+    return $Is_VMS ? "$makefile".'_old' : "$makefile.old";
 }
 
 =item B<make>
