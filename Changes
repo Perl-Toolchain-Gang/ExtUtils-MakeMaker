@@ -7,6 +7,7 @@
     * Making it a bit more obvious in the MANIFEST where META.yml comes from.
     - Fixed $_ clobbering in ExtUtils::Manifest functions.
     - [rt.cpan.org 2591] some LD_RUN_PATH thing (Marek Rouchal)
+    - Added core.\d+ files to 'make clean' [rt.cpan.org 2543] (Slaven Rezic)
 
 6.10_03 Fri Apr 11 00:21:25 PDT 2003
     * Added NO_META WriteMakefile() option to suppress generation of

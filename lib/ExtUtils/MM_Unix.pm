@@ -304,6 +304,9 @@ clean :: clean_subdirs
     }
     else {
         push(@otherfiles, qw[core core.*perl.*.? *perl.core]);
+
+        # core.\d+
+        push(@otherfiles, map { "core." . "[0-9]"x$_ } (1..5));
     }
 
     push @m, "\t-\$(RM_RF) @otherfiles\n";
