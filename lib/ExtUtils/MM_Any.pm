@@ -2,7 +2,7 @@ package ExtUtils::MM_Any;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = 0.01;
+$VERSION = 0.02;
 
 use Config;
 use File::Spec;
@@ -120,72 +120,6 @@ having been written in a way to avoid incompatibilities.
 
 =over 4
 
-=item htmlifypods
-
-  $htmlifypods_target = $mm->htmlifypods;
-
-Defines targets and routines to translate the pods into HTML manpages
-using pod2html and put them into the INST_HTMLLIBDIR and
-INST_HTMLSCRIPTDIR directories.
-
-$(POD2HTML_EXE) and $(POD2HTML) are defined and the htmlifypods target
-built.
-
-=cut
-
-sub htmlifypods {
-    my $self = shift;
-    return "\nhtmlifypods : pure_all\n\t$self->{NOECHO}\$(NOOP)\n" unless
-      %{$self->{HTMLLIBPODS}} || %{$self->{HTMLSCRIPTPODS}};
-    my($dist);
-    my($pod2html_exe);
-    if (defined $self->{PERL_SRC}) {
-        $pod2html_exe = File::Spec->catfile($self->{PERL_SRC},'pod',
-                                            'pod2html');
-    } 
-    else {
-	$pod2html_exe = File::Spec->catfile($Config{scriptdirexp},'pod2html');
-    }
-    unless ($pod2html_exe = $self->perl_script($pod2html_exe)) {
-	# No pod2html but some HTMLxxxPODS to be installed
-	print <<END;
-
-Warning: I could not locate your pod2html program. Please make sure,
-         your pod2html program is in your PATH before you execute 'make'
-
-END
-        $pod2html_exe = "-S pod2html";
-    }
-
-    my $m = sprintf <<'MAKE_TEXT', $pod2html_exe, $self->{MAKEFILE};
-POD2HTML_EXE = %s
-POD2HTML = \$(PERLRUN) "-we" "use File::Basename; use File::Path q(mkpath);" \\
--e "%%m=@ARGV;while (($p,$h) = each %%m){" \\
--e "  next if -e $$h && -M $$h < -M $$p && -M $$h < -M '%s';" \\
--e "  print qq(Htmlifying $$h\n);" \\
--e "  $$dir = dirname($$h); mkpath($$dir) unless -d $$dir;" \\
--e "  system(q[$(PERLRUN) $(POD2HTML_EXE) ].qq[$$p > $$h])==0 " \\
--e "    or warn qq(Couldn\\047t install $$h\n);" \\
--e "  chmod(oct($(PERM_RW))), $$h " \\
--e "    or warn qq(chmod $(PERM_RW) $$h: $$!\n);" \\
--e "}"
-
-MAKE_TEXT
-
-    $m .= "htmlifypods : pure_all ";
-    $m .= join " \\\n\t", keys %{$self->{HTMLLIBPODS}},
-                          keys %{$self->{HTMLSCRIPTPODS}};
-
-    $m .= "\n";
-    if (keys %{$self->{HTMLLIBPODS}} || keys %{$self->{HTMLSCRIPTPODS}}) {
-        $m .= "\t$self->{NOECHO}\$(POD2HTML) \\\n\t";
-        $m .= join " \\\n\t", %{$self->{HTMLLIBPODS}}, 
-                              %{$self->{HTMLSCRIPTPODS}};
-    }
-
-    return $m;
-}
-
 =item test_via_harness
 
   my $command = $mm->test_via_harness($perl, $tests);
@@ -200,7 +134,8 @@ Used on the t/*.t files.
 sub test_via_harness {
     my($self, $perl, $tests) = @_;
 
-    return "\t$perl".q{ $(TEST_LIBS) "-e" 'use Test::Harness;  $$Test::Harness::Verbose=$(TEST_VERBOSE); runtests @ARGV;' } . "$tests\n";
+    return qq{\t$perl \$(TEST_LIBS) "-MExtUtils::Command::MM" }.
+           qq{"-e" "test_harness(\$(TEST_VERBOSE))" $tests};
 }
 
 =item test_via_script
