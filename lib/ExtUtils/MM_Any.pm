@@ -369,6 +369,113 @@ MAKE
 }
 
 
+=head3 clean (o)
+
+Defines the clean target.
+
+=cut
+
+sub clean {
+# --- Cleanup and Distribution Sections ---
+
+    my($self, %attribs) = @_;
+    my @m;
+    push(@m, '
+# Delete temporary files but do not touch installed files. We don\'t delete
+# the Makefile here so a later make realclean still has a makefile to use.
+
+clean :: clean_subdirs
+');
+
+    my @files = values %{$self->{XS}}; # .c files from *.xs files
+    if ( $Is_QNX ) {
+      my @errfiles = @{$self->{C}};
+      for ( @errfiles ) {
+	s/.c$/.err/;
+      }
+      push( @files, @errfiles, 'perlmain.err' );
+    }
+
+    if( $attribs{FILES} ) {
+        push @files, ref $attribs{FILES}                ?
+                         @{$attribs{FILES}}             :
+                         split /\s+/, $attribs{FILES}   ;
+    }
+
+    push(@files, qw[blib $(MAKE_APERL_FILE) 
+                    perlmain.c tmon.out mon.out so_locations 
+                    blibdirs.ts pm_to_blib.ts
+                    *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
+                    $(BOOTSTRAP) $(BASEEXT).bso
+                    $(BASEEXT).def lib$(BASEEXT).def
+                    $(BASEEXT).exp $(BASEEXT).x
+                   ]);
+
+    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
+    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
+
+    if( $Is_VOS ) {
+        push(@files, qw[*.kp]);
+    }
+    else {
+        push(@files, qw[core core.*perl.*.? *perl.core]);
+
+        # core.\d+
+        push(@files, map { "core." . "[0-9]"x$_ } (1..5));
+    }
+
+    # OS specific files to clean up
+    push @files, $self->extra_clean_files;
+
+    # Occasionally files are repeated several times from different sources
+    { my(%f) = map { ($_ => 1) } @files; @files = keys %f; }
+
+    push @m, map "\t$_\n", $self->split_command('-$(RM_RF)', @files);
+
+    # Leave Makefile.old around for realclean
+    push @m, <<'MAKE';
+	-$(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
+MAKE
+
+    push(@m, "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
+
+    join("", @m);
+}
+
+
+=head3 clean_subdirs_target
+
+  my $make_frag = $MM->clean_subdirs_target;
+
+Returns the clean_subdirs target.  This is used by the clean target to
+call clean on any subdirectories which contain Makefiles.
+
+=cut
+
+sub clean_subdirs_target {
+    my($self) = shift;
+
+    # No subdirectories, no cleaning.
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+clean_subdirs :
+	$(NOECHO) $(NOOP)
+NOOP_FRAG
+
+
+    my $clean = "clean_subdirs :\n";
+
+    for my $dir (@{$self->{DIR}}) {
+        my $subclean = $self->oneliner(sprintf <<'CODE', $dir);
+chdir '%s';  system '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
+CODE
+
+        $clean .= "\t$subclean\n";
+    }
+
+    return $clean;
+}
+
+
 =head3 dir_target B<DEPRECATED>
 
     my $make_frag = $mm->dir_target(@directories);
@@ -381,6 +488,93 @@ create its own directories anyway.
 =cut
 
 sub dir_target {}
+
+
+=head3 distdir
+
+Defines the scratch directory target that will hold the distribution
+before tar-ing (or shar-ing).
+
+=cut
+
+# For backwards compatibility.
+*dist_dir = *distdir;
+
+sub distdir {
+    my($self) = shift;
+
+    my $mpl_args = join " ", map(qq["$_"], @ARGV);
+    my $metafile = $self->cd('$(DISTVNAME)', 
+            '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
+            '$(MAKE) metafile $(MACROSTART)$(PASTHRU)$(MACROEND)',
+            '$(MAKE) metafile_addtomanifest $(MACROSTART)$(PASTHRU)$(MACROEND)'
+    );
+
+    my $distdir = sprintf <<'MAKE_FRAG', $metafile;
+distdir :
+	$(RM_RF) $(DISTVNAME)
+	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
+		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
+	%s
+MAKE_FRAG
+
+    if( $self->{SIGN} ) {
+	my $sign = $self->cd('$(DISTVNAME)', 
+                     '$(MAKE) signature $(MACROSTART)$(PASTHRU)$(MACROEND)'
+                   );
+
+	$distdir .= sprintf <<'MAKE_FRAG', $sign;
+	%s
+MAKE_FRAG
+    }
+
+    $distdir .= "\n";
+
+    return $distdir;
+}
+
+
+=head3 dist_test
+
+Defines a target that produces the distribution in the
+scratchdirectory, and runs 'perl Makefile.PL; make ;make test' in that
+subdirectory.
+
+=cut
+
+sub dist_test {
+    my($self) = shift;
+
+    my $test = $self->cd('$(DISTVNAME)',
+                         '$(MAKE) $(MACROSTART)$(PASTHRU)$(MACROEND)',
+                         '$(MAKE) test $(MACROSTART)$(PASTHRU)$(MACROEND)'
+                        );
+
+    return sprintf <<'MAKE_FRAG', $test;
+disttest : distdir
+	%s
+
+MAKE_FRAG
+
+
+}
+
+
+=head3 dynamic (o)
+
+Defines the dynamic target.
+
+=cut
+
+sub dynamic {
+# --- Dynamic Loading Sections ---
+
+    my($self) = shift;
+    '
+dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
+	$(NOECHO) $(NOOP)
+';
+}
 
 
 =head3 makemakerdflt_target
@@ -938,6 +1132,20 @@ sub catfile {
 
 Methods I can't really figure out where they should go yet.
 
+
+=head3 find_tests
+
+  my $test = $mm->find_tests;
+
+Returns a string suitable for feeding to the shell to return all
+tests in t/*.t.
+
+=cut
+
+sub find_tests {
+    my($self) = shift;
+    return -d 't' ? 't/*.t' : '';
+}
 
 
 =head3 extra_clean_files
