@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.90_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.37 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.38 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -100,7 +100,7 @@ sub eval_in_x {
 #         } else {
 #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
 #         }
-        warn "WARNING from evaluation of $dir/Makefile.PL: $@";
+        die "ERROR from evaluation of $dir/Makefile.PL: $@";
     }
 }
 
@@ -281,7 +281,7 @@ sub new {
                    unless $self->{PREREQ_FATAL};
             $unsatisfied{$prereq} = 'not installed';
         } elsif ($pr_version < $self->{PREREQ_PM}->{$prereq} ){
-            warn "Warning: prerequisite %s %s not found. We have %s.\n",
+            warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $self->{PREREQ_PM}{$prereq}, 
                 ($pr_version || 'unknown version') 
                   unless $self->{PREREQ_FATAL};
@@ -1804,7 +1804,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.37 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.38 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
