@@ -51,7 +51,9 @@ sub new {
 
     mkdir("Obj", 0777) unless -d "Obj";
 
-    $self = {} unless (defined $self);
+    $self = {} unless defined $self;
+
+    check_hints($self);
 
     my(%initial_att) = %$self; # record initial attributes
 
@@ -74,6 +76,9 @@ sub new {
         require ExtUtils::MY;
         @{"$newclass\:\:ISA"} = 'MM';
     }
+
+    $ExtUtils::MakeMaker::Recognized_Att_Keys{$_} = 1
+      for map { $_ . 'Optimize' } qw(MWC MWCPPC MWC68K MPW MRC MRC SC);
 
     if (defined $ExtUtils::MakeMaker::Parent[-2]){
         $self->{PARENT} = $ExtUtils::MakeMaker::Parent[-2];
@@ -154,15 +159,15 @@ END
 	    dynamic_bs dynamic_lib static_lib manifypods
 	    installbin subdirs dist_basics dist_core
 	    dist_dir dist_test dist_ci install force perldepend makefile
-	    staticmake test pm_to_blib selfdocument cflags 
+	    staticmake test pm_to_blib selfdocument
 	    const_loadlibs const_cccmd
-    /) 
+    /)
     {
 	$self->{SKIPHASH}{$_} = 2;
     }
     push @ExtUtils::MakeMaker::MM_Sections, "rulez" 
     	unless grep /rulez/, @ExtUtils::MakeMaker::MM_Sections;
-    
+
     if ($self->{PARENT}) {
 	for (qw/install dist dist_basics dist_core dist_dir dist_test dist_ci/) {
 	    $self->{SKIPHASH}{$_} = 1;
@@ -867,6 +872,18 @@ $target :: $plfile
     }
     join "", @m;
 }
+
+sub cflags {
+    my($self,$libperl) = @_;
+    my $optimize;
+
+    for (map { $_ . "Optimize" } qw(MWC MWCPPC MWC68K MPW MRC MRC SC)) {
+        $optimize .= "$_ = $self->{$_}" if exists $self->{$_};
+    }
+
+    return $self->{CFLAGS} = $optimize;
+}
+
 
 sub _include {  # for Unix-style includes, with -I instead of -i
 	my($inc) = @_;

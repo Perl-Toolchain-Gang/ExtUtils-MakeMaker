@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.03";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.65 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.66 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -674,7 +674,11 @@ sub check_hints {
     my($self) = @_;
     # We allow extension-specific hints files.
 
-    return unless -d "hints";
+    require File::Spec;
+    my $curdir = File::Spec->curdir;
+
+    my $hint_dir = File::Spec->catdir($curdir, "hints");
+    return unless -d $hint_dir;
 
     # First we look for the best hintsfile we have
     my($hint)="${^O}_$Config{osvers}";
@@ -684,11 +688,11 @@ sub check_hints {
 
     # Also try without trailing minor version numbers.
     while (1) {
-        last if -f "hints/$hint.pl";      # found
+        last if -f File::Spec->catdir($hint_dir, "$hint.pl");  # found
     } continue {
         last unless $hint =~ s/_[^_]*$//; # nothing to cut off
     }
-    my $hint_file = "hints/$hint.pl";
+    my $hint_file = File::Spec->catdir($hint_dir, "$hint.pl");
 
     return unless -f $hint_file;    # really there
 
@@ -702,7 +706,7 @@ sub _run_hintfile {
 
     local $@;
     print STDERR "Processing hints file $hint_file\n";
-    my $ret = do "./$hint_file";
+    my $ret = do $hint_file;
     unless( defined $ret ) {
         print STDERR $@ if $@;
     }
@@ -1908,7 +1912,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.65 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.66 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

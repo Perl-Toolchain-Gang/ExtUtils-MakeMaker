@@ -11,6 +11,8 @@
       (bleadperl 17488)
     - Fixed space-vs-tab bug on Netware (bleadperl 17579)
     - Mysterious NetWare fix from Ananth (bleadperl 17376)
+    - Support OPTIMIZE in MacOS (bleadperl 17347)
+    - Support hints in MacOS (mutation of bleadperl 17347)
 
 6.03 Wed Jun 19 17:06:14 EDT 2002
     - Documented that we're clamping down on cargo-cult MakeMaker
