@@ -1,6 +1,8 @@
-5.93_01 Mon May  6 00:24:58 EDT 2002
+5.93_01 Mon May  6 00:54:39 EDT 2002
     - fixed basic.t for limited depth VMS systems
     * MM_BeOS was totally hosed by a typo.
+    - Made the ExtUtils::Command docs clear about how things come
+      from @ARGV not @_.
 
     * Backporting to 5.005_03
     - 'require 5.006' statements to 5.00503
