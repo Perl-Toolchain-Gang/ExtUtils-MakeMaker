@@ -13,11 +13,13 @@ use DirHandle;
 use strict;
 use vars qw($VERSION @ISA
             $Is_Mac $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos $Is_VOS
-            $Verbose %pm %static $Xsubpp_Version);
+            $Verbose %pm %static $Xsubpp_Version
+            %Config_Override
+           );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.20_01';
+$VERSION = '1.30_01';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -479,17 +481,23 @@ sub constants {
     for $tmp (qw/
 
 	      AR_STATIC_ARGS NAME DISTNAME NAME_SYM VERSION
-	      VERSION_SYM XS_VERSION INST_BIN INST_LIB
-	      INST_ARCHLIB INST_SCRIPT PREFIX  INSTALLDIRS
-	      INSTALLPRIVLIB INSTALLARCHLIB INSTALLSITELIB
-	      INSTALLSITEARCH INSTALLBIN INSTALLSCRIPT PERL_LIB
-	      PERL_ARCHLIB SITELIBEXP SITEARCHEXP LIBPERL_A MYEXTLIB
+	      VERSION_SYM XS_VERSION 
+	      INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
+              INSTALLDIRS
+              PREFIX          SITEPREFIX      VENDORPREFIX
+	      INSTALLPRIVLIB  INSTALLSITELIB  INSTALLVENDORLIB
+	      INSTALLARCHLIB  INSTALLSITEARCH INSTALLVENDORARCH
+              INSTALLBIN      INSTALLSITEBIN  INSTALLVENDORBIN  INSTALLSCRIPT 
+              PERL_LIB        PERL_ARCHLIB 
+              SITELIBEXP      SITEARCHEXP 
+              LIBPERL_A MYEXTLIB
 	      FIRST_MAKEFILE MAKE_APERL_FILE PERLMAINCC PERL_SRC
 	      PERL_INC PERL FULLPERL PERLRUN FULLPERLRUN PERLRUNINST 
               FULLPERLRUNINST ABSPERL ABSPERLRUN ABSPERLRUNINST
               FULL_AR PERL_CORE NOOP NOECHO
 
-	      / ) {
+	      / ) 
+    {
 	next unless defined $self->{$tmp};
 
         # pathnames can have sharp signs in them; escape them so
@@ -521,7 +529,8 @@ MM_VERSION = $ExtUtils::MakeMaker::VERSION
     for $tmp (qw/
 	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
 	      LDFROM LINKTYPE PM_FILTER
-	      /	) {
+	      /	) 
+    {
 	next unless defined $self->{$tmp};
 	push @m, "$tmp = $self->{$tmp}\n";
     }
@@ -537,9 +546,12 @@ MAN3PODS = ".join(" \\\n\t", sort keys %{$self->{MAN3PODS}})."
 ";
 
     for $tmp (qw/
-	      INST_MAN1DIR        INSTALLMAN1DIR MAN1EXT
-	      INST_MAN3DIR        INSTALLMAN3DIR MAN3EXT
-	      /) {
+	      INST_MAN1DIR  MAN1EXT 
+              INSTALLMAN1DIR INSTALLSITEMAN1DIR INSTALLVENDORMAN1DIR
+	      INST_MAN3DIR  MAN3EXT
+              INSTALLMAN3DIR INSTALLSITEMAN3DIR INSTALLVENDORMAN3DIR
+	      /) 
+    {
 	next unless defined $self->{$tmp};
 	push @m, "$tmp = $self->{$tmp}\n";
     }
@@ -547,7 +559,8 @@ MAN3PODS = ".join(" \\\n\t", sort keys %{$self->{MAN3PODS}})."
     for $tmp (qw(
 		PERM_RW PERM_RWX
 		)
-	     ) {
+	     ) 
+    {
         my $method = lc($tmp);
 	# warn "self[$self] method[$method]";
         push @m, "$tmp = ", $self->$method(), "\n";
@@ -1857,14 +1870,25 @@ sub init_INSTALL {
         }
     }
 
+    # There are no Config.pm defaults for these.
+    $Config_Override{installsiteman1dir} = "$Config{siteprefixexp}/man/man1";
+    $Config_Override{installsiteman3dir} = "$Config{siteprefixexp}/man/man3";
+    $Config_Override{installvendorman1dir}="$Config{vendorprefixexp}/man/man1";
+    $Config_Override{installvendorman3dir}="$Config{vendorprefixexp}/man/man3";
 
-    my $iprefix = $Config{installprefix} || '';
-    my $vprefix = $Config{vendorprefix}  || $iprefix;
-    my $sprefix = $Config{siteprefix}    || '';
+    my $iprefix = $Config{installprefixexp} || '';
+    my $vprefix = $Config{vendorprefixexp}  || $iprefix;
+    my $sprefix = $Config{siteprefixexp}    || '';
 
     my $u_prefix  = $self->{PREFIX} || '';
-    my $u_mprefix = $self->{MANPREFIX} || $u_prefix;
-    my $u_lprefix = $self->{LIBPREFIX} || $self->{LIB} || $u_prefix;
+    my $u_sprefix = $self->{SITEPREFIX}   || $u_prefix;
+    my $u_vprefix = $self->{VENDORPREFIX} || $u_prefix;
+    my $u_mprefix = $self->{MANPREFIX};
+    my $u_lprefix = $self->{LIBPREFIX} || $self->{LIB};
+
+    $self->{PREFIX}       ||= $u_prefix  || $iprefix;
+    $self->{SITEPREFIX}   ||= $u_sprefix || $sprefix;
+    $self->{VENDORPREFIX} ||= $u_vprefix || $vprefix;
 
     my $arch    = $Config{archname};
     my $version = $Config{version};
@@ -1884,10 +1908,10 @@ sub init_INSTALL {
                          r => $u_prefix,
                          d => 'bin' },
         vendorbin   => { s => $vprefix,
-                         r => $u_prefix,
+                         r => $u_vprefix,
                          d => 'bin' },
         sitebin     => { s => $sprefix,
-                         r => $u_prefix,
+                         r => $u_sprefix,
                          d => 'bin' },
         script      => { s => $iprefix,
                          r => $u_prefix,
@@ -1896,41 +1920,58 @@ sub init_INSTALL {
     
     my %man_layouts =
     (
-        man1dir     => { s => $iprefix,
-                         r => $u_mprefix,
-                         d => "man/man1",
-                         style => $manstyle, },
-        man3dir     => { s => $iprefix,
-                         r => $u_mprefix,
-                         d => "man/man3",
-                         style => $manstyle, },
+        man1dir         => { s => $iprefix,
+                             r => $u_mprefix || $u_prefix,
+                             d => "man/man1",
+                             style => $manstyle, },
+        siteman1dir     => { s => $sprefix,
+                             r => $u_mprefix || $u_sprefix,
+                             d => "man/man1",
+                             style => $manstyle, },
+        vendorman1dir   => { s => $vprefix,
+                             r => $u_mprefix || $u_vprefix,
+                             d => "man/man1",
+                             style => $manstyle, },
+
+        man3dir         => { s => $iprefix,
+                             r => $u_mprefix || $u_prefix,
+                             d => "man/man3",
+                             style => $manstyle, },
+        siteman3dir     => { s => $sprefix,
+                             r => $u_mprefix || $u_sprefix,
+                             d => "man/man3",
+                             style => $manstyle, },
+        vendorman3dir   => { s => $vprefix,
+                             r => $u_mprefix || $u_vprefix,
+                             d => "man/man3",
+                             style => $manstyle, },
     );
 
     my %lib_layouts =
     (
         privlib     => { s => $iprefix,
-                         r => $u_lprefix,
+                         r => $u_lprefix || $u_prefix,
                          d => '',
                          style => $libstyle, },
         vendorlib   => { s => $vprefix,
-                         r => $u_lprefix,
+                         r => $u_lprefix || $u_vprefix,
                          d => '',
                          style => $libstyle, },
         sitelib     => { s => $sprefix,
-                         r => $u_lprefix,
+                         r => $u_lprefix || $u_sprefix,
                          d => 'site_perl',
                          style => $libstyle, },
         
-        vendorarch  => { s => $vprefix,
-                         r => $u_lprefix,
+        archlib     => { s => $iprefix,
+                         r => $u_lprefix || $u_prefix,
                          d => "$version/$arch",
                          style => $libstyle },
-        archlib     => { s => $iprefix,
-                         r => $u_lprefix,
+        vendorarch  => { s => $vprefix,
+                         r => $u_lprefix || $u_vprefix,
                          d => "$version/$arch",
                          style => $libstyle },
         sitearch    => { s => $sprefix,
-                         r => $u_lprefix,
+                         r => $u_lprefix || $u_sprefix,
                          d => "site_perl/$version/$arch",
                          style => $libstyle },
     );
@@ -1950,7 +1991,8 @@ sub init_INSTALL {
             $self->prefixify($installvar, $s, $r, $d);
         }
         else {
-            $self->{$Installvar} = $Config{$installvar};
+            $self->{$Installvar} = $Config_Override{$installvar} || 
+                                   $Config{$installvar};
         }
 
         print STDERR "  $Installvar == $self->{$Installvar}\n" 
@@ -1961,6 +2003,7 @@ sub init_INSTALL {
 
     return 1;
 }
+
 
 =item init_PERL
 
@@ -2082,6 +2125,8 @@ install_perl :: all pure_perl_install doc_perl_install
 
 install_site :: all pure_site_install doc_site_install
 
+install_vendor :: all pure_vendor_install doc_vendor_install
+
 pure_install :: pure_$(INSTALLDIRS)_install
 
 doc_install :: doc_$(INSTALLDIRS)_install
@@ -2113,12 +2158,21 @@ pure_site_install ::
 		write }.File::Spec->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{ \
 		$(INST_LIB) $(INSTALLSITELIB) \
 		$(INST_ARCHLIB) $(INSTALLSITEARCH) \
-		$(INST_BIN) $(INSTALLBIN) \
+		$(INST_BIN) $(INSTALLSITEBIN) \
 		$(INST_SCRIPT) $(INSTALLSCRIPT) \
-		$(INST_MAN1DIR) $(INSTALLMAN1DIR) \
-		$(INST_MAN3DIR) $(INSTALLMAN3DIR)
+		$(INST_MAN1DIR) $(INSTALLSITEMAN1DIR) \
+		$(INST_MAN3DIR) $(INSTALLSITEMAN3DIR)
 	}.$self->{NOECHO}.q{$(WARN_IF_OLD_PACKLIST) \
 		}.File::Spec->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{
+
+pure_vendor_install ::
+	}.$self->{NOECHO}.q{$(MOD_INSTALL) \
+		$(INST_LIB) $(INSTALLVENDORLIB) \
+		$(INST_ARCHLIB) $(INSTALLVENDORARCH) \
+		$(INST_BIN) $(INSTALLVENDORBIN) \
+		$(INST_SCRIPT) $(INSTALLSCRIPT) \
+		$(INST_MAN1DIR) $(INSTALLVENDORMAN1DIR) \
+		$(INST_MAN3DIR) $(INSTALLVENDORMAN3DIR)
 
 doc_perl_install ::
 	-}.$self->{NOECHO}.q{$(MKPATH) $(INSTALLARCHLIB)
@@ -2138,7 +2192,9 @@ doc_site_install ::
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.File::Spec->catfile('$(INSTALLARCHLIB)','perllocal.pod').q{
+		>> }.File::Spec->catfile('$(INSTALLSITEARCH)','perllocal.pod').q{
+
+doc_vendor_install ::
 
 };
 
@@ -3099,7 +3155,8 @@ simply use '/home/foo/man/man1'.
 sub prefixify {
     my($self,$var,$sprefix,$rprefix,$default) = @_;
 
-    my $path = $self->{uc $var} || $Config{lc $var};
+    my $path = $self->{uc $var} || 
+               $Config_Override{lc $var} || $Config{lc $var};
 
     print STDERR "  prefixify $var=$path\n" if $Verbose >= 2;
     print STDERR "    from $sprefix to $rprefix\n" 
