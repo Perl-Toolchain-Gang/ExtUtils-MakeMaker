@@ -425,7 +425,10 @@ sub pm_to_blib {
 
     mkpath($autodir,0,0755);
     while(my($from, $to) = each %$fromto) {
-	next if -f $to && -M $to < -M $from;
+	if( -f $to && -s $from == -s $to && -M $to < -M $from ) {
+            print "Skip $to (unchanged)\n";
+            next;
+        }
 
 	# When a pm_filter is defined, we need to pre-process the source first
 	# to determine whether it has changed or not.  Therefore, only perform
