@@ -42,6 +42,15 @@ $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
 $Is_BSD     = $^O =~ /^(?:free|net|open)bsd|bsdos$/;
 
 
+BEGIN {
+    if( $Is_VMS ) {
+        # For things like vmsify()
+        require VMS::Filespec;
+        VMS::Filespec->import;
+    }
+}
+
+
 =head1 NAME
 
 ExtUtils::MM_Unix - methods used by ExtUtils::MakeMaker
@@ -2603,7 +2612,7 @@ sub installbin {
     @exefiles = map vmsify($_), @exefiles if $Is_VMS;
 
     my %fromto;
-    for my $from (@{$self->{EXE_FILES}}) {
+    for my $from (@$exefiles) {
 	my($path)= $self->catfile('$(INST_SCRIPT)', basename($from));
 
 	local($_) = $path; # for backwards compatibility
@@ -2626,7 +2635,7 @@ sub installbin {
 
     my @m;
     push(@m, qq{
-EXE_FILES = @{$self->{EXE_FILES}}
+EXE_FILES = @$exefiles
 
 FIXIN = $fixin
 
