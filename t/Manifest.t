@@ -14,7 +14,7 @@ chdir 't';
 use strict;
 
 # these files help the test run
-use Test::More tests => 32;
+use Test::More tests => 31;
 use Cwd;
 
 # these files are needed for the module itself
@@ -104,14 +104,13 @@ add_file( 'MANIFEST.SKIP', "baz\n.SKIP" );
 like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' );
 
 # I'm not sure why this should be... shouldn't $missing be the only one?
-my ($found, $missing );
+my @skipped;
 catch_warning( sub {
-	( $found, $missing ) = skipcheck()
+	@skipped = skipcheck()
 });
 
 # nothing new should be found, bar should be skipped
-is( @$found, 0, 'no output here' );
-is( join( ' ', @$missing ), 'bar', 'listed skipped files' );
+is( join( ' ', @skipped ), 'bar', 'listed skipped files' );
 
 {
 	local $ExtUtils::Manifest::Quiet = 1;
