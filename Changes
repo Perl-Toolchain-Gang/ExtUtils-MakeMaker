@@ -1,4 +1,4 @@
-6.17
+6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
     * Fixing the init_PERL() "tack $Config{exe_ext} onto $^X" logic so 
       it works on VMS allowing $^X to be found.
