@@ -17,7 +17,7 @@ use MakeMaker::Test::Utils;
 
 my $Is_VMS = $^O eq 'VMS';
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 my $perl = which_perl;
 my $mm = bless { NAME => "Foo" }, "MM";
@@ -45,8 +45,10 @@ $even_args = $mm->oneliner(q{print !(@ARGV % 2)});
 isnt( @cmds, 0 );
 
 @results = _run(@cmds);
-like( join('', @results ), qr/^1+$/,
-                                                    'pairs preserved' );
+like( join('', @results ), qr/^1+$/,         'pairs preserved' );
+
+is( $mm->split_command($echo), 0,  'no args means no commands' );
+
 
 sub _run {
     my @cmds = @_;
