@@ -18,6 +18,8 @@ die "You have File::Spec version $File::Spec::VERSION\n".
   if $File::Spec::VERSION < 0.8;
 
 $PACKAGE = 'ExtUtils::MakeMaker';
+my $version = ${$PACKAGE.'::VERSION'};
+$version =~ s/_//;  # for X.Y_Z alpha releases
 ($PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
 $LAST_API_CHANGE = 5.50;
 
@@ -27,7 +29,7 @@ my $Is_VMS = $^O eq 'VMS';
 eval "require $PACKAGE";
 
 unless ($@) { # Make sure we did find the module.
-    print <<"CHANGE_WARN" if ${$PACKAGE.'::VERSION'} < $LAST_API_CHANGE;
+    print <<"CHANGE_WARN" if $version < $LAST_API_CHANGE;
 
 NOTE: There have been API changes between this version and any older
 than version $LAST_API_CHANGE!  Please read the Changes file if you
