@@ -13,7 +13,15 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 11;
+use Test::More;
+
+unless( eval { require Data::Dumper } ) {
+    plan skip_all => 'Data::Dumper not available';
+}
+
+plan tests => 11;
+
+
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
