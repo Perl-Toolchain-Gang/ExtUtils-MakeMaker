@@ -1,4 +1,4 @@
-6.25_07
+6.25_07  Fri Dec 31 03:47:20 EST 2004
     - perllocal on VMS was inserting executables twice.
     - No longer using $(IGNORE) macro.  Turns out MMS/K was not honoring
       it.  Using "-$(NOECHO) command" which seems to make everybody happy.
