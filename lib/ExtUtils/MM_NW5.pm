@@ -76,13 +76,11 @@ sub init_platform {
 
     (my $boot = $self->{'NAME'}) =~ s/:/_/g;
     $self->{'BOOT_SYMBOL'}=$boot;
-    push @m, "BOOT_SYMBOL = $self->{'BOOT_SYMBOL'}\n";
 
     # If the final binary name is greater than 8 chars,
     # truncate it here.
     if(length($self->{'BASEEXT'}) > 8) {
         $self->{'NLM_SHORT_NAME'} = substr($self->{'BASEEXT'},0,8);
-        push @m, "NLM_SHORT_NAME = $self->{'NLM_SHORT_NAME'}\n";
     }
 
     # Get the include path and replace the spaces with ;
