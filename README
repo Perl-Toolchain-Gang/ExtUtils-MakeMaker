@@ -1,16 +1,11 @@
 This is a CPAN distribution of the venerable MakeMaker module.
 
 
-Known Good:
+PLEASE NOTE: This distribution does not include the xsubpp or typemap
+programs.  They are extremely specific to your version or Perl, so
+MakeMaker will simply use the one which came with your copy of Perl.
+Do not delete your old ExtUtils/ directory.
 
-Linux                   5.005_03, 5.6.0, 5.6.1, bleadperl
-Tru64                   5.6.0, bleadperl
-OpenVMS                 5.6.1
-Cygwin                  5.6.1
-ActivePerl/Win95        5.6.1 build 631 with nmake
-Mac OS X 10.1           5.6.1
-Solaris 7               5.6.1
-BeOS                    bleadperl
 
 Known Problems:
 
