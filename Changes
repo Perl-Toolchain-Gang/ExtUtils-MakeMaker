@@ -1,5 +1,5 @@
 6.10_02 Mon Apr  7 00:57:15 PDT 2003
-    - Removed 2>&1 experiment introduced in 6.10_01 for all non-Unixen
+    * Removed 2>&1 experiment introduced in 6.10_01 for all non-Unixen
       except for OS/2.  Thought Perl might emulate `... 2>&1`.  It doesn't.
       Just on OS/2.
 
@@ -26,10 +26,10 @@
     - Adding os_flavor() and os_flavor_is()
     - Making basic.t error output combine STDOUT & STDERR for easier 
       reading.
-    - ExtUtils::Manifest will now work case insensitively.
+    * ExtUtils::Manifest will now work case insensitively.
     - Fixed 'subroutine redefined' warnings in 00compile.t
     - Fixed it so typemaps are only looked for in the perl core library.
-    - Hacking around VMS filesystem problems reconstructing package names
+    * Hacking around VMS filesystem problems reconstructing package names
       from filenames in ExtUtils::Installed.  (Jesper Naur)
 
 # There was no 6.06, I jumped straight to 6.10_XX because there's been
