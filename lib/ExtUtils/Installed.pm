@@ -122,7 +122,7 @@ sub new {
     };
 
     my(@dirs) = grep { -e } ($archlib, $sitearch);
-    find($sub, @dirs);
+    find($sub, @dirs) if @dirs;
 
     return(bless($self, $class));
 }
