@@ -45,6 +45,8 @@ t/MM_Win32.t
 t/Manifest.t
 t/Mkbootstrap.t
 t/Packlist.t
+t/Problem-Module/Makefile.PL
+t/Problem-Module/subdir/Makefile.PL
 t/basic.t
 t/hints.t
 t/lib/MakeMaker/Test/Utils.pm
@@ -52,4 +54,5 @@ t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/lib/TieOut.pm
+t/problems.t
 t/testlib.t
