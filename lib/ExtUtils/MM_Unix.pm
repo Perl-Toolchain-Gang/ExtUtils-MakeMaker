@@ -3520,7 +3520,7 @@ sub tool_xsubpp {
 
     return qq{
 XSUBPPDIR = $xsdir
-XSUBPP = \$(PERLRUN) \$(XSUBPPDIR)/xsubpp
+XSUBPP = \$(PERLRUN) \$(XSUBPPDIR)\$(DFSEP)xsubpp
 XSPROTOARG = $self->{XSPROTOARG}
 XSUBPPDEPS = @tmdeps \$(XSUBPP)
 XSUBPPARGS = @tmargs
