@@ -29,7 +29,7 @@ $Is_Mac   = $^O eq 'MacOS';
 $Is_Win32 = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
 $Is_Dos   = $^O eq 'dos';
 $Is_VOS   = $^O eq 'vos';
-
+$Is_VMS   = $^O eq 'VMS';
 
 =head1 NAME
 
