@@ -1377,8 +1377,10 @@ sub htmlifypods {
     my($dist);
     my($pod2html_exe);
     if (defined $self->{PERL_SRC}) {
-	$pod2html_exe = File::Spec->catfile($self->{PERL_SRC},'pod','pod2html');
-    } else {
+	$pod2html_exe = File::Spec->catfile($self->{PERL_SRC},'pod',
+                                            'pod2html');
+    } 
+    else {
 	$pod2html_exe = File::Spec->catfile($Config{scriptdirexp},'pod2html');
     }
     unless ($pod2html_exe = $self->perl_script($pod2html_exe)) {
@@ -1391,26 +1393,34 @@ Warning: I could not locate your pod2html program. Please make sure,
 END
         $pod2html_exe = "-S pod2html";
     }
-    my(@m);
-    push @m,
-qq[POD2HTML_EXE = $pod2html_exe\n],
-qq[POD2HTML = \$(PERL) -we 'use File::Basename; use File::Path qw(mkpath); %m=\@ARGV;for (keys %m){' \\\n],
-q[-e 'next if -e $$m{$$_} && -M $$m{$$_} < -M $$_ && -M $$m{$$_} < -M "],
- $self->{MAKEFILE}, q[";' \\
--e 'print "Htmlifying $$m{$$_}\n";' \\
--e '$$dir = dirname($$m{$$_}); mkpath($$dir) unless -d $$dir;' \\
--e 'system(q[$(PERLRUN) $(POD2HTML_EXE) ].qq[$$_>$$m{$$_}])==0 or warn "Couldn\\047t install $$m{$$_}\n";' \\
--e 'chmod(oct($(PERM_RW))), $$m{$$_} or warn "chmod $(PERM_RW) $$m{$$_}: $$!\n";}'
-];
-    push @m, "\nhtmlifypods : pure_all ";
-    push @m, join " \\\n\t", keys %{$self->{HTMLLIBPODS}}, keys %{$self->{HTMLSCRIPTPODS}};
 
-    push(@m,"\n");
-    if (%{$self->{HTMLLIBPODS}} || %{$self->{HTMLSCRIPTPODS}}) {
-	push @m, "\t$self->{NOECHO}\$(POD2HTML) \\\n\t";
-	push @m, join " \\\n\t", %{$self->{HTMLLIBPODS}}, %{$self->{HTMLSCRIPTPODS}};
+    my $m = sprintf <<'MAKE_TEXT', $pod2html_exe, $self->{MAKEFILE};
+POD2HTML_EXE = %s
+POD2HTML = \$(PERLRUN) -we "use File::Basename; use File::Path qw(mkpath);" \\
+-e "%%m=@ARGV;while (($p,$h) = each %%m){" \\
+-e "  next if -e $$h && -M $$h < -M $$p && -M $$h < -M '%s';" \\
+-e "  print qq(Htmlifying $$h\n);" \\
+-e "  $$dir = dirname($$h); mkpath($$dir) unless -d $$dir;" \\
+-e "  system(q[$(PERLRUN) $(POD2HTML_EXE) ].qq[$$p > $$h])==0 " \\
+-e "    or warn qq(Couldn\\047t install $$h\n);" \\
+-e "  chmod(oct($(PERM_RW))), $$h " \\
+-e "    or warn qq(chmod $(PERM_RW) $$h: $$!\n);" \\
+-e "}"
+
+MAKE_TEXT
+
+    $m .= "htmlifypods : pure_all ";
+    $m .= join " \\\n\t", keys %{$self->{HTMLLIBPODS}},
+                          keys %{$self->{HTMLSCRIPTPODS}};
+
+    $m .= "\n";
+    if (keys %{$self->{HTMLLIBPODS}} || keys %{$self->{HTMLSCRIPTPODS}}) {
+        push @m, "\t$self->{NOECHO}\$(POD2HTML) \\\n\t";
+        push @m, join " \\\n\t", %{$self->{HTMLLIBPODS}}, 
+                                 %{$self->{HTMLSCRIPTPODS}};
     }
-    join('', @m);
+
+    return $m;
 }
 
 =item init_dirscan

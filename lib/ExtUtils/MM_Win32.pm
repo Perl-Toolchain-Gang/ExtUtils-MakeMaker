@@ -770,68 +770,6 @@ Version_check:
     join('',@m);
 }
 
-=item htmlifypods (o)
-
-Defines targets and routines to translate the pods into HTML manpages
-and put them into the INST_HTMLLIBDIR and INST_HTMLSCRIPTDIR
-directories.
-
-Same as MM_Unix version (changes command-line quoting).
-
-=cut
-
-sub htmlifypods {
-    my($self, %attribs) = @_;
-    return "\nhtmlifypods : pure_all\n\t$self->{NOECHO}\$(NOOP)\n" unless
-	%{$self->{HTMLLIBPODS}} || %{$self->{HTMLSCRIPTPODS}};
-    my($dist);
-    my($pod2html_exe);
-    if (defined $self->{PERL_SRC}) {
-	$pod2html_exe = File::Spec->catfile($self->{PERL_SRC},'pod',
-                                            'pod2html');
-    } else {
-	$pod2html_exe = File::Spec->catfile($Config{scriptdirexp},'pod2html');
-    }
-    unless ($pod2html_exe = $self->perl_script($pod2html_exe)) {
-	# No pod2html but some HTMLxxxPODS to be installed
-	print <<END;
-
-Warning: I could not locate your pod2html program. Please make sure,
-         your pod2html program is in your PATH before you execute 'make'
-
-END
-        $pod2html_exe = "-S pod2html";
-    }
-
-    my $m = sprintf <<'MAKE_TEXT', $pod2html_exe, $self->{MAKEFILE};
-POD2HTML_EXE = %s
-POD2HTML = \$(PERLRUN) -we "use File::Basename; use File::Path qw(mkpath);" \\
--e "%%m=@ARGV;while (($p,$h) = each %%m){" \\
--e "  next if -e $$h && -M $$h < -M $$p && -M $$h < -M '%s';" \\
--e "  print qq(Htmlifying $$h\n);" \\
--e "  $$dir = dirname($$h); mkpath($$dir) unless -d $$dir;" \\
--e "  system(q[$(PERLRUN) $(POD2HTML_EXE) ].qq[$$p > $$h])==0 " \\
--e "    or warn qq(Couldn\\047t install $$h\n);" \\
--e "  chmod(oct($(PERM_RW))), $$h " \\
--e "    or warn qq(chmod $(PERM_RW) $$h: $$!\n);" \\
--e "}"
-
-MAKE_TEXT
-
-    $m .= "htmlifypods : pure_all ";
-    $m .= join " \\\n\t", keys %{$self->{HTMLLIBPODS}},
-                          keys %{$self->{HTMLSCRIPTPODS}};
-
-    $m .= "\n";
-    if (keys %{$self->{HTMLLIBPODS}} || keys %{$self->{HTMLSCRIPTPODS}}) {
-        push @m, "\t$self->{NOECHO}\$(POD2HTML) \\\n\t";
-        push @m, join " \\\n\t", %{$self->{HTMLLIBPODS}}, 
-                                 %{$self->{HTMLSCRIPTPODS}};
-    }
-
-    return $m;
-}
-
 =item manifypods (o)
 
 We don't want manpage process.
