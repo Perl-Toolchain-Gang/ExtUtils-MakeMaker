@@ -210,7 +210,7 @@ sub dos2unix {
     File::Find::find(sub {
         return if -d $_;
         return unless -w _;
-        return unless -b _;
+        return if -B _;
 
         local @ARGV = $_;
         local $^I = '';
