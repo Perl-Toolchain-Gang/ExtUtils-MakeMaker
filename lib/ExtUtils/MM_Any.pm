@@ -282,8 +282,17 @@ Usage might be something like:
     $oneliner = $MM->perl_oneliner('print "Foo\n"');
     $make = '$oneliner > somefile';
 
+All dollar signs must be doubled in the $perl_code if you expect them
+to be interpreted normally, otherwise it will be considered a make
+macro.  Also remember to quote make macros else it might be used as a
+bareword.  For example:
+
+    # Assign the value of the $(VERSION_FROM) make macro to $vf.
+    $oneliner = $MM->perl_oneliner('$$vf = "$(VERSION_FROM)"');
+
 Its currently very simple and may be expanded sometime in the figure
 to include more flexible code and switches.
+
 
 =back
 
