@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.55_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.30 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.31 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -34,16 +34,9 @@ full_setup();
 require ExtUtils::MM;  # Things like CPAN assume loading ExtUtils::MakeMaker
                        # will give them MM.
 
-sub warnhandler {
-    $_[0] =~ /^Use of uninitialized value/ && return;
-    $_[0] =~ /used only once/ && return;
-    $_[0] =~ /^Subroutine\s+[\w:]+\s+redefined/ && return;
-    warn @_;
-}
 
 sub WriteMakefile {
     Carp::croak "WriteMakefile: Need even number of args" if @_ % 2;
-    local $SIG{__WARN__} = \&warnhandler;
 
     require ExtUtils::MY;
     my %att = @_;
@@ -276,15 +269,17 @@ sub new {
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         eval "require $prereq";
 
+        my $pr_version = $prereq->VERSION || 0;
+
         if ($@) {
             warn sprintf "Warning: prerequisite %s %s not found.\n", 
               $prereq, $self->{PREREQ_PM}{$prereq} 
                    unless $self->{PREREQ_FATAL};
             $unsatisfied{$prereq} = 'not installed';
-        } elsif ($prereq->VERSION < $self->{PREREQ_PM}->{$prereq} ){
+        } elsif ($pr_version < $self->{PREREQ_PM}->{$prereq} ){
             warn "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $self->{PREREQ_PM}{$prereq}, 
-                ($prereq->VERSION || 'unknown version') 
+                ($pr_version || 'unknown version') 
                   unless $self->{PREREQ_FATAL};
             $unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
               $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
@@ -480,7 +475,6 @@ END
 
 sub WriteEmptyMakefile {
     Carp::croak "WriteEmptyMakefile: Need even number of args" if @_ % 2;
-    local $SIG{__WARN__} = \&warnhandler;
 
     my %att = @_;
     my $self = MM->new(\%att);
@@ -639,6 +633,7 @@ sub mv_all_methods {
     # still trying to reduce the list to some reasonable minimum --
     # because I want to make it easier for the user. A.K.
 
+    no warnings 'redefine';
     foreach my $method (@Overridable) {
 
         # We cannot say "next" here. Nick might call MY->makeaperl
@@ -1757,7 +1752,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.30 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.31 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
