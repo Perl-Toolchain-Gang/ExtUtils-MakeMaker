@@ -327,7 +327,7 @@
 
 5.50_01 Mon Mar  4 23:44:48 EST 2002
     [[ API Changes ]]
-      htmlifypods and all HTML targets have been removed.  It didn't
+    - htmlifypods and all HTML targets have been removed.  It didn't
       work properly.  A target for HTMLifying of docs will be
       added sometime in the future (read: send a patch).
     - Deprecated ROOTEXT variable removed (its been deprecated for
