@@ -7,7 +7,7 @@ require Exporter;
 use vars qw($VERSION @ISA @EXPORT);
 @ISA = qw(Exporter);
 
-@EXPORT = qw(test_harness test_pl);
+@EXPORT = qw(test_harness);
 $VERSION = '0.01';
 
 =head1 NAME
@@ -44,10 +44,8 @@ Typically used with t/*.t files.
 =cut
 
 sub test_harness {
-    my($verbose) = shift;
-
     require Test::Harness;
-    $Test::Harness::Verbose = $verbose;
+    $Test::Harness::verbose = shift;
     Test::Harness::runtests(@ARGV);
 }
 
