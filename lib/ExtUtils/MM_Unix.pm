@@ -1104,18 +1104,16 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) blibdirs $(EXPORT_LIST) $(PE
 
     my $libs = '$(LDLOADLIBS)';
 
-    if ($Is_NetBSD) {
+    if ($Is_NetBSD && $Config{'useshrplib'}) {
 	# Use nothing on static perl platforms, and to the flags needed
 	# to link against the shared libperl library on shared perl
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
 	# or -R to add paths to the run-time library search path.
-	if ($Config{'useshrplib'}) {
-	    if ($Config{'lddlflags'} =~ /-Wl,-R/) {
-		$libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -lperl';
-	    } elsif ($Config{'lddlflags'} =~ /-R/) {
-		$libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -lperl';
-	    }
-	}
+        if ($Config{'lddlflags'} =~ /-Wl,-R/) {
+            $libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -lperl';
+        } elsif ($Config{'lddlflags'} =~ /-R/) {
+            $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -lperl';
+        }
     }
 
     push(@m,
