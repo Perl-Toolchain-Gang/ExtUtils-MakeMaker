@@ -77,7 +77,8 @@ will be overridable via the MY class.
 
 The following description of methods is still under
 development. Please refer to the code for not suitably documented
-sections and complain loudly to the makemaker mailing list.
+sections and complain loudly to the makemaker@perl.org mailing list.
+Better yet, provide a patch.
 
 Not all of the methods below are overridable in a
 Makefile.PL. Overridable methods are marked as (o). All methods are
@@ -95,9 +96,9 @@ $Rootdir = File::Spec->rootdir;
 $Updir   = File::Spec->updir;
 
 
-=head2 SelfLoaded methods
+=head2 Methods
 
-=over 2
+=over 4
 
 =item c_o (o)
 
@@ -3391,11 +3392,11 @@ but handles simple ones.
 =cut
 
 sub quote_paren {
-    local $_ = shift;
-    s/\$\((.+?)\)/\$\\\\($1\\\\)/g;	# protect $(...)
-    s/(?<!\\)([()])/\\$1/g;		# quote unprotected
-    s/\$\\\\\((.+?)\\\\\)/\$($1)/g;	# unprotect $(...)
-    return $_;
+    my $arg = shift;
+    $arg =~ s/\$\((.+?)\)/\$\\\\($1\\\\)/g;	# protect $(...)
+    $arg =~ s/(?<!\\)([()])/\\$1/g;		# quote unprotected
+    $arg =~ s/\$\\\\\((.+?)\\\\\)/\$($1)/g;	# unprotect $(...)
+    return $arg;
 }
 
 =item realclean (o)
