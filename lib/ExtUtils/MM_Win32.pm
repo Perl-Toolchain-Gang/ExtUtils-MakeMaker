@@ -28,7 +28,7 @@ use vars qw(@ISA $VERSION $BORLAND $GCC $DMAKE $NMAKE $PERLMAKE);
 
 require ExtUtils::MM_Unix;
 @ISA = qw( ExtUtils::MM_Unix );
-$VERSION = '1.01_01';
+$VERSION = '1.02_01';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
@@ -52,7 +52,7 @@ sub dlsyms {
 	push(@m,"
 $self->{BASEEXT}.def: Makefile.PL
 ",
-     q!	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MExtUtils::Mksymlists \\
+     q!	$(PERLRUN) -MExtUtils::Mksymlists \\
      -e "Mksymlists('NAME'=>\"!, $self->{NAME},
      q!\", 'DLBASE' => '!,$self->{DLBASE},
      # The above two lines quoted differently to work around
@@ -121,7 +121,8 @@ in these dirs:
 	    print "Checking $abs\n" if ($trace >= 2);
 	    next unless $self->maybe_command($abs);
 	    print "Executing $abs\n" if ($trace >= 2);
-	    $val = `$abs -e "require $ver;" 2>&1`;
+            (my($safe_abs) = $abs) =~ s{(\s)}{\\$1}g;
+	    $val = `$safe_abs -e "require $ver;" 2>&1`;
 	    if ($? == 0) {
 	        print "Using PERL=$abs\n" if $trace;
 	        return $abs;
@@ -137,15 +138,15 @@ in these dirs:
 sub init_others
 {
  my ($self) = @_;
- &ExtUtils::MM_Unix::init_others;
- $self->{'TOUCH'}  = '$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e touch';
- $self->{'CHMOD'}  = '$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e chmod'; 
- $self->{'CP'}     = '$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e cp';
- $self->{'RM_F'}   = '$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e rm_f';
- $self->{'RM_RF'}  = '$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e rm_rf';
- $self->{'MV'}     = '$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e mv';
+ $self->SUPER::init_others;
+ $self->{'TOUCH'}  = '$(PERLRUN) -MExtUtils::Command -e touch';
+ $self->{'CHMOD'}  = '$(PERLRUN) -MExtUtils::Command -e chmod'; 
+ $self->{'CP'}     = '$(PERLRUN) -MExtUtils::Command -e cp';
+ $self->{'RM_F'}   = '$(PERLRUN) -MExtUtils::Command -e rm_f';
+ $self->{'RM_RF'}  = '$(PERLRUN) -MExtUtils::Command -e rm_rf';
+ $self->{'MV'}     = '$(PERLRUN) -MExtUtils::Command -e mv';
  $self->{'NOOP'}   = 'rem';
- $self->{'TEST_F'} = '$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e test_f';
+ $self->{'TEST_F'} = '$(PERLRUN) -MExtUtils::Command -e test_f';
  $self->{'LD'}     = $Config{'ld'} || 'link';
  $self->{'AR'}     = $Config{'ar'} || 'lib';
  $self->{'LDLOADLIBS'} ||= $Config{'libs'};
@@ -162,7 +163,6 @@ sub init_others
      $self->{'LDDLFLAGS'} .= " $libpath";
  }
  $self->{'DEV_NULL'} = '> NUL';
- # $self->{'NOECHO'} = ''; # till we have it working
 }
 
 
@@ -367,7 +367,7 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # The DynaLoader only reads a non-empty file.
 $(BOOTSTRAP): '."$self->{MAKEFILE} $self->{BOOTDEP}".' $(INST_ARCHAUTODIR)\.exists
 	'.$self->{NOECHO}.'echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
-	'.$self->{NOECHO}.'$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" \
+	'.$self->{NOECHO}.'$(PERLRUN) \
 		-MExtUtils::Mkbootstrap \
 		-e "Mkbootstrap(\'$(BASEEXT)\',\'$(BSLOADLIBS)\');"
 	'.$self->{NOECHO}.'$(TOUCH) $(BOOTSTRAP)
@@ -518,8 +518,7 @@ sub pm_to_blib {
     my($autodir) = File::Spec->catdir('$(INST_LIB)','auto');
     return q{
 pm_to_blib: $(TO_INST_PM)
-	}.$self->{NOECHO}.q{$(PERL) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)" \
-	"-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MExtUtils::Install \
+	}.$self->{NOECHO}.q{$(PERLRUNINST) -MExtUtils::Install \
         -e "pm_to_blib(}.
 	($NMAKE ? 'qw[ <<pmfiles.dat ],'
 	        : $DMAKE ? 'qw[ $(mktmp,pmfiles.dat $(PM_TO_BLIB:s,\\,\\\\,)\n) ],'
@@ -545,7 +544,7 @@ sub tool_autosplit{
     $asl = "\$AutoSplit::Maxlen=$attribs{MAXLEN};" if $attribs{MAXLEN};
     q{
 # Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = $(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MAutoSplit }.$asl.q{ -e "autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1);"
+AUTOSPLITFILE = $(PERLRUN) -MAutoSplit }.$asl.q{ -e "autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1);"
 };
 }
 
@@ -574,13 +573,13 @@ SHELL = $bin_sh
     push @m, q{
 # The following is a portable way to say mkdir -p
 # To see which directories are created, change the if 0 to if 1
-MKPATH = $(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e mkpath
+MKPATH = $(PERLRUN) -MExtUtils::Command -e mkpath
 
 # This helps us to minimize the effect of the .exists files A yet
 # better solution would be to have a stable file in the perl
 # distribution with a timestamp of zero. But this solution doesn't
 # need any changes to the core distribution and works with older perls
-EQUALIZE_TIMESTAMP = $(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Command -e eqtime
+EQUALIZE_TIMESTAMP = $(PERLRUN) -MExtUtils::Command -e eqtime
 };
 
 
@@ -715,7 +714,7 @@ sub dist_ci {
     my @m;
     push @m, q{
 ci :
-	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Manifest=maniread \\
+	$(PERLRUN) -MExtUtils::Manifest=maniread \\
 		-e "@all = keys %{ maniread() };" \\
 		-e "print(\"Executing $(CI) @all\n\"); system(\"$(CI) @all\");" \\
 		-e "print(\"Executing $(RCS_LABEL) ...\n\"); system(\"$(RCS_LABEL) @all\");"
