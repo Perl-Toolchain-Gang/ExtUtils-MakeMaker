@@ -369,7 +369,9 @@ sub blibdirs_target {
                                            man1dir man3dir
                                           );
 
-    my $make = sprintf <<'MAKE', join(' ', @dirs);
+    my @exists = map { $_.'$(DFSEP).exists' } @dirs;
+
+    my $make = sprintf <<'MAKE', join(' ', @exists);
 blibdirs : %s
 	$(NOECHO) $(NOOP)
 

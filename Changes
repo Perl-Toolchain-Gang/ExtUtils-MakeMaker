@@ -5,6 +5,8 @@
       XSUBPP alone.
     - Removed DESTDIR from PASTHRU as install is not recursive and it can
       make commands too long on VMS.
+    - Older versions of MMS cannot handle directory targets at all.  Using
+      .exists files everywhere.
 
 6.25_07  Fri Dec 31 03:47:20 EST 2004
     - perllocal on VMS was inserting executables twice.
