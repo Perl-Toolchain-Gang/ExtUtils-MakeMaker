@@ -474,7 +474,7 @@ locking (ie. Windows).  So we wrap it and close the filehandle.
 
 sub _autosplit {
     my $retval = autosplit(@_);
-    close *AutoSplit::IN;
+    close *AutoSplit::IN if defined *AutoSplit::IN{IO};
 
     return $retval;
 }
