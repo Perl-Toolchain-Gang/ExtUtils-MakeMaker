@@ -134,8 +134,10 @@ sub touch {
 
 =item mv source... destination
 
-Moves source to destination.
-Multiple sources are allowed if destination is an existing directory.
+Moves source to destination.  Multiple sources are allowed if
+destination is an existing directory.
+
+Returns true if all moves succeeded, false otherwise.
 
 =cut 
 
@@ -143,15 +145,20 @@ sub mv {
     my $dst = pop(@ARGV);
     expand_wildcards();
     croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
+
+    my $nok = 0;
     foreach my $src (@ARGV) {
-        move($src,$dst);
+        $nok ||= !move($src,$dst);
     }
+    return !$nok;
 }
 
 =item cp source... destination
 
-Copies source to destination.
-Multiple sources are allowed if destination is an existing directory.
+Copies source to destination.  Multiple sources are allowed if
+destination is an existing directory.
+
+Returns true if all copies succeeded, false otherwise.
 
 =cut
 
@@ -159,9 +166,12 @@ sub cp {
     my $dst = pop(@ARGV);
     expand_wildcards();
     croak("Too many arguments") if (@ARGV > 1 && ! -d $dst);
+
+    my $nok = 0;
     foreach my $src (@ARGV) {
-        copy($src,$dst);
+        $nok ||= !copy($src,$dst);
     }
+    return $nok;
 }
 
 =item chmod mode files...

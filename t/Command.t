@@ -23,7 +23,7 @@ BEGIN {
 }
 
 BEGIN {
-    use Test::More tests => 29;
+    use Test::More tests => 30;
     use File::Spec;
 }
 
@@ -160,7 +160,7 @@ BEGIN {
 
     # move a file to a subdirectory
     @ARGV = ( $Testfile, 'ecmddir' );
-    mv();
+    ok( mv() );
 
     ok( ! -e $Testfile, 'moved file away' );
     ok( -e File::Spec->join( 'ecmddir', $Testfile ), 'file in new location' );
