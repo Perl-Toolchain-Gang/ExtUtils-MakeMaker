@@ -708,15 +708,12 @@ generated_by: ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
 YAML
 
     my @write_meta = $self->echo($meta, 'META_new.yml');
-    my $move = $self->oneliner(<<'CODE', ['-MExtUtils::Command', '-MFile::Compare']);
-compare(@ARGV) != 0 ? (mv or warn "Cannot move @ARGV: $$!\n") : unlink(shift);
-CODE
 
-    return sprintf <<'MAKE_FRAG', join("\n\t", @write_meta), $move;
+    return sprintf <<'MAKE_FRAG', join("\n\t", @write_meta);
 metafile :
 	$(NOECHO) $(ECHO) Generating META.yml
 	%s
-	$(IGNORE)$(NOECHO) %s META_new.yml META.yml
+	$(IGNORE)$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 MAKE_FRAG
 
 }
@@ -744,7 +741,6 @@ CODE
     return sprintf <<'MAKE', $add_meta_to_distdir;
 # Copy, do not move.  We don't know if one was already here.
 distmeta : metafile
-	$(NOECHO) $(CP) META.yml $(DISTVNAME)
 	$(NOECHO) %s
 
 MAKE
