@@ -3,7 +3,7 @@ package ExtUtils::MM;
 use strict;
 use Config;
 use vars qw(@ISA $VERSION);
-$VERSION = 0.01;
+$VERSION = 0.02;
 
 require ExtUtils::Liblist;
 require ExtUtils::MakeMaker;
@@ -50,9 +50,12 @@ $Is{MacOS}  = 1 if $^O eq 'MacOS';
 if( $^O eq 'MSWin32' ) {
     Win32::IsWin95() ? $Is{Win95} = 1 : $Is{Win32} = 1;
 }
+$Is{UWIN}   = 1 if $^O eq 'uwin';
 $Is{Cygwin} = 1 if $^O eq 'cygwin';
 $Is{NW5}    = 1 if $Config{osname} eq 'NetWare';
 $Is{BeOS}   = 1 if $^O =~ /beos/i;    # XXX should this be that loose?
+$Is{DOS}    = 1 if $^O eq 'dos';
+
 $Is{Unix}   = 1 if !keys %Is;
 
 delete $Is{Win32} if $Is{NW5};
