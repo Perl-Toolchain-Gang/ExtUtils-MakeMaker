@@ -1,7 +1,31 @@
-The MakeMaker class hierarchy
-*****************************
+The Simplified MakeMaker class hierarchy
+****************************************
 
-Subclasses on top.
+What most people need to know.
+
+(Subclasses on top.)
+
+               MY
+                |
+        ExtUtils::MakeMaker
+                |
+        ExtUtils::MM_{Current OS}
+                |
+        ExtUtils::MM_Unix
+                |
+        ExtUtils::MM_Any
+
+The object actually used is of the class MY which allows you to
+override bits of MakeMaker inside your Makefile.PL by declaring
+MY::foo() methods.
+
+
+The Real MakeMaker class hierarchy
+**********************************
+
+You wish it was that simple.
+
+Here's how it really works.
 
                PACK### (created each call to ExtUtils::MakeMaker->new)
                     .                       |
