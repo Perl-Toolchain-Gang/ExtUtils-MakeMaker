@@ -18,7 +18,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 107;
+        plan tests => 108;
     }
 }
 
@@ -220,4 +220,15 @@ foreach (qw/ export_list perl_archive perl_archive_after/)
   is ($t->$_(),'',"$_() is empty string on Unix"); 
   }
 
+
+{
+    $t->{CCFLAGS} = '-DMY_THING';
+    $t->{LIBPERL_A} = 'libperl.a';
+    $t->{LIB_EXT}   = '.a';
+    local $t->{NEEDS_LINKING} = 1;
+    $t->cflags();
+
+    # Brief bug where CCFLAGS was being blown away
+    is( $t->{CCFLAGS}, '-DMY_THING',    'cflags retains CCFLAGS' );
+}
 

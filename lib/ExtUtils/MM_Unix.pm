@@ -306,7 +306,7 @@ sub cflags {
 	$cflags{$_} =~ s/^\s+//;
 	$cflags{$_} =~ s/\s+/ /g;
 	$cflags{$_} =~ s/\s+$//;
-	$self->{uc $_} = $cflags{$_};
+	$self->{uc $_} ||= $cflags{$_};
     }
 
     if ($self->{POLLUTE}) {
