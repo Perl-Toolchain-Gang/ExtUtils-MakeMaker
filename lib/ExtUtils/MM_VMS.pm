@@ -1083,19 +1083,7 @@ VMS-style command line quoting in a few cases.
 
 sub install {
     my($self, %attribs) = @_;
-    my(@m,@exe_files);
-
-    if ($self->{EXE_FILES}) {
-	my($line,$file) = ('','');
-	foreach $file (@{$self->{EXE_FILES}}) {
-	    $line .= "$file ";
-	    if (length($line) > 128) {
-		push(@exe_files,qq[\t\$(NOECHO) \$(ECHO) "$line" >>.MM_tmp\n]);
-		$line = '';
-	    }
-	}
-	push(@exe_files,qq[\t\$(NOECHO) \$(ECHO) "$line" >>.MM_tmp\n]) if $line;
-    }
+    my(@m);
 
     push @m, q[
 install :: all pure_install doc_install
@@ -1165,8 +1153,7 @@ doc_perl_install ::
 	$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLPRIVLIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
-],@exe_files,
-q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 
 # And again
@@ -1175,8 +1162,7 @@ doc_site_install ::
 	$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLSITELIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
-],@exe_files,
-q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 
 doc_vendor_install ::
@@ -1184,8 +1170,7 @@ doc_vendor_install ::
 	$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLVENDORLIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
-],@exe_files,
-q[	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 
 ];
