@@ -30,8 +30,7 @@ delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
-chdir($Is_VMS ? 'BFD_TEST_ROOT:[t]' : 't');
-
+chdir 't';
 
 perl_lib;
 

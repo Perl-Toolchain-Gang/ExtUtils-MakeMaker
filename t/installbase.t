@@ -24,7 +24,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 my $perl = which_perl();
 
-chdir($Is_VMS ? 'BFD_TEST_ROOT:[t]' : 't');
+chdir 't';
 perl_lib;
 
 ok( setup_recurs(), 'setup' );

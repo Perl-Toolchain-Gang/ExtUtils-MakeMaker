@@ -8,6 +8,7 @@ use strict;
 use File::Path;
 use File::Basename;
 
+my $Is_VMS = $^O eq 'VMS';
 
 my %Files = (
              'Big-Dummy/lib/Big/Dummy.pm'     => <<'END',
@@ -94,7 +95,7 @@ END
 
 
 sub _setup_bfd_test_root {
-    if( $^O eq 'VMS' ) {
+    if( $Is_VMS ) {
         # On older systems we might exceed the 8-level directory depth limit
         # imposed by RMS.  We get around this with a rooted logical, but we
         # can't create logical names with attributes in Perl, so we do it
@@ -114,6 +115,7 @@ COMMAND
 
 sub setup_recurs {
     _setup_bfd_test_root();
+    chdir 'BFD_TEST_ROOT:[t]' if $Is_VMS;
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
