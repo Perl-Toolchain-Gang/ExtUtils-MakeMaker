@@ -21,7 +21,7 @@ BEGIN {
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
 ($VERSION) = '5.71';
-($Revision) = q$Revision: 1.111 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.112 $ =~ /Revision:\s+(\S+)/;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1236,13 +1236,13 @@ clean :: clean_subdirs
 	}
     }
     push(@otherfiles, qw[ blib $(MAKE_APERL_FILE) 
-                          perlmain.c pm_to_blib pm_to_blib.ts ]);
+                          perlmain.c blibdirs pm_to_blib pm_to_blib.ts ]);
     push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
     push(@otherfiles, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
 
     # Occasionally files are repeated several times from different sources
     { my(%of) = map { ($_ => 1) } @otherfiles; @otherfiles = keys %of; }
-    
+
     my $line = '';
     foreach my $file (@otherfiles) {
 	$file = $self->fixpath($file);
