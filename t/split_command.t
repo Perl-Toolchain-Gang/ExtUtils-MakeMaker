@@ -15,7 +15,8 @@ chdir 't';
 use ExtUtils::MM;
 use MakeMaker::Test::Utils;
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS   = $^O eq 'VMS';
+my $Is_Win32 = $^O eq 'MSWin32';
 
 use Test::More tests => 7;
 
@@ -56,6 +57,9 @@ sub _run {
     s{\$\(PERLRUN\)}{$perl} foreach @cmds;
     if( $Is_VMS ) {
         s{-\n}{} foreach @cmds
+    }
+    elsif( $Is_Win32 ) {
+        s{\\\n}{} foreach @cmds;
     }
 
     return map { s/\n+$//; $_ } map { `$_` } @cmds
