@@ -687,63 +687,6 @@ sub const_cccmd {
     $self->{CONST_CCCMD} = join('',@m);
 }
 
-=item pm_to_blib (override)
-
-DCL I<still> accepts a maximum of 255 characters on a command
-line, so we write the (potentially) long list of file names
-to a temp file, then persuade Perl to read it instead of the
-command line to find args.
-
-=cut
-
-sub pm_to_blib {
-    my($self) = @_;
-    my($autodir) = File::Spec->catdir($self->{INST_LIB},'auto');
-    my(%files) = %{$self->{PM}};
-
-    my $m = <<'MAKE_FRAG';
-
-# Dummy target to match Unix target name; we use pm_to_blib.ts as
-# timestamp file to avoid repeated invocations under VMS
-pm_to_blib : pm_to_blib.ts
-	$(NOECHO) $(NOOP)
-
-# As always, keep under DCL's 255-char limit
-pm_to_blib.ts : $(TO_INST_PM)
-MAKE_FRAG
-
-    if( keys %files ) {
-        $m .= <<'MAKE_FRAG';
-	$(NOECHO) $(RM_F) .MM_tmp
-MAKE_FRAG
-
-        my $line = '';
-        while (my($from, $to) = each %files) {
-            $line .= " $from $to";
-            if (length($line) > 128) {
-                $m .= sprintf <<'MAKE_FRAG', $line;
-	$(NOECHO) $(PERL) -e "print '%s'" >>.MM_tmp
-MAKE_FRAG
-                $line = '';
-            }
-        }
-        $m .= sprintf <<'MAKE_FRAG', $line if $line;
-	$(NOECHO) $(PERL) -e "print '%s'" >>.MM_tmp
-MAKE_FRAG
-
-        $m .= sprintf <<'MAKE_FRAG', $autodir;
-	$(PERLRUN) "-MExtUtils::Install" -e "pm_to_blib({split(' ',<STDIN>)},'%s','$(PM_FILTER)')" <.MM_tmp
-	$(NOECHO) $(RM_F) .MM_tmp
-MAKE_FRAG
-
-    }
-    $m .= <<'MAKE_FRAG';
-	$(NOECHO) $(TOUCH) pm_to_blib.ts
-MAKE_FRAG
-
-    return $m;
-}
-
 
 =item tool_sxubpp (override)
 
