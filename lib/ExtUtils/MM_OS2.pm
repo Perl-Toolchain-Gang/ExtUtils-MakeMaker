@@ -106,14 +106,8 @@ sub maybe_command {
     return;
 }
 
-sub file_name_is_absolute {
-    shift;
-    return File::Spec->file_name_is_absolute(@_);
-}
-
-sub perl_archive
-{
- return "\$(PERL_INC)/libperl\$(LIB_EXT)";
+sub perl_archive {
+    return "\$(PERL_INC)/libperl\$(LIB_EXT)";
 }
 
 =item perl_archive_after
