@@ -2321,7 +2321,10 @@ sub init_PERL {
 
     # Build up a set of file names (not command names).
     my $thisperl = $self->canonpath($^X);
-    $thisperl .= $Config{exe_ext} unless $thisperl =~ m/$Config{exe_ext}$/i;
+    $thisperl .= $Config{exe_ext} unless 
+                # VMS might have a file version # at the end
+      $Is_VMS ? $thisperl =~ m/(;\d+)?$Config{exe_ext}$/i
+              : $thisperl =~ m/$Config{exe_ext}$/i;
 
     # We need a relative path to perl when in the core.
     $thisperl = $self->abs2rel($thisperl) if $self->{PERL_CORE};
