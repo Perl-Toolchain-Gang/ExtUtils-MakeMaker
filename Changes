@@ -1,6 +1,6 @@
 5.90_01
     [[ API Changes ]]
-    * Partial implementation of the new PREFIX logic.
+    * Implementation of the new PREFIX logic.
     * Added new INSTALL targets:
         INSTALLSITEBIN
         INSTALLSITEMAN1DIR   INSTALLSITEMAN3DIR 
