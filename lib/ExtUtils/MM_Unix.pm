@@ -17,7 +17,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.19_01';
+$VERSION = '1.20_01';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -1523,7 +1523,7 @@ sub init_main {
                       File::Spec->catdir($Updir,$Updir,$Updir,$Updir))
         {
 	    if (
-		-f File::Spec->catfile($dir,"config.sh")
+		-f File::Spec->catfile($dir,"config_h.SH")
 		&&
 		-f File::Spec->catfile($dir,"perl.h")
 		&&
@@ -1534,6 +1534,10 @@ sub init_main {
 	    }
 	}
     }
+
+    warn "PERL_CORE is set but I can't find your PERL_SRC!\n" if
+      $self->{PERL_CORE} and !$self->{PERL_SRC};
+
     if ($self->{PERL_SRC}){
 	$self->{PERL_LIB}     ||= File::Spec->catdir("$self->{PERL_SRC}","lib");
 	$self->{PERL_ARCHLIB} = $self->{PERL_LIB};
