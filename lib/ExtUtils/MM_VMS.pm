@@ -361,6 +361,11 @@ off to the default MM_Unix method.
 
 DEV_NULL should probably be overriden with something.
 
+Also changes EQUALIZE_TIMESTAMP to set revision date of target file to
+one second later than source file, since MMK interprets precisely
+equal revision dates for a source and target file as a sign that the
+target needs to be updated.
+
 =cut
 
 sub init_others {
@@ -380,6 +385,8 @@ sub init_others {
     $self->{RM_F}     ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_f';
     $self->{RM_RF}    ||= '$(PERLRUN) "-MExtUtils::Command" -e rm_rf';
     $self->{TEST_F}   ||= '$(PERLRUN) "-MExtUtils::Command" -e test_f';
+    $self->{EQUALIZE_TIMESTAMP} ||= '$(PERLRUN) -we "open F,qq{>>$ARGV[1]};close F;utime(0,(stat($ARGV[0]))[9]+1,$ARGV[1])"';
+
 
     $self->{SHELL}    ||= 'Posix';
 
@@ -815,12 +822,9 @@ EOM
 
 =item tools_other (override)
 
-Adds a few MM[SK] macros, and shortens some the installatin commands,
-in order to stay under DCL's 255-character limit.  Also changes
-EQUALIZE_TIMESTAMP to set revision date of target file to one second
-later than source file, since MMK interprets precisely equal revision
-dates for a source and target file as a sign that the target needs
-to be updated.
+Throw in some dubious extra macros for Makefile args.
+
+Also keep around the old $(SAY) macro in case somebody's using it.
 
 =cut
 
