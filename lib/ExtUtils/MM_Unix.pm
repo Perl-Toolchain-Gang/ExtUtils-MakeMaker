@@ -704,8 +704,9 @@ sub dist {
 
     $attribs{DISTVNAME} ||= "$attribs{NAME}-$attribs{VERSION}";
 
-    # We've already printed out a VERSION variable.
+    # We've already printed out VERSION and NAME variables.
     delete $attribs{VERSION};
+    delete $attribs{NAME};
 
     my $make = '';
     while(my($var, $value) = each %attribs) {
