@@ -1997,8 +1997,6 @@ sub init_INSTALL {
           if $Verbose >= 2;
     }
 
-    $self->{PREFIX} ||= $iprefix;
-
     return 1;
 }
 
