@@ -22,7 +22,7 @@ use vars qw($Revision);
 use strict;
 
 $VERSION = '6.25_09';
-($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 3928$ =~ /Revision:\s+(\S+)/;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
