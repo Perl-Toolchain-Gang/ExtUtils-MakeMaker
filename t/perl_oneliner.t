@@ -13,7 +13,7 @@ BEGIN {
 chdir 't';
 
 use MakeMaker::Test::Utils;
-use Test::More tests => 6;
+use Test::More tests => 5;
 use File::Spec;
 
 BEGIN { use_ok('ExtUtils::MM') }
