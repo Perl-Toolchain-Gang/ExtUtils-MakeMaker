@@ -1006,62 +1006,6 @@ sub xs_o {	# many makes are too dumb to use xs_c then c_o
 ';
 }
 
-=item top_targets (override)
-
-Path seperator differences.
-
-=cut
-
-sub top_targets {
-    my($self) = shift;
-    my(@m);
-    push @m, '
-all :: pure_all
-	$(NOECHO) $(NOOP)
-
-pure_all :: config pm_to_blib subdirs linkext
-	$(NOECHO) $(NOOP)
-
-subdirs :: $(MYEXTLIB)
-	$(NOECHO) $(NOOP)
-
-config :: $(MAKEFILE) $(INST_LIBDIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-
-config :: $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-
-config :: $(INST_AUTODIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-';
-
-    push @m, $self->dir_target(qw[$(INST_AUTODIR) $(INST_LIBDIR) $(INST_ARCHAUTODIR)]);
-    if (%{$self->{MAN1PODS}}) {
-	push @m, q[
-config :: $(INST_MAN1DIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-];
-	push @m, $self->dir_target(qw[$(INST_MAN1DIR)]);
-    }
-    if (%{$self->{MAN3PODS}}) {
-	push @m, q[
-config :: $(INST_MAN3DIR)$(DIRFILESEP).exists
-	$(NOECHO) $(NOOP)
-];
-	push @m, $self->dir_target(qw[$(INST_MAN3DIR)]);
-    }
-
-    push @m, '
-$(O_FILES) : $(H_FILES)
-' if @{$self->{O_FILES} || []} && @{$self->{H} || []};
-
-    push @m, q{
-help :
-	perldoc ExtUtils::MakeMaker
-};
-
-    join('',@m);
-}
 
 =item dlsyms (override)
 

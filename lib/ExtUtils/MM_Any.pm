@@ -567,6 +567,23 @@ sub platform_constants {
     return '';
 }
 
+
+=item all_target
+
+Generate the default target 'all'.
+
+=cut
+
+sub all_target {
+    my $self = shift;
+
+    return <<'MAKE_EXT';
+all :: pure_all
+	$(NOECHO) $(NOOP)
+MAKE_EXT
+
+}
+
 =back
 
 =head1 AUTHOR

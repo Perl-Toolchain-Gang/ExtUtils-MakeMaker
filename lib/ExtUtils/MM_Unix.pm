@@ -3941,6 +3941,22 @@ EOM
     return $Xsubpp_Version = "1.0" ;
 }
 
+
+=item all_target
+
+Build man pages, too
+
+=cut
+
+sub all_target {
+    my $self = shift;
+
+    return <<'MAKE_EXT';
+all :: pure_all manifypods
+	$(NOECHO) $(NOOP)
+MAKE_EXT
+}
+
 =item top_targets (o)
 
 Defines the targets all, subdirs, config, and O_FILES
@@ -3953,11 +3969,7 @@ sub top_targets {
     my($self) = shift;
     my(@m);
 
-    push @m, '
-all :: pure_all manifypods
-	$(NOECHO) $(NOOP)
-' 
-	  unless $self->{SKIPHASH}{'all'};
+    push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
     
     push @m, '
 pure_all :: config pm_to_blib subdirs linkext
