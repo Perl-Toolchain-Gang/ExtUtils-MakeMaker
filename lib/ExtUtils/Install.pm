@@ -9,7 +9,8 @@ use Carp ();
 use Config qw(%Config);
 @ISA = ('Exporter');
 @EXPORT = ('install','uninstall','pm_to_blib', 'install_default');
-$Is_VMS = $^O eq 'VMS';
+$Is_VMS     = $^O eq 'VMS';
+$Is_MacPerl = $^O eq 'MacOS';
 
 my $splitchar = $^O eq 'VMS' ? '|' : ($^O eq 'os2' || $^O eq 'dos') ? ';' : ':';
 my @PERL_ENV_LIB = split $splitchar, defined $ENV{'PERL5LIB'} ? $ENV{'PERL5LIB'} : $ENV{'PERLLIB'} || '';
@@ -195,7 +196,9 @@ sub install {
 
             # File::Find can get confused if you chdir in here.
             chdir $save_cwd;
-	}, $Curdir);
+
+        # File::Find seems to always be Unixy except on MacPerl :(
+	}, $Is_MacPerl ? '.' : $Curdir);
 	chdir($cwd) or Carp::croak("Couldn't chdir to $cwd: $!");
     }
     if ($pack{'write'}) {
