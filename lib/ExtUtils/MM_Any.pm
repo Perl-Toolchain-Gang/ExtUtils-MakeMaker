@@ -327,6 +327,44 @@ Its currently very simple and may be expanded sometime in the figure
 to include more flexible code and switches.
 
 
+=item B<init_others>
+
+    $MM->init_others();
+
+Initializes the macro definitions used by tools_other() and places them
+in the $MM object.
+
+If there is no description, its the same as the parameter to
+WriteMakefile() documented in ExtUtils::MakeMaker.
+
+Defines at least these macros.
+
+  Macro             Description
+
+  NOOP              
+  NOECHO                                        
+
+  MAKEFILE
+  FIRST_MAKEFILE
+  MAKEFILE_OLD
+  MAKE_APERL_FILE   File used by MAKE_APERL
+
+  SHELL             Program used to run
+                    shell commands
+
+  RM_F              Remove a file 
+  RM_RF             Remove a directory          
+  TOUCH             Update a file's timestamp   
+  TEST_F            Test for a file's existence 
+  CP                Copy a file                 
+  MV                Move a file                 
+  CHMOD             Change permissions on a     
+                    file
+
+  UMASK_NULL        Nullify umask
+  DEV_NULL          Supress all command output
+
+
 =back
 
 =head1 AUTHOR
