@@ -2,7 +2,7 @@ package ExtUtils::MM_Any;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = 0.07;
+$VERSION = 0.08;
 @ISA = qw(File::Spec);
 
 use Config;
@@ -178,7 +178,7 @@ sub split_command {
         }
         chop $arg_str;
 
-        push @cmds, $self->escape_newlines("$cmd\n$arg_str");
+        push @cmds, $self->escape_newlines("$cmd \n$arg_str");
     } while @args;
 
     return @cmds;
