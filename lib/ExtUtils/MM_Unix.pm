@@ -861,8 +861,8 @@ sub dist_test {
     push @m, q{
 disttest : distdir
 	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL
-	cd $(DISTVNAME) && $(MAKE)
-	cd $(DISTVNAME) && $(MAKE) test
+	cd $(DISTVNAME) && $(MAKE) $(PASTHRU)
+	cd $(DISTVNAME) && $(MAKE) test $(PASTHRU)
 };
     join "", @m;
 }
