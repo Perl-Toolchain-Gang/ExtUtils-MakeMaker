@@ -2059,6 +2059,10 @@ sub init_INSTALL {
         $self->{PERLPREFIX}   ||= $iprefix;
         $self->{SITEPREFIX}   ||= $sprefix;
         $self->{VENDORPREFIX} ||= $vprefix;
+
+        # Lots of MM extension authors like to use $(PREFIX) so we
+        # put something sensible in there no matter what.
+        $self->{PREFIX} = '$('.uc $self->{INSTALLDIRS}.'PREFIX)';
     }
 
     my $arch    = $Config{archname};

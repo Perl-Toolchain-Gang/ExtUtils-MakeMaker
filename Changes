@@ -9,6 +9,9 @@
     * Eliminated .exists files.  Added blibdirs target using MKPATH instead.
     - Removed now unused dir_target() method.
     - Added a little documentation to instmodsh.
+    * Made sure PREFIX always has something in it.  Module authors like to use
+      it when extending MakeMaker.  Currently using one of 
+      PERL/SITE/VENDORPREFIX based on the value of INSTALLDIRS.
 
 6.17 Sun Sep 14 20:52:45 PDT 2003
     - Fixing LD so it can be set properly on Win32. (Orton Yves)
