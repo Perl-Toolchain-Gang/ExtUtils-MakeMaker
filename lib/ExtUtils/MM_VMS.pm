@@ -1396,13 +1396,8 @@ sub clean {
     push @m, '
 # Delete temporary files but do not touch installed files. We don\'t delete
 # the Descrip.MMS here so that a later make realclean still has it to use.
-clean ::
+clean :: clean_subdirs
 ';
-    foreach $dir (@{$self->{DIR}}) { # clean subdirectories first
-	my($vmsdir) = $self->fixpath($dir,1);
-	push( @m, '	If F$Search("'.$vmsdir.'$(MAKEFILE)").nes."" Then \\',"\n\t",
-	      '$(PERL) -e "chdir ',"'$vmsdir'",'; print `$(MMS)$(MMSQUALIFIERS) clean`;"',"\n");
-    }
     push @m, '	$(RM_F) *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) *$(OBJ_EXT) *$(LIB_EXT) *.Opt $(BOOTSTRAP) $(BASEEXT).bso .MM_Tmp
 ';
 
@@ -1439,6 +1434,40 @@ clean ::
     push(@m, "	$attribs{POSTOP}\n") if $attribs{POSTOP};
     join('', @m);
 }
+
+
+=item clean_subdirs_target
+
+  my $make_frag = $MM->clean_subdirs_target;
+
+VMS semantics for changing directories and rerunning make very different.
+
+=cut
+
+sub clean_subdirs_target {
+    my($self) = shift;
+
+    # No subdirectories, no cleaning.
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+clean_subdirs :
+	$(NOECHO)$(NOOP)
+NOOP_FRAG
+
+
+    my $clean = "clean_subdirs :\n";
+
+    foreach my $dir (@{$self->{DIR}}) { # clean subdirectories first
+	$dir = $self->fixpath($dir,1);
+
+        $clean .= sprintf <<'MAKE_FRAG', $dir, $dir;
+	If F$Search("%s$(MAKEFILE)").nes."" Then \\
+	    $(PERLRUN) -e "chdir '%s'; print `$(MMS)$(MMSQUALIFIERS) clean`;"
+MAKE_FRAG
+    }
+
+    return $clean;
+}
+
 
 =item realclean (override)
 

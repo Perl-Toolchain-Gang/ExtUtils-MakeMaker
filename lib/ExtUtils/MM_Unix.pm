@@ -258,24 +258,8 @@ sub clean {
 # Delete temporary files but do not touch installed files. We don\'t delete
 # the Makefile here so a later make realclean still has a makefile to use.
 
-clean ::
+clean :: clean_subdirs
 ');
-    # clean subdirectories first
-    for $dir (@{$self->{DIR}}) {
-	if ($Is_Win32  &&  Win32::IsWin95()) {
-	    push @m, sprintf <<'EOT', $dir;
-	cd %s
-	$(TEST_F) $(MAKEFILE)
-	$(MAKE) clean
-	cd ..
-EOT
-	}
-	else {
-	    push @m, sprintf <<'EOT', $dir;
-	-cd %s && $(TEST_F) $(MAKEFILE) && $(MAKE) clean
-EOT
-	}
-    }
 
     my(@otherfiles) = values %{$self->{XS}}; # .c files from *.xs files
     if ( $^O eq 'qnx' ) {
@@ -301,7 +285,7 @@ EOT
         push(@otherfiles, qw[core core.*perl.*.? *perl.core]);
     }
 
-    push @m, "\t-$self->{RM_RF} @otherfiles\n";
+    push @m, "\t-\$(RM_RF) @otherfiles\n";
     # See realclean and ext/utils/make_ext for usage of Makefile.old
     push(@m,
 	 "\t-\$(MV) \$(MAKEFILE) \$(MAKEFILE_OLD) \$(DEV_NULL)\n");
@@ -309,6 +293,38 @@ EOT
 	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
     join("", @m);
 }
+
+
+=item clean_subdirs_target
+
+  my $make_frag = $MM->clean_subdirs_target;
+
+Returns the clean_subdirs target.  This is used by the clean target to
+call clean on any subdirectories which contain Makefiles.
+
+=cut
+
+sub clean_subdirs_target {
+    my($self) = shift;
+
+    # No subdirectories, no cleaning.
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+clean_subdirs :
+	$(NOECHO)$(NOOP)
+NOOP_FRAG
+
+
+    my $clean = "clean_subdirs :\n";
+
+    for my $dir (@{$self->{DIR}}) {
+        $clean .= sprintf <<'MAKE_FRAG', $dir;
+	-cd %s && $(TEST_F) $(MAKEFILE) && $(MAKE) clean
+MAKE_FRAG
+    }
+
+    return $clean;
+}
+
 
 =item const_cccmd (o)
 

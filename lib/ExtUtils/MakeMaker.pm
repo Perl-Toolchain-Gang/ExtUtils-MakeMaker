@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.75 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.76 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -245,7 +245,8 @@ sub full_setup {
  c_o xs_c xs_o top_targets linkext dlsyms dynamic dynamic_bs
  dynamic_lib static static_lib manifypods processPL
  installbin subdirs
- clean realclean dist_basics dist_core dist_dir dist_test dist_ci
+ clean_subdirs clean realclean 
+ dist_basics dist_core dist_dir dist_test dist_ci
  install force perldepend makefile staticmake test ppd
 
           ); # loses section ordering
@@ -542,6 +543,10 @@ END
     }
 
     foreach my $section ( @MM_Sections ){
+        # Support for new foo_target() methods.
+        my $method = $section;
+        $method .= '_target' unless $self->can($method);
+
         print "Processing Makefile '$section' section\n" if ($Verbose >= 2);
         my($skipit) = $self->skipcheck($section);
         if ($skipit){
@@ -550,7 +555,7 @@ END
             my(%a) = %{$self->{$section} || {}};
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
             push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
-            push @{$self->{RESULT}}, $self->nicetext($self->$section( %a ));
+            push @{$self->{RESULT}}, $self->nicetext($self->$method( %a ));
         }
     }
 
@@ -1942,7 +1947,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.75 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.76 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

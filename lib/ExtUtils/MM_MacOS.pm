@@ -751,20 +751,8 @@ sub clean {
 # Delete temporary files but do not touch installed files. We don\'t delete
 # the Makefile here so a later make realclean still has a makefile to use.
 
-clean ::
+clean :: clean_subdirs
 ');
-    # clean subdirectories first
-    for $dir (@{$self->{DIR}}) {
-	push @m, 
-"	Set OldEcho \{Echo\}
-	Set Echo 0
-	Directory $dir
-	If \"\`Exists -f \$(MAKEFILE)\`\" != \"\"
-	    \$(MAKE) clean
-	End
-	Set Echo \{OldEcho\}
-	";
-    }
 
     my(@otherfiles) = values %{$self->{XS}}; # .c files from *.xs files
     push(@otherfiles, patternify($attribs{FILES})) if $attribs{FILES};
@@ -776,6 +764,42 @@ clean ::
 	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
     join("", @m);
 }
+
+=item clean_subdirs_target
+
+MacOS semantics for changing directories and checking for existence
+very different than everyone else.
+
+=cut
+
+sub clean_subdirs_target {
+    my($self) = shift;
+
+    # No subdirectories, no cleaning.
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+clean_subdirs :
+	$(NOECHO)$(NOOP)
+NOOP_FRAG
+
+
+    my $clean = "clean_subdirs :\n";
+
+    for my $dir (@{$self->{DIR}}) {
+        $clean .= sprintf <<'MAKE_FRAG', $dir;
+	Set OldEcho {Echo}
+	Set Echo 0
+	Directory %s
+	If "`Exists -f $(MAKEFILE)`" != ""
+	    $(MAKE) clean
+	End
+	Set Echo {OldEcho}
+	
+MAKE_FRAG
+    }
+
+    return $clean;
+}
+
 
 =item realclean (o)
 

@@ -27,13 +27,14 @@ to get MakeMaker playing nice with command.com and other Win9Xisms.
 =head2 Overriden methods
 
 Most of these make up for limitations in the Win9x command shell.
+Namely the lack of && and that a chdir is global, so you have to chdir
+back at the end.
 
 =over 4
 
 =item dist_test
 
-command.com has no &&, so we must chdir at the top of the target and
-chdir back at the end.
+&& and chdir problem.
 
 =cut
 
@@ -51,7 +52,7 @@ disttest : distdir
 
 =item subdir_x
 
-The && problem.
+&& and chdir problem.
 
 Also, dmake has an odd way of making a command series silent.
 
@@ -130,5 +131,37 @@ sub xs_o {
 	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.c
 	';
 }
+
+=item clean_subdirs_target
+
+&& and chdir problem.
+
+=cut
+
+sub clean_subdirs_target {
+    my($self) = shift;
+
+    # No subdirectories, no cleaning.
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+clean_subdirs :
+	$(NOECHO)$(NOOP)
+NOOP_FRAG
+
+
+    my $clean = "clean_subdirs :\n";
+
+    for my $dir (@{$self->{DIR}}) {
+        $clean .= sprintf <<'MAKE_FRAG', $dir;
+	cd %s
+	$(TEST_F) $(MAKEFILE)
+	$(MAKE) clean
+	cd ..
+MAKE_FRAG
+    }
+
+    return $clean;
+}
+    
+
 
 1;
