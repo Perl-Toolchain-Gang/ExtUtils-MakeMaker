@@ -1674,7 +1674,6 @@ usually solves this kind of problem.
 	$self->{VERSION} = $self->parse_version($self->{VERSION_FROM}) or
 	    Carp::carp "WARNING: Setting VERSION via file '$self->{VERSION_FROM}' failed\n"
     }
-    $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION}";
 
     # strip blanks
     if ($self->{VERSION}) {
@@ -1685,6 +1684,7 @@ usually solves this kind of problem.
     $self->{VERSION} ||= "0.10";
     ($self->{VERSION_SYM} = $self->{VERSION}) =~ s/\W/_/g;
 
+    $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION}";
 
     # Graham Barr and Paul Marquess had some ideas how to ensure
     # version compatibility between the *.pm file and the

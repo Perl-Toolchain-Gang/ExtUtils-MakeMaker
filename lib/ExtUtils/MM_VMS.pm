@@ -332,6 +332,20 @@ sub replace_manpage_separator {
     $man;
 }
 
+=item init_main (override)
+
+Override DISTVNAME so it uses VERSION_SYM to avoid getting too many
+dots in the name.
+
+=cut
+
+sub init_main {
+    my($self) = shift;
+
+    $self->SUPER::init_main;
+    $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION_SYM}";
+}
+
 =item init_others (override)
 
 Provide VMS-specific forms of various utility commands, then hand
@@ -946,6 +960,8 @@ sub dist {
     # Sanitize these for use in $(DISTVNAME) filespec
     $attribs{VERSION} =~ s/[^\w\$]/_/g;
     $attribs{NAME} =~ s/[^\w\$]/-/g;
+
+    $attribs{DISTVNAME} ||= '$(DISTNAME)-$(VERSION_SYM)';
 
     return $self->SUPER::dist(%attribs);
 }
