@@ -5,7 +5,6 @@ NOTES
 README
 TODO
 bin/instmodsh
-bin/xsubpp
 lib/ExtUtils/Command.pm
 lib/ExtUtils/Command/MM.pm
 lib/ExtUtils/Constant.pm
@@ -34,7 +33,6 @@ lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/Packlist.pm
 lib/ExtUtils/testlib.pm
-lib/ExtUtils/typemap
 t/Big-Fat-Dummy/Makefile.PL
 t/Big-Fat-Dummy/lib/Big/Fat/Dummy.pm
 t/Big-Fat-Dummy/t/compile.t
