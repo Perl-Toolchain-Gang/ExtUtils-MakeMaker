@@ -758,7 +758,7 @@ clean ::
 "	Set OldEcho \{Echo\}
 	Set Echo 0
 	Directory $dir
-	If \"\`Exists -f $self->{MAKEFILE}\`\" != \"\"
+	If \"\`Exists -f \$(MAKEFILE)\`\" != \"\"
 	    \$(MAKE) clean
 	End
 	Set Echo \{OldEcho\}
@@ -770,7 +770,7 @@ clean ::
     push @m, "\t\$(RM_RF) @otherfiles\n";
     # See realclean and ext/utils/make_ext for usage of Makefile.old
     push(@m,
-	 "\t\$(MV) $self->{MAKEFILE} $self->{MAKEFILE}.old\n");
+	 "\t\$(MV) \$(MAKEFILE) \$(MAKEFILE).old\n");
     push(@m,
 	 "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
     join("", @m);
@@ -800,11 +800,11 @@ realclean purge ::  clean
 	Set Echo \{OldEcho\}
 	";
     foreach(@{$self->{DIR}}){
-	push(@m, sprintf($sub,$_,"$self->{MAKEFILE}.old","-f $self->{MAKEFILE}.old"));
-	push(@m, sprintf($sub,$_,"$self->{MAKEFILE}",''));
+	push(@m, sprintf($sub,$_,'$(MAKEFILE).old','-f $(MAKEFILE).old"));
+	push(@m, sprintf($sub,$_,'$(MAKEFILE)',''));
     }
-    my(@otherfiles) = ($self->{MAKEFILE},
-		       "$self->{MAKEFILE}.old"); # Makefiles last
+    my(@otherfiles) = ('$(MAKEFILE),
+		       '$(MAKEFILE).old'); # Makefiles last
     push(@otherfiles, patternify($attribs{FILES})) if $attribs{FILES};
     push(@m, "\t\$(RM_RF) @otherfiles\n") if @otherfiles;
     push(@m, "\t$attribs{POSTOP}\n")       if $attribs{POSTOP};

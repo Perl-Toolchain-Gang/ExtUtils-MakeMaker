@@ -338,7 +338,7 @@ BOOTSTRAP = '."$self->{BASEEXT}.bs".'
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP): '."$self->{MAKEFILE} $self->{BOOTDEP}".' $(INST_ARCHAUTODIR)\.exists
+$(BOOTSTRAP): $(MAKEFILE) '.$self->{BOOTDEP}.' $(INST_ARCHAUTODIR)\.exists
 	'.$self->{NOECHO}.'echo "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	'.$self->{NOECHO}.'$(PERLRUN) \
 		-MExtUtils::Mkbootstrap \
@@ -605,7 +605,7 @@ pure_all :: config pm_to_blib subdirs linkext
 subdirs :: $(MYEXTLIB)
 	'.$self->{NOECHO}.'$(NOOP)
 
-config :: '.$self->{MAKEFILE}.' $(INST_LIBDIR)\.exists
+config :: $(MAKEFILE) $(INST_LIBDIR)\.exists
 	'.$self->{NOECHO}.'$(NOOP)
 
 config :: $(INST_ARCHAUTODIR)\.exists
@@ -677,7 +677,7 @@ sub dist_core {
     push @m, q{
 dist : $(DIST_DEFAULT)
 	}.$self->{NOECHO}.q{$(PERL) -le "print \"Warning: Makefile possibly out of date with $$vf\" if " \
-	    -e "-e ($$vf=\"$(VERSION_FROM)\") and -M $$vf < -M \"}.$self->{MAKEFILE}.q{\";"
+	    -e "-e ($$vf=\"$(VERSION_FROM)\") and -M $$vf < -M \"$(MAKEFILE)\";"
 
 tardist : $(DISTVNAME).tar$(SUFFIX)
 
