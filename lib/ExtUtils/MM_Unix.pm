@@ -3411,56 +3411,73 @@ sub realclean {
 
     push(@m,'
 # Delete temporary files (via clean) and also delete installed files
-realclean purge ::  clean
+realclean purge ::  clean realclean_subdirs
+	$(RM_RF) $(INST_AUTODIR) $(INST_ARCHAUTODIR)
+	$(RM_RF) $(DISTVNAME)
 ');
-    # realclean subdirectories first (already cleaned)
-    my $sub;
-    if( $Is_Win95 ) {
-        $sub = <<'REALCLEAN';
-	-cd %s
-	-$(PERLRUN) -e "exit unless -f shift; system q{$(MAKE) realclean}" %s
-	-cd ..
-REALCLEAN
-    }
-    else {
-        $sub = <<'REALCLEAN';
-	-cd %s && $(TEST_F) %s && $(MAKE) %s realclean
-REALCLEAN
-    }
 
-    foreach(@{$self->{DIR}}){
-	push(@m, sprintf($sub,$_,'$(MAKEFILE_OLD)','-f $(MAKEFILE_OLD)'));
-	push(@m, sprintf($sub,$_,'$(MAKEFILE)',''));
-    }
-    push(@m, "	\$(RM_RF) \$(INST_AUTODIR) \$(INST_ARCHAUTODIR)\n");
-    push(@m, "	\$(RM_RF) \$(DISTVNAME)\n");
     if( $self->has_link_code ){
         push(@m, "	\$(RM_F) \$(INST_DYNAMIC) \$(INST_BOOT)\n");
         push(@m, "	\$(RM_F) \$(INST_STATIC)\n");
     }
+
+    my(@files) = (values %{$self->{PM}});
+    push @files, $attribs{FILES} if $attribs{FILES};
+    push @files, '$(MAKEFILE)', '$(MAKEFILE_OLD)';
+
+    # Occasionally files are repeated several times from different sources
+    { my(%f) = map { ($_,1) } @files; @files = keys %f; }
+
     # Issue a several little RM_F commands rather than risk creating a
     # very long command line (useful for extensions such as Encode
     # that have many files).
-    if (keys %{$self->{PM}}) {
-	my $line = "";
-	foreach (values %{$self->{PM}}) {
-	    if (length($line) + length($_) > 80) {
-		push @m, "\t$self->{RM_F} $line\n";
-		$line = $_;
-	    }
-	    else {
-		$line .= " $_"; 
-	    }
-	}
-        push @m, "\t\$(RM_F) $line\n" if $line;
+    my $line = "";
+    foreach my $file (@files) {
+        if (length($line) + length($file) > 200) {
+            push @m, "\t\$(RM_F) $line\n";
+            $line = $file;
+        }
+        else {
+            $line .= " $file"; 
+        }
     }
-    my(@otherfiles) = ('$(MAKEFILE)',
-		       '$(MAKEFILE_OLD)'); # Makefiles last
-    push(@otherfiles, $attribs{FILES})    if $attribs{FILES};
-    push(@m, "	\$(RM_RF) @otherfiles\n") if @otherfiles;
-    push(@m, "	$attribs{POSTOP}\n")      if $attribs{POSTOP};
+    push @m, "\t\$(RM_F) $line\n" if $line;
+    push(@m, "\t$attribs{POSTOP}\n")      if $attribs{POSTOP};
+
     join("", @m);
 }
+
+
+=item realclean_subdirs_target
+
+  my $make_frag = $MM->realclean_subdirs_target;
+
+Returns the realclean_subdirs target.  This is used by the realclean
+target to call realclean on any subdirectories which contain Makefiles.
+
+=cut
+
+sub realclean_subdirs_target {
+    my $self = shift;
+
+    return <<'NOOP_FRAG' unless @{$self->{DIR}};
+realclean_subdirs :
+	$(NOECHO)$(NOOP)
+NOOP_FRAG
+
+    my $rclean = "realclean_subdirs :\n";
+
+    foreach my $dir (@{$self->{DIR}}){
+        $rclean .= sprintf <<'RCLEAN', $dir, $dir;
+	-cd %s && $(TEST_F) $(MAKEFILE_OLD) && $(MAKE) -f $(MAKEFILE_OLD) realclean
+	-cd %s && $(TEST_F) $(MAKEFILE) && $(MAKE) realclean
+RCLEAN
+
+    }
+
+    return $rclean;
+}
+
 
 =item replace_manpage_separator
 
