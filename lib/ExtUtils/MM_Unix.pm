@@ -922,7 +922,7 @@ sub distdir {
     my($self) = shift;
 
     return <<'MAKE_FRAG';
-distdir : metayaml metayaml_addtomanifest
+distdir : metafile metafile_addtomanifest
 	$(RM_RF) $(DISTVNAME)
 	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
@@ -3282,46 +3282,38 @@ sub ppd {
     my $author = $self->{AUTHOR} || '';
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
-    $author =~ s/@/\\@/g;
 
     my $ppd_xml = sprintf <<'PPD_HTML', $pack_ver, $abstract, $author;
-<SOFTPKG NAME="$(DISTNAME)" VERSION="%s">\n\t<TITLE>$(DISTNAME)</TITLE>\n\t<ABSTRACT>%s</ABSTRACT>\n\t<AUTHOR>%s</AUTHOR>\n
+<SOFTPKG NAME="$(DISTNAME)" VERSION="%s">
+    <TITLE>$(DISTNAME)</TITLE>
+    <ABSTRACT>%s</ABSTRACT>
+    <AUTHOR>%s</AUTHOR>
 PPD_HTML
 
-    # strip off that trailing newline.
-    chomp $ppd_xml;
-
-    my @ppd_oneliners = (); 
-    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}});
-
-    $ppd_xml = '\t<IMPLEMENTATION>\n';
+    $ppd_xml .= "    <IMPLEMENTATION>\n";
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
         my ($dep_ver) = join ",", (split (/\./, $self->{PREREQ_PM}{$prereq}), 
                                   (0) x 4) [0 .. 3];
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
-\t\t<DEPENDENCY NAME="%s" VERSION="%s" />\n
+        <DEPENDENCY NAME="%s" VERSION="%s" />
 PPD_OUT
 
-        chomp $ppd_xml;
     }
 
-    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}});
-
-    $ppd_xml = sprintf <<'PPD_OUT', $Config{archname};
-\t\t<OS NAME="$(OSNAME)" />\n\t\t<ARCHITECTURE NAME="%s" />\n
+    $ppd_xml .= sprintf <<'PPD_OUT', $Config{archname};
+        <OS NAME="$(OSNAME)" />
+        <ARCHITECTURE NAME="%s" />
 PPD_OUT
-
-    chomp $ppd_xml;
 
     if ($self->{PPM_INSTALL_SCRIPT}) {
         if ($self->{PPM_INSTALL_EXEC}) {
-            $ppd_xml .= sprintf q{\t\t<INSTALL EXEC="%s">%s</INSTALL>\n},
+            $ppd_xml .= sprintf qq{        <INSTALL EXEC="%s">%s</INSTALL>\n},
                   $self->{PPM_INSTALL_EXEC}, $self->{PPM_INSTALL_SCRIPT};
         }
         else {
-            $ppd_xml .= sprintf q{\t\t<INSTALL>%s</INSTALL>\n}, 
+            $ppd_xml .= sprintf qq{        <INSTALL>%s</INSTALL>\n}, 
                   $self->{PPM_INSTALL_SCRIPT};
         }
     }
@@ -3330,19 +3322,17 @@ PPD_OUT
     $bin_location =~ s/\\/\\\\/g;
 
     $ppd_xml .= sprintf <<'PPD_XML', $bin_location;
-\t\t<CODEBASE HREF="%s" />\n\t</IMPLEMENTATION>\n</SOFTPKG>\n
+        <CODEBASE HREF="%s" />
+    </IMPLEMENTATION>
+</SOFTPKG>
 PPD_XML
 
-    chomp $ppd_xml;
+    my @ppd_cmds = $self->echo($ppd_xml, '$(DISTNAME).ppd');
 
-    push @ppd_oneliners, $self->oneliner(qq{print qq{$ppd_xml}});
-
-    return sprintf <<'PPD_OUT', @ppd_oneliners;
+    return sprintf <<'PPD_OUT', join "\n\t", @ppd_cmds;
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	$(NOECHO) %s >  $(DISTNAME).ppd
-	$(NOECHO) %s >> $(DISTNAME).ppd
-	$(NOECHO) %s >> $(DISTNAME).ppd
+	%s
 PPD_OUT
 
 }
