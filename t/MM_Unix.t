@@ -164,8 +164,8 @@ is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 ###############################################################################
 # libscan
 
-is ($t->libscan('RCS'),'','libscan on RCS');
-is ($t->libscan('CVS'),'','libscan on CVS');
+is ($t->libscan('foo/RCS/bar'),'','libscan on RCS');
+is ($t->libscan('CVS/bar/car'),'','libscan on CVS');
 is ($t->libscan('SCCS'),'','libscan on SCCS');
 is ($t->libscan('Fatty'),'Fatty','libscan on something not RCS, CVS or SCCS');
 
