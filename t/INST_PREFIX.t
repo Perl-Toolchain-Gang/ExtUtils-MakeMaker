@@ -122,6 +122,7 @@ foreach my $var (@Vend_Install) {
                            INSTALLMAN1DIR=> 'wibble/and/such'
                           );
 
-    is( $mm->{INSTALLMAN1DIR}, 'wibble/and/such' );
-    is( $mm->{INSTALLMAN3DIR}, 'none'            );
+    my $wibble = File::Spec->catdir(qw(wibble and such));
+    is( $mm->{INSTALLMAN1DIR}, $wibble );
+    is( $mm->{INSTALLMAN3DIR}, 'none'  );
 }
