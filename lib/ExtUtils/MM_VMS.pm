@@ -20,7 +20,8 @@ BEGIN {
 
 use File::Basename;
 use vars qw($Revision @ISA $VERSION);
-($VERSION) = $Revision = '5.66';
+($VERSION) = '5.66';
+($Revision = substr(q$Revision: 1.76 $, 10)) =~ s/\s+$//;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -2055,7 +2056,7 @@ sub prefixify {
 
     # Translate $(PERLPREFIX) to a real path.
     $rprefix = $self->eliminate_macros($rprefix);
-    $rprefix = VMS::Filespec::vmsify($rprefix) if $rprefix;
+    $rprefix = VMS::Filespec::vmspath($rprefix) if $rprefix;
 
     $default = VMS::Filespec::vmsify($default) 
       unless $default =~ /\[.*\]/;
