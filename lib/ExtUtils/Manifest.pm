@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA @EXPORT_OK
           $Is_MacOS $Is_VMS 
           $Debug $Verbose $Quiet $MANIFEST $DEFAULT_MSKIP);
 
-$VERSION = 1.39;
+$VERSION = 1.40;
 @ISA=('Exporter');
 @EXPORT_OK = qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
@@ -539,14 +539,17 @@ sub maniadd {
     _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
-    open(MANIFEST, ">>$MANIFEST") or die "Could not open $MANIFEST: $!";
+    my $is_open;
     foreach my $file (_sort keys %$additions) {
         next if exists $manifest->{$file};
+
+        $is_open++ or open(MANIFEST, ">>$MANIFEST") or 
+          die "Could not open $MANIFEST: $!";
 
         my $comment = $additions->{$file} || '';
         printf MANIFEST "%-40s%s\n", $file, $comment;
     }
-    close MANIFEST;
+    close MANIFEST if $is_open;
 }
 
 
