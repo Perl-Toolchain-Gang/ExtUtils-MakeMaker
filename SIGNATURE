@@ -14,8 +14,8 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 9b52b3e5ba2f5156fb4954736bb87838166bedd2 .patch
-SHA1 ddc921c83cfc0f416c22f52d93bbbccb43d82982 Changes
+SHA1 05325a673db0a1d38bb98551c85360cbdf316b9b .patch
+SHA1 bd755cfed84d37ff00430d9048d566a2743a7c5c Changes
 SHA1 9a5818da277e4c4d34dbb5011d3073b495ee37e8 MANIFEST
 SHA1 001ec2e096a338ed14c59807bc4cae471c431ea2 MANIFEST.SKIP
 SHA1 86b2321ecbc3ad0ab4b9a7cbf0485645345f2170 META.yml
@@ -89,7 +89,7 @@ SHA1 2ecd285b33d58e4f48d6f087485e2a66449eae3e t/lib/Test/Simple.pm
 SHA1 6af56f0c51707d326afe417f2acd9fd8101653c7 t/lib/TieIn.pm
 SHA1 0251fa1e6af99f87c60971c640ceb903f929bb6d t/lib/TieOut.pm
 SHA1 29c6e5d3c4c05a99a162ce1bb88687ff856777c5 t/oneliner.t
-SHA1 06c4dadf05590deca581b4cd7d1af6b9b3c965d8 t/parse_version.t
+SHA1 188c3ee2912311978d828951c1eeab4bdc103f86 t/parse_version.t
 SHA1 aaac8d9122c352fc9273fce97262c5705c7016fa t/postamble.t
 SHA1 d972a6edecb41ea54d912eb8403d174590ebfe76 t/prefixify.t
 SHA1 6606845cbea67fe5738b966b1c02024690065fa2 t/prereq_print.t
@@ -103,7 +103,7 @@ SHA1 4a7685da6367a7a79ecfac76f96adf2aeac46514 t/writemakefile_args.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2 (Darwin)
 
-iD8DBQFAbwVZT4Li3Cw/PzQRAmx+AJ95R5paztfzRRfDFDVmP+VsJT4nQgCdH3hZ
-N6orlxlBW/aom4uShj6vSXo=
-=zh3H
+iD8DBQFAbyuMT4Li3Cw/PzQRAh5BAKCBh9faUEawuPUwZSX2w5lkcK8XFACfR2yP
+uA4BdgEKyBUT38+ZP4JzaRs=
+=+UHk
 -----END PGP SIGNATURE-----
