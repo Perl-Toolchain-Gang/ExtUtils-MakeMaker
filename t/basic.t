@@ -54,7 +54,7 @@ print eval "use Big::Fat::Dummy; 1;" ? "ok 1\n" : "not ok 1\n";
 print eval "use Big::Fat::Liar; 1;" ? "ok 2\n" : "not ok 2\n";
 print "ok 3 - TEST_VERBOSE\n";
 SANITY_T
-
+close TEST;
 
 END { unlink 't/compile.t', 'Liar/t/sanity.t' }
 
