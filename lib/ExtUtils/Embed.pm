@@ -1,5 +1,5 @@
-# $Id: Embed.pm,v 1.2 2002/01/22 00:22:20 schwern Exp $
-require 5.002;
+# $Id: Embed.pm,v 1.3 2002/01/31 00:15:05 schwern Exp $
+require 5.006_001;
 
 package ExtUtils::Embed;
 require Exporter;
