@@ -5,7 +5,7 @@ package ExtUtils::MakeMaker;
 $VERSION = "5.55_01";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.24 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.25 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -1760,7 +1760,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.24 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.25 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2078,7 +2078,7 @@ ExtUtils::Embed
 =head1 AUTHORS
 
 Andy Dougherty <F<doughera@lafayette.edu>>, Andreas KE<ouml>nig
-<F<andreas.koenig@mind.de>>, Tim Bunce <F<Tim.Bunce@ig.co.uk>>.  VMS
+<F<andreas.koenig@mind.de>>, Tim Bunce <F<timb@cpan.org>>.  VMS
 support by Charles Bailey <F<bailey@newman.upenn.edu>>.  OS/2 support
 by Ilya Zakharevich <F<ilya@math.ohio-state.edu>>.
 
