@@ -36,6 +36,8 @@
     - hint.t generating improperly named hint files on OS's where $^O
       contains a '.'.  They should be converted to underscores.  Test
       mistake, not a bug.  [rt 5365]
+    - Fixed ExtUtils::Command::chmod() so it will work on directories on
+      VMS. [rt 4676]
 
 6.21 Tue Nov 11 00:12:56 PST 2003
     - NetBSD was looking in INSTALLARCHLIB/CORE for libperl instead of 
