@@ -685,7 +685,9 @@ L<ExtUtils::MakeMaker> which has handy targets for most of the functionality.
 
 =head1 AUTHOR
 
-Andreas Koenig <F<andreas.koenig@anima.de>>
+Andreas Koenig C<andreas.koenig@anima.de>
+
+Currently maintained by Michael G Schwern C<schwern@pobox.com>
 
 =cut
 

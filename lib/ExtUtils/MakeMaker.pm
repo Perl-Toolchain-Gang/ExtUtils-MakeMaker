@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.18';
-($Revision) = q$Revision: 1.137 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.138 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -2053,7 +2053,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.137 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.138 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2205,7 +2205,7 @@ for embedding.
 
 If you still need a different solution, try to develop another
 subroutine that fits your needs and submit the diffs to
-F<makemaker@perl.org>
+C<makemaker@perl.org>
 
 For a complete description of all MakeMaker methods see
 L<ExtUtils::MM_Unix>.
@@ -2453,26 +2453,26 @@ ExtUtils::Embed
 
 =head1 AUTHORS
 
-Andy Dougherty <F<doughera@lafayette.edu>>, Andreas KE<ouml>nig
-<F<andreas.koenig@mind.de>>, Tim Bunce <F<timb@cpan.org>>.  VMS
-support by Charles Bailey <F<bailey@newman.upenn.edu>>.  OS/2 support
-by Ilya Zakharevich <F<ilya@math.ohio-state.edu>>.
+Andy Dougherty C<doughera@lafayette.edu>, Andreas KE<ouml>nig
+C<andreas.koenig@mind.de>, Tim Bunce C<timb@cpan.org>.  VMS
+support by Charles Bailey C<bailey@newman.upenn.edu>.  OS/2 support
+by Ilya Zakharevich C<ilya@math.ohio-state.edu>.
 
-Currently maintained by Michael G Schwern <F<schwern@pobox.com>>
+Currently maintained by Michael G Schwern C<schwern@pobox.com>
 
-Send patches and ideas to <F<makemaker@perl.org>>.
+Send patches and ideas to C<makemaker@perl.org>.
 
 Send bug reports via http://rt.cpan.org/.  Please send your
 generated Makefile along with your report.
 
-For more up-to-date information, see http://www.makemaker.org.
+For more up-to-date information, see L<http://www.makemaker.org>.
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or 
 modify it under the same terms as Perl itself.
 
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See L<http://www.perl.com/perl/misc/Artistic.html>
 
 
 =cut

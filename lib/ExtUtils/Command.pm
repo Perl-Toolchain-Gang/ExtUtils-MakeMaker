@@ -246,7 +246,9 @@ ExtUtils::MakeMaker, ExtUtils::MM_Unix, ExtUtils::MM_Win32
 
 =head1 AUTHOR
 
-Nick Ing-Simmons <F<nick@ni-s.u-net.com>>.
+Nick Ing-Simmons C<ni-s@cpan.org>
+
+Currently maintained by Michael G Schwern C<schwern@pobox.com>.
 
 =cut
 
