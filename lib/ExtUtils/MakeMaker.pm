@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = "6.10_01";
-($Revision = substr(q$Revision: 1.106 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.107 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -15,6 +15,7 @@ use vars qw(
             $Revision $VERSION $Verbose %Config 
             @Prepend_parent @Parent
             %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
+            $Filename
            );
 use strict;
 
@@ -26,6 +27,10 @@ use strict;
 # purged.
 my $Is_VMS     = $^O eq 'VMS';
 my $Is_Win32   = $^O eq 'MSWin32';
+
+# Our filename for diagnostic and debugging purposes.  More reliable
+# than %INC (think caseless filesystems)
+$Filename = __FILE__;
 
 full_setup();
 
@@ -2011,7 +2016,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.106 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.107 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 

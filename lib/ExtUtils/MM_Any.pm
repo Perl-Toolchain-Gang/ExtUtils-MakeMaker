@@ -213,7 +213,7 @@ Called by init_main.
 sub init_VERSION {
     my($self) = shift;
 
-    $self->{MAKEMAKER}  = $INC{'ExtUtils/MakeMaker.pm'};
+    $self->{MAKEMAKER}  = $ExtUtils::MakeMaker::Filename;
     $self->{MM_VERSION} = $ExtUtils::MakeMaker::VERSION;
     $self->{MM_REVISION}= $ExtUtils::MakeMaker::Revision;
     $self->{VERSION_FROM} ||= '';
