@@ -384,6 +384,8 @@ sub init_others {
     $self->{MV} = 'Rename/NoConfirm';
     $self->{UMASK_NULL} = '! ';  
 
+    $self->SUPER::init_others;
+
     if ($self->{OBJECT} =~ /\s/) {
         $self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
         $self->{OBJECT} = $self->wraplist(
@@ -394,8 +396,6 @@ sub init_others {
     $self->{LDFROM} = $self->wraplist(
         map $self->fixpath($_,0), split /,?\s+/, $self->{LDFROM}
     );
-    
-    $self->SUPER::init_others;
 }
 
 
@@ -879,9 +879,10 @@ sub init_dist {
     $self->{SUFFIX}       ||= '-gz';
     $self->{SHAR}         ||= 'vms_share';
     $self->{DIST_DEFAULT} ||= 'zipdist';
-    $self->{DISTVNAME}    ||= "$self->{DISTNAME}-$self->{VERSION_SYM}";
 
     $self->SUPER::init_dist;
+
+    $self->{DISTVNAME}    = "$self->{DISTNAME}-$self->{VERSION_SYM}";
 }
 
 =item c_o (override)
@@ -1511,8 +1512,8 @@ doc__install : doc_site_install
 
 # This hack brought to you by DCL's 255-character command line limit
 pure_perl_install ::
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.$self->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLPRIVLIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLARCHLIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLBIN) '" >>.MM_tmp
@@ -1525,8 +1526,8 @@ pure_perl_install ::
 
 # Likewise
 pure_site_install ::
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.$self->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_LIB) $(INSTALLSITELIB) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_ARCHLIB) $(INSTALLSITEARCH) '" >>.MM_tmp
 	$(NOECHO) $(PERL) -e "print '$(INST_BIN) $(INSTALLSITEBIN) '" >>.MM_tmp
