@@ -119,7 +119,7 @@ sub split_command {
                 $arg_str .= $next_arg_str
             }
             elsif( length($arg_str) + length($next_arg_str) > $len_left ) {
-                push @args, @next_args;
+                unshift @args, @next_args;
                 last;
             }
             else {
