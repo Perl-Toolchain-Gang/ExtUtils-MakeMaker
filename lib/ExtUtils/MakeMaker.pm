@@ -5,7 +5,7 @@ BEGIN {require 5.005_03;}
 $VERSION = "6.05";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.77 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.78 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -236,13 +236,17 @@ sub full_setup {
     @MM_Sections = 
         qw(
 
- post_initialize const_config constants tool_autosplit tool_xsubpp
- tools_other dist macro depend cflags const_loadlibs const_cccmd
+ post_initialize const_config constants platform_constants 
+ tool_autosplit tool_xsubpp tools_other 
+ dist macro depend cflags const_loadlibs const_cccmd
  post_constants
 
  pasthru
 
- c_o xs_c xs_o top_targets linkext dlsyms dynamic dynamic_bs
+ makemakerdflt
+ special_targets
+ c_o xs_c xs_o
+ top_targets linkext dlsyms dynamic dynamic_bs
  dynamic_lib static static_lib manifypods processPL
  installbin subdirs
  clean_subdirs clean realclean 
@@ -448,6 +452,8 @@ sub new {
     ($self->{NAME_SYM} = $self->{NAME}) =~ s/\W+/_/g;
 
     $self->init_main();
+    $self->init_DIRFILESEP();
+    $self->init_VERSION();
 
     if (! $self->{PERL_SRC} ) {
         require VMS::Filespec if $Is_VMS;
@@ -476,6 +482,7 @@ END
 
     $self->init_dirscan();
     $self->init_others();
+    $self->init_platform();
     $self->init_PERM();
     my($argv) = neatvalue(\@ARGV);
     $argv =~ s/^\[/(/;
@@ -1947,7 +1954,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.77 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.78 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
