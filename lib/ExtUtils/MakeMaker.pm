@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker;
 BEGIN {require 5.005_03;}
 
 $VERSION = '6.18';
-($Revision) = q$Revision: 1.139 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 1.140 $ =~ /Revision:\s+(\S+)/;
 
 require Exporter;
 use Config;
@@ -167,9 +167,11 @@ sub eval_in_subdirs {
 
     foreach my $dir (@{$self->{DIR}}){
         my($abs) = $self->catdir($pwd,$dir);
-        $self->eval_in_x($abs);
+        eval { $self->eval_in_x($abs); };
+        last if $@;
     }
     chdir $pwd;
+    die $@ if $@;
 }
 
 sub eval_in_x {
@@ -2062,7 +2064,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = sprintf "%d.%03d", q$Revision: 1.139 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%03d", q$Revision: 1.140 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
