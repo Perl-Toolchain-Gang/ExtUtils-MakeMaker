@@ -142,7 +142,7 @@ ok ( join (' ', $class->dist_basics()), 'distclean :: realclean distcheck');
 ###############################################################################
 # has_link_code tests
 
-my $t = {}; bless $t,$class;
+my $t = bless { NAME => "Foo" }, $class;
 $t->{HAS_LINK_CODE} = 1; 
 is ($t->has_link_code(),1,'has_link_code'); is ($t->{HAS_LINK_CODE},1);
 
