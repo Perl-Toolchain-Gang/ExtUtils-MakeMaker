@@ -524,7 +524,7 @@ sub dir_target {
     my $make = '';
     foreach my $dir (@dirs) {
         $make .= sprintf <<'MAKE', ($dir) x 7;
-%s$(DFSEP).exists :
+%s$(DFSEP).exists ::
 	$(NOECHO) $(MKPATH) %s
 	$(NOECHO) $(CHMOD) 755 %s
 	$(NOECHO) $(TOUCH) %s$(DFSEP).exists
@@ -770,6 +770,13 @@ sub realclean {
 
     my @dirs  = qw($(DISTVNAME));
     my @files = qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
+
+    # Special exception for the perl core where INST_* is not in blib.
+    # This cleans up the files built from the ext/ directory (all XS).
+    if( $self->{PERL_CORE} ) {
+	push @dirs, qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
+        push @files, values %{$self->{PM}};
+    }
 
     if( $self->has_link_code ){
         push @files, qw($(OBJECT));
