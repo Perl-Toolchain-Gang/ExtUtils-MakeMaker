@@ -7,6 +7,8 @@ $VERSION = '0.02';
 require ExtUtils::MM_Unix;
 @ISA = qw(ExtUtils::MM_Unix);
 
+use ExtUtils::MakeMaker qw(neatvalue);
+
 
 =head1 NAME
 
