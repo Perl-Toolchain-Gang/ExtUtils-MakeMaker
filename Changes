@@ -2,6 +2,8 @@
     - Fix realclean so it cleans up files installed from ext/ in the core
     - Fix dir_target() so it doesn't warn should any of the INST_* paths
       be the same (as with the ext/ modules in the core)
+    - Fix MANIFEST.SKIP so it skips not just _darcs/ but everything inside
+      it and any which happen to be in subdirs.
 
 6.27  Mon Apr  4 16:36:14 PDT 2005
     * Added _darcs to the list of revision control administrative 
