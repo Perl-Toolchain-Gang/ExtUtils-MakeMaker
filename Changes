@@ -6,6 +6,7 @@
       it and any which happen to be in subdirs.
     - MM_AIX forgot to import neatvalue() from E::MakeMaker. 
       (bleadperl@24185)
+    - Fixed a minor C<<>> POD nit (Scott Lanning)
 
 6.27  Mon Apr  4 16:36:14 PDT 2005
     * Added _darcs to the list of revision control administrative 

@@ -2262,13 +2262,13 @@ Some of the most common mistakes:
 
 =over 2
 
-=item C<<MAN3PODS => ' '>>
+=item C<< MAN3PODS => ' ' >>
 
 This is commonly used to supress the creation of man pages.  MAN3PODS
 takes a hash ref not a string, but the above worked by accident in old
 versions of MakeMaker.
 
-The correct code is C<<MAN3PODS => { }>>.
+The correct code is C<< MAN3PODS => { } >>.
 
 =back
 
