@@ -1883,7 +1883,7 @@ This behavior can be overridden by supplying your own set of files to
 search.  PL_FILES accepts a hash ref, the key being the file to run
 and the value is passed in as the first argument when the PL file is run.
 
-  PL_FILES => {'bin/foobar.PL' => 'bin/foobar'}
+    PL_FILES => {'bin/foobar.PL' => 'bin/foobar'}
 
 Would run bin/foobar.PL like this:
 
@@ -1891,13 +1891,15 @@ Would run bin/foobar.PL like this:
 
 If multiple files from one program are desired an array ref can be used.
 
-  PL_FILES => {'bin/foobar.PL' => [qw(bin/foobar1 bin/foobar2)]}
+    PL_FILES => {'bin/foobar.PL' => [qw(bin/foobar1 bin/foobar2)]}
 
 In this case the program will be run multiple times using each target file.
 
     perl bin/foobar.PL bin/foobar1
     perl bin/foobar.PL bin/foobar2
 
+PL files are run B<before> pm_to_blib so the result is considered for
+copying into blib like a normal file.
 
 =item PM
 
@@ -2473,6 +2475,10 @@ is processed before any actual command line arguments are processed.
 
 If set to a true value then MakeMaker's prompt function will
 always return the default without waiting for user input.
+
+=item PERL_CORE
+
+Same as the PERL_CORE parameter.  The parameter overrides this.
 
 =back
 

@@ -1,3 +1,6 @@
+6.29
+    - Now honors PERL_CORE environment variable.
+
 6.28  Tue Apr 12 16:17:07 PDT 2005
     - Fix realclean so it cleans up files installed from ext/ in the core
     - Fix dir_target() so it doesn't warn should any of the INST_* paths
