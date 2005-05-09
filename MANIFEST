@@ -48,6 +48,7 @@ t/bytes.t
 t/Command.t
 t/config.t
 t/dir_target.t
+t/FIRST_MAKEFILE.t
 t/hints.t
 t/INST.t
 t/INST_PREFIX.t
