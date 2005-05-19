@@ -1898,8 +1898,9 @@ In this case the program will be run multiple times using each target file.
     perl bin/foobar.PL bin/foobar1
     perl bin/foobar.PL bin/foobar2
 
-PL files are run B<before> pm_to_blib so the result is considered for
-copying into blib like a normal file.
+PL files are run B<after> pm_to_blib and include INST_LIB and INST_ARCH
+in its C<@INC> so the just built modules can be accessed.
+
 
 =item PM
 

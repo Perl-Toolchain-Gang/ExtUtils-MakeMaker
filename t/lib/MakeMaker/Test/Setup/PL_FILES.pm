@@ -23,14 +23,25 @@ WriteMakefile(
 );
 END
 
-	     'PL_FILES-Module/single.PL' => _gen_pl_files(),
-	     'PL_FILES-Module/multi.PL'  => _gen_pl_files(),
+	     'PL_FILES-Module/single.PL'     => _gen_pl_files(),
+	     'PL_FILES-Module/multi.PL'      => _gen_pl_files(),
+	     'PL_FILES-Module/lib/PL/Foo.pm' => <<'END',
+# Module to load to ensure PL_FILES have blib in @INC.
+package PL::Foo;
+sub bar { 42 }
+1;
+END
+
 );
 
 
 sub _gen_pl_files {
     my $test = <<'END';
 #!/usr/bin/perl -w
+
+# Ensure we have blib in @INC
+use PL::Foo;
+die unless PL::Foo::bar() == 42;
 
 # Had a bug where PL_FILES weren't sent the file to generate
 die "argv empty\n" unless @ARGV;
