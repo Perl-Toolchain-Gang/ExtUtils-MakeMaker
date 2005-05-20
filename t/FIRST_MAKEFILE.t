@@ -10,7 +10,7 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More 'no_plan';
+use Test::More tests => 7;
 
 use MakeMaker::Test::Setup::BFD;
 use MakeMaker::Test::Utils;
