@@ -1,4 +1,4 @@
-6.30
+6.30  Fri May 20 16:05:38 PDT 2005
     * PL_FILES behavior tweak again to restore old behavior.  Sometimes its 
       supposed to run before pm_to_blib, sometimes after.
     - Some tests shipped with 'no_plan' which will break on older 
