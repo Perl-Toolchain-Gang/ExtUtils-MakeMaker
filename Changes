@@ -1,8 +1,13 @@
 6.31
     * Fixed compiling modules using an uninstalled Perl on Win32 by using
       the proper perl header location for Windows (which is different from
-      Unix).
-      [bugs.perl.org 36128]
+      Unix).  Looks like a very old bug.  [bugs.perl.org 36128]
+    - $ExtUtils::MakeMaker::Revision accidentally left in a stray "Revision".
+      [thanks pdx.pm for noticing this]
+    - Fixed the $VERSION = $Revision$ example in the MakeMaker docs and the
+      FAQ. [thanks again, pdx.pm]
+    - Elaborated on the differences between CVS, SVN and others when using
+      $Revision$ based $VERSIONs.
 
 6.30  Fri May 20 16:05:38 PDT 2005
     * PL_FILES behavior tweak again to restore old behavior.  Sometimes its 
