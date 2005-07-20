@@ -86,6 +86,7 @@ t/prereq_print.t
 t/problems.t
 t/prompt.t
 t/recurs.t
+t/revision.t
 t/split_command.t
 t/testlib.t
 t/VERSION_FROM.t
