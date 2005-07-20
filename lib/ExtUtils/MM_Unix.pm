@@ -1603,15 +1603,18 @@ from the perl source tree.
 	    and not $old){
 	    # Maybe somebody tries to build an extension with an
 	    # uninstalled Perl outside of Perl build tree
-	    my $found;
+	    my $lib;
 	    for my $dir (@INC) {
-	      $found = $dir, last if -e $self->catdir($dir, "Config.pm");
+	      $lib = $dir, last if -e $self->catdir($dir, "Config.pm");
 	    }
-	    if ($found) {
-	      my $inc = dirname $found;
+	    if ($lib) {
+              # Win32 puts its header files in /perl/src/lib/CORE.
+              # Unix leaves them in /perl/src.
+	      my $inc = $Is_Win32 ? $self->catdir($lib, "CORE" )
+                                  : dirname $lib;
 	      if (-e $self->catdir($inc, "perl.h")) {
-		$self->{PERL_LIB}	   = $found;
-		$self->{PERL_ARCHLIB}	   = $found;
+		$self->{PERL_LIB}	   = $lib;
+		$self->{PERL_ARCHLIB}	   = $lib;
 		$self->{PERL_INC}	   = $inc;
 		$self->{UNINSTALLED_PERL}  = 1;
 		print STDOUT <<EOP;
