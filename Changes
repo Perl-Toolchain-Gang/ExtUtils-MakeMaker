@@ -8,6 +8,12 @@
       FAQ. [thanks again, pdx.pm]
     - Elaborated on the differences between CVS, SVN and others when using
       $Revision$ based $VERSIONs.
+    * ExtUtils::Command, ExtUtils::Install, ExtUtils::Manifest,
+      ExtUtils::Mkbootstrap, ExtUtils::Mksymlists and ExtUtils::Packlist
+      are all now considered to be separate distributions.  To avoid a 
+      circular dependency, MakeMaker distributes its own versions but CPAN 
+      should not index them and they will not overwrite a newer, installed 
+      version.
 
 6.30  Fri May 20 16:05:38 PDT 2005
     * PL_FILES behavior tweak again to restore old behavior.  Sometimes its 

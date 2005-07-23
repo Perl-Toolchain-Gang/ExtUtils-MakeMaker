@@ -85,6 +85,7 @@ my %Special_Sigs = (
  PL_FILES           => 'hash',
  PM                 => 'hash',
  PMLIBDIRS          => 'array',
+ PMLIBPARENTDIRS    => 'array',
  PREREQ_PM          => 'hash',
  SKIP               => 'array',
  TYPEMAPS           => 'array',
@@ -231,7 +232,7 @@ sub full_setup {
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
     PERL_SRC PERM_RW PERM_RWX
-    PL_FILES PM PM_FILTER PMLIBDIRS POLLUTE PPM_INSTALL_EXEC
+    PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE PPM_INSTALL_EXEC
     PPM_INSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
     SIGN SKIP TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
     XS_VERSION clean depend dist dynamic_lib linkext macro realclean
@@ -281,7 +282,10 @@ sub full_setup {
     push @Overridable, qw[
 
  libscan makeaperl needs_linking perm_rw perm_rwx
- subdir_x test_via_harness test_via_script init_PERL
+ subdir_x test_via_harness test_via_script 
+
+ init_VERSION init_dist init_INST init_INSTALL init_DEST init_dirscan
+ init_PM init_MANPODS init_xs init_PERL init_DIRFILESEP init_linker
                          ];
 
     push @MM_Sections, qw[
@@ -498,6 +502,8 @@ sub new {
     $self->init_INSTALL;
     $self->init_DEST;
     $self->init_dirscan;
+    $self->init_PM;
+    $self->init_MANPODS;
     $self->init_xs;
     $self->init_PERL;
     $self->init_DIRFILESEP;

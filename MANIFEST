@@ -1,9 +1,14 @@
 bin/instmodsh
 Changes
-lib/ExtUtils/Command.pm
+inc/ExtUtils/Command.pm
+inc/ExtUtils/Install.pm
+inc/ExtUtils/Installed.pm
+inc/ExtUtils/Manifest.pm
+inc/ExtUtils/MANIFEST.SKIP
+inc/ExtUtils/Mkbootstrap.pm
+inc/ExtUtils/Mksymlists.pm
+inc/ExtUtils/Packlist.pm
 lib/ExtUtils/Command/MM.pm
-lib/ExtUtils/Install.pm
-lib/ExtUtils/Installed.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
 lib/ExtUtils/MakeMaker.pm
@@ -12,10 +17,6 @@ lib/ExtUtils/MakeMaker/Config.pm
 lib/ExtUtils/MakeMaker/FAQ.pod
 lib/ExtUtils/MakeMaker/Tutorial.pod
 lib/ExtUtils/MakeMaker/vmsish.pm
-lib/ExtUtils/Manifest.pm
-lib/ExtUtils/MANIFEST.SKIP
-lib/ExtUtils/Mkbootstrap.pm
-lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/MM.pm
 lib/ExtUtils/MM_AIX.pm
 lib/ExtUtils/MM_Any.pm
@@ -33,7 +34,6 @@ lib/ExtUtils/MM_VOS.pm
 lib/ExtUtils/MM_Win32.pm
 lib/ExtUtils/MM_Win95.pm
 lib/ExtUtils/MY.pm
-lib/ExtUtils/Packlist.pm
 lib/ExtUtils/testlib.pm
 Makefile.PL
 MANIFEST			This list of files
