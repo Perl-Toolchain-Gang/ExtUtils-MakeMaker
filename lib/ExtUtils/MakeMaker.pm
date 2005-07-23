@@ -227,7 +227,7 @@ sub full_setup {
     PERL_LIB        PERL_ARCHLIB 
     SITELIBEXP      SITEARCHEXP 
 
-    INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS
+    INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
     LINKTYPE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET 
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
@@ -508,6 +508,7 @@ sub new {
     $self->init_PERL;
     $self->init_DIRFILESEP;
     $self->init_linker;
+    $self->init_ABSTRACT;
 
     if (! $self->{PERL_SRC} ) {
         require VMS::Filespec if $Is_VMS;
@@ -1688,6 +1689,11 @@ you specify a scalar as in
   'LIBS' => "-ltcl -ltk -lX11"
 
 MakeMaker will turn it into an array with one element.
+
+=item LICENSE
+
+The licensing terms of your distribution.  See L<Module::Build::Authoring>
+for the list of options.
 
 =item LINKTYPE
 

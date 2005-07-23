@@ -69,10 +69,12 @@ my $MM = WriteMakefile(
     EXTRA_META      => <<'META',
 no_index:
     dir:
-    - inc
+        - inc
 META
 
     INSTALLDIRS     => 'perl',
+
+    LICENSE         => 'perl',
 
     ABSTRACT_FROM   => "lib/$PACKAGE_FILE.pm",
     AUTHOR          => 'Michael G Schwern <schwern@pobox.com>',

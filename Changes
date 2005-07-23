@@ -16,6 +16,12 @@
       version.
     * Added EXTRA_META option to allow module authors to append extra
       text to the generated META.yml.
+    * Added a LICENSE field mirroring Module::Build's license.
+    * META.yml support updated to version 1.1.  All required fields
+      now generated.
+    * Non-conforming version_from and installdirs META.yml fields removed.
+    * META.yml distribution_type field now intelligent enough to guess at
+      the type rather than hard code 'module'.
 
 6.30  Fri May 20 16:05:38 PDT 2005
     * PL_FILES behavior tweak again to restore old behavior.  Sometimes its 

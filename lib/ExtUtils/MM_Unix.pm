@@ -2948,12 +2948,6 @@ for a binary distribution.
 sub ppd {
     my($self) = @_;
 
-    if ($self->{ABSTRACT_FROM}){
-        $self->{ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
-            carp "WARNING: Setting ABSTRACT via file ".
-                 "'$self->{ABSTRACT_FROM}' failed\n";
-    }
-
     my ($pack_ver) = join ",", (split (/\./, $self->{VERSION}), (0)x4)[0..3];
 
     my $abstract = $self->{ABSTRACT} || '';

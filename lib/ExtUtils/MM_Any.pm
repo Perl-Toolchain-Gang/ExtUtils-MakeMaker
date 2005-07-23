@@ -4,6 +4,7 @@ use strict;
 use vars qw($VERSION @ISA);
 $VERSION = '0.13';
 
+use Carp;
 use File::Spec;
 BEGIN { @ISA = qw(File::Spec); }
 
@@ -706,16 +707,32 @@ MAKE_FRAG
         $prereq_pm .= sprintf "\n    %-30s %s", "$mod:", $ver;
     }
 
-    my $meta = <<YAML;
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         $self->{DISTNAME}
-version:      $self->{VERSION}
-version_from: $self->{VERSION_FROM}
-installdirs:  $self->{INSTALLDIRS}
+    # Use a list to preserve order.
+    my @meta_to_mm = (
+        name         => $self->{DISTNAME},
+        version      => $self->{VERSION},
+        abstract     => $self->{ABSTRACT},
+        license      => $self->{LICENSE} || 'unknown',
+        generated_by => 
+                "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
+        authored_by  => $self->{AUTHOR},
+        distribution_type => $self->{PM} ? 'module' : 'script',
+    );
+
+    my $meta = '';
+    while( @meta_to_mm ) {
+        my($key, $val) = splice @meta_to_mm, 0, 2;
+
+        $val = '~' unless defined $val;
+
+        $meta .= sprintf "%-20s %s\n", "$key:", $val;
+    };
+
+    $meta .= <<YAML;
 requires:     $prereq_pm
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1
 YAML
 
     $meta .= $self->{EXTRA_META} if $self->{EXTRA_META};
@@ -938,6 +955,28 @@ MAKE_FRAG
 
 Methods which help initialize the MakeMaker object and macros.
 
+
+=head3 init_ABSTRACT
+
+    $mm->init_ABSTRACT
+
+=cut
+
+sub init_ABSTRACT {
+    my $self = shift;
+
+    if( $self->{ABSTRACT_FROM} and $self->{ABSTRACT} ) {
+        warn "Both ABSTRACT_FROM and ABSTRACT are set.  ".
+             "Ignoring ABSTRACT_FROM.\n";
+        return;
+    }
+
+    if ($self->{ABSTRACT_FROM}){
+        $self->{ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
+            carp "WARNING: Setting ABSTRACT via file ".
+                 "'$self->{ABSTRACT_FROM}' failed\n";
+    }
+}
 
 =head3 init_INST
 
@@ -1306,9 +1345,8 @@ sub init_VERSION {
     if ($self->{VERSION_FROM}){
         $self->{VERSION} = $self->parse_version($self->{VERSION_FROM});
         if( $self->{VERSION} eq 'undef' ) {
-            require Carp;
-            Carp::carp("WARNING: Setting VERSION via file ".
-                       "'$self->{VERSION_FROM}' failed\n");
+            carp("WARNING: Setting VERSION via file ".
+                 "'$self->{VERSION_FROM}' failed\n");
         }
     }
 
