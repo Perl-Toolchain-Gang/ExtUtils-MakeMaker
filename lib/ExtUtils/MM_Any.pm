@@ -1041,12 +1041,12 @@ INSTALLDIRS) and *PREFIX.
 sub init_INSTALL {
     my($self) = shift;
 
-    if( $self->{ARGS}{INSTALLBASE} and $self->{ARGS}{PREFIX} ) {
-        die "Only one of PREFIX or INSTALLBASE can be given.  Not both.\n";
+    if( $self->{ARGS}{INSTALL_BASE} and $self->{ARGS}{PREFIX} ) {
+        die "Only one of PREFIX or INSTALL_BASE can be given.  Not both.\n";
     }
 
-    if( $self->{ARGS}{INSTALLBASE} ) {
-        $self->init_INSTALL_from_INSTALLBASE;
+    if( $self->{ARGS}{INSTALL_BASE} ) {
+        $self->init_INSTALL_from_INSTALL_BASE;
     }
     else {
         $self->init_INSTALL_from_PREFIX;
@@ -1259,9 +1259,9 @@ sub init_INSTALL_from_PREFIX {
 }
 
 
-=head3 init_from_INSTALLBASE
+=head3 init_from_INSTALL_BASE
 
-    $mm->init_from_INSTALLBASE
+    $mm->init_from_INSTALL_BASE
 
 =cut
 
@@ -1274,11 +1274,11 @@ my %map = (
           );
 $map{script} = $map{bin};
 
-sub init_INSTALL_from_INSTALLBASE {
+sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
 
     @{$self}{qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)} = 
-                                                         '$(INSTALLBASE)';
+                                                         '$(INSTALL_BASE)';
 
     my %install;
     foreach my $thing (keys %map) {
@@ -1287,7 +1287,7 @@ sub init_INSTALL_from_INSTALLBASE {
             my $key = "INSTALL".$dir.$uc_thing;
 
             $install{$key} ||= 
-              $self->catdir('$(INSTALLBASE)', @{$map{$thing}});
+              $self->catdir('$(INSTALL_BASE)', @{$map{$thing}});
         }
     }
 

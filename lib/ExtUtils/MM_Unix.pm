@@ -372,7 +372,7 @@ sub constants {
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
               INST_MAN1DIR INST_MAN3DIR
               MAN1EXT      MAN3EXT
-              INSTALLDIRS INSTALLBASE DESTDIR PREFIX
+              INSTALLDIRS INSTALL_BASE DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
                    ),
                    (map { ("INSTALL".$_,
@@ -2739,7 +2739,7 @@ sub pasthru {
     $sep .= "\\\n\t";
 
     foreach $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
-                     PREFIX INSTALLBASE)
+                     PREFIX INSTALL_BASE)
                  ) 
     {
         next unless defined $self->{$key};

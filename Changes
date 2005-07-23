@@ -22,6 +22,7 @@
     * Non-conforming version_from and installdirs META.yml fields removed.
     * META.yml distribution_type field now intelligent enough to guess at
       the type rather than hard code 'module'.
+    * INSTALLBASE changed to INSTALL_BASE to match Module::Build.
 
 6.30  Fri May 20 16:05:38 PDT 2005
     * PL_FILES behavior tweak again to restore old behavior.  Sometimes its 
