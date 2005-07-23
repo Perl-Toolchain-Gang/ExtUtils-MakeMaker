@@ -209,7 +209,7 @@ sub full_setup {
 
     AUTHOR ABSTRACT ABSTRACT_FROM BINARY_LOCATION
     C CAPI CCFLAGS CONFIG CONFIGURE DEFINE DIR DISTNAME DL_FUNCS DL_VARS
-    EXCLUDE_EXT EXE_FILES FIRST_MAKEFILE
+    EXCLUDE_EXT EXE_FILES EXTRA_META FIRST_MAKEFILE
     FULLPERL FULLPERLRUN FULLPERLRUNINST
     FUNCLIST H IMPORTS
 
@@ -1457,6 +1457,10 @@ If your executables start with something like #!perl or
 #!/usr/bin/perl MakeMaker will change this to the path of the perl
 'Makefile.PL' was invoked with so the programs will be sure to run
 properly even if perl is not in /usr/bin/perl.
+
+=item EXTRA_META
+
+Extra text to be appended to the generated META.yml.
 
 =item FIRST_MAKEFILE
 

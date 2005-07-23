@@ -64,8 +64,15 @@ my $MM = WriteMakefile(
                        },
     PMLIBDIRS       => [qw(lib inc)],
     PMLIBPARENTDIRS => [qw(lib inc)],
-    INSTALLDIRS     => 'perl',
     EXE_FILES       => [qw(bin/instmodsh)],
+
+    EXTRA_META      => <<'META',
+no_index:
+    dir:
+    - inc
+META
+
+    INSTALLDIRS     => 'perl',
 
     ABSTRACT_FROM   => "lib/$PACKAGE_FILE.pm",
     AUTHOR          => 'Michael G Schwern <schwern@pobox.com>',

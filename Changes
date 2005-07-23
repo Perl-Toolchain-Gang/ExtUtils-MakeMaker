@@ -14,6 +14,8 @@
       circular dependency, MakeMaker distributes its own versions but CPAN 
       should not index them and they will not overwrite a newer, installed 
       version.
+    * Added EXTRA_META option to allow module authors to append extra
+      text to the generated META.yml.
 
 6.30  Fri May 20 16:05:38 PDT 2005
     * PL_FILES behavior tweak again to restore old behavior.  Sometimes its 

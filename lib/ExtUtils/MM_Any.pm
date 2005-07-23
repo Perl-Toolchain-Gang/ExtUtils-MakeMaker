@@ -703,7 +703,7 @@ MAKE_FRAG
     my $prereq_pm = '';
     foreach my $mod ( sort { lc $a cmp lc $b } keys %{$self->{PREREQ_PM}} ) {
         my $ver = $self->{PREREQ_PM}{$mod};
-        $prereq_pm .= sprintf "    %-30s %s\n", "$mod:", $ver;
+        $prereq_pm .= sprintf "\n    %-30s %s", "$mod:", $ver;
     }
 
     my $meta = <<YAML;
@@ -713,11 +713,12 @@ name:         $self->{DISTNAME}
 version:      $self->{VERSION}
 version_from: $self->{VERSION_FROM}
 installdirs:  $self->{INSTALLDIRS}
-requires:
-$prereq_pm
+requires:     $prereq_pm
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
 YAML
+
+    $meta .= $self->{EXTRA_META} if $self->{EXTRA_META};
 
     my @write_meta = $self->echo($meta, 'META_new.yml');
 
