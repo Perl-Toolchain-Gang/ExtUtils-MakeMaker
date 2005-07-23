@@ -1692,8 +1692,12 @@ MakeMaker will turn it into an array with one element.
 
 =item LICENSE
 
-The licensing terms of your distribution.  See L<Module::Build::Authoring>
-for the list of options.
+The licensing terms of your distribution.  Generally its "perl" for the
+same license as Perl itself.
+
+See L<Module::Build::Authoring> for the list of options.
+
+Defaults to "unknown".
 
 =item LINKTYPE
 

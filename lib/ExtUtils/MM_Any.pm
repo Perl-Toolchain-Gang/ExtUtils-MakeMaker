@@ -719,7 +719,8 @@ MAKE_FRAG
         distribution_type => $self->{PM} ? 'module' : 'script',
     );
 
-    my $meta = '';
+    my $meta = "--- #YAML:1.0\n";
+
     while( @meta_to_mm ) {
         my($key, $val) = splice @meta_to_mm, 0, 2;
 

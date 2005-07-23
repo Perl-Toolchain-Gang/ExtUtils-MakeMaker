@@ -434,7 +434,7 @@ sub oneliner {
 
     $switches = join ' ', @$switches;
 
-    return qq{\$(ABSPERLRUN) $switches -e $cmd};
+    return qq{\$(ABSPERLRUN) $switches -e $cmd --};
 }
 
 
