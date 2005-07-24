@@ -325,7 +325,28 @@ this is the max size of a shell command line.
 $self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
 
 
+=head3 make
 
+    my $make = $MM->make;
+
+Returns the make variant we're generating the Makefile for.  This attempts
+to do some normalization on the information from %Config or the user.
+
+=cut
+
+sub make {
+    my $self = shift;
+
+    my $make = lc $self->{MAKE};
+
+    # Truncate anything like foomake6 to just foomake.
+    $make =~ s/^(\w+make).*/$1/;
+
+    # Turn gnumake into gmake.
+    $make =~ s/^gnu/g/;
+
+    return $make;
+}
 
 
 =head2 Targets
@@ -1400,8 +1421,7 @@ Defines at least these macros.
   MAKEFILE_OLD
   MAKE_APERL_FILE   File used by MAKE_APERL
 
-  SHELL             Program used to run
-                    shell commands
+  SHELL             Program used to run shell commands
 
   ECHO              Print text adding a newline on the end
   RM_F              Remove a file 
@@ -1474,7 +1494,19 @@ sub init_platform {
 }
 
 
+=head3 init_MAKE
 
+    $mm->init_MAKE
+
+Initialize MAKE from either a MAKE environment variable or $Config{make}.
+
+=cut
+
+sub init_MAKE {
+    my $self = shift;
+
+    $self->{MAKE} ||= $ENV{MAKE} || $Config{make};
+}
 
 
 =head2 Tools

@@ -228,7 +228,7 @@ sub full_setup {
     SITELIBEXP      SITEARCHEXP 
 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
-    LINKTYPE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET 
+    LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET 
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
     PERL_SRC PERM_RW PERM_RWX
@@ -304,9 +304,9 @@ sub full_setup {
     # we will use all these variables in the Makefile
     @Get_from_Config = 
         qw(
-           ar cc cccdlflags ccdlflags dlext dlsrc ld lddlflags ldflags libc
-           lib_ext obj_ext osname osvers ranlib sitelibexp sitearchexp so
-           exe_ext full_ar
+           ar cc cccdlflags ccdlflags dlext dlsrc exe_ext full_ar ld 
+           lddlflags ldflags libc lib_ext obj_ext osname osvers ranlib 
+           sitelibexp sitearchexp so
           );
 
     # 5.5.3 doesn't have any concept of vendor libs
@@ -495,6 +495,7 @@ sub new {
 
     ($self->{NAME_SYM} = $self->{NAME}) =~ s/\W+/_/g;
 
+    $self->init_MAKE;
     $self->init_main;
     $self->init_VERSION;
     $self->init_dist;
@@ -1704,6 +1705,20 @@ Defaults to "unknown".
 'static' or 'dynamic' (default unless usedl=undef in
 config.sh). Should only be used to force static linking (also see
 linkext below).
+
+=item MAKE
+
+Variant of make you intend to run the generated Makefile with.  This
+parameter lets Makefile.PL know what make quirks to account for when
+generating the Makefile.
+
+MakeMaker also honors the MAKE environment variable.  This parameter
+takes precedent.
+
+Currently the only significant values are 'dmake' and 'nmake' for Windows
+users.
+
+Defaults to $Config{make}.
 
 =item MAKEAPERL
 

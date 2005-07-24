@@ -34,7 +34,6 @@ $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
 my $BORLAND  = $Config{'cc'} =~ /^bcc/i;
 my $GCC      = $Config{'cc'} =~ /^gcc/i;
-my $DMAKE    = $Config{'make'} =~ /^dmake/i;
 
 
 =item os_flavor
