@@ -66,6 +66,7 @@ t/lib/Test/Simple.pm
 t/lib/TieIn.pm
 t/lib/TieOut.pm
 t/Liblist.t
+t/make.t
 t/Manifest.t
 t/Mkbootstrap.t
 t/MM_Any.t
