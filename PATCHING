@@ -132,11 +132,19 @@ Cross-Platform Compatibility
 
 - Use $(NOECHO) instead of @.
 
+- Use - to tell make to ignore the exit code of a command.  (Unfortunately,
+  some make variants don't honor an $(IGNORE) macro).
+
 - Always put a space between $(NOECHO) and the command.
 
 - Always put a space between - (ignore) and the command.
 
 - Always put $(NOECHO) and - together, no space between them.
+
+        # Right
+        -$(NOECHO) command
+        $(NOECHO) command
+        - command
 
 - Often when you patch ExtUtils::MM_Unix, similar patches must be done
   to the other MM_* modules.  If you can, please do this extra work
