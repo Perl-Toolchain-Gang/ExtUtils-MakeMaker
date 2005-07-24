@@ -1,3 +1,8 @@
+"The easy way is always mined.
+ The important things are always simple.
+ The simple things are always hard."
+        -- Some of Murphy's Laws of Combat
+
 This is a short set of guidelines for those patching
 ExtUtils::MakeMaker.  Its not an iron-clad set of rules, but just
 things which make life easier when reading and integrating a patch.
