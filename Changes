@@ -18,7 +18,9 @@
       text to the generated META.yml.
     * Added a LICENSE field mirroring Module::Build's license.
     * META.yml support updated to version 1.1.  All required fields
-      now generated.
+      now generated.  (NOTE: 1.1 isn't yet complete but we're going with
+      it anyway.  MakeMaker uses "author" instead of "authored_by" as its
+      expected the former will be used in 1.1 final).
     * Non-conforming version_from and installdirs META.yml fields removed.
     * META.yml distribution_type field now intelligent enough to guess at
       the type rather than hard code 'module'.

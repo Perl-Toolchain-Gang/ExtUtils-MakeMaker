@@ -736,7 +736,7 @@ MAKE_FRAG
         license      => $self->{LICENSE} || 'unknown',
         generated_by => 
                 "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
-        authored_by  => $self->{AUTHOR},
+        author       => $self->{AUTHOR},
         distribution_type => $self->{PM} ? 'module' : 'script',
     );
 

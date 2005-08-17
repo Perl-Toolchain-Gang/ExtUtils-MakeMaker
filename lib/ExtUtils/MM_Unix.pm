@@ -1046,7 +1046,7 @@ WARNING
                 print "Using PERL=$abs\n" if $trace;
                 return $abs;
             } elsif ($trace >= 2) {
-                print "Result: '$val'\n";
+                print "Result: '$val' ".($? >> 8)."\n";
             }
         }
     }
