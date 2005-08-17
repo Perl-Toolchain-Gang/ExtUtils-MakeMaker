@@ -1,4 +1,4 @@
-6.31
+6.30_01  Tue Aug 16 23:53:27 PDT 2005
     * Fixed compiling modules using an uninstalled Perl on Win32 by using
       the proper perl header location for Windows (which is different from
       Unix).  Looks like a very old bug.  [bugs.perl.org 36128]
