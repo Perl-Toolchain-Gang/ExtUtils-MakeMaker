@@ -126,7 +126,10 @@ SPACE_WARN
             next unless $inc =~ /\.pm$/;
 
             my $installed = _find_installed($inc);
-            delete $self->{PM}{$inc} if 
+
+            # Shut up "isn't numeric" warning on X.Y_Z versions.
+            local $^W = 0;
+            delete $self->{PM}{$inc} if
               defined $installed and
               $self->parse_version($installed) > $self->parse_version($inc);
         }
