@@ -2,6 +2,7 @@
     - $Revision was broken.
     - Updated our internal version of Test::More to catch a few warnings.
     - ExtUtils::Command::test_f() test was broken.
+    - Clarified that test_f() exits.
 
 6.30_01  Tue Aug 16 23:53:27 PDT 2005
     * Fixed compiling modules using an uninstalled Perl on Win32 by using
