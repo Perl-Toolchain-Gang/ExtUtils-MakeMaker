@@ -3,21 +3,15 @@ package Test::Simple;
 use 5.004;
 
 use strict 'vars';
-use vars qw($VERSION);
-$VERSION = '0.41';
+use vars qw($VERSION @ISA @EXPORT);
+$VERSION = '0.61';
+$VERSION = eval $VERSION;    # make the alpha version come out as a number
 
+use Test::Builder::Module;
+@ISA    = qw(Test::Builder::Module);
+@EXPORT = qw(ok);
 
-use Test::Builder;
-my $Test = Test::Builder->new;
-
-sub import {
-    my $self = shift;
-    my $caller = caller;
-    *{$caller.'::ok'} = \&ok;
-
-    $Test->exported_to($caller);
-    $Test->plan(@_);
-}
+my $CLASS = __PACKAGE__;
 
 
 =head1 NAME
@@ -61,8 +55,8 @@ You must have a plan.
   ok( $foo eq $bar, $name );
   ok( $foo eq $bar );
 
-ok() is given an expression (in this case C<$foo eq $bar>).  If its
-true, the test passed.  If its false, it didn't.  That's about it.
+ok() is given an expression (in this case C<$foo eq $bar>).  If it's
+true, the test passed.  If it's false, it didn't.  That's about it.
 
 ok() prints out either "ok" or "not ok" along with a test number (it
 keeps track of that for you).
@@ -73,7 +67,7 @@ keeps track of that for you).
 If you provide a $name, that will be printed along with the "ok/not
 ok" to make it easier to find your test when if fails (just search for
 the name).  It also makes it easier for the next guy to understand
-what your test is for.  Its highly recommended you use test names.
+what your test is for.  It's highly recommended you use test names.
 
 All tests are run in scalar context.  So this:
 
@@ -84,7 +78,7 @@ will do what you mean (fail if stuff is empty)
 =cut
 
 sub ok ($;$) {
-    $Test->ok(@_);
+    $CLASS->builder->ok(@_);
 }
 
 
@@ -106,13 +100,13 @@ considered a failure and will exit with 255.
 So the exit codes are...
 
     0                   all tests successful
-    255                 test died
+    255                 test died or all passed but wrong # of tests run
     any other number    how many failed (including missing or extras)
 
 If you fail more than 254 tests, it will be reported as 254.
 
 This module is by no means trying to be a complete testing system.
-Its just to get you started.  Once you're off the ground its
+It's just to get you started.  Once you're off the ground its
 recommended you look at L<Test::More>.
 
 
@@ -129,7 +123,7 @@ Here's an example of a simple .t file for the fictional Film module.
                              Rating   => 'R',
                              NumExplodingSheep => 1
                            });
-    ok( defined($btaste) and ref $btaste eq 'Film',     'new() works' );
+    ok( defined($btaste) && ref $btaste eq 'Film,     'new() works' );
 
     ok( $btaste->Title      eq 'Bad Taste',     'Title() get'    );
     ok( $btaste->Director   eq 'Peter Jackson', 'Director() get' );
@@ -143,7 +137,8 @@ It will produce output like this:
     ok 2 - Title() get
     ok 3 - Director() get
     not ok 4 - Rating() get
-    #    Failed test (t/film.t at line 14)
+    #   Failed test 'Rating() get'
+    #   in t/film.t at line 14.
     ok 5 - NumExplodingSheep() get
     # Looks like you failed 1 tests of 5
 
@@ -171,6 +166,7 @@ Unfortunately, I can't differentiate any further.
 
 Test::Simple is B<explicitly> tested all the way back to perl 5.004.
 
+Test::Simple is thread-safe in perl 5.8.0 and up.
 
 =head1 HISTORY
 
@@ -222,7 +218,7 @@ E<lt>schwern@pobox.comE<gt>, wardrobe by Calvin Klein.
 
 =head1 COPYRIGHT
 
-Copyright 2001 by Michael G Schwern E<lt>schwern@pobox.comE<gt>.
+Copyright 2001, 2002, 2004 by Michael G Schwern E<lt>schwern@pobox.comE<gt>.
 
 This program is free software; you can redistribute it and/or 
 modify it under the same terms as Perl itself.

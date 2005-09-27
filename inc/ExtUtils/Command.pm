@@ -38,17 +38,20 @@ ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.
 
 The module is used to replace common UNIX commands.  In all cases the
 functions work from @ARGV rather than taking arguments.  This makes
-them easier to deal with in Makefiles.
+them easier to deal with in Makefiles.  Call them like this:
 
   perl -MExtUtils::Command -e some_command some files to work on
 
-I<NOT>
+and I<NOT> like this:
 
   perl -MExtUtils::Command -e 'some_command qw(some files to work on)'
 
 For that use L<Shell::Command>.
 
 Filenames with * and ? will be glob expanded.
+
+
+=head2 FUNCTIONS
 
 =over 4
 
@@ -259,13 +262,14 @@ sub mkpath
 
     test_f file
 
-Tests if a file exists
+Tests if a file exists.  I<Exits> with 0 if it does, 1 if it does not (ie.
+shell's idea of true and false).
 
 =cut 
 
 sub test_f
 {
- exit !-f $ARGV[0];
+ exit(-f $ARGV[0] ? 0 : 1);
 }
 
 =item dos2unix

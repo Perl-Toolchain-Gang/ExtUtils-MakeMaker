@@ -46,7 +46,7 @@ sub read_manifest {
 }
 
 sub catch_warning {
-    my $warn;
+    my $warn = '';
     local $SIG{__WARN__} = sub { $warn .= $_[0] };
     return join('', $_[0]->() ), $warn;
 }
@@ -100,7 +100,7 @@ is( $res, 'bar', 'bar reported as new' );
 ($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1; 
                      catch_warning( \&skipcheck ) 
                 };
-cmp_ok( $warn, 'eq', '', 'disabled warnings' );
+is( $warn, '', 'disabled warnings' );
 
 # add a skip file with a rule to skip itself (and the nonexistent glob '*baz*')
 add_file( 'MANIFEST.SKIP', "baz\n.SKIP" );
@@ -111,7 +111,7 @@ like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' );
 
 my @skipped;
 catch_warning( sub {
-	@skipped = skipcheck()
+	@skipped = skipcheck();
 });
 
 is( join( ' ', @skipped ), 'MANIFEST.SKIP', 'listed skipped files' );
@@ -199,8 +199,8 @@ add_file( 'MANIFEST.SKIP' => 'foo' );
 add_file( 'MANIFEST'      => "foobar\n"   );
 add_file( 'foobar'        => '123' );
 ($res, $warn) = catch_warning( \&manicheck );
-is( $res,  '',      'MANIFEST overrides MANIFEST.SKIP' );
-is( $warn, undef,   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
+is( $res,  '',   'MANIFEST overrides MANIFEST.SKIP' );
+is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
 
 $files = maniread;
 ok( !$files->{wibble},     'MANIFEST in good state' );

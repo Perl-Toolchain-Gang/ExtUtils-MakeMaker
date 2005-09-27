@@ -23,14 +23,14 @@ BEGIN {
 }
 
 BEGIN {
-    use Test::More tests => 38;
+    use Test::More tests => 37;
     use File::Spec;
 }
 
 BEGIN {
     # bad neighbor, but test_f() uses exit()
-        *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
-    *CORE::GLOBAL::exit = sub { return @_ };
+    *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
+    *CORE::GLOBAL::exit = sub { return $_[0] };
     use_ok( 'ExtUtils::Command' );
 }
 
@@ -53,19 +53,16 @@ BEGIN {
     is( scalar( $$out =~ s/use_ok\( 'ExtUtils::Command'//g), 2, 
         'concatenation worked' );
 
-    # the truth value here is reversed -- Perl true is C false
+    # the truth value here is reversed -- Perl true is shell false
     @ARGV = ( $Testfile );
-    ok( test_f(), 'testing non-existent file' );
-
-    @ARGV = ( $Testfile );
-    cmp_ok( ! test_f(), '==', (-f $Testfile), 'testing non-existent file' );
+    is( test_f(), 1, 'testing non-existent file' );
 
     # these are destructive, have to keep setting @ARGV
     @ARGV = ( $Testfile );
     touch();
 
     @ARGV = ( $Testfile );
-    ok( test_f(), 'now creating that file' );
+    is( test_f(), 0, 'now creating that file' );
     is_deeply( \@ARGV, [$Testfile], 'test_f preserves @ARGV' );
 
     @ARGV = ( $Testfile );
