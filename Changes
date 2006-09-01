@@ -1,4 +1,5 @@
 6.30_02
+    - Updated to ExtUtils::Install 1.41
     * Won't scan for and build man pages when MAN3PODS is deliberately set
       empty.
     - Minor VMS fixes. [bleadperl@26813]
