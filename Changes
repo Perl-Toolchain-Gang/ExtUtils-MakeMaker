@@ -1,4 +1,4 @@
-6.30_02
+6.30_02  Fri Sep  1 15:03:55 EDT 2006
     - Updated to ExtUtils::Install 1.41
     * Won't scan for and build man pages when MAN3PODS is deliberately set
       empty.
