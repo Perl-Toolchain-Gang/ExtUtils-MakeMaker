@@ -1,4 +1,5 @@
 6.30_02
+    - Minor fix to work with Pod::man 2.04. [bleadperl@26457]
     - $Revision was broken.
     - Updated our internal version of Test::More to catch a few warnings.
     - ExtUtils::Command::test_f() test was broken.

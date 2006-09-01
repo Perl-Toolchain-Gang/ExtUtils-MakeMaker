@@ -117,8 +117,6 @@ sub pod2man {
     # compatibility.
     delete $options{lax};
 
-    my $parser = Pod::Man->new(%options);
-
     do {{  # so 'next' works
         my ($pod, $man) = splice(@ARGV, 0, 2);
 
@@ -128,6 +126,7 @@ sub pod2man {
 
         print "Manifying $man\n";
 
+        my $parser = Pod::Man->new(%options);
         $parser->parse_from_file($pod, $man)
           or do { warn("Could not install $man\n");  next };
 
