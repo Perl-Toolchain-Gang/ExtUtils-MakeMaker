@@ -23,7 +23,7 @@ BEGIN {
 }
 
 BEGIN {
-    use Test::More tests => 37;
+    use Test::More tests => 38;
     use File::Spec;
 }
 
@@ -55,14 +55,14 @@ BEGIN {
 
     # the truth value here is reversed -- Perl true is shell false
     @ARGV = ( $Testfile );
-    is( test_f(), 1, 'testing non-existent file' );
+    ok( test_f(), 'testing non-existent file' );
 
     # these are destructive, have to keep setting @ARGV
     @ARGV = ( $Testfile );
     touch();
 
     @ARGV = ( $Testfile );
-    is( test_f(), 0, 'now creating that file' );
+    ok( !test_f(), 'now creating that file' );
     is_deeply( \@ARGV, [$Testfile], 'test_f preserves @ARGV' );
 
     @ARGV = ( $Testfile );
@@ -159,13 +159,6 @@ BEGIN {
         is( ((stat('testdir'))[2] & 07777) & 0700,
             0100, 'change a dir to execute-only' );
 
-        # change a dir to read-only
-        @ARGV = ( '0400', 'testdir' );
-        ExtUtils::Command::chmod();
-
-        is( ((stat('testdir'))[2] & 07777) & 0700,
-            ($^O eq 'vos' ? 0500 : 0400), 'change a dir to read-only' );
-
         # change a dir to write-only
         @ARGV = ( '0200', 'testdir' );
         ExtUtils::Command::chmod();
@@ -173,8 +166,16 @@ BEGIN {
         is( ((stat('testdir'))[2] & 07777) & 0700,
             ($^O eq 'vos' ? 0700 : 0200), 'change a dir to write-only' );
 
+        # change a dir to read-only
+        @ARGV = ( '0400', 'testdir' );
+        ExtUtils::Command::chmod();
+
+        is( ((stat('testdir'))[2] & 07777) & 0700,
+            ($^O eq 'vos' ? 0500 : 0400), 'change a dir to read-only' );
+
         @ARGV = ('testdir');
         rm_rf;
+        ok( ! -e 'testdir', 'rm_rf can delete a read-only dir' );
     }
 
 
