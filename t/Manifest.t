@@ -72,7 +72,7 @@ ok( chdir( 'mantest' ), 'chdir() to mantest' );
 ok( add_file('foo'), 'add a temporary file' );
 
 # there shouldn't be a MANIFEST there
-my ($res, $warn) = catch_warning( \&mkmanifest ); 
+my ($res, $warn) = catch_warning( \&mkmanifest );
 # Canonize the order.
 $warn = join("", map { "$_|" } 
                  sort { lc($a) cmp lc($b) } split /\r?\n/, $warn);
@@ -97,8 +97,8 @@ like( $warn, qr/^Not in MANIFEST: bar/, 'warning that bar has been added' );
 is( $res, 'bar', 'bar reported as new' );
 
 # now quiet the warning that bar was added and test again
-($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1; 
-                     catch_warning( \&skipcheck ) 
+($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
+                     catch_warning( \&skipcheck )
                 };
 is( $warn, '', 'disabled warnings' );
 
@@ -150,8 +150,8 @@ is_deeply( [sort map { lc } @copies], [sort map { lc } keys %$files] );
 foreach my $orig (@copies) {
     my $copy = "copy/$orig";
     ok( -r $copy,               "$copy: must be readable" );
-    is( -w $copy, -w $orig,     "       writable if original was" );
-    is( -x $copy, -x $orig,     "       executable if original was" );
+    is( -w $copy, -w $orig,     "       has orig write state" );
+    is( -x $copy, -x $orig,     "       has orig executable state" );
 }
 rmtree('copy');
 
