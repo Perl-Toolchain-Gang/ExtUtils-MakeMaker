@@ -1722,7 +1722,7 @@ sub oneliner {
     # Switches must be quoted else they will be lowercased.
     $switches = join ' ', map { qq{"$_"} } @$switches;
 
-    return qq{\$(ABSPERLRUN) $switches -e $cmd --};
+    return qq{\$(ABSPERLRUN) $switches -e $cmd "--"};
 }
 
 

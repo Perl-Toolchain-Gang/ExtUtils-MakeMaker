@@ -1,5 +1,6 @@
 6.30_02
-    - Split INSTALLSCRIPT into INSTALLSCRIPT, INSTALLSITESCRIPT and
+    - VMS->one_liner must quote "--" argument. [bleadperl@27613]
+    * Split INSTALLSCRIPT into INSTALLSCRIPT, INSTALLSITESCRIPT and
       INSTALLVENDORSCRIPT so it now honors INSTALLDIRS. [bleadperl@26536]
     - Minor fix to work with Pod::man 2.04. [bleadperl@26457]
     - $Revision was broken.
