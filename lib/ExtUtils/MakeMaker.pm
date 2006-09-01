@@ -223,7 +223,7 @@ sub full_setup {
     INSTALLMAN1DIR          INSTALLMAN3DIR
     INSTALLSITEMAN1DIR      INSTALLSITEMAN3DIR
     INSTALLVENDORMAN1DIR    INSTALLVENDORMAN3DIR
-    INSTALLSCRIPT 
+    INSTALLSCRIPT   INSTALLSITESCRIPT  INSTALLVENDORSCRIPT
     PERL_LIB        PERL_ARCHLIB 
     SITELIBEXP      SITEARCHEXP 
 
@@ -1092,7 +1092,7 @@ INSTALLDIRS according to the following table:
   INST_ARCHLIB   INSTALLARCHLIB  INSTALLSITEARCH     INSTALLVENDORARCH
   INST_LIB       INSTALLPRIVLIB  INSTALLSITELIB      INSTALLVENDORLIB
   INST_BIN       INSTALLBIN      INSTALLSITEBIN      INSTALLVENDORBIN
-  INST_SCRIPT    INSTALLSCRIPT   INSTALLSCRIPT       INSTALLSCRIPT
+  INST_SCRIPT    INSTALLSCRIPT   INSTALLSITESCRIPT   INSTALLVENDORSCRIPT
   INST_MAN1DIR   INSTALLMAN1DIR  INSTALLSITEMAN1DIR  INSTALLVENDORMAN1DIR
   INST_MAN3DIR   INSTALLMAN3DIR  INSTALLSITEMAN3DIR  INSTALLVENDORMAN3DIR
 
@@ -1557,7 +1557,7 @@ Defaults to $Config{installprivlib}.
 =item INSTALLSCRIPT
 
 Used by 'make install' which copies files from INST_SCRIPT to this
-directory.
+directory if INSTALLDIRS=perl.
 
 =item INSTALLSITEARCH
 
@@ -1584,6 +1584,11 @@ $(SITEPREFIX)/man/man$(MAN*EXT).
 
 If set to 'none', no man pages will be installed.
 
+=item INSTALLSITESCRIPT
+
+Used by 'make install' which copies files from INST_SCRIPT to this
+directory if INSTALLDIRS is set to site (default).
+
 =item INSTALLVENDORARCH
 
 Used by 'make install', which copies files from INST_ARCHLIB to this
@@ -1607,6 +1612,11 @@ These directories get the man pages at 'make install' time if
 INSTALLDIRS=vendor.  Defaults to $(VENDORPREFIX)/man/man$(MAN*EXT).
 
 If set to 'none', no man pages will be installed.
+
+=item INSTALLVENDORSCRIPT
+
+Used by 'make install' which copies files from INST_SCRIPT to this
+directory if INSTALLDIRS is set to is set to vendor.
 
 =item INST_ARCHLIB
 

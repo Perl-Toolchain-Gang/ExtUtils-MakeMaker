@@ -1107,11 +1107,18 @@ sub init_INSTALL_from_PREFIX {
 
     $self->{INSTALLSITEBIN} ||= '$(INSTALLBIN)'
       unless $Config{installsitebin};
+    $self->{INSTALLSITESCRIPT} ||= '$(INSTALLSCRIPT)'
+      unless $Config{installsitescript};
 
     unless( $Config{installvendorbin} ) {
         $self->{INSTALLVENDORBIN} ||= $Config{usevendorprefix} 
                                     ? $Config{installbin}
                                     : '';
+    }
+    unless( $Config{installvendorscript} ) {
+        $self->{INSTALLVENDORSCRIPT} ||= $Config{usevendorprefix}
+                                       ? $Config{installscript}
+                                       : '';
     }
 
 
@@ -1172,6 +1179,12 @@ sub init_INSTALL_from_PREFIX {
                          d => 'bin' },
         script      => { s => $iprefix,
                          t => 'perl',
+                         d => 'bin' },
+        vendorscript=> { s => $vprefix,
+                         t => 'vendor',
+                         d => 'bin' },
+        sitescript  => { s => $sprefix,
+                         t => 'site',
                          d => 'bin' },
     );
     
@@ -1315,7 +1328,6 @@ sub init_INSTALL_from_INSTALL_BASE {
     # Adjust for variable quirks.
     $install{INSTALLARCHLIB} ||= delete $install{INSTALLARCH};
     $install{INSTALLPRIVLIB} ||= delete $install{INSTALLLIB};
-    delete @install{qw(INSTALLVENDORSCRIPT INSTALLSITESCRIPT)};
 
     foreach my $key (keys %install) {
         $self->{$key} ||= $install{$key};
@@ -1699,7 +1711,7 @@ sub installvars {
     return qw(PRIVLIB SITELIB  VENDORLIB
               ARCHLIB SITEARCH VENDORARCH
               BIN     SITEBIN  VENDORBIN
-              SCRIPT
+              SCRIPT  SITESCRIPT  VENDORSCRIPT
               MAN1DIR SITEMAN1DIR VENDORMAN1DIR
               MAN3DIR SITEMAN3DIR VENDORMAN3DIR
              );
