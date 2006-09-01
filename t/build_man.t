@@ -13,7 +13,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 9;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -42,8 +42,7 @@ ok( my $stdout = tie *STDOUT, 'TieOut' );
         VERSION_FROM    => 'lib/Big/Dummy.pm',
     );
 
-    is( $mm->{BUILDMAN1PODS}, 1 );
-    is( $mm->{BUILDMAN3PODS}, 1 );
+    ok( keys %{ $mm->{MAN3PODS} } );
 }
 
 {
@@ -53,8 +52,7 @@ ok( my $stdout = tie *STDOUT, 'TieOut' );
         INSTALLMAN3DIR  => 'none'
     );
 
-    is( $mm->{BUILDMAN1PODS}, 1 );
-    is( $mm->{BUILDMAN3PODS}, 0 );
+    ok( !keys %{ $mm->{MAN3PODS} } );
 }
 
 
@@ -65,8 +63,6 @@ ok( my $stdout = tie *STDOUT, 'TieOut' );
         MAN3PODS        => {}
     );
 
-    is( $mm->{BUILDMAN1PODS}, 1 );
-    is( $mm->{BUILDMAN3PODS}, 0 );
     is_deeply( $mm->{MAN3PODS}, { } );
 }
 
@@ -78,7 +74,5 @@ ok( my $stdout = tie *STDOUT, 'TieOut' );
         MAN3PODS        => { "Foo.pm" => "Foo.1" }
     );
 
-    is( $mm->{BUILDMAN1PODS}, 1 );
-    is( $mm->{BUILDMAN3PODS}, 0 );
     is_deeply( $mm->{MAN3PODS}, { "Foo.pm" => "Foo.1" } );
 }
