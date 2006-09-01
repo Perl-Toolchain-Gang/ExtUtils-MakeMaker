@@ -1,4 +1,6 @@
 6.30_02
+    * Won't scan for and build man pages when MAN3PODS is deliberately set
+      empty.
     - Minor VMS fixes. [bleadperl@26813]
     - VMS->one_liner must quote "--" argument. [bleadperl@27613]
     * Split INSTALLSCRIPT into INSTALLSCRIPT, INSTALLSITESCRIPT and
