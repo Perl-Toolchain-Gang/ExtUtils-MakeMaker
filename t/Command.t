@@ -105,7 +105,7 @@ BEGIN {
             $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin'  ||
             $^O eq 'MacOS'
            ) {
-            skip( "different file permission semantics on $^O", 3);
+            skip( "different file permission semantics on $^O", 4);
         }
 
         # change a file to execute-only
