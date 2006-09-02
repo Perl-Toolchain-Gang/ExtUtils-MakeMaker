@@ -153,6 +153,49 @@ automatically generated as part of the 'distdir' target (and thus
 
 To shut off its generation, pass the C<NO_META> flag to C<WriteMakefile()>.
 
+
+=item How do I delete everything not in my F<MANIFEST>?
+
+Some folks are surpried that C<make distclean> does not delete
+everything not listed in their MANIFEST (thus making a clean
+distribution) but only tells them what they need to delete.  This is
+done because it is considered too dangerous.  While developing your
+module you might write a new file, not add it to the MANIFEST, then
+run a C<distclean> and be sad because your new work was deleted.
+
+If you really want to do this, you can use
+C<ExtUtils::Manifest::manifind()> to read the MANIFEST and File::Find
+to delete the files.  But you have to be careful.  Here's a script to
+do that.  Use at your own risk.  Have fun blowing holes in your foot.
+
+    #!/usr/bin/perl -w
+    
+    use strict;
+    
+    use File::Spec;
+    use File::Find;
+    use ExtUtils::Manifest qw(maniread);
+    
+    my %manifest = map  { ($_ => 1 ) }
+                   grep { File::Spec->canonpath($_) }
+                        keys %{ maniread() };
+    
+    find({
+          wanted   => sub {
+              my $path = File::Spec->canonpath($_);
+    
+              return unless -f $path;
+              return if exists $manifest{ $path };
+    
+              print "unlink $path\n";
+              unlink $path;
+          },
+          no_chdir => 1
+         },
+         "."
+    );
+
+
 =back
 
 =head2 XS
