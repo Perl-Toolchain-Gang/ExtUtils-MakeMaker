@@ -1460,10 +1460,6 @@ If your executables start with something like #!perl or
 'Makefile.PL' was invoked with so the programs will be sure to run
 properly even if perl is not in /usr/bin/perl.
 
-=item EXTRA_META
-
-Extra text to be appended to the generated META.yml.
-
 =item FIRST_MAKEFILE
 
 The name of the Makefile to be produced.  This is used for the second
