@@ -1416,8 +1416,6 @@ Initializes PMLIBDIRS and PM from PMLIBDIRS.
 sub init_PM {
     my $self = shift;
 
-    my $pm = $self->{PM};
-
     # Some larger extensions often wish to install a number of *.pm/pl
     # files into the library in various locations.
 
@@ -1469,6 +1467,8 @@ sub init_PM {
 	@{$self->{PMLIBPARENTDIRS}} = ('lib');
     }
 
+    return if $self->{PM} and $self->{ARGS}{PM};
+
     if (@{$self->{PMLIBDIRS}}){
 	print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
 	    if ($Verbose >= 2);
@@ -1498,7 +1498,7 @@ sub init_PM {
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
 	    return unless $inst;
-	    $pm->{$path} = $inst;
+	    $self->{PM}{$path} = $inst;
 	}, @{$self->{PMLIBDIRS}});
     }
 }

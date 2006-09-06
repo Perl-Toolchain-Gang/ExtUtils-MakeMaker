@@ -83,6 +83,7 @@ t/oneliner.t
 t/Packlist.t
 t/parse_version.t
 t/PL_FILES.t
+t/pm.t
 t/postamble.t
 t/prefixify.t
 t/prereq_print.t

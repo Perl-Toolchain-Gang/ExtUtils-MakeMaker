@@ -3,6 +3,8 @@
       interface works but I don't want to hold up 6.31.
     - Added explaination of distclean behavior and instructions on how to
       blow away anything not in the MANIFEST to the FAQ.
+    * 6.30_01 broke overrides of PM.  MakeMaker would add to a user
+      suplied PM rather than simply accepting it.
 
 6.30_03  Fri Sep  1 17:03:11 EDT 2006
     - Minor fix to Command.t for Win32.
