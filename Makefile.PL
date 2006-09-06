@@ -121,7 +121,7 @@ SPACE_WARN
 
         $self->SUPER::init_PM;
 
-        # Don't overwrite newer versions of modules with ours in inc/
+        # Only override older versions of modules with ours in inc/
         for my $inc (grep /^inc/, keys %{$self->{PM}}) {
             next unless $inc =~ /\.pm$/;
 
@@ -131,7 +131,7 @@ SPACE_WARN
             local $^W = 0;
             delete $self->{PM}{$inc} if
               defined $installed and
-              $self->parse_version($installed) > $self->parse_version($inc);
+              $self->parse_version($installed) >= $self->parse_version($inc);
         }
 
         # If ExtUtils::Manifest isn't included don't include MANIFEST.SKIP
