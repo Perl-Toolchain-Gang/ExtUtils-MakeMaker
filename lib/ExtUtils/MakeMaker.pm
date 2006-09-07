@@ -1030,7 +1030,7 @@ The generated Makefile enables the user of the extension to invoke
 The Makefile to be produced may be altered by adding arguments of the
 form C<KEY=VALUE>. E.g.
 
-  perl Makefile.PL PREFIX=~
+  perl Makefile.PL INSTALL_BASE=~
 
 Other interesting targets in the generated Makefile are
 
@@ -1118,17 +1118,48 @@ C<UNINST> variable.
     make install UNINST=1
 
 
+=head2 INSTALL_BASE
+
+INSTALL_BASE can be passed into Makefile.PL to change where your
+module will be installed.  INSTALL_BASE is more like what everyone
+else calls "prefix" than PREFIX is.
+
+To have everything installed in your home directory, do the following.
+
+    perl Makefile.PL INSTALL_BASE=~
+
+Like PREFIX, it sets several INSTALL* attributes at once.  Unlike
+PREFIX it is easy to predict where the module will end up.  The
+installation pattern looks like this:
+
+    INSTALLARCHLIB     INSTALL_BASE/lib/perl5/$Config{archname}
+    INSTALLPRIVLIB     INSTALL_BASE/lib/perl5
+    INSTALLBIN         INSTALL_BASE/bin
+    INSTALLSCRIPT      INSTALL_BASE/bin
+    INSTALLMAN1DIR     INSTALL_BASE/man/man1
+    INSTALLMAN3DIR     INSTALL_BASE/man/man3
+
+INSTALL_BASE in MakeMaker and C<--install_base> in Module::Build (as
+of 0.28) install to the same location.  If you want MakeMaker and
+Module::Build to install to the same location simply set INSTALL_BASE
+and C<--install_base> to the same location.
+
+INSTALL_BASE was added in 6.31.
+
+
 =head2 PREFIX and LIB attribute
 
 PREFIX and LIB can be used to set several INSTALL* attributes in one
-go. The quickest way to install a module in a non-standard place might
-be
+go.  Here's an example for installing into your home directory.
 
     perl Makefile.PL PREFIX=~
 
 This will install all files in the module under your home directory,
 with man pages and libraries going into an appropriate place (usually
-~/man and ~/lib).
+~/man and ~/lib).  How the exact location is determined is complicated
+and depends on how your Perl was configured.  INSTALL_BASE works more
+like what other build systems call "prefix" than PREFIX and we
+recommend you use that instead.
 
 Another way to specify many INSTALL directories with a single
 parameter is LIB.
