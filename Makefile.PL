@@ -63,9 +63,13 @@ my $MM = WriteMakefile(
                          DirHandle          => 0,
                        },
     PMLIBDIRS       => [qw(lib inc)],
+    # PMLIBPARENTDIRS is an experimental feature
     PMLIBPARENTDIRS => [qw(lib inc)],
+
     EXE_FILES       => [qw(bin/instmodsh)],
 
+    # EXTRA_META is an experimental feature and its not going to work
+    # like this next release.
     EXTRA_META      => <<'META',
 no_index:
     dir:
