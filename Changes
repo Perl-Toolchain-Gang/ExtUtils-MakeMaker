@@ -1,6 +1,7 @@
 6.30_04
     - EXTRA_META has been undocumented as I don't like the way the
-      interface works but I don't want to hold up 6.31.
+      interface works but I don't want to hold up 6.31.  It will be
+      replaced with something better next version.
     - Added explaination of distclean behavior and instructions on how to
       blow away anything not in the MANIFEST to the FAQ.
     * 6.30_01 broke overrides of PM.  MakeMaker would add to a user
