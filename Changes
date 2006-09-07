@@ -9,6 +9,8 @@
     * Added "How do I install a module into my home directory?" to the FAQ
     * Added "How do I get MakeMaker and Module::Build to install to the
       same place?"
+    - Moving ExtUtils::Mksymlists and ExtUtils::Mkbootstrap back into
+      lib/ because no independent distribution has taken them over.
 
 6.30_03  Fri Sep  1 17:03:11 EDT 2006
     - Minor fix to Command.t for Win32.
