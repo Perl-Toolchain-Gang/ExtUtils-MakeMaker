@@ -1,7 +1,7 @@
 package ExtUtils::MakeMaker::FAQ;
 
 use vars qw($VERSION);
-$VERSION = '1.11_02';
+$VERSION = '1.11_04';
 
 1;
 __END__
