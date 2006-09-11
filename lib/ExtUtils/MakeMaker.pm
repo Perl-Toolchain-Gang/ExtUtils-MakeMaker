@@ -2561,8 +2561,15 @@ Same as the PERL_CORE parameter.  The parameter overrides this.
 
 =head1 SEE ALSO
 
-ExtUtils::MM_Unix, ExtUtils::Manifest ExtUtils::Install,
-ExtUtils::Embed
+L<Module::Build> is a pure-Perl alternative to MakeMaker which does
+not rely on make or any other external utility.  It is easier to
+extend to suit your needs.
+
+L<Module::Install> is a wrapper around MakeMaker which adds features
+not normally available.
+
+L<ExtUtils::ModuleMaker> and L<Module::Starter> are both modules to
+help you setup your distribution.
 
 =head1 AUTHORS
 
