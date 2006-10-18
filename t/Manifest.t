@@ -111,7 +111,7 @@ like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' );
 
 my @skipped;
 catch_warning( sub {
-	@skipped = skipcheck();
+	@skipped = skipcheck()
 });
 
 is( join( ' ', @skipped ), 'MANIFEST.SKIP', 'listed skipped files' );
@@ -150,8 +150,8 @@ is_deeply( [sort map { lc } @copies], [sort map { lc } keys %$files] );
 foreach my $orig (@copies) {
     my $copy = "copy/$orig";
     ok( -r $copy,               "$copy: must be readable" );
-    is( -w $copy, -w $orig,     "       has orig write state" );
-    is( -x $copy, -x $orig,     "       has orig executable state" );
+    is( -w $copy, -w $orig,     "       writable if original was" );
+    is( -x $copy, -x $orig,     "       executable if original was" );
 }
 rmtree('copy');
 
@@ -164,7 +164,7 @@ is( ExtUtils::Manifest::maniread()->{none}, '#none',
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 $files = maniread();
 eval { (undef, $warn) = catch_warning( sub {
- 		manicopy( $files, 'copy', 'cp' ) }) 
+ 		manicopy( $files, 'copy', 'cp' ) })
 };
 like( $@, qr/^Can't read none: /, 'croaked about none' );
 
@@ -179,7 +179,7 @@ like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' );
 	local $ExtUtils::Manifest::MANIFEST = 'albatross'; 
 	($res, $warn) = catch_warning( \&mkmanifest );
 	like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
-	
+
 	# add the new file to the list of files to be deleted
 	$Files{'albatross'}++;
 }
@@ -199,7 +199,7 @@ add_file( 'MANIFEST.SKIP' => 'foo' );
 add_file( 'MANIFEST'      => "foobar\n"   );
 add_file( 'foobar'        => '123' );
 ($res, $warn) = catch_warning( \&manicheck );
-is( $res,  '',   'MANIFEST overrides MANIFEST.SKIP' );
+is( $res,  '',      'MANIFEST overrides MANIFEST.SKIP' );
 is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
 
 $files = maniread;
