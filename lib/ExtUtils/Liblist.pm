@@ -1,6 +1,8 @@
 package ExtUtils::Liblist;
 
-use vars qw($VERSION);
+use strict;
+
+use vars qw($VERSION @ISA);
 $VERSION = '1.02';
 
 use File::Spec;

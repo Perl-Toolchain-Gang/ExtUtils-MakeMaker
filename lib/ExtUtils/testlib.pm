@@ -1,4 +1,8 @@
 package ExtUtils::testlib;
+
+use strict;
+
+use vars qw($VERSION);
 $VERSION = 1.16;
 
 use Cwd;

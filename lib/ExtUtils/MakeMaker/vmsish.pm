@@ -1,5 +1,7 @@
 package ExtUtils::MakeMaker::vmsish;
 
+use strict;
+
 use vars qw($VERSION);
 $VERSION = 0.02;
 

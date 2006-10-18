@@ -1,5 +1,7 @@
 package ExtUtils::MM_BeOS;
 
+use strict;
+
 =head1 NAME
 
 ExtUtils::MM_BeOS - methods to override UN*X behaviour in ExtUtils::MakeMaker
@@ -16,7 +18,7 @@ the semantics.
 
 =over 4
 
-=cut 
+=cut
 
 use ExtUtils::MakeMaker::Config;
 use File::Spec;

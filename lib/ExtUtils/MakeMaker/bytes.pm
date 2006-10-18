@@ -1,5 +1,7 @@
 package ExtUtils::MakeMaker::bytes;
 
+use strict;
+
 use vars qw($VERSION);
 $VERSION = 0.02;
 

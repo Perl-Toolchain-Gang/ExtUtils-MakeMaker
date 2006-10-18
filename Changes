@@ -1,3 +1,6 @@
+6.31_01
+    - Turn on "use strict" where it was missing.
+
 6.31  Mon Oct  9 16:54:47 PDT 2006
     - Update our META.yml to version 1.2 of the spec.
     * Update the SEE ALSO to mention Module::Build, Module::Install,
