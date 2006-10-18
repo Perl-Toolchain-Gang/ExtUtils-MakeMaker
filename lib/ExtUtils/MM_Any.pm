@@ -676,10 +676,6 @@ sub manifypods_target {
         $dependencies .= " \\\n\t$name";
     }
 
-    foreach my $name (keys %{$self->{MAN3PODS}}) {
-        $dependencies .= " \\\n\t$name"
-    }
-
     my $manify = <<END;
 manifypods : pure_all $dependencies
 END
