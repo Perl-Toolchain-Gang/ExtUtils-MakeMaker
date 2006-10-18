@@ -30,7 +30,7 @@ BEGIN {
 BEGIN {
     # bad neighbor, but test_f() uses exit()
     *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
-    *CORE::GLOBAL::exit = sub { return $_[0] };
+    *CORE::GLOBAL::exit = sub (;$) { return $_[0] };
     use_ok( 'ExtUtils::Command' );
 }
 
@@ -105,7 +105,7 @@ BEGIN {
             $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin'  ||
             $^O eq 'MacOS'
            ) {
-            skip( "different file permission semantics on $^O", 4);
+            skip( "different file permission semantics on $^O", 3);
         }
 
         # change a file to execute-only
@@ -145,7 +145,7 @@ BEGIN {
             $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin'  ||
             $^O eq 'MacOS'
            ) {
-            skip( "different file permission semantics on $^O", 4);
+            skip( "different file permission semantics on $^O", 5);
         }
 
         @ARGV = ('testdir');
