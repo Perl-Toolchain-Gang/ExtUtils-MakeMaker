@@ -1126,7 +1126,8 @@ else calls "prefix" than PREFIX is.
 
 To have everything installed in your home directory, do the following.
 
-    perl Makefile.PL INSTALL_BASE=~
+    # Unix users, INSTALL_BASE=~ works fine
+    perl Makefile.PL INSTALL_BASE=/path/to/your/home/dir
 
 Like PREFIX, it sets several INSTALL* attributes at once.  Unlike
 PREFIX it is easy to predict where the module will end up.  The
@@ -1152,7 +1153,8 @@ INSTALL_BASE was added in 6.31.
 PREFIX and LIB can be used to set several INSTALL* attributes in one
 go.  Here's an example for installing into your home directory.
 
-    perl Makefile.PL PREFIX=~
+    # Unix users, PREFIX=~ works fine
+    perl Makefile.PL PREFIX=/path/to/your/home/dir
 
 This will install all files in the module under your home directory,
 with man pages and libraries going into an appropriate place (usually

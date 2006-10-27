@@ -3,6 +3,8 @@
     - Fixed a minor duplication in manifypod_target().  [rt.cpan.org 22149]
     - The build_man.t test would fail if your Perl is configured to not
       generate man pages ($Config{installman3dir} is set to none).
+    - Made the home dir install examples a little more friendly to non-Unix
+      folks.
 
 6.31  Mon Oct  9 16:54:47 PDT 2006
     - Update our META.yml to version 1.2 of the spec.
