@@ -9,8 +9,7 @@
 
 use 5.00503;
 
-use lib qw(lib);    # build ourself with ourself
-use lib qw(inc);    # build ourself with ourself
+use lib qw(lib inc);    # build ourself with ourself
 use File::Spec;
 use ExtUtils::MakeMaker;
 
