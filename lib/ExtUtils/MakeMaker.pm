@@ -631,7 +631,7 @@ END
 }
 
 sub WriteEmptyMakefile {
-    Carp::croak "WriteEmptyMakefile: Need even number of args" if @_ % 2;
+    Carp::croak "WriteEmptyMakefile: Need an even number of args" if @_ % 2;
 
     my %att = @_;
     my $self = MM->new(\%att);
