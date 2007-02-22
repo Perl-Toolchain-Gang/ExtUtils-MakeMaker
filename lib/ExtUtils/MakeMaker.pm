@@ -2411,7 +2411,7 @@ directory with the name C<$(DISTNAME)-$(VERSION)>. If that directory
 exists, it will be removed first.
 
 Additionally, it will create a META.yml module meta-data file in the
-distdir and add this to the distdir's MANFIEST.  You can shut this
+distdir and add this to the distdir's MANIFEST.  You can shut this
 behavior off with the NO_META flag.
 
 =item   make disttest
@@ -2422,7 +2422,7 @@ a make test in that directory.
 =item    make tardist
 
 First does a distdir. Then a command $(PREOP) which defaults to a null
-command, followed by $(TOUNIX), which defaults to a null command under
+command, followed by $(TO_UNIX), which defaults to a null command under
 UNIX, and will convert files in distribution directory to UNIX format
 otherwise. Next it runs C<tar> on that directory into a tarfile and
 deletes the directory. Finishes with a command $(POSTOP) which
