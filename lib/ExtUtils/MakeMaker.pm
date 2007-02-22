@@ -26,7 +26,8 @@ $VERSION = '6.31';
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
-@EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists);
+@EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
+                &WriteEmptyMakefile);
 
 # These will go away once the last of the Win32 & VMS specific code is 
 # purged.
@@ -2506,7 +2507,8 @@ to create the Module, but this is a normal state of things, then you
 can create a F<Makefile> which does nothing, but succeeds on all the
 "usual" build targets.  To do so, use
 
-   ExtUtils::MakeMaker::WriteEmptyMakefile();
+    use ExtUtils::MakeMaker qw(WriteEmptyMakefile);
+    WriteEmptyMakefile();
 
 instead of WriteMakefile().
 
