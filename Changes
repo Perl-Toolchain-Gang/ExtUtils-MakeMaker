@@ -1,4 +1,8 @@
 6.33
+    Bug Fixes
+    - Embed manifest files in EXEs and DLLs when building with VC++ 8.x
+      [bleadperl #29266]
+
     Doc Improvements
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
 
