@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker::vmsish;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 my $IsVMS = $^O eq 'VMS';
 
