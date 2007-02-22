@@ -10,9 +10,9 @@ use File::Path;
 
 use vars qw(
             @ISA @EXPORT @EXPORT_OK
-            $VERSION $Verbose %Config 
+            $VERSION $Verbose %Config
             @Prepend_parent @Parent
-            %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable 
+            %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable
             $Filename
            );
 
