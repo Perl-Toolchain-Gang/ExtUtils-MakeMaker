@@ -154,6 +154,8 @@ SPACE_WARN
             my $path = File::Spec->catfile($inc, $file);
             return $path if -r $path;
         }
+
+        return;
     }
 
     use Config;
