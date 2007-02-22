@@ -255,6 +255,7 @@ BEGIN {
 {
     { local @ARGV = 'd2utest'; mkpath; }
     open(FILE, '>d2utest/foo');
+    binmode FILE;
     print FILE "stuff\015\012and thing\015\012";
     close FILE;
 
