@@ -1,4 +1,7 @@
 6.31_01
+    - Set binmode() when writing to files in Command.t for operating
+      systems which need that sort of thing.  [bleadperl #29578]
+    - miniperl no longer has the Win32 functions.
     - Turn on "use strict" where it was missing.
     - Fixed a minor duplication in manifypod_target().  [rt.cpan.org 22149]
     - The build_man.t test would fail if your Perl is configured to not
