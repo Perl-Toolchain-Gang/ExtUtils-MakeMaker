@@ -141,7 +141,7 @@ SPACE_WARN
         # either.
         my $maniskip_key    = grep /MANIFEST.SKIP$/i, keys %{$self->{PM}};
         my $manifest_pm_key = grep /Manifest.pm$/i,   keys %{$self->{PM}};
-        delete $self->{PM}{$maniskip_key} unless 
+        delete $self->{PM}{$maniskip_key} unless
           exists $self->{PM}{$manifest_pm_key};
     }
 
