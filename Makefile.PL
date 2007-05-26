@@ -8,10 +8,12 @@
 # Alternatively, you can say the hell with this and use h2xs.
 
 use 5.00503;
+use strict;
 
 use lib qw(lib inc);    # build ourself with ourself
 use File::Spec;
 use ExtUtils::MakeMaker;
+
 
 BEGIN {
     die "You have File::Spec version $File::Spec::VERSION\n".
@@ -19,11 +21,11 @@ BEGIN {
         if $File::Spec::VERSION < 0.8;
 }
 
-$PACKAGE = 'ExtUtils::MakeMaker';
-my $version = ${$PACKAGE.'::VERSION'};
+my $PACKAGE = 'ExtUtils::MakeMaker';
+my $version = do { no strict 'refs'; ${$PACKAGE.'::VERSION'}; };
 $version =~ s/_//;  # for X.Y_Z alpha releases
-($PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
-$LAST_API_CHANGE = 5.50;
+(my $PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
+my $LAST_API_CHANGE = 5.50;
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -53,12 +55,12 @@ my $MM = WriteMakefile(
     PREREQ_PM       => { %prereq,
 
                          # splitpath(), rel2abs()
-                         File::Spec         => 0.8,
+                         'File::Spec'       => 0.8,
 
                          # manifypods needs Pod::Man
-                         Pod::Man   => 0,
+                         'Pod::Man'         => 0,
 
-                         File::Basename     => 0,
+                         'File::Basename'   => 0,
                          DirHandle          => 0,
                        },
     PMLIBDIRS       => [qw(lib inc)],
