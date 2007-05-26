@@ -2,6 +2,8 @@
     Bug Fixes
     - Embed manifest files in EXEs and DLLs when building with VC++ 8.x
       [bleadperl #29266]
+    - Properly not installing MANIFEST.SKIP when ExtUtils::Manifest is not
+      being installed. [rt.cpan.org 21318]
 
     Doc Improvements
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
