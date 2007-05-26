@@ -139,11 +139,18 @@ SPACE_WARN
               $self->parse_version($installed) >= $self->parse_version($inc);
         }
 
-        # If ExtUtils::Manifest isn't included don't include MANIFEST.SKIP
-        # either.
+        _remove_MANIFEST_SKIP($self);
+    }
+
+    # If ExtUtils::Manifest isn't included don't include MANIFEST.SKIP either.
+    sub _remove_MANIFEST_SKIP {
+        my $self = shift;
+        
+        return if grep /Manifest\.pm$/i, keys %{$self->{PM}};
         my($maniskip_key)    = grep /MANIFEST\.SKIP$/i, keys %{$self->{PM}};
-        delete $self->{PM}{$maniskip_key} unless
-            grep /Manifest\.pm$/i, keys %{$self->{PM}};
+        return unless $maniskip_key;
+        
+        return delete $self->{PM}{$maniskip_key};
     }
 
     sub _find_installed {
