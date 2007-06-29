@@ -495,10 +495,14 @@ sub new {
         parse_args($self,split(' ', $ENV{PERL_MM_OPT} || ''),@ARGV);
     }
     if (%unsatisfied && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join ', ', map {"$_ $unsatisfied{$_}"} 
-                            keys %unsatisfied;
-        die qq{MakeMaker FATAL: prerequisites not found ($failedprereqs)\n
-               Please install these modules first and rerun 'perl Makefile.PL'.\n};
+        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"} 
+                            sort { $a cmp $b } keys %unsatisfied;
+        die <<"END";
+MakeMaker FATAL: prerequisites not found.
+$failedprereqs
+
+Please install these modules first and rerun 'perl Makefile.PL'.
+END
     }
 
 

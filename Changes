@@ -44,6 +44,7 @@
       installed or provided dependency (ie. ExtUtils::Command).
     - Updated included versions of ExtUtils::Manifest and Command.
     - Add .bak and .old to veryclean [rt.cpan.org 21284]
+    - Improved the PREREQ_FATAL message.
 
 6.32  Wed Feb 21 07:59:57 PST 2007
     New Features

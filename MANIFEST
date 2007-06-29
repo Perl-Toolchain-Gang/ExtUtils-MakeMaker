@@ -83,6 +83,7 @@ t/PL_FILES.t
 t/pm.t
 t/postamble.t
 t/prefixify.t
+t/prereq.t
 t/prereq_print.t
 t/problems.t
 t/prompt.t
