@@ -15,7 +15,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 use File::Spec;
 
-use Test::More tests => 6;
+use Test::More tests => 4;
 
 my @cd_args = ("some/dir", "command1", "command2");
 
