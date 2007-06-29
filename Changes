@@ -14,6 +14,7 @@
     - Use linker flags rather than compiler flags to determine if the
       perl sharable image was linked debug.  This keeps OPTIMIZE from
       confusing things. [rt.cpan.org 25268]
+    - Accidental use of $\ in a regex. [bleadperl 30521]
 
     Doc Improvements
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
