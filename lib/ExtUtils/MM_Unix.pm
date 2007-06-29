@@ -1576,24 +1576,17 @@ sub init_main {
     my $inc_carp_dir   = dirname($INC{'Carp.pm'});
 
     unless ($self->{PERL_SRC}){
-	my($dir);
-	foreach $dir ($Updir,
-                  $self->catdir($Updir,$Updir),
-                  $self->catdir($Updir,$Updir,$Updir),
-                  $self->catdir($Updir,$Updir,$Updir,$Updir),
-                  $self->catdir($Updir,$Updir,$Updir,$Updir,$Updir))
-        {
-	    if (
-		-f $self->catfile($dir,"config_h.SH")
-		&&
-		-f $self->catfile($dir,"perl.h")
-		&&
-		-f $self->catfile($dir,"lib","Exporter.pm")
-	       ) {
-		$self->{PERL_SRC}=$dir ;
-		last;
-	    }
-	}
+        foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
+            $dir = $self->catdir(($Updir) x $dir_count);
+
+            if (-f $self->catfile($dir,"config_h.SH")   &&
+                -f $self->catfile($dir,"perl.h")        &&
+                -f $self->catfile($dir,"lib","Exporter.pm")
+            ) {
+                $self->{PERL_SRC}=$dir ;
+                last;
+            }
+        }
     }
 
     warn "PERL_CORE is set but I can't find your PERL_SRC!\n" if
