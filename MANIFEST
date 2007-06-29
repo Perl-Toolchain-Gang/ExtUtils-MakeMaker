@@ -46,16 +46,13 @@ t/backwards.t
 t/basic.t
 t/build_man.t
 t/bytes.t
-t/Command.t
 t/config.t
 t/dir_target.t
 t/FIRST_MAKEFILE.t
 t/hints.t
 t/INST.t
 t/INST_PREFIX.t
-t/Install.t
 t/INSTALL_BASE.t
-t/Installed.t
 t/lib/MakeMaker/Test/Setup/BFD.pm
 t/lib/MakeMaker/Test/Setup/PL_FILES.pm
 t/lib/MakeMaker/Test/Setup/Problem.pm
@@ -69,7 +66,6 @@ t/lib/TieIn.pm
 t/lib/TieOut.pm
 t/Liblist.t
 t/make.t
-t/Manifest.t
 t/Mkbootstrap.t
 t/MM_Any.t
 t/MM_BeOS.t
@@ -80,7 +76,6 @@ t/MM_Unix.t
 t/MM_VMS.t
 t/MM_Win32.t
 t/oneliner.t
-t/Packlist.t
 t/parse_version.t
 t/PL_FILES.t
 t/pm.t
@@ -95,6 +90,7 @@ t/split_command.t
 t/testlib.t
 t/VERSION_FROM.t
 t/vmsish.t
+t/WriteEmptyMakefile.t
 t/writemakefile_args.t
 t/xs.t
 TODO
