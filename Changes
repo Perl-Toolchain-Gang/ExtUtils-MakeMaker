@@ -3,6 +3,7 @@
     - Properly not installing MANIFEST.SKIP when ExtUtils::Manifest is not
       being installed. [rt.cpan.org 21318]
     - fixin() no longer clobbers $/ [rt.cpan.org 26234]
+    - Fixed bug finding cross-compiled perls [bleadperl 31404]
 
     Windows
     - Embed manifest files in EXEs and DLLs when building with VC++ 8.x

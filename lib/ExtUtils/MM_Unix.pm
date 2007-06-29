@@ -1028,6 +1028,9 @@ WARNING
             print "Executing $abs\n" if ($trace >= 2);
 
             my $version_check = qq{$abs -le "require $ver; print qq{VER_OK}"};
+            $version_check = "$Config{run} $version_check"
+                if defined $Config{run} and length $Config{run};
+
             # To avoid using the unportable 2>&1 to suppress STDERR,
             # we close it before running the command.
             # However, thanks to a thread library bug in many BSDs
