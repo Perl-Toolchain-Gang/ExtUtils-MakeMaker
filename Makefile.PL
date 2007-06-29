@@ -131,12 +131,19 @@ SPACE_WARN
             next unless $inc =~ /\.pm$/;
 
             my $installed = _find_installed($inc);
+            next unless defined $installed;
 
             # Shut up "isn't numeric" warning on X.Y_Z versions.
             local $^W = 0;
-            delete $self->{PM}{$inc} if
-              defined $installed and
-              $self->parse_version($installed) >= $self->parse_version($inc);
+            my $installed_version = $self->parse_version($installed);
+            my $inc_version       = $self->parse_version($inc);
+            if( $installed_version >= $inc_version ) {
+                delete $self->{PM}{$inc};
+            }
+            else {
+                my $module = _module_name($inc);
+                print qq{Using included version of $module ($inc_version) as it is newer than the installed version ($installed_version).\n};
+            }
         }
 
         _remove_MANIFEST_SKIP($self);
@@ -164,6 +171,17 @@ SPACE_WARN
         }
 
         return;
+    }
+
+    sub _module_name {
+        my $path = shift;
+        
+        my($vol, $dirs, $file) = File::Spec->splitpath($path);
+        my @dirs = File::Spec->splitdir($dirs);
+        shift @dirs;  # remove inc/
+        $file =~ s{\.pm$}{};
+        
+        return join '::', @dirs, $file;
     }
 
     use Config;
