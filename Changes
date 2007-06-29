@@ -12,6 +12,7 @@
       [bleadperl #29266] [rt.cpan.org 26208]
     - Improved the subdir command code so DIR can do more than one level
       down. [rt.cpan.org 25180]
+    - Fix static builds on Win32 by using -DPERLDLL [bleadperl 31229]
 
     VMS
     - Use linker flags rather than compiler flags to determine if the
