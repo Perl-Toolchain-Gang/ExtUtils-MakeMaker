@@ -10,9 +10,9 @@ use File::Path qw(rmtree);
 require Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
 @ISA       = qw(Exporter);
-@EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f chmod 
+@EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
                 dos2unix);
-$VERSION = '1.09_01';
+$VERSION = '1.13';
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -22,16 +22,17 @@ ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.
 
 =head1 SYNOPSIS
 
-  perl -MExtUtils::Command  -e cat files... > destination
-  perl -MExtUtils::Command  -e mv source... destination
-  perl -MExtUtils::Command  -e cp source... destination
-  perl -MExtUtils::Command  -e touch files...
-  perl -MExtUtils::Command  -e rm_f files...
-  perl -MExtUtils::Command  -e rm_rf directories...
-  perl -MExtUtils::Command  -e mkpath directories...
-  perl -MExtUtils::Command  -e eqtime source destination
-  perl -MExtUtils::Command  -e test_f file
-  perl -MExtUtils::Command  -e chmod mode files...
+  perl -MExtUtils::Command -e cat files... > destination
+  perl -MExtUtils::Command -e mv source... destination
+  perl -MExtUtils::Command -e cp source... destination
+  perl -MExtUtils::Command -e touch files...
+  perl -MExtUtils::Command -e rm_f files...
+  perl -MExtUtils::Command -e rm_rf directories...
+  perl -MExtUtils::Command -e mkpath directories...
+  perl -MExtUtils::Command -e eqtime source destination
+  perl -MExtUtils::Command -e test_f file
+  perl -MExtUtils::Command -e test_d directory
+  perl -MExtUtils::Command -e chmod mode files...
   ...
 
 =head1 DESCRIPTION
@@ -272,6 +273,20 @@ sub test_f
  exit(-f $ARGV[0] ? 0 : 1);
 }
 
+=item test_d
+
+    test_d directory
+
+Tests if a directory exists.  I<Exits> with 0 if it does, 1 if it does
+not (ie. shell's idea of true and false).
+
+=cut
+
+sub test_d
+{
+ exit(-d $ARGV[0] ? 0 : 1);
+}
+
 =item dos2unix
 
     dos2unix files or dirs ...
@@ -308,7 +323,7 @@ sub dos2unix {
 
 =back
 
-=head1 SEE ALSO 
+=head1 SEE ALSO
 
 Shell::Command which is these same functions but take arguments normally.
 
@@ -317,7 +332,9 @@ Shell::Command which is these same functions but take arguments normally.
 
 Nick Ing-Simmons C<ni-s@cpan.org>
 
-Currently maintained by Michael G Schwern C<schwern@pobox.com>.
+Maintained by Michael G Schwern C<schwern@pobox.com> within the
+ExtUtils-MakeMaker package and, as a separate CPAN package, by
+Randy Kobes C<r.kobes@uwinnipeg.ca>.
 
 =cut
 
