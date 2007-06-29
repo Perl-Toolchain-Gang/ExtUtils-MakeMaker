@@ -1,4 +1,8 @@
 6.33
+    New Features
+    * VERSION now accepts version objects without warning.
+      [rt.cpan.org 26075]
+
     Bug Fixes
     - Properly not installing MANIFEST.SKIP when ExtUtils::Manifest is not
       being installed. [rt.cpan.org 21318]

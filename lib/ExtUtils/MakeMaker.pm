@@ -68,41 +68,42 @@ sub WriteMakefile {
 # scalar.
 my %Att_Sigs;
 my %Special_Sigs = (
- C                  => 'array',
- CONFIG             => 'array',
- CONFIGURE          => 'code',
- DIR                => 'array',
- DL_FUNCS           => 'hash',
- DL_VARS            => 'array',
- EXCLUDE_EXT        => 'array',
- EXE_FILES          => 'array',
- FUNCLIST           => 'array',
- H                  => 'array',
- IMPORTS            => 'hash',
- INCLUDE_EXT        => 'array',
- LIBS               => ['array',''],
- MAN1PODS           => 'hash',
- MAN3PODS           => 'hash',
- PL_FILES           => 'hash',
- PM                 => 'hash',
- PMLIBDIRS          => 'array',
- PMLIBPARENTDIRS    => 'array',
- PREREQ_PM          => 'hash',
- SKIP               => 'array',
- TYPEMAPS           => 'array',
- XS                 => 'hash',
+ C                  => 'ARRAY',
+ CONFIG             => 'ARRAY',
+ CONFIGURE          => 'CODE',
+ DIR                => 'ARRAY',
+ DL_FUNCS           => 'HASH',
+ DL_VARS            => 'ARRAY',
+ EXCLUDE_EXT        => 'ARRAY',
+ EXE_FILES          => 'ARRAY',
+ FUNCLIST           => 'ARRAY',
+ H                  => 'ARRAY',
+ IMPORTS            => 'HASH',
+ INCLUDE_EXT        => 'ARRAY',
+ LIBS               => ['ARRAY',''],
+ MAN1PODS           => 'HASH',
+ MAN3PODS           => 'HASH',
+ PL_FILES           => 'HASH',
+ PM                 => 'HASH',
+ PMLIBDIRS          => 'ARRAY',
+ PMLIBPARENTDIRS    => 'ARRAY',
+ PREREQ_PM          => 'HASH',
+ SKIP               => 'ARRAY',
+ TYPEMAPS           => 'ARRAY',
+ XS                 => 'HASH',
+ VERSION            => ['version',''],
  _KEEP_AFTER_FLUSH  => '',
 
- clean      => 'hash',
- depend     => 'hash',
- dist       => 'hash',
- dynamic_lib=> 'hash',
- linkext    => 'hash',
- macro      => 'hash',
- postamble  => 'hash',
- realclean  => 'hash',
- test       => 'hash',
- tool_autosplit => 'hash',
+ clean      => 'HASH',
+ depend     => 'HASH',
+ dist       => 'HASH',
+ dynamic_lib=> 'HASH',
+ linkext    => 'HASH',
+ macro      => 'HASH',
+ postamble  => 'HASH',
+ realclean  => 'HASH',
+ test       => 'HASH',
+ tool_autosplit => 'HASH',
 );
 
 @Att_Sigs{keys %Recognized_Att_Keys} = ('') x keys %Recognized_Att_Keys;
@@ -120,18 +121,27 @@ sub _verify_att {
         }
 
         my @sigs   = ref $sig ? @$sig : $sig;
-        my $given = lc ref $val;
-        unless( grep $given eq $_, @sigs ) {
-            my $takes = join " or ", map { $_ ne '' ? "$_ reference"
-                                                    : "string/number"
-                                         } @sigs;
-            my $has   = $given ne '' ? "$given reference"
-                                     : "string/number";
+        my $given  = ref $val;
+        unless( grep { $given eq $_ || ($_ && eval{$val->isa($_)}) } @sigs ) {
+            my $takes = join " or ", map { _format_att($_) } @sigs;
+
+            my $has = _format_att($given);
             warn "WARNING: $key takes a $takes not a $has.\n".
                  "         Please inform the author.\n";
         }
     }
 }
+
+
+sub _format_att {
+    my $given = shift;
+    
+    return $given eq ''        ? "string/number"
+         : uc $given eq $given ? "$given reference"
+         :                       "$given object"
+         ;
+}
+
 
 sub prompt ($;$) {
     my($mess, $def) = @_;
