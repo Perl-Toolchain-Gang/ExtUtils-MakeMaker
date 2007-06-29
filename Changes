@@ -16,6 +16,11 @@
       confusing things. [rt.cpan.org 25268]
     - Accidental use of $\ in a regex. [bleadperl 30521]
 
+    BSD
+    - If calling perl causes MakeMaker to emit warnings, then it
+      cannot find the location of its binary. [rt.cpan.org 23178]
+
+
     Doc Improvements
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
     - The example for setting $VERSION from $Revision$ in SVN was

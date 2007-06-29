@@ -1042,7 +1042,7 @@ WARNING
                 open STDERR, '>&STDERR_COPY' if $stderr_duped;
             }
 
-            if ($val =~ /^VER_OK/) {
+            if ($val =~ /^VER_OK/m) {
                 print "Using PERL=$abs\n" if $trace;
                 return $abs;
             } elsif ($trace >= 2) {
