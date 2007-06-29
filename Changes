@@ -27,6 +27,8 @@
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
     - The example for setting $VERSION from $Revision$ in SVN was
       incorrect. (Thanks to ROBERTMAY@cpan.org) [rt.cpan.org 26995]
+    - Document what's wrong with PREFIX and what to use instead.
+      [rt.cpan.org 12919]
 
     Misc
     - Provide information during the install about whether we're using the

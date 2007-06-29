@@ -104,6 +104,20 @@ And then set PERL5LIB to F<~/tmp/lib/perl5>.  This works well when you
 have multiple modules to work with.  It also ensures that the module
 goes through its full installation process which may modify it.
 
+=item PREFIX vs INSTALL_BASE from Module::Build::Cookbook
+
+The behavior of prefix is complicated and depends closely on how your
+Perl is configured. The resulting installation locations will vary from
+machine to machine and even different installations of Perl on the same machine.
+Because of this, its difficult to document where prefix will place your modules.
+
+In contrast, install_base has predictable, easy to explain installation locations.
+Now that Module::Build and MakeMaker both have install_base there is little reason
+to use prefix other than to preserve your existing installation locations. If you
+are starting a fresh Perl installation we encourage you to use install_base. If
+you have an existing installation installed via prefix, consider moving it to an
+installation structure matching install_base and using that instead.
+
 =back
 
 
