@@ -1,4 +1,4 @@
-6.33
+6.33  Fri Jun 29 17:15:34 CDT 2007
     New Features
     * VERSION now accepts version objects without warning.
       [rt.cpan.org 26075]
