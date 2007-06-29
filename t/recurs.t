@@ -122,5 +122,3 @@ close MAKEFILE;
 
     untie *STDERR;
 }
-
-print STDERR "foo";
