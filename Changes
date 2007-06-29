@@ -32,6 +32,7 @@
     - Provide information during the install about whether we're using the
       installed or provided dependency (ie. ExtUtils::Command).
     - Updated included versions of ExtUtils::Manifest and Command.
+    - Add .bak and .old to veryclean [rt.cpan.org 21284]
 
 6.32  Wed Feb 21 07:59:57 PST 2007
     New Features

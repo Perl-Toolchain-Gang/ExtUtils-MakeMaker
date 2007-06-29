@@ -632,7 +632,7 @@ manifest :
 	$(PERLRUN) "-MExtUtils::Manifest=mkmanifest" -e mkmanifest
 
 veryclean : realclean
-	$(RM_F) *~ *.orig */*~ */*.orig
+	$(RM_F) *~ *.orig */*~ */*.orig *.bak *.old */*.bak */*.old 
 
 MAKE_FRAG
 
@@ -1586,7 +1586,7 @@ sub init_main {
 
     unless ($self->{PERL_SRC}){
         foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
-            $dir = $self->catdir(($Updir) x $dir_count);
+            my $dir = $self->catdir(($Updir) x $dir_count);
 
             if (-f $self->catfile($dir,"config_h.SH")   &&
                 -f $self->catfile($dir,"perl.h")        &&
