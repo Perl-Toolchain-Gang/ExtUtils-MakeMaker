@@ -7,6 +7,8 @@
     Windows
     - Embed manifest files in EXEs and DLLs when building with VC++ 8.x
       [bleadperl #29266] [rt.cpan.org 26208]
+    - Improved the subdir command code so DIR can do more than one level
+      down. [rt.cpan.org 25180]
 
     VMS
     - Use linker flags rather than compiler flags to determine if the

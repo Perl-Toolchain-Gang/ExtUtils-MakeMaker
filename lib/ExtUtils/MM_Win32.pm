@@ -487,8 +487,7 @@ wants:
     another_command
     cd ..
 
-B<NOTE> This cd can only go one level down.  So far this sufficient for
-what MakeMaker needs.
+NOTE: This only works with simple relative directories.  Throw it an absolute dir or something with .. in it and things will go wrong.
 
 =cut
 
@@ -499,11 +498,13 @@ sub cd {
 
     my $cmd = join "\n\t", map "$_", @cmds;
 
+    my $updirs = $self->catdir(map { $self->updir } $self->splitdir($dir));
+
     # No leading tab and no trailing newline makes for easier embedding.
-    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
+    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd, $updirs;
 cd %s
 	%s
-	cd ..
+	cd %s
 MAKE_FRAG
 
     chomp $make_frag;
