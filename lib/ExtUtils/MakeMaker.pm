@@ -425,13 +425,6 @@ sub new {
               $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
         }
     }
-    if (%unsatisfied && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join ', ', map {"$_ $unsatisfied{$_}"} 
-                            keys %unsatisfied;
-        die qq{MakeMaker FATAL: prerequisites not found ($failedprereqs)\n
-               Please install these modules first and rerun 'perl Makefile.PL'.\n};
-    }
-
     if (defined $self->{CONFIGURE}) {
         if (ref $self->{CONFIGURE} eq 'CODE') {
             %configure_att = %{&{$self->{CONFIGURE}}};
@@ -501,6 +494,13 @@ sub new {
     } else {
         parse_args($self,split(' ', $ENV{PERL_MM_OPT} || ''),@ARGV);
     }
+    if (%unsatisfied && $self->{PREREQ_FATAL}){
+        my $failedprereqs = join ', ', map {"$_ $unsatisfied{$_}"} 
+                            keys %unsatisfied;
+        die qq{MakeMaker FATAL: prerequisites not found ($failedprereqs)\n
+               Please install these modules first and rerun 'perl Makefile.PL'.\n};
+    }
+
 
     $self->{NAME} ||= $self->guess_name;
 
@@ -2071,16 +2071,23 @@ by the PREFIX.
 =item PREREQ_FATAL
 
 Bool. If this parameter is true, failing to have the required modules
-(or the right versions thereof) will be fatal. perl Makefile.PL will die
-with the proper message.
+(or the right versions thereof) will be fatal. C<perl Makefile.PL>
+will C<die> instead of simply informing the user of the missing dependencies.
 
-Note: see L<Test::Harness> for a shortcut for stopping tests early if
-you are missing dependencies.
+It is I<extremely> rare to have to use C<PREREQ_FATAL>. Its use by module
+authors is I<strongly discouraged> and should never be used lightly.
+Module installation tools have ways of resolving umet dependencies but
+to do that they need a F<Makefile>.  Using C<PREREQ_FATAL> breaks this.
+That's bad.
 
-Do I<not> use this parameter for simple requirements, which could be resolved
-at a later time, e.g. after an unsuccessful B<make test> of your module.
+The only situation where it is appropriate is when you have
+dependencies that are indispensible to actually I<write> a
+F<Makefile>. For example, MakeMaker's F<Makefile.PL> needs L<File::Spec>.
+If its not available it cannot write the F<Makefile>.
 
-It is I<extremely> rare to have to use C<PREREQ_FATAL> at all!
+Note: see L<Test::Harness> for a shortcut for stopping tests early
+if you are missing dependencies and are afraid that users might
+use your module with an incomplete environment.
 
 =item PREREQ_PM
 

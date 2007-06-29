@@ -36,6 +36,8 @@
       incorrect. (Thanks to ROBERTMAY@cpan.org) [rt.cpan.org 26995]
     - Document what's wrong with PREFIX and what to use instead.
       [rt.cpan.org 12919]
+    - Improve the PREREQ_FATAL docs to make it really clear that you
+      do NOT want to use this!
 
     Misc
     - Provide information during the install about whether we're using the
