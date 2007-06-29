@@ -6,6 +6,8 @@
     - Fixed bug finding cross-compiled perls [bleadperl 31404]
     - Looking up to 8 levels up to find uninstalled perls
       [bleadperl 30932]
+    * A test failure in a sub-project would not cause "make test" to
+      fail. [rt.cpan.org 27804]
 
     Windows
     - Embed manifest files in EXEs and DLLs when building with VC++ 8.x

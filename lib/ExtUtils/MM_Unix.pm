@@ -3428,17 +3428,21 @@ TESTDB_SW = -d
 
 testdb :: testdb_\$(LINKTYPE)
 
-test :: \$(TEST_TYPE)
+test :: \$(TEST_TYPE) subdirs-test
+
+subdirs-test ::
+	\$(NOECHO) \$(NOOP)
+
 ");
 
     foreach my $dir (@{ $self->{DIR} }) {
-        my $test = $self->oneliner(sprintf <<'CODE', $dir);
-chdir '%s';  
-system '$(MAKE) test $(PASTHRU)' 
-    if -f '$(FIRST_MAKEFILE)';
-CODE
+        my $test = $self->cd($dir, '$(MAKE) test $(PASTHRU)');
 
-        push(@m, "\t\$(NOECHO) $test\n");
+        push @m, <<END
+subdirs-test ::
+	\$(NOECHO) $test
+
+END
     }
 
     push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")

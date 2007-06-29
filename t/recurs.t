@@ -15,7 +15,7 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 25;
+use Test::More tests => 26;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::Recurs;
 
@@ -111,3 +111,7 @@ ok( open(MAKEFILE, $submakefile) ) || diag("Can't open $submakefile: $!");
         'prepend .. not stomping WriteMakefile args' ) 
 }
 close MAKEFILE;
+
+
+my $test_out = run("$make test");
+isnt $?, 0, 'test failure in a subdir causes make to fail';
