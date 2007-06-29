@@ -342,8 +342,9 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
        q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
       .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)});
 
-      # VC 2005 (aka VC 8) or higher
-      if ($Config{cc} eq 'cl' and $Config{ccversion} =~ /^(\d+)/ and $1 >= 14) {
+      # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
+      if ($Config{ivsize} == 4 && $Config{cc} eq 'cl' and $Config{ccversion} =~ /^(\d+)/ and $1 >= 14) 
+    {
         push(@m,
           q{
 	mt -nologo -manifest $@.manifest -outputresource:$@;2 && del $@.manifest});
