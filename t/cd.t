@@ -19,22 +19,24 @@ use Test::More tests => 4;
 
 my @cd_args = ("some/dir", "command1", "command2");
 
-
 {
     package Test::MM_Win32;
     use ExtUtils::MM_Win32;
     @ISA = qw(ExtUtils::MM_Win32);
 
-        my $mm = bless {}, 'Test::MM_Win32';
+    my $mm = bless {}, 'Test::MM_Win32';
 
     {
         local *make = sub { "nmake" };
+
+        my @dirs = (File::Spec->updir) x 2;
+        my $expected_updir = File::Spec->catdir(@dirs);
         
         ::is $mm->cd(@cd_args),
-q{cd some/dir
+qq{cd some/dir
 	command1
 	command2
-	cd ../..};
+	cd $expected_updir};
     }
     
     {
