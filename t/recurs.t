@@ -115,10 +115,8 @@ close MAKEFILE;
 
 {
     # Quiet "make test" failure noise
-    my $out = tie *STDERR, 'TieOut';
+    close *STDERR;
 
     my $test_out = run("$make test");
     isnt $?, 0, 'test failure in a subdir causes make to fail';
-
-    untie *STDERR;
 }
