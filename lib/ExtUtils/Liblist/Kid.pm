@@ -376,9 +376,7 @@ sub _vms_ext {
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
-  my($dbgqual) = $self->{OPTIMIZE} || $Config{'optimize'} ||
-                 $self->{CCFLAGS}   || $Config{'ccflags'};
-  @crtls = ( ($dbgqual =~ m-/Debug-i ? $Config{'dbgprefix'} : '')
+  @crtls = ( ($Config{'ldflags'} =~ m-/Debug-i ? $Config{'dbgprefix'} : '')
               . 'PerlShr/Share' );
   push(@crtls, grep { not /\(/ } split /\s+/, $Config{'perllibs'});
   push(@crtls, grep { not /\(/ } split /\s+/, $Config{'libc'});

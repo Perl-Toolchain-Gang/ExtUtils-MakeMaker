@@ -8,6 +8,11 @@
     - Embed manifest files in EXEs and DLLs when building with VC++ 8.x
       [bleadperl #29266] [rt.cpan.org 26208]
 
+    VMS
+    - Use linker flags rather than compiler flags to determine if the
+      perl sharable image was linked debug.  This keeps OPTIMIZE from
+      confusing things. [rt.cpan.org 25268]
+
     Doc Improvements
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
     - The example for setting $VERSION from $Revision$ in SVN was
