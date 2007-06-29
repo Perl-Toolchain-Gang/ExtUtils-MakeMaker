@@ -7,6 +7,8 @@
 
     Doc Improvements
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
+    - The example for setting $VERSION from $Revision$ in SVN was
+      incorrect. (Thanks to ROBERTMAY@cpan.org) [rt.cpan.org 26995]
 
 6.32  Wed Feb 21 07:59:57 PST 2007
     New Features

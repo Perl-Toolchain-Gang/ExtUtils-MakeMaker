@@ -175,7 +175,7 @@ in the $Revision$ will be updated, updating your $VERSION.
 SVN uses a simple integer for $Revision$ so you can adapt it for your
 $VERSION like so:
 
-    $VERSION = (q$Revision$) =~ /(\d+)/g;
+    ($VERSION) = q$Revision$ =~ /(\d+)/;
 
 In CVS and RCS version 1.9 is followed by 1.10.  Since CPAN compares
 version numbers numerically we use a sprintf() to convert 1.9 to 1.009
