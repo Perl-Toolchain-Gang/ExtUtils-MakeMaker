@@ -1129,7 +1129,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 	
 	# Print out the new #! line (or equivalent).
 	local $\;
-	undef $/;
+	local $/;
 	print FIXOUT $shb, <FIXIN>;
 	close FIXIN;
 	close FIXOUT;

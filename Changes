@@ -4,6 +4,7 @@
       [bleadperl #29266] [rt.cpan.org 26208]
     - Properly not installing MANIFEST.SKIP when ExtUtils::Manifest is not
       being installed. [rt.cpan.org 21318]
+    - fixin() no longer clobbers $/ [rt.cpan.org 26234]
 
     Doc Improvements
     - Typo fixes.  $(TOUNIX) -> $(TO_UNIX).  [rt.cpan.org 23495]
