@@ -1,3 +1,7 @@
+6.34  Sat Jun 30 11:06:54 CDT 2007
+    Test Fixes
+    - Accidentally hard coded the version of strict.pm [rt.cpan.org 27838]
+
 6.33  Fri Jun 29 17:15:34 CDT 2007
     New Features
     * VERSION now accepts version objects without warning.
