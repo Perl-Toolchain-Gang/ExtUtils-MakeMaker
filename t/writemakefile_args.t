@@ -165,28 +165,30 @@ VERIFY
 
     SKIP: {
         skip("Can't test version objects",2) unless eval { require version };
+        version->import;
 
-        my $VERSION = version->new("1.2.3");
+        my $version = version->new("1.2.3");
         $warnings = '';
         eval {
             $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
-            VERSION    => $VERSION,
+            VERSION    => $version,
             );
         };
         is( $warnings, '' );
         isa_ok( $mm->{VERSION}, 'version' );
-        is( $mm->{VERSION}, '1.2.3' );
+        is( $mm->{VERSION}, $version );
 
         $warnings = '';
+        $version = qv('1.2.3');
         eval {
             $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
-            VERSION    => qv("1.2.3"),
+            VERSION    => $version,
             );
         };
         is( $warnings, '' );
         isa_ok( $mm->{VERSION}, 'version' );
-        is( $mm->{VERSION}, '1.2.3' );
+        is( $mm->{VERSION}, $version );
     }
 }

@@ -1,3 +1,7 @@
+6.35
+    Test Fixes
+    - writemakefile_args.t now works with older versions of version.pm
+
 6.34  Sat Jun 30 11:06:54 CDT 2007
     Test Fixes
     - Accidentally hard coded the version of strict.pm [rt.cpan.org 27838]
