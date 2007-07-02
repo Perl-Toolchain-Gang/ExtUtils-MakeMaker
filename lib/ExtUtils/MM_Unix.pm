@@ -2686,10 +2686,16 @@ sub parse_abstract {
 
 =item parse_version
 
-parse a file and return what you think is $VERSION in this file set to.
+    my $version = MM->parse_version($file);
+
+Parse a $file and return what $VERSION is set to by the first assignment.
 It will return the string "undef" if it can't figure out what $VERSION
-is. $VERSION should be for all to see, so our $VERSION or plain $VERSION
-are okay, but my $VERSION is not.
+is. $VERSION should be for all to see, so C<our $VERSION> or plain $VERSION
+are okay, but C<my $VERSION> is not.
+
+parse_version() will try to C<use version> before checking for C<$VERSION> so the following will work.
+
+    $VERSION = qv(1.2.3);
 
 =cut
 
@@ -2709,6 +2715,10 @@ sub parse_version {
 	my $eval = qq{
 	    package ExtUtils::MakeMaker::_version;
 	    no strict;
+	    BEGIN { eval {
+	        require version;
+	        "version"->import;
+	    } }
 
 	    local $1$2;
 	    \$$2=undef; do {

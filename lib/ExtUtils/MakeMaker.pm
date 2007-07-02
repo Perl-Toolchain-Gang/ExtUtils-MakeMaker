@@ -2188,16 +2188,27 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    $VERSION = (q$Revision$) =~ /(\d+)/g;
+    ($VERSION) = q$Revision$ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
-    our $VERSION = 1.2.3;       # new for perl5.6.0 
+    our $VERSION = 1.2.3;       # new for perl5.6.0
 
 but these will fail:
 
     my $VERSION = '1.01';
     local $VERSION = '1.02';
     local $FOO::VERSION = '1.30';
+
+L<version> will be loaded, if available, so this will work.
+
+    our $VERSION = qv(1.2.3);   # version.pm will be loaded if available
+
+Its up to you to declare a dependency on C<version>.  Also note that this
+feature was introduced in MakeMaker 6.35.  Earlier versions of MakeMaker
+require this:
+
+    # All on one line
+    use version; our $VERSION = qv(1.2.3);
 
 (Putting C<my> or C<local> on the preceding line will work o.k.)
 
