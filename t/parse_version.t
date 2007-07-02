@@ -19,7 +19,6 @@ my %versions = (q[$VERSION = '1.00']        => '1.00',
                 q[($VERSION) = q$Revision: 32208 $ =~ /(\d+)/g;] => 32208,
                 q[$FOO::VERSION = '1.10';]  => '1.10',
                 q[*FOO::VERSION = \'1.11';] => '1.11',
-                q[our $VERSION = '1.23';]   => '1.23',
                 '$VERSION = 0.02'   => 0.02,
                 '$VERSION = 0.0'    => 0.0,
                 '$VERSION = -1.0'   => -1.0,
@@ -29,6 +28,10 @@ my %versions = (q[$VERSION = '1.00']        => '1.00',
                 q[local $VERISON = '1.02']      => 'undef',
                 q[local $FOO::VERSION = '1.30'] => 'undef',
                );
+
+if( eval 'our $foo' ) {
+    $versions{q[our $VERSION = '1.23';]}   = '1.23',
+}
 
 if( eval 'require version; "version"->import' ) {
     $versions{q[use version; $VERSION = qv(1.2.3);]} = qv(1.2.3);
