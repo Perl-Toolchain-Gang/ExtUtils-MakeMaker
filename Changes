@@ -1,11 +1,10 @@
-6.35
+6.35  Sun Jul  1 20:53:38 PDT 2007
     New Features
     * MakeMaker will now try to "use version" before parsing $VERSION.
       This allows "$VERSION = qv(1.2.3)" to work.
 
     Test Fixes
     - writemakefile_args.t now works with older versions of version.pm
-
 
 6.34  Sat Jun 30 11:06:54 CDT 2007
     Test Fixes
