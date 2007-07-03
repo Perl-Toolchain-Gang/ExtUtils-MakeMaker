@@ -1,3 +1,8 @@
+6.36  Tue Jul  3 01:06:40 PDT 2007
+    Test Fixes
+    - version.pm prior to 0.7203 caused Foo->VERSION to reformat
+      $Foo::VERSION.  This caused prereq.t to fail.
+
 6.35  Sun Jul  1 20:53:38 PDT 2007
     New Features
     * MakeMaker will now try to "use version" before parsing $VERSION.
