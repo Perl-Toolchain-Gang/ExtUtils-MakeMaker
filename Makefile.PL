@@ -73,7 +73,7 @@ my $MM = WriteMakefile(
     # like this next release.
     EXTRA_META      => <<'META',
 no_index:
-    dir:
+    directory:
         - inc
 META
 
