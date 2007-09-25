@@ -35,8 +35,9 @@ BEGIN {
     $Is_SunOS4  = $^O eq 'sunos';
     $Is_Solaris = $^O eq 'solaris';
     $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
-    $Is_BSD     = $^O =~ /^(?:free|net|open)bsd$/ or
-                  $^O eq 'bsdos' or $^O eq 'interix';
+    $Is_BSD     = ($^O =~ /^(?:free|net|open)bsd$/ or
+                   grep( $^O eq $_, qw(bsdos interix dragonfly) )
+                  );
 }
 
 BEGIN {

@@ -1,6 +1,12 @@
 6.37
     Test Fixes
     - cd() test on VMS used non-native paths. [bleadperl 31534]
+    
+    Bug Fixes
+    - BSD detection code would not pick up bsdos or internix
+    
+    Portability Fixes
+    - Add "dragonfly" to the list of BSDish operating systems
 
 6.36  Tue Jul  3 01:06:40 PDT 2007
     Test Fixes
