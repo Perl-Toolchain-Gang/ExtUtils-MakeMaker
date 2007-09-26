@@ -721,13 +721,17 @@ MAKE_FRAG
         $prereq_pm .= sprintf "\n    %-30s %s", "$mod:", $ver;
     }
 
+    my $author_value = defined $self->{AUTHOR}
+        ? "\n    - $self->{AUTHOR}"
+        : undef;
+
     # Use a list to preserve order.
     my @meta_to_mm = (
         name         => $self->{DISTNAME},
         version      => $self->{VERSION},
         abstract     => $self->{ABSTRACT},
         license      => $self->{LICENSE},
-        author       => $self->{AUTHOR},
+        author       => $author_value,
         generated_by => 
                 "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
         distribution_type => $self->{PM} ? 'module' : 'script',

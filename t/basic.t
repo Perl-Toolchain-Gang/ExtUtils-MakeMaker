@@ -259,7 +259,8 @@ name:                Big-Dummy
 version:             0.01
 abstract:            Try "our" hot dog's
 license:             ~
-author:              Michael G Schwern <schwern@pobox.com>
+author:              
+    - Michael G Schwern <schwern@pobox.com>
 generated_by:        ExtUtils::MakeMaker version 6.36
 distribution_type:   module
 requires:     
