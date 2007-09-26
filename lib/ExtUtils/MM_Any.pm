@@ -727,6 +727,7 @@ MAKE_FRAG
         version      => $self->{VERSION},
         abstract     => $self->{ABSTRACT},
         license      => $self->{LICENSE},
+        author       => $self->{AUTHOR},
         generated_by => 
                 "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
         distribution_type => $self->{PM} ? 'module' : 'script',
@@ -745,13 +746,8 @@ MAKE_FRAG
     $meta .= <<"YAML";
 requires:     $prereq_pm
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
-YAML
-
-    $meta .= <<"YAML" if defined $self->{AUTHOR};
-author:
-    - $self->{AUTHOR}
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
 YAML
 
     $meta .= $self->{EXTRA_META} if $self->{EXTRA_META};
