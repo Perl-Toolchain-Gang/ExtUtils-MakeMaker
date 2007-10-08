@@ -7,6 +7,8 @@
 
     Test Fixes
     - cd() test on VMS used non-native paths. [bleadperl 31534]
+    - Removed uses of "no_plan" in tests to remain compatible with
+      old versions of Test::Harness.
     
     Bug Fixes
     - BSD detection code would not pick up bsdos or internix
