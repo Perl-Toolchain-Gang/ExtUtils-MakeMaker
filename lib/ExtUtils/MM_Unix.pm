@@ -2717,12 +2717,17 @@ sub parse_version {
             package ExtUtils::MakeMaker::_version;
             no strict;
             BEGIN { eval {
+                # Ensure any version() routine which might have leaked
+                # into this package has been deleted.  Interferes with
+                # version->import()
+                undef *version;
                 require version;
                 "version"->import;
             } }
 
             local $1$2;
-            \$$2=undef; do {
+            \$$2=undef;
+            do {
                 $_
             }; \$$2
         };

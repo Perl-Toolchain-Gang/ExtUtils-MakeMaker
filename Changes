@@ -12,6 +12,8 @@
     
     Bug Fixes
     - BSD detection code would not pick up bsdos or internix
+    - $VERSION detection code would be confused by "sub version"
+      [rt.cpan.org 30747]
     
     Portability Fixes
     - Add "dragonfly" to the list of BSDish operating systems
