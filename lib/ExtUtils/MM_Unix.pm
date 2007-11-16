@@ -2709,27 +2709,27 @@ sub parse_version {
     open(FH,$parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     while (<FH>) {
-	$inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
-	next if $inpod || /^\s*#/;
-	chop;
-	next unless /(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
-	my $eval = qq{
-	    package ExtUtils::MakeMaker::_version;
-	    no strict;
-	    BEGIN { eval {
-	        require version;
-	        "version"->import;
-	    } }
+        $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
+        next if $inpod || /^\s*#/;
+        chop;
+        next unless /(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+        my $eval = qq{
+            package ExtUtils::MakeMaker::_version;
+            no strict;
+            BEGIN { eval {
+                require version;
+                "version"->import;
+            } }
 
-	    local $1$2;
-	    \$$2=undef; do {
-		$_
-	    }; \$$2
-	};
+            local $1$2;
+            \$$2=undef; do {
+                $_
+            }; \$$2
+        };
         local $^W = 0;
-	$result = eval($eval);
-	warn "Could not eval '$eval' in $parsefile: $@" if $@;
-	last;
+        $result = eval($eval);
+        warn "Could not eval '$eval' in $parsefile: $@" if $@;
+        last;
     }
     close FH;
 
