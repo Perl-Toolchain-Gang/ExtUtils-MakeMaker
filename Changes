@@ -1,4 +1,4 @@
-6.37
+6.37_01  Sun Nov 25 17:05:53 PST 2007
     Improvements
     - Upgraded the META.yml to version 1.3 of the spec (which really
       doesn't change anything).  Thanks bdfoy.
