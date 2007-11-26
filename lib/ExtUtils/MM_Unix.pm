@@ -130,37 +130,42 @@ sub c_o {
     my($self) = shift;
     return '' unless $self->needs_linking();
     my(@m);
+    
+    my $command = '$(CCCMD)';
+    my $flags   = '$(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
+    
     if (my $cpp = $Config{cpprun}) {
         my $cpp_cmd = $self->const_cccmd;
         $cpp_cmd =~ s/^CCCMD\s*=\s*\$\(CC\)/$cpp/;
-        push @m, '
+        push @m, qq{
 .c.i:
-	'. $cpp_cmd . ' $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c > $*.i
-';
+	$cpp_cmd $flags \$*.c > \$*.i
+};
     }
-    push @m, '
+
+    push @m, qq{
 .c.s:
-	$(CCCMD) -S $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c
-';
-    push @m, '
+	$command -S $flags \$*.c
+
 .c$(OBJ_EXT):
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c
-';
-    push @m, '
-.C$(OBJ_EXT):
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.C
-' if !$Is_OS2 and !$Is_Win32 and !$Is_Dos; #Case-specific
-    push @m, '
+	$command $flags \$*.c
+
 .cpp$(OBJ_EXT):
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.cpp
+	$command $flags \$*.cpp
 
 .cxx$(OBJ_EXT):
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.cxx
+	$command $flags \$*.cxx
 
 .cc$(OBJ_EXT):
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.cc
-';
-    join "", @m;
+	$command $flags \$*.cc
+};
+
+    push @m, qq{
+.C$(OBJ_EXT):
+	$command \$*.C
+} if !$Is_OS2 and !$Is_Win32 and !$Is_Dos; #Case-specific
+
+    return join "", @m;
 }
 
 =item cflags (o)
