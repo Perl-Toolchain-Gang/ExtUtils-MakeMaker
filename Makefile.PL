@@ -7,7 +7,7 @@
 # - Fill in your dependencies in PREREQ_PM
 # Alternatively, you can say the hell with this and use h2xs.
 
-use 5.00503;
+BEGIN { require 5.006; }
 use strict;
 
 use lib qw(lib inc);    # build ourself with ourself

@@ -1,6 +1,10 @@
 6.37_03
-    Test Fixes
+    Tests
     - parse_version.t had wrong test count when version.pm isn't installed.
+    - Fixed some warnings in the XS module we're using for testing.
+
+    Portability
+    - Moved the minimum required version up to 5.6.0.
 
 6.37_02  Sun Nov 25 23:33:14 PST 2007
     Test Improvements
