@@ -29,11 +29,8 @@ my %versions = (q[$VERSION = '1.00']            => '1.00',
                 q[my $VERSION = '1.01']         => 'undef',
                 q[local $VERISON = '1.02']      => 'undef',
                 q[local $FOO::VERSION = '1.30'] => 'undef',
-                q[our $VERSION = '1.23';]}      => '1.23',
+                q[our $VERSION = '1.23';]       => '1.23',
                );
-
-    $versions{
-}
 
 if( $Has_Version ) {
     $versions{q[use version; $VERSION = qv("1.2.3");]} = qv("1.2.3");
