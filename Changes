@@ -5,6 +5,7 @@
     - MakeMaker now always includes the required 'author' field in 
       the META.yml even if it's undef to comply with the META.yml spec.
     - Updated ExtUtils-Install to latest version (1.44)
+    - Unified the version numbers of all modules.
 
     Test Fixes
     - cd() test on VMS used non-native paths. [bleadperl 31534]
