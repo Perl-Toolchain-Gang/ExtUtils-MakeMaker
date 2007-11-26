@@ -15,6 +15,7 @@ BEGIN {
 
 use strict;
 use Config;
+use ExtUtils::MakeMaker;
 
 use Test::More tests => 83;
 use MakeMaker::Test::Utils;
@@ -253,15 +254,15 @@ ok open META, $meta_yml or diag $!;
 my $meta = join '', <META>;
 ok close META;
 
-is $meta, <<'END';
+is $meta, <<"END";
 --- #YAML:1.0
 name:                Big-Dummy
 version:             0.01
 abstract:            Try "our" hot dog's
 license:             ~
 author:              
-    - Michael G Schwern <schwern@pobox.com>
-generated_by:        ExtUtils::MakeMaker version 6.36
+    - Michael G Schwern <schwern\@pobox.com>
+generated_by:        ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
 distribution_type:   module
 requires:     
     strict:                        0
