@@ -9,7 +9,9 @@
     - cd() test on VMS used non-native paths. [bleadperl 31534]
     - Removed uses of "no_plan" in tests to remain compatible with
       old versions of Test::Harness.
-    
+    - writemakefile_args.t had the wrong test count if version.pm isn't
+      installed.
+
     Bug Fixes
     - BSD detection code would not pick up bsdos or internix
     - $VERSION detection code would be confused by "sub version"
