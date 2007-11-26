@@ -3,7 +3,7 @@
     - Upgraded the META.yml to version 1.3 of the spec (which really
       doesn't change anything).  Thanks bdfoy.
     - MakeMaker now always includes the required 'author' field in 
-      the META.yml even if it's undef.
+      the META.yml even if it's undef to comply with the META.yml spec.
     - Updated ExtUtils-Install to latest version (1.44)
 
     Test Fixes
