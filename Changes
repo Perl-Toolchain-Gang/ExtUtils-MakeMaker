@@ -2,6 +2,9 @@
     Tests
     - parse_version.t had wrong test count when version.pm isn't installed.
     - Fixed some warnings in the XS module we're using for testing.
+    - "our $VERSION" test in parse_version.t was never running
+    - Quoting uses of 1.2.3 style versions in parse_version.t to protect
+      older perls.
 
     Portability
     - Moved the minimum required version up to 5.6.0.
