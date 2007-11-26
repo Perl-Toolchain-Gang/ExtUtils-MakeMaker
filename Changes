@@ -4,6 +4,7 @@
       doesn't change anything).  Thanks bdfoy.
     - MakeMaker now always includes the required 'author' field in 
       the META.yml even if it's undef.
+    - Updated ExtUtils-Install to latest version (1.44)
 
     Test Fixes
     - cd() test on VMS used non-native paths. [bleadperl 31534]
@@ -20,9 +21,6 @@
 
     Portability Fixes
     - Add "dragonfly" to the list of BSDish operating systems
-
-    Misc
-    - Updated ExtUtils-Install to latest version (1.44)
 
 6.36  Tue Jul  3 01:06:40 PDT 2007
     Test Fixes
