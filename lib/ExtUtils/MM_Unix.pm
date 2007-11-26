@@ -147,21 +147,21 @@ sub c_o {
 .c.s:
 	$command -S $flags \$*.c
 
-.c$(OBJ_EXT):
+.c\$(OBJ_EXT):
 	$command $flags \$*.c
 
-.cpp$(OBJ_EXT):
+.cpp\$(OBJ_EXT):
 	$command $flags \$*.cpp
 
-.cxx$(OBJ_EXT):
+.cxx\$(OBJ_EXT):
 	$command $flags \$*.cxx
 
-.cc$(OBJ_EXT):
+.cc\$(OBJ_EXT):
 	$command $flags \$*.cc
 };
 
     push @m, qq{
-.C$(OBJ_EXT):
+.C\$(OBJ_EXT):
 	$command \$*.C
 } if !$Is_OS2 and !$Is_Win32 and !$Is_Dos; #Case-specific
 

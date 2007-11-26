@@ -1,3 +1,10 @@
+6.37_02
+    Test Improvements
+    - Added a test for a basic XS build.
+
+    Bug Fixes
+    - A refactoring in 6.37_01 broke XS compilation.
+
 6.37_01  Sun Nov 25 17:05:53 PST 2007
     Improvements
     - Upgraded the META.yml to version 1.3 of the spec (which really
