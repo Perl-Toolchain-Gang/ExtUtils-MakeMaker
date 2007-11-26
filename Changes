@@ -14,15 +14,16 @@
       installed.
 
     Bug Fixes
-    - BSD detection code would not pick up bsdos or internix
     - $VERSION detection code would be confused by "sub version"
       [rt.cpan.org 30747]
-    - Fix detection of shared libperl on NetBSD [bleadperl 31526]
     - LINKTYPE=static will now be propagated to child builds.
       [bleadperl 31761]
 
     Portability Fixes
     - Add "dragonfly" to the list of BSDish operating systems
+    - BSD detection code would not pick up bsdos or internix
+    - Fix detection of shared libperl on NetBSD [bleadperl 31526]
+
 
 6.36  Tue Jul  3 01:06:40 PDT 2007
     Test Fixes
