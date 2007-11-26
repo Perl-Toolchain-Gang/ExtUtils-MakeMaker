@@ -66,7 +66,7 @@ sub parse_version_string {
 
 
 SKIP: {
-    skip "need version.pm", 2 unless $Has_Version;
+    skip "need version.pm", 4 unless $Has_Version;
     is parse_version_string(q[ $VERSION = '1.00'; sub version { $VERSION } ]),
        '1.00';
     is parse_version_string(q[ use version; $VERSION = version->new(1.23) ]),

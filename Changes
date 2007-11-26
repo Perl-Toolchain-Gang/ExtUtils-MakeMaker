@@ -1,3 +1,7 @@
+6.37_03
+    Test Fixes
+    - parse_version.t had wrong test count when version.pm isn't installed.
+
 6.37_02  Sun Nov 25 23:33:14 PST 2007
     Test Improvements
     - Added a test for a basic XS build.
