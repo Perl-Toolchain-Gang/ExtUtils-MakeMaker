@@ -3,7 +3,7 @@ package ExtUtils::MM_MacOS;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = 6.37_01;
+$VERSION = 6.37_02;
 
 sub new {
     die <<'UNSUPPORTED';

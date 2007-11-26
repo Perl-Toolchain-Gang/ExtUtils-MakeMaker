@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker::bytes;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = 6.37_01;
+$VERSION = 6.37_02;
 
 my $Have_Bytes = eval q{require bytes; 1;};
 
