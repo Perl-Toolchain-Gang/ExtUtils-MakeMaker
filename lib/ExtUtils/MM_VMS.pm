@@ -1571,23 +1571,7 @@ map_clean :
 
     join '', @m;
 }
-  
-# --- Output postprocessing section ---
 
-=item nicetext (override)
-
-Insure that colons marking targets are preceded by space, in order
-to distinguish the target delimiter from a colon appearing as
-part of a filespec.
-
-=cut
-
-sub nicetext {
-    my($self,$text) = @_;
-    return $text if $text =~ m/^\w+\s*=/; # leave macro defs alone
-    $text =~ s/([^\s:])(:+\s)/$1 $2/gs;
-    $text;
-}
 
 =item prefixify (override)
 

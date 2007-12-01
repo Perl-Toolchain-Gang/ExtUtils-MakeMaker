@@ -635,7 +635,7 @@ END
             my(%a) = %{$self->{$section} || {}};
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
             push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
-            push @{$self->{RESULT}}, $self->nicetext($self->$method( %a ));
+            push @{$self->{RESULT}}, $self->$method( %a );
         }
     }
 
@@ -660,15 +660,15 @@ sub WriteEmptyMakefile {
     }
     open MF, '>'.$new or die "open $new for write: $!";
     print MF <<'EOP';
-all:
+all :
 
-clean:
+clean :
 
-install:
+install :
 
-makemakerdflt:
+makemakerdflt :
 
-test:
+test :
 
 EOP
     close MF or die "close $new for write: $!";
