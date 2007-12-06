@@ -3,7 +3,7 @@ package ExtUtils::MM_DOS;
 use strict;
 use vars qw($VERSION @ISA);
 
-$VERSION = 6.39_01;
+$VERSION = 6.40;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
