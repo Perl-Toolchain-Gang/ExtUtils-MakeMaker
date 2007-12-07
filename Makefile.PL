@@ -75,6 +75,8 @@ my $MM = WriteMakefile(
 no_index:
     directory:
         - inc
+    package:
+        - DynaLoader
 META
 
     INSTALLDIRS     => 'perl',
