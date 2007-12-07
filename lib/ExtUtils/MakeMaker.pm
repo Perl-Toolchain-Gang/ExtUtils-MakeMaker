@@ -637,7 +637,9 @@ END
             my(%a) = %{$self->{$section} || {}};
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
             push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
-            push @{$self->{RESULT}}, $self->$method( %a );
+            push @{$self->{RESULT}}, $self->maketext_filter(
+                $self->$method( %a )
+            );
         }
     }
 

@@ -1572,6 +1572,22 @@ map_clean :
     join '', @m;
 }
 
+# --- Output postprocessing section ---
+
+=item maketext_filter (override)
+
+Insure that colons marking targets are preceded by space, in order
+to distinguish the target delimiter from a colon appearing as
+part of a filespec.
+
+=cut
+
+sub maketext_filter {
+    my($self, $text) = @_;
+
+    $text =~ s/^([^\s:=]+)(:+\s)/$1 $2/mg;
+    return $text;
+}
 
 =item prefixify (override)
 
