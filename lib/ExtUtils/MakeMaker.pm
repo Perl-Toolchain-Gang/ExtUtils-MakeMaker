@@ -425,6 +425,18 @@ sub new {
               $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
         }
     }
+    
+     if (%unsatisfied && $self->{PREREQ_FATAL}){
+        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"} 
+                            sort { $a cmp $b } keys %unsatisfied;
+        die <<"END";
+MakeMaker FATAL: prerequisites not found.
+$failedprereqs
+
+Please install these modules first and rerun 'perl Makefile.PL'.
+END
+    }
+    
     if (defined $self->{CONFIGURE}) {
         if (ref $self->{CONFIGURE} eq 'CODE') {
             %configure_att = %{&{$self->{CONFIGURE}}};
@@ -493,16 +505,6 @@ sub new {
         parse_args($self,@fm) if @fm;
     } else {
         parse_args($self,split(' ', $ENV{PERL_MM_OPT} || ''),@ARGV);
-    }
-    if (%unsatisfied && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"} 
-                            sort { $a cmp $b } keys %unsatisfied;
-        die <<"END";
-MakeMaker FATAL: prerequisites not found.
-$failedprereqs
-
-Please install these modules first and rerun 'perl Makefile.PL'.
-END
     }
 
 
