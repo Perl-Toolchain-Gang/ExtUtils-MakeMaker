@@ -1,4 +1,4 @@
-6.41_01
+6.42  Fri Dec  7 17:00:14 PST 2007
     Bug Fixes
     - 6.33 moved PREREQ_FATAL to happen after CONFIGURE.  This meant if
       your CONFIGURE use a prereq it would fail and no PREREQ_FATAL
