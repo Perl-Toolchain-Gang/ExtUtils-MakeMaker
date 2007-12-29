@@ -5,7 +5,7 @@ package ExtUtils::Liblist::Kid;
 # This kid package is to be used by MakeMaker.  It will not work if
 # $self is not a Makemaker.
 
-use 5.00503;
+use 5.006;
 # Broken out of MakeMaker from version 4.11
 
 use strict;
