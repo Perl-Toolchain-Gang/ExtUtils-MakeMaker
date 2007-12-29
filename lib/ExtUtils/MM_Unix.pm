@@ -995,7 +995,7 @@ Finds the executables PERL and FULLPERL
 
 sub find_perl {
     my($self, $ver, $names, $dirs, $trace) = @_;
-    my($name, $dir);
+
     if ($trace >= 2){
         print "Looking for perl $ver by these names:
 @$names
@@ -1006,8 +1006,10 @@ in these dirs:
 
     my $stderr_duped = 0;
     local *STDERR_COPY;
+
     unless ($Is_BSD) {
-        if( open(STDERR_COPY, '>&STDERR') ) {
+        # >& and lexical filehandles together give 5.6.2 indigestion
+        if( open(STDERR_COPY, '>&STDERR') ) {  ## no critic
             $stderr_duped = 1;
         }
         else {
@@ -1018,8 +1020,8 @@ WARNING
         }
     }
 
-    foreach $name (@$names){
-        foreach $dir (@$dirs){
+    foreach my $name (@$names){
+        foreach my $dir (@$dirs){
             next unless defined $dir; # $self->{PERL_SRC} may be undefined
             my ($abs, $val);
             if ($self->file_name_is_absolute($name)) {     # /foo/bar
@@ -1049,7 +1051,10 @@ WARNING
             } else {
                 close STDERR if $stderr_duped;
                 $val = `$version_check`;
-                open STDERR, '>&STDERR_COPY' if $stderr_duped;
+
+                # 5.6.2's 3-arg open doesn't work with >&
+                open STDERR, ">&STDERR_COPY"  ## no critic
+                        if $stderr_duped;
             }
 
             if ($val =~ /^VER_OK/m) {
@@ -1081,11 +1086,9 @@ sub fixin {    # stolen from the pink Camel book, more or less
         my $file_new = "$file.new";
         my $file_bak = "$file.bak";
 
-        local (*FIXIN);
-        local (*FIXOUT);
-        open( FIXIN, $file ) or croak "Can't process '$file': $!";
+        open( my $fixin, '<', $file ) or croak "Can't process '$file': $!";
         local $/ = "\n";
-        chomp( my $line = <FIXIN> );
+        chomp( my $line = <$fixin> );
         next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
         # Now figure out the interpreter name.
         my ( $cmd, $arg ) = split ' ', $line, 2;
@@ -1106,8 +1109,8 @@ sub fixin {    # stolen from the pink Camel book, more or less
             my (@absdirs)
                 = reverse grep { $self->file_name_is_absolute } $self->path;
             $interpreter = '';
-            my ($dir);
-            foreach $dir (@absdirs) {
+
+            foreach my $dir (@absdirs) {
                 if ( $self->maybe_command($cmd) ) {
                     warn "Ignoring $interpreter in $file\n"
                         if $Verbose && $interpreter;
@@ -1140,17 +1143,17 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
             next;
         }
 
-        unless ( open( FIXOUT, ">$file_new" ) ) {
+        open( my $fixout, ">", "$file_new" ) or do {
             warn "Can't create new $file: $!\n";
             next;
-        }
+        };
 
         # Print out the new #! line (or equivalent).
         local $\;
         local $/;
-        print FIXOUT $shb, <FIXIN>;
-        close FIXIN;
-        close FIXOUT;
+        print $fixout $shb, <$fixin>;
+        close $fixin;
+        close $fixout;
 
         chmod 0666, $file_bak;
         unlink $file_bak;
@@ -1169,7 +1172,6 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
         unlink $file_bak;
     }
     continue {
-        close(FIXIN) if fileno(FIXIN);
         system("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
     }
 }
@@ -1255,7 +1257,7 @@ Called by init_main.
 
 sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my($self) = @_;
-    my($name, %dir, %xs, %c, %h, %pl_files, %pm);
+    my(%dir, %xs, %c, %h, %pl_files, %pm);
 
     my %ignore = map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t);
 
@@ -1265,7 +1267,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 
     @ignore{map lc, keys %ignore} = values %ignore if $Is_VMS;
 
-    foreach $name ($self->lsdir($Curdir)){
+    foreach my $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
 	next if $name eq $Curdir or $name eq $Updir or $ignore{$name};
 	next unless $self->libscan($name);
@@ -1287,7 +1289,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	} elsif (($Is_VMS || $Is_Dos) && $name =~ /[._]pl$/i) {
 	    # case-insensitive filesystem, one dot per name, so foo.h.PL
 	    # under Unix appears as foo.h_pl under VMS or fooh.pl on Dos
-	    local($/); open(PL,$name); my $txt = <PL>; close PL;
+	    local($/); open(my $pl, '<', $name); my $txt = <$pl>; close $pl;
 	    if ($txt =~ /Extracting \S+ \(with variable substitutions/) {
 		($pl_files{$name} = $name) =~ s/[._]pl\z//i ;
 	    }
@@ -1339,19 +1341,18 @@ sub init_MANPODS {
 sub _has_pod {
     my($self, $file) = @_;
 
-    local *FH;
     my($ispod)=0;
-    if (open(FH,"<$file")) {
-	while (<FH>) {
-	    if (/^=(?:head\d+|item|pod)\b/) {
-		$ispod=1;
-		last;
-	    }
-	}
-	close FH;
+    if (open( my $fh, '<', $file )) {
+        while (<$fh>) {
+            if (/^=(?:head\d+|item|pod)\b/) {
+                $ispod=1;
+                last;
+            }
+        }
+        close $fh;
     } else {
-	# If it doesn't exist yet, we assume, it has pods in it
-	$ispod = 1;
+        # If it doesn't exist yet, we assume, it has pods in it
+        $ispod = 1;
     }
 
     return $ispod;
@@ -1754,8 +1755,8 @@ sub init_others {	# --- Initialize Other Attributes
 
     $self->{LIBS} = [''] unless @{$self->{LIBS}} && defined $self->{LIBS}[0];
     $self->{LD_RUN_PATH} = "";
-    my($libs);
-    foreach $libs ( @{$self->{LIBS}} ){
+
+    foreach my $libs ( @{$self->{LIBS}} ){
 	$libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
 	my(@libs) = $self->extliblist($libs);
 	if ($libs[0] or $libs[1] or $libs[2]){
@@ -2400,16 +2401,14 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
 	if( exists $self->{INCLUDE_EXT} ){
 		my $found = 0;
-		my $incl;
-		my $xx;
 
-		($xx = $File::Find::name) =~ s,.*?/auto/,,s;
+		(my $xx = $File::Find::name) =~ s,.*?/auto/,,s;
 		$xx =~ s,/?$_,,;
 		$xx =~ s,/,::,g;
 
 		# Throw away anything not explicitly marked for inclusion.
 		# DynaLoader is implied.
-		foreach $incl ((@{$self->{INCLUDE_EXT}},'DynaLoader')){
+		foreach my $incl ((@{$self->{INCLUDE_EXT}},'DynaLoader')){
 			if( $xx eq $incl ){
 				$found++;
 				last;
@@ -2418,15 +2417,12 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 		return unless $found;
 	}
 	elsif( exists $self->{EXCLUDE_EXT} ){
-		my $excl;
-		my $xx;
-
-		($xx = $File::Find::name) =~ s,.*?/auto/,,s;
+		(my $xx = $File::Find::name) =~ s,.*?/auto/,,s;
 		$xx =~ s,/?$_,,;
 		$xx =~ s,/,::,g;
 
 		# Throw away anything explicitly marked for exclusion
-		foreach $excl (@{$self->{EXCLUDE_EXT}}){
+		foreach my $excl (@{$self->{EXCLUDE_EXT}}){
 			return if( $xx eq $excl );
 		}
 	}
@@ -2511,8 +2507,7 @@ $(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" 
 	$(NOECHO) $(TOUCH) $@
 ';
 
-    my $catfile;
-    foreach $catfile (@$extra){
+    foreach my $catfile (@$extra){
 	push @m, "\tcat $catfile >> \$\@\n";
     }
 
@@ -2629,8 +2624,8 @@ also has_link_code())
 
 sub needs_linking {
     my($self) = shift;
-    my($child,$caller);
-    $caller = (caller(0))[3];
+
+    my $caller = (caller(0))[3];
     confess("needs_linking called too early") if 
       $caller =~ /^ExtUtils::MakeMaker::/;
     return $self->{NEEDS_LINKING} if defined $self->{NEEDS_LINKING};
@@ -2638,7 +2633,7 @@ sub needs_linking {
 	$self->{NEEDS_LINKING} = 1;
 	return 1;
     }
-    foreach $child (keys %{$self->{CHILDREN}}) {
+    foreach my $child (keys %{$self->{CHILDREN}}) {
 	if ($self->{CHILDREN}->{$child}->needs_linking) {
 	    $self->{NEEDS_LINKING} = 1;
 	    return 1;
@@ -2657,13 +2652,13 @@ parse a file and return what you think is the ABSTRACT
 sub parse_abstract {
     my($self,$parsefile) = @_;
     my $result;
-    local *FH;
+
     local $/ = "\n";
-    open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
-    while (<FH>) {
+    while (<$fh>) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if !$inpod;
         chop;
@@ -2671,7 +2666,8 @@ sub parse_abstract {
         $result = $2;
         last;
     }
-    close FH;
+    close $fh;
+
     return $result;
 }
 
@@ -2693,12 +2689,12 @@ parse_version() will try to C<use version> before checking for C<$VERSION> so th
 sub parse_version {
     my($self,$parsefile) = @_;
     my $result;
-    local *FH;
+
     local $/ = "\n";
     local $_;
-    open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
-    while (<FH>) {
+    while (<$fh>) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if $inpod || /^\s*#/;
         chop;
@@ -2722,11 +2718,11 @@ sub parse_version {
             }; \$$2
         };
         local $^W = 0;
-        $result = eval($eval);
+        $result = eval($eval);  ## no critic
         warn "Could not eval '$eval' in $parsefile: $@" if $@;
         last;
     }
-    close FH;
+    close $fh;
 
     $result = "undef" unless defined $result;
     return $result;
@@ -2742,13 +2738,13 @@ subdirectories.
 
 sub pasthru {
     my($self) = shift;
-    my(@m,$key);
+    my(@m);
 
     my(@pasthru);
     my($sep) = $Is_VMS ? ',' : '';
     $sep .= "\\\n\t";
 
-    foreach $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
+    foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
                      PREFIX INSTALL_BASE)
                  ) 
     {
@@ -2756,7 +2752,7 @@ sub pasthru {
 	push @pasthru, "$key=\"\$($key)\"";
     }
 
-    foreach $key (qw(DEFINE INC)) {
+    foreach my $key (qw(DEFINE INC)) {
         next unless defined $self->{$key};
 	push @pasthru, "PASTHRU_$key=\"\$(PASTHRU_$key)\"";
     }
@@ -3389,11 +3385,11 @@ Defines targets to process subdirectories.
 sub subdirs {
 # --- Sub-directory Sections ---
     my($self) = shift;
-    my(@m,$dir);
+    my(@m);
     # This method provides a mechanism to automatically deal with
     # subdirectories containing further Makefile.PL scripts.
     # It calls the subdir_x() method for each subdirectory.
-    foreach $dir (@{$self->{DIR}}){
+    foreach my $dir (@{$self->{DIR}}){
 	push(@m, $self->subdir_x($dir));
 ####	print "Including $dir subdirectory\n";
     }
@@ -3569,20 +3565,19 @@ sub tool_xsubpp {
     my $tmdir   = File::Spec->catdir($self->{PERL_LIB},"ExtUtils");
     my(@tmdeps) = $self->catfile($tmdir,'typemap');
     if( $self->{TYPEMAPS} ){
-	my $typemap;
-	foreach $typemap (@{$self->{TYPEMAPS}}){
-		if( ! -f  $typemap ){
-			warn "Typemap $typemap not found.\n";
-		}
-		else{
-			push(@tmdeps,  $typemap);
-		}
-	}
+        foreach my $typemap (@{$self->{TYPEMAPS}}){
+            if( ! -f  $typemap ) {
+                warn "Typemap $typemap not found.\n";
+            }
+            else {
+                push(@tmdeps,  $typemap);
+            }
+        }
     }
     push(@tmdeps, "typemap") if -f "typemap";
     my(@tmargs) = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
- 	unshift( @tmargs, $self->{XSOPT} );
+        unshift( @tmargs, $self->{XSOPT} );
     }
 
     if ($Is_VMS                          &&

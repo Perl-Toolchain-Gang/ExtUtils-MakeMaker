@@ -33,8 +33,8 @@ $VERSION = '6.42';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my $BORLAND = 1 if $Config{'cc'} =~ /^bcc/i;
-my $GCC     = 1 if $Config{'cc'} =~ /^gcc/i;
+my $BORLAND = $Config{'cc'} =~ /^bcc/i ? 1 : 0;
+my $GCC     = $Config{'cc'} =~ /^gcc/i ? 1 : 0;
 
 
 =head2 Overridden methods
