@@ -1,8 +1,9 @@
 package ExtUtils::MakeMaker::Config;
 
-$VERSION = '6.42';
-
 use strict;
+
+our $VERSION = '6.42';
+
 use Config ();
 
 # Give us an overridable config.
@@ -12,7 +13,7 @@ use vars qw(%Config);
 sub import {
     my $caller = caller;
 
-    no strict 'refs';
+    no strict 'refs';   ## no critic
     *{$caller.'::Config'} = \%Config;
 }
 

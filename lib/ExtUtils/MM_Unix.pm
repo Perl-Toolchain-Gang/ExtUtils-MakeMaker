@@ -1,6 +1,6 @@
 package ExtUtils::MM_Unix;
 
-require 5.005_03;  # Maybe further back, dunno
+require 5.006;
 
 use strict;
 
@@ -231,8 +231,7 @@ sub cflags {
 	  echo perltype=\$perltype
 	  echo optdebug=\$optdebug
 	  `;
-	my($line);
-	foreach $line (@o){
+	foreach my $line (@o){
 	    chomp $line;
 	    if ($line =~ /(.*?)=\s*(.*)\s*$/){
 		$cflags{$1} = $2;
@@ -308,16 +307,19 @@ sub const_config {
 # --- Constants Sections ---
 
     my($self) = shift;
-    my(@m,$m);
-    push(@m,"\n# These definitions are from config.sh (via $INC{'Config.pm'})\n");
-    push(@m,"\n# They may have been overridden via Makefile.PL or on the command line\n");
+    my @m = <<"END";
+
+# These definitions are from config.sh (via $INC{'Config.pm'}).
+# They may have been overridden via Makefile.PL or on the command line.
+END
+
     my(%once_only);
-    foreach $m (@{$self->{CONFIG}}){
-	# SITE*EXP macros are defined in &constants; avoid duplicates here
-	next if $once_only{$m};
-	$self->{uc $m} = quote_paren($self->{uc $m});
-	push @m, uc($m) , ' = ' , $self->{uc $m}, "\n";
-	$once_only{$m} = 1;
+    foreach my $key (@{$self->{CONFIG}}){
+        # SITE*EXP macros are defined in &constants; avoid duplicates here
+        next if $once_only{$key};
+        $self->{uc $key} = quote_paren($self->{uc $key});
+        push @m, uc($key) , ' = ' , $self->{uc $key}, "\n";
+        $once_only{$key} = 1;
     }
     join('', @m);
 }
@@ -338,19 +340,18 @@ sub const_loadlibs {
 # See ExtUtils::Liblist for details
 #
 };
-    my($tmp);
-    for $tmp (qw/
-	 EXTRALIBS LDLOADLIBS BSLOADLIBS
-	 /) {
-	next unless defined $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
+    for my $tmp (qw/
+         EXTRALIBS LDLOADLIBS BSLOADLIBS
+         /) {
+        next unless defined $self->{$tmp};
+        push @m, "$tmp = $self->{$tmp}\n";
     }
     # don't set LD_RUN_PATH if empty
-    for $tmp (qw/
-	 LD_RUN_PATH
-	 /) {
-	next unless $self->{$tmp};
-	push @m, "$tmp = $self->{$tmp}\n";
+    for my $tmp (qw/
+         LD_RUN_PATH
+         /) {
+        next unless $self->{$tmp};
+        push @m, "$tmp = $self->{$tmp}\n";
     }
     return join "", @m;
 }
@@ -1693,17 +1694,17 @@ EOP
 
     # Get some stuff out of %Config if we haven't yet done so
     print STDOUT "CONFIG must be an array ref\n"
-	if ($self->{CONFIG} and ref $self->{CONFIG} ne 'ARRAY');
+        if ($self->{CONFIG} and ref $self->{CONFIG} ne 'ARRAY');
     $self->{CONFIG} = [] unless (ref $self->{CONFIG});
     push(@{$self->{CONFIG}}, @ExtUtils::MakeMaker::Get_from_Config);
     push(@{$self->{CONFIG}}, 'shellflags') if $Config{shellflags};
     my(%once_only);
     foreach my $m (@{$self->{CONFIG}}){
-	next if $once_only{$m};
-	print STDOUT "CONFIG key '$m' does not exist in Config.pm\n"
-		unless exists $Config{$m};
-	$self->{uc $m} ||= $Config{$m};
-	$once_only{$m} = 1;
+        next if $once_only{$m};
+        print STDOUT "CONFIG key '$m' does not exist in Config.pm\n"
+                unless exists $Config{$m};
+        $self->{uc $m} ||= $Config{$m};
+        $once_only{$m} = 1;
     }
 
 # This is too dangerous:
@@ -1726,8 +1727,8 @@ EOP
     # make a simple check if we find Exporter
     warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
         (Exporter.pm not found)"
-	unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
-        $self->{NAME} eq "ExtUtils::MakeMaker";
+        unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
+               $self->{NAME} eq "ExtUtils::MakeMaker";
 }
 
 =item init_others

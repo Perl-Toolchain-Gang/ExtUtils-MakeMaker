@@ -1,7 +1,9 @@
 # $Id$
 package ExtUtils::MakeMaker;
 
-BEGIN {require 5.005_03;}
+use strict;
+
+BEGIN {require 5.006;}
 
 require Exporter;
 use ExtUtils::MakeMaker::Config;
@@ -19,7 +21,6 @@ use vars qw(
 # Has to be on its own line with no $ after it to avoid being noticed by
 # the version control system
 use vars qw($Revision);
-use strict;
 
 $VERSION = '6.42';
 ($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
@@ -143,7 +144,7 @@ sub _format_att {
 }
 
 
-sub prompt ($;$) {
+sub prompt ($;$) {  ## no critic
     my($mess, $def) = @_;
     Carp::confess("prompt function called without an argument") 
         unless defined $mess;
@@ -454,19 +455,19 @@ END
     my $newclass = ++$PACKNAME;
     local @Parent = @Parent;    # Protect against non-local exits
     {
-        no strict 'refs';
         print "Blessing Object into class [$newclass]\n" if $Verbose>=2;
         mv_all_methods("MY",$newclass);
         bless $self, $newclass;
         push @Parent, $self;
         require ExtUtils::MY;
+
+        no strict 'refs';   ## no critic;
         @{"$newclass\:\:ISA"} = 'MM';
     }
 
     if (defined $Parent[-2]){
         $self->{PARENT} = $Parent[-2];
-        my $key;
-        for $key (@Prepend_parent) {
+        for my $key (@Prepend_parent) {
             next unless defined $self->{PARENT}{$key};
 
             # Don't stomp on WriteMakefile() args.
@@ -606,8 +607,7 @@ END
     }
 
     # turn the SKIP array into a SKIPHASH hash
-    my (%skip,$skip);
-    for $skip (@{$self->{SKIP} || []}) {
+    for my $skip (@{$self->{SKIP} || []}) {
         $self->{SKIPHASH}{$skip} = 1;
     }
     delete $self->{SKIP}; # free memory
@@ -662,8 +662,8 @@ sub WriteEmptyMakefile {
     if ( -f $new ) {
         _rename($new, $old) or warn "rename $new => $old: $!"
     }
-    open MF, '>'.$new or die "open $new for write: $!";
-    print MF <<'EOP';
+    open my $mfh, '>', $new or die "open $new for write: $!";
+    print $mfh <<'EOP';
 all :
 
 clean :
@@ -675,7 +675,7 @@ makemakerdflt :
 test :
 
 EOP
-    close MF or die "close $new for write: $!";
+    close $mfh or die "close $new for write: $!";
 }
 
 sub check_manifest {
@@ -794,7 +794,7 @@ sub check_hints {
 }
 
 sub _run_hintfile {
-    no strict 'vars';
+    our $self;
     local($self) = shift;       # make $self available to the hint file.
     my($hint_file) = shift;
 
@@ -813,8 +813,6 @@ sub _run_hintfile {
 
 sub mv_all_methods {
     my($from,$to) = @_;
-    no strict 'refs';
-    my($symtab) = \%{"${from}::"};
 
     # Here you see the *current* list of methods that are overridable
     # from Makefile.PL via MY:: subroutines. As of VERSION 5.07 I'm
@@ -837,19 +835,23 @@ sub mv_all_methods {
 
         next unless defined &{"${from}::$method"};
 
-        *{"${to}::$method"} = \&{"${from}::$method"};
+        {
+            no strict 'refs';   ## no critic
+            *{"${to}::$method"} = \&{"${from}::$method"};
 
-        # delete would do, if we were sure, nobody ever called
-        # MY->makeaperl directly
+            # If we delete a method, then it will be undefined and cannot
+            # be called.  But as long as we have Makefile.PLs that rely on
+            # %MY:: being intact, we have to fill the hole with an
+            # inheriting method:
 
-        # delete $symtab->{$method};
-
-        # If we delete a method, then it will be undefined and cannot
-        # be called.  But as long as we have Makefile.PLs that rely on
-        # %MY:: being intact, we have to fill the hole with an
-        # inheriting method:
-
-        eval "package MY; sub $method { shift->SUPER::$method(\@_); }";
+            {
+                package MY;
+                my $super = "SUPER::".$method;
+                *{$method} = sub {
+                    shift->$super(@_);
+                };
+            }
+        }
     }
 
     # We have to clean out %INC also, because the current directory is
@@ -898,20 +900,19 @@ sub skipcheck {
 
 sub flush {
     my $self = shift;
-    my($chunk);
-    local *FH;
 
     my $finalname = $self->{MAKEFILE};
     print STDOUT "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
-    open(FH,">MakeMaker.tmp") or die "Unable to open MakeMaker.tmp: $!";
+    open(my $fh,">", "MakeMaker.tmp")
+        or die "Unable to open MakeMaker.tmp: $!";
 
-    for $chunk (@{$self->{RESULT}}) {
-        print FH "$chunk\n";
+    for my $chunk (@{$self->{RESULT}}) {
+        print $fh "$chunk\n";
     }
 
-    close FH;
+    close $fh;
     _rename("MakeMaker.tmp", $finalname) or
       warn "rename MakeMaker.tmp => $finalname: $!";
     chmod 0644, $finalname unless $Is_VMS;
