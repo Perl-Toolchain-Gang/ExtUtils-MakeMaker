@@ -1,5 +1,9 @@
 6.44
-    Test Fixes
+    Docs
+    * The documentation of VERSION_FROM was recommending vstrings (1.2.3)
+      which have never worked right.
+
+    Tests
     * The compilation test was testing the installed modules, not the
       about-to-be-installed.
 

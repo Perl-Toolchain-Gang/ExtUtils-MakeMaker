@@ -2191,26 +2191,29 @@ will be evaluated with eval() and the value of the named variable
 B<after> the eval() will be assigned to the VERSION attribute of the
 MakeMaker object. The following lines will be parsed o.k.:
 
-    $VERSION = '1.00';
-    *VERSION = \'1.01';
+    $VERSION   = '1.00';
+    *VERSION   = \'1.01';
     ($VERSION) = q$Revision$ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
-    our $VERSION = 1.2.3;       # new for perl5.6.0
 
 but these will fail:
 
-    my $VERSION = '1.01';
-    local $VERSION = '1.02';
+    # Bad
+    my $VERSION         = '1.01';
+    local $VERSION      = '1.02';
     local $FOO::VERSION = '1.30';
 
-L<version> will be loaded, if available, so this will work.
+"Version strings" are incompatible should not be used.
 
-    our $VERSION = qv(1.2.3);   # version.pm will be loaded if available
+    # Bad
+    $VERSION = 1.2.3;
+    $VERSION = v1.2.3;
 
-Its up to you to declare a dependency on C<version>.  Also note that this
-feature was introduced in MakeMaker 6.35.  Earlier versions of MakeMaker
-require this:
+L<version> objects are fine.  As of MakeMaker 6.35 version.pm will be
+automatically loaded, but you must declare the dependency on version.pm.
+For compatibility with older MakeMaker you should load on the same line 
+as $VERSION is declared.
 
     # All on one line
     use version; our $VERSION = qv(1.2.3);
