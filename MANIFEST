@@ -22,6 +22,7 @@ lib/ExtUtils/MM_AIX.pm
 lib/ExtUtils/MM_Any.pm
 lib/ExtUtils/MM_BeOS.pm
 lib/ExtUtils/MM_Cygwin.pm
+lib/ExtUtils/MM_Darwin.pm
 lib/ExtUtils/MM_DOS.pm
 lib/ExtUtils/MM_MacOS.pm
 lib/ExtUtils/MM_NW5.pm

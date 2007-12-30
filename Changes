@@ -1,4 +1,7 @@
 6.44
+    OS X
+    * "make dist" will no longer bundle up resource fork files (._foo).
+
     Docs
     * The documentation of VERSION_FROM was recommending vstrings (1.2.3)
       which have never worked right.
