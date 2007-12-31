@@ -122,7 +122,7 @@ sub guess_name {
       s/.pm$// for @pm;
       if (@pm == 1) { ($defpm = $pm[0]) =~ s/.pm$//; }
       elsif (@pm) {
-        %xs = map { s/.xs$//; ($_,1) } glob('*.xs');
+        %xs = map { s/.xs$//; ($_,1) } glob('*.xs');  ## no critic
         if (keys %xs) { 
             foreach my $pm (@pm) { 
                 $defpm = $pm, last if exists $xs{$pm}; 
