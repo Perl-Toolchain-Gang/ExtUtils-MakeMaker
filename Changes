@@ -1,4 +1,9 @@
 6.44
+    Bug Fixes
+    * Change the "is this really a Perl core library directory" checks to
+      look for strict instead of Exporter.  Now that Exporter is on CPAN
+      it can wind up in site_perl.
+
     OS X
     * "make dist" will no longer bundle up resource fork files (._foo).
 

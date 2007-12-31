@@ -1598,7 +1598,7 @@ sub init_main {
 
             if (-f $self->catfile($dir,"config_h.SH")   &&
                 -f $self->catfile($dir,"perl.h")        &&
-                -f $self->catfile($dir,"lib","Exporter.pm")
+                -f $self->catfile($dir,"lib","strict.pm")
             ) {
                 $self->{PERL_SRC}=$dir ;
                 last;
@@ -1725,10 +1725,10 @@ EOP
 
     $self->{LIBPERL_A} ||= "libperl$self->{LIB_EXT}";
 
-    # make a simple check if we find Exporter
+    # make a simple check if we find strict
     warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
-        (Exporter.pm not found)"
-        unless -f $self->catfile("$self->{PERL_LIB}","Exporter.pm") ||
+        (strict.pm not found)"
+        unless -f $self->catfile("$self->{PERL_LIB}","strict.pm") ||
                $self->{NAME} eq "ExtUtils::MakeMaker";
 }
 
