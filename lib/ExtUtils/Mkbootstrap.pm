@@ -3,16 +3,15 @@ package ExtUtils::Mkbootstrap;
 # There's just too much Dynaloader incest here to turn on strict vars.
 use strict 'refs';
 
-use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '6.42';
+our $VERSION = '6.42';
 
 require Exporter;
-@ISA = ('Exporter');
-@EXPORT = ('&Mkbootstrap');
+our @ISA = ('Exporter');
+our @EXPORT = ('&Mkbootstrap');
 
 use Config;
 
-use vars qw($Verbose);
+our $Verbose = 0;
 
 
 sub Mkbootstrap {

@@ -1,4 +1,4 @@
-6.44
+6.43_01
     Bug Fixes
     * Change the "is this really a Perl core library directory" checks to
       look for strict instead of Exporter.  Now that Exporter is on CPAN
@@ -14,6 +14,12 @@
     Tests
     * The compilation test was testing the installed modules, not the
       about-to-be-installed.
+    
+    Misc
+    * Cleanups brought to you by no more 5.5 compatibility!
+    * MakeMaker is now perlcritic clean at severity level 5... except
+      the really silly ones.
+    * DIE use vars DIE!
 
 6.42  Fri Dec  7 17:00:14 PST 2007
     Bug Fixes

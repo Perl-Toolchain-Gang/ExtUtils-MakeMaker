@@ -1,12 +1,11 @@
 package ExtUtils::MM_Any;
 
 use strict;
-use vars qw($VERSION @ISA);
-$VERSION = '6.42';
+our $VERSION = '6.42';
 
 use Carp;
 use File::Spec;
-BEGIN { @ISA = qw(File::Spec); }
+BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
 use ExtUtils::MakeMaker qw($Verbose);

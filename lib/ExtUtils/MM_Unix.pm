@@ -9,39 +9,37 @@ use ExtUtils::MakeMaker::Config;
 use File::Basename qw(basename dirname);
 use DirHandle;
 
-use vars qw($VERSION @ISA
-            $Is_OS2 $Is_VMS $Is_Win32 $Is_Dos
-            $Is_OSF $Is_IRIX  $Is_NetBSD $Is_BSD
-            $Is_SunOS4 $Is_Solaris $Is_SunOS $Is_Interix
-            %Config_Override
-           );
+our %Config_Override;
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
+# If we make $VERSION an our variable parse_version() breaks
+use vars qw($VERSION);
 $VERSION = '6.42';
 
 require ExtUtils::MM_Any;
-@ISA = qw(ExtUtils::MM_Any);
+our @ISA = qw(ExtUtils::MM_Any);
 
+my %Is;
 BEGIN { 
-    $Is_OS2     = $^O eq 'os2';
-    $Is_Win32   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
-    $Is_Dos     = $^O eq 'dos';
-    $Is_VMS     = $^O eq 'VMS';
-    $Is_OSF     = $^O eq 'dec_osf';
-    $Is_IRIX    = $^O eq 'irix';
-    $Is_NetBSD  = $^O eq 'netbsd';
-    $Is_Interix = $^O eq 'interix';
-    $Is_SunOS4  = $^O eq 'sunos';
-    $Is_Solaris = $^O eq 'solaris';
-    $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
-    $Is_BSD     = ($^O =~ /^(?:free|net|open)bsd$/ or
+    $Is{OS2}     = $^O eq 'os2';
+    $Is{Win32}   = $^O eq 'MSWin32' || $Config{osname} eq 'NetWare';
+    $Is{Dos}     = $^O eq 'dos';
+    $Is{VMS}     = $^O eq 'VMS';
+    $Is{OSF}     = $^O eq 'dec_osf';
+    $Is{IRIX}    = $^O eq 'irix';
+    $Is{NetBSD}  = $^O eq 'netbsd';
+    $Is{Interix} = $^O eq 'interix';
+    $Is{SunOS4}  = $^O eq 'sunos';
+    $Is{Solaris} = $^O eq 'solaris';
+    $Is{SunOS}   = $Is{SunOS4} || $Is{Solaris};
+    $Is{BSD}     = ($^O =~ /^(?:free|net|open)bsd$/ or
                    grep( $^O eq $_, qw(bsdos interix dragonfly) )
                   );
 }
 
 BEGIN {
-    if( $Is_VMS ) {
+    if( $Is{VMS} ) {
         # For things like vmsify()
         require VMS::Filespec;
         VMS::Filespec->import;
@@ -163,7 +161,7 @@ sub c_o {
     push @m, qq{
 .C\$(OBJ_EXT):
 	$command \$*.C
-} if !$Is_OS2 and !$Is_Win32 and !$Is_Dos; #Case-specific
+} if !$Is{OS2} and !$Is{Win32} and !$Is{Dos}; #Case-specific
 
     return join "", @m;
 }
@@ -859,7 +857,7 @@ sub dynamic_bs {
 BOOTSTRAP =
 ' unless $self->has_link_code();
 
-    my $target = $Is_VMS ? '$(MMS$TARGET)' : '$@';
+    my $target = $Is{VMS} ? '$(MMS$TARGET)' : '$@';
 
     return sprintf <<'MAKE_FRAG', ($target) x 5;
 BOOTSTRAP = $(BASEEXT).bs
@@ -898,10 +896,10 @@ sub dynamic_lib {
     my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
     my($armaybe) = $attribs{ARMAYBE} || $self->{ARMAYBE} || ":";
     my($ldfrom) = '$(LDFROM)';
-    $armaybe = 'ar' if ($Is_OSF and $armaybe eq ':');
+    $armaybe = 'ar' if ($Is{OSF} and $armaybe eq ':');
     my(@m);
-    my $ld_opt = $Is_OS2 ? '$(OPTIMIZE) ' : '';	# Useful on other systems too?
-    my $ld_fix = $Is_OS2 ? '|| ( $(RM_F) $@ && sh -c false )' : '';
+    my $ld_opt = $Is{OS2} ? '$(OPTIMIZE) ' : '';	# Useful on other systems too?
+    my $ld_fix = $Is{OS2} ? '|| ( $(RM_F) $@ && sh -c false )' : '';
     push(@m,'
 # This section creates the dynamically loadable $(INST_DYNAMIC)
 # from $(OBJECT) and possibly $(MYEXTLIB).
@@ -917,10 +915,10 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 	push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
 	push(@m,'	$(RANLIB) '."$ldfrom\n");
     }
-    $ldfrom = "-all $ldfrom -none" if $Is_OSF;
+    $ldfrom = "-all $ldfrom -none" if $Is{OSF};
 
     # The IRIX linker doesn't use LD_RUN_PATH
-    my $ldrun = $Is_IRIX && $self->{LD_RUN_PATH} ?         
+    my $ldrun = $Is{IRIX} && $self->{LD_RUN_PATH} ?         
                        qq{-rpath "$self->{LD_RUN_PATH}"} : '';
 
     # For example in AIX the shared objects/libraries from previous builds
@@ -933,7 +931,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 
     my $libs = '$(LDLOADLIBS)';
 
-    if (($Is_NetBSD || $Is_Interix) && $Config{'useshrplib'} eq 'true') {
+    if (($Is{NetBSD} || $Is{Interix}) && $Config{'useshrplib'} eq 'true') {
 	# Use nothing on static perl platforms, and to the flags needed
 	# to link against the shared libperl library on shared perl
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
@@ -1007,7 +1005,7 @@ in these dirs:
     my $stderr_duped = 0;
     local *STDERR_COPY;
 
-    unless ($Is_BSD) {
+    unless ($Is{BSD}) {
         # >& and lexical filehandles together give 5.6.2 indigestion
         if( open(STDERR_COPY, '>&STDERR') ) {  ## no critic
             $stderr_duped = 1;
@@ -1046,7 +1044,7 @@ WARNING
             # ( http://www.freebsd.org/cgi/query-pr.cgi?pr=51535 )
             # we cannot use the fancier more portable way in here
             # but instead need to use the traditional 2>&1 construct.
-            if ($Is_BSD) {
+            if ($Is{BSD}) {
                 $val = `$version_check 2>&1`;
             } else {
                 close STDERR if $stderr_duped;
@@ -1135,7 +1133,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
             $shb .= qq{
 eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     if 0; # not running under some shell
-} unless $Is_Win32;    # this won't work on win32, so don't
+} unless $Is{Win32};    # this won't work on win32, so don't
         }
         else {
             warn "Can't find $cmd in PATH, $file unchanged"
@@ -1181,7 +1179,7 @@ sub _rename {
     my($old, $new) = @_;
 
     foreach my $file ($old, $new) {
-        if( $Is_VMS and basename($file) !~ /\./ ) {
+        if( $Is{VMS} and basename($file) !~ /\./ ) {
             # rename() in 5.8.0 on VMS will not rename a file if it
             # does not contain a dot yet it returns success.
             $file = "$file.";
@@ -1262,10 +1260,10 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my %ignore = map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t);
 
     # ignore the distdir
-    $Is_VMS ? $ignore{"$self->{DISTVNAME}.dir"} = 1
+    $Is{VMS} ? $ignore{"$self->{DISTVNAME}.dir"} = 1
             : $ignore{$self->{DISTVNAME}} = 1;
 
-    @ignore{map lc, keys %ignore} = values %ignore if $Is_VMS;
+    @ignore{map lc, keys %ignore} = values %ignore if $Is{VMS};
 
     foreach my $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
@@ -1286,7 +1284,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    $h{$name} = 1;
 	} elsif ($name =~ /\.PL\z/) {
 	    ($pl_files{$name} = $name) =~ s/\.PL\z// ;
-	} elsif (($Is_VMS || $Is_Dos) && $name =~ /[._]pl$/i) {
+	} elsif (($Is{VMS} || $Is{Dos}) && $name =~ /[._]pl$/i) {
 	    # case-insensitive filesystem, one dot per name, so foo.h.PL
 	    # under Unix appears as foo.h_pl under VMS or fooh.pl on Dos
 	    local($/); open(my $pl, '<', $name); my $txt = <$pl>; close $pl;
@@ -1463,7 +1461,7 @@ sub init_PM {
     # that's important for nested modules.
 
     unless( $self->{PMLIBDIRS} ) {
-        if( $Is_VMS ) {
+        if( $Is{VMS} ) {
             # Avoid logical name vs directory collisions
             $self->{PMLIBDIRS} = ['./lib', "./$self->{BASEEXT}"];
         }
@@ -1617,11 +1615,11 @@ sub init_main {
               $self->catdir("$self->{PERL_SRC}","xlib",$Cross::platform);
             $self->{PERL_INC}     = 
               $self->catdir("$self->{PERL_SRC}","xlib",$Cross::platform, 
-                                 $Is_Win32?("CORE"):());
+                                 $Is{Win32}?("CORE"):());
         }
         else {
             $self->{PERL_ARCHLIB} = $self->{PERL_LIB};
-            $self->{PERL_INC}     = ($Is_Win32) ? 
+            $self->{PERL_INC}     = ($Is{Win32}) ? 
               $self->catdir($self->{PERL_LIB},"CORE") : $self->{PERL_SRC};
         }
 
@@ -1629,11 +1627,11 @@ sub init_main {
 	unless (
 		-s $self->catfile($self->{PERL_SRC},'cflags')
 		or
-		$Is_VMS
+		$Is{VMS}
 		&&
 		-s $self->catfile($self->{PERL_SRC},'perlshr_attr.opt')
 		or
-		$Is_Win32
+		$Is{Win32}
 	       ){
 	    warn qq{
 You cannot build extensions below the perl source tree after executing
@@ -1668,7 +1666,7 @@ from the perl source tree.
 	    if ($lib) {
               # Win32 puts its header files in /perl/src/lib/CORE.
               # Unix leaves them in /perl/src.
-	      my $inc = $Is_Win32 ? $self->catdir($lib, "CORE" )
+	      my $inc = $Is{Win32} ? $self->catdir($lib, "CORE" )
                                   : dirname $lib;
 	      if (-e $self->catdir($inc, "perl.h")) {
 		$self->{PERL_LIB}	   = $lib;
@@ -1933,7 +1931,7 @@ sub init_PERL {
     my $thisperl = $self->canonpath($^X);
     $thisperl .= $Config{exe_ext} unless 
                 # VMS might have a file version # at the end
-      $Is_VMS ? $thisperl =~ m/$Config{exe_ext}(;\d+)?$/i
+      $Is{VMS} ? $thisperl =~ m/$Config{exe_ext}(;\d+)?$/i
               : $thisperl =~ m/$Config{exe_ext}$/i;
 
     # We need a relative path to perl when in the core.
@@ -1960,7 +1958,7 @@ sub init_PERL {
 
     # When built for debugging, VMS doesn't create perl.exe but ndbgperl.exe.
     my $perl_name = 'perl';
-    $perl_name = 'ndbgperl' if $Is_VMS && 
+    $perl_name = 'ndbgperl' if $Is{VMS} && 
       defined $Config{usevmsdebug} && $Config{usevmsdebug} eq 'define';
 
     # XXX This logic is flawed.  If "miniperl" is anywhere in the path
@@ -2217,7 +2215,7 @@ sub installbin {
     my @exefiles = @{$self->{EXE_FILES}};
     return "" unless @exefiles;
 
-    @exefiles = map vmsify($_), @exefiles if $Is_VMS;
+    @exefiles = map vmsify($_), @exefiles if $Is{VMS};
 
     my %fromto;
     for my $from (@exefiles) {
@@ -2227,7 +2225,7 @@ sub installbin {
 	my $to = $self->libscan($path);
 	print "libscan($from) => '$to'\n" if ($Verbose >=2);
 
-        $to = vmsify($to) if $Is_VMS;
+        $to = vmsify($to) if $Is{VMS};
 	$fromto{$from} = $to;
     }
     my @to   = values %fromto;
@@ -2480,10 +2478,10 @@ MAP_PRELIBS   = $Config{perllibs} $Config{cryptlib}
 
         if (! -f $libperl and ! -f $lperl) {
           # We did not find a static libperl. Maybe there is a shared one?
-          if ($Is_SunOS) {
+          if ($Is{SunOS}) {
             $lperl  = $libperl = "$dir/$Config{libperl}";
             # SUNOS ld does not take the full path to a shared library
-            $libperl = '' if $Is_SunOS4;
+            $libperl = '' if $Is{SunOS4};
           }
         }
 
@@ -2579,7 +2577,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 
 ' if $self->{OBJECT};
 
-    my $newer_than_target = $Is_VMS ? '$(MMS$SOURCE_LIST)' : '$?';
+    my $newer_than_target = $Is{VMS} ? '$(MMS$SOURCE_LIST)' : '$?';
     my $mpl_args = join " ", map qq["$_"], @ARGV;
 
     $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
@@ -2715,7 +2713,8 @@ sub parse_version {
             \$$2=undef;
             do {
                 $_
-            }; \$$2
+            };
+            \$$2;
         };
         local $^W = 0;
         $result = eval($eval);  ## no critic
@@ -2741,7 +2740,7 @@ sub pasthru {
     my(@m);
 
     my(@pasthru);
-    my($sep) = $Is_VMS ? ',' : '';
+    my($sep) = $Is{VMS} ? ',' : '';
     $sep .= "\\\n\t";
 
     foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
@@ -3096,7 +3095,7 @@ sub processPL {
 		     : [$pl_files->{$plfile}];
 
 	foreach my $target (@$list) {
-            if( $Is_VMS ) {
+            if( $Is{VMS} ) {
                 $plfile = vmsify($self->eliminate_macros($plfile));
                 $target = vmsify($self->eliminate_macros($target));
             }
@@ -3580,7 +3579,7 @@ sub tool_xsubpp {
         unshift( @tmargs, $self->{XSOPT} );
     }
 
-    if ($Is_VMS                          &&
+    if ($Is{VMS}                          &&
         $Config{'ldflags'}               && 
         $Config{'ldflags'} =~ m!/Debug!i &&
         (!exists($self->{XSOPT}) || $self->{XSOPT} !~ /linenumbers/)

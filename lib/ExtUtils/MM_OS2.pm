@@ -1,16 +1,15 @@
 package ExtUtils::MM_OS2;
 
 use strict;
-use vars qw($VERSION @ISA);
 
 use ExtUtils::MakeMaker qw(neatvalue);
 use File::Spec;
 
-$VERSION = '6.42';
+our $VERSION = '6.42';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw(ExtUtils::MM_Any ExtUtils::MM_Unix);
+our @ISA = qw(ExtUtils::MM_Any ExtUtils::MM_Unix);
 
 =pod
 

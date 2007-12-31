@@ -7,8 +7,7 @@ our $VERSION = '6.42';
 use Config ();
 
 # Give us an overridable config.
-use vars qw(%Config);
-%Config = %Config::Config;
+our %Config = %Config::Config;
 
 sub import {
     my $caller = caller;

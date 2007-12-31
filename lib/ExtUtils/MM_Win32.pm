@@ -24,12 +24,10 @@ use File::Basename;
 use File::Spec;
 use ExtUtils::MakeMaker qw( neatvalue );
 
-use vars qw(@ISA $VERSION);
-
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
-$VERSION = '6.42';
+our @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
+our $VERSION = '6.42';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 

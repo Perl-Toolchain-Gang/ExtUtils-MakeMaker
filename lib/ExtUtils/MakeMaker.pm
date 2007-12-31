@@ -10,34 +10,27 @@ use ExtUtils::MakeMaker::Config;
 use Carp ();
 use File::Path;
 
-use vars qw(
-            @ISA @EXPORT @EXPORT_OK
-            $VERSION $Verbose %Config
-            @Prepend_parent @Parent
-            %Recognized_Att_Keys @Get_from_Config @MM_Sections @Overridable
-            $Filename
-           );
+our $Verbose = 0;       # exported
+our @Parent;            # needs to be localized
+our @Get_from_Config;   # referenced by MM_Unix
+my @MM_Sections;
+my @Overridable;
+my @Prepend_parent;
+my %Recognized_Att_Keys;
 
-# Has to be on its own line with no $ after it to avoid being noticed by
-# the version control system
-use vars qw($Revision);
+our $VERSION = '6.42';
+our ($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
+our $Filename = __FILE__;   # referenced outside MakeMaker
 
-$VERSION = '6.42';
-($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
-
-@ISA = qw(Exporter);
-@EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
-@EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
-                &WriteEmptyMakefile);
+our @ISA = qw(Exporter);
+our @EXPORT    = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
+our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
+                    &WriteEmptyMakefile);
 
 # These will go away once the last of the Win32 & VMS specific code is 
 # purged.
 my $Is_VMS     = $^O eq 'VMS';
 my $Is_Win32   = $^O eq 'MSWin32';
-
-# Our filename for diagnostic and debugging purposes.  More reliable
-# than %INC (think caseless filesystems)
-$Filename = __FILE__;
 
 full_setup();
 

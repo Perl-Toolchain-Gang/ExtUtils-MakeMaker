@@ -15,17 +15,14 @@ BEGIN {
 
 use File::Basename;
 
-# $Revision can't be on the same line or SVN/K gets confused
-use vars qw($Revision
-            $VERSION @ISA);
-$VERSION = '6.42';
+our $VERSION = '6.42';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
+our @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
-$Revision = $ExtUtils::MakeMaker::Revision;
+our $Revision = $ExtUtils::MakeMaker::Revision;
 
 
 =head1 NAME
@@ -1340,7 +1337,7 @@ Consequently, it hasn't really been tested, and may well be incomplete.
 
 =cut
 
-use vars qw(%olbs);
+our %olbs;  # needs to be localized
 
 sub makeaperl {
     my($self, %attribs) = @_;
