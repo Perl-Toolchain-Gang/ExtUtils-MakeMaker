@@ -17,6 +17,7 @@
     Tests
     * The compilation test was testing the installed modules, not the
       about-to-be-installed.
+    * xs.t would fail if ExtUtils::CBuilder was not installed.
     
     Misc
     * Cleanups brought to you by no more 5.5 compatibility!
