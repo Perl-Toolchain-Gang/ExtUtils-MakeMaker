@@ -4,6 +4,12 @@
       look for strict instead of Exporter.  Now that Exporter is on CPAN
       it can wind up in site_perl.
 
+    Installation
+    * MakeMaker would not install if the installed MakeMaker was too old,
+      like on 5.6.1.  The installation process was still using the
+      installed MakeMaker in a few places.  This has been fixed.
+      [rt.cpan.org 24746]
+
     OS X
     * "make dist" will no longer bundle up resource fork files (._foo).
       [rt.cpan.org 29525]

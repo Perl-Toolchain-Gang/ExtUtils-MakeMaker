@@ -108,19 +108,15 @@ SPACE_WARN
 {
     package MY;
 
-    my($lib, $tlib);
-    BEGIN { 
-        $lib  = File::Spec->canonpath('lib/');
-        $tlib = File::Spec->rel2abs('t/lib/');
-    }
-
     # Make sure PERLRUN uses the MakeMaker about to be installed
     # and not the currently installed one.
     sub init_PERL {
         my($self) = shift;
         $self->SUPER::init_PERL;
-        $self->{PERLRUN} .= qq{ "-I$lib"};
-        $self->{FULLPERLRUN} .= qq{ "-I$lib"};
+        
+        for my $key (qw(PERLRUN FULLPERLRUN ABSPERLRUN)) {
+            $self->{$key}     .= q[ "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"];
+        }
     }
 
     sub init_PM {
@@ -184,33 +180,5 @@ SPACE_WARN
         $file =~ s{\.pm$}{};
         
         return join '::', @dirs, $file;
-    }
-
-    use Config;
-    sub test_via_harness {
-        my($self, $orig_perl, $tests) = @_;
-
-        my @perls = ($orig_perl);
-        if( $ENV{PERL_TEST_ALL} ) {
-            push @perls, 
-              map "PERL5LIB=$lib$Config{path_sep}$tlib /usr/local/bin/$_",
-                'perl5.5.3';
-
-            push @perls, map "PERL5LIB=$lib /usr/local/bin/$_", 
-              qw(perl5.5.4
-		 perl5.6.2
-		 perl5.8.0
-		 perl5.8.1
-                 perl
-                 bleadperl
-                );
-        }
-
-        my $out;
-        foreach my $perl (@perls) {
-            $out .= $self->SUPER::test_via_harness($perl, $tests);
-        }
-
-        return $out;
     }
 }
