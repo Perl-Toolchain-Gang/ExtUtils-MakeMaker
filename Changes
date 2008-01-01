@@ -6,10 +6,13 @@
 
     OS X
     * "make dist" will no longer bundle up resource fork files (._foo).
+      [rt.cpan.org 29525]
 
     Docs
     * The documentation of VERSION_FROM was recommending vstrings (1.2.3)
       which have never worked right.
+    * The documentation for the accepted values of LICENSE moved to
+      Module::Build::API. [rt.cpan.org 32020]
 
     Tests
     * The compilation test was testing the installed modules, not the

@@ -1750,7 +1750,7 @@ MakeMaker will turn it into an array with one element.
 The licensing terms of your distribution.  Generally its "perl" for the
 same license as Perl itself.
 
-See L<Module::Build::Authoring> for the list of options.
+See L<Module::Build::API> for the list of options.
 
 Defaults to "unknown".
 
