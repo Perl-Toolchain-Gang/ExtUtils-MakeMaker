@@ -144,8 +144,8 @@ sub split_command {
     # newline.
     chomp $cmd;
 
-    # set aside 20% for macro expansion.
-    my $len_left = int($self->max_exec_len * 0.80);
+    # set aside 30% for macro expansion.
+    my $len_left = int($self->max_exec_len * 0.70);
     $len_left -= length $self->_expand_macros($cmd);
 
     do {

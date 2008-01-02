@@ -3,6 +3,9 @@
     * Change the "is this really a Perl core library directory" checks to
       look for strict instead of Exporter.  Now that Exporter is on CPAN
       it can wind up in site_perl.
+    * split_command() will now set aside a little more space for macro
+      expansion.  This should help on systems with cramped command line
+      lengths.  Specifically, Pugs on Win32.  [rt.cpan.org 20145]
 
     Installation
     * MakeMaker would not install if the installed MakeMaker was too old,
