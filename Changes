@@ -30,6 +30,7 @@
     * MakeMaker is now perlcritic clean at severity level 5... except
       the really silly ones.
     * DIE use vars DIE!
+    * Added some resources to the META.yml
 
 6.42  Fri Dec  7 17:00:14 PST 2007
     Bug Fixes

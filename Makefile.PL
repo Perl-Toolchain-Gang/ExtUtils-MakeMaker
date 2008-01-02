@@ -77,6 +77,12 @@ no_index:
         - inc
     package:
         - DynaLoader
+resources:
+    license:     http://dev.perl.org/licenses/
+    homepage:    http://makemaker.org
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker
+    repository:  http://svn.schwern.org/svn/CPAN/ExtUtils-MakeMaker
+    MailingList: makemaker@perl.org
 META
 
     INSTALLDIRS     => 'perl',
