@@ -1,4 +1,4 @@
-6.43_01
+6.43_01  Tue Jan  1 16:06:47 PST 2008
     Bug Fixes
     * Change the "is this really a Perl core library directory" checks to
       look for strict instead of Exporter.  Now that Exporter is on CPAN
