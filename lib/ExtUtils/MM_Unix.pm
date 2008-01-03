@@ -2448,7 +2448,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	push @$extra, $_;
     }
 
-    grep(s/^(.*)/"-I$1"/, @{$perlinc || []});
+    s/^(.*)/"-I$1"/ for @{$perlinc || []};
 
     $target ||= "perl";
     $tmp    ||= ".";
