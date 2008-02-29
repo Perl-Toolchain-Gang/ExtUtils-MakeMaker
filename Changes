@@ -1,4 +1,4 @@
-6.44
+6.44  Thu Feb 28 16:06:04 PST 2008
     Bug Fixes
     * Updated bundled ExtUtils::Install to 1.45 which should fix some
       Cygwin issues. [rt.cpan.org 33291]
