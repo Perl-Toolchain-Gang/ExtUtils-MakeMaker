@@ -1,3 +1,8 @@
+6.45  ?????????
+    Portability
+    * Changed the name/dmake test in MM_Win32.pm to use regexs to that
+      they are able to handle Perl on a Stick absolute paths.
+
 6.44  Thu Feb 28 16:06:04 PST 2008
     Bug Fixes
     * Updated bundled ExtUtils::Install to 1.45 which should fix some
