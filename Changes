@@ -1,4 +1,4 @@
-6.45_03
+6.46  Sat Sep 27 17:34:03 EDT 2008
     Bug Fixes
     - Fix META_MERGE for more than one level of hashes.  [rt.cpan.org 39348]
 
