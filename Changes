@@ -1,7 +1,11 @@
-6.45_02
+6.45_02  Sun Sep  7 13:59:14 PDT 2008
     Bug Fixes
     - Updated bundled ExtUtils::Command to 1.14, ExtUtils::Install to
       1.50 and ExtUtils::Manifest to 1.54
+
+    Test Fixes
+    - t/writemakefile_args.t had the wrong skip amoung causing failures
+      when run without version.pm (mostly 5.6 users)
 
 
 6.45_01  Sat Sep  6 03:19:03 PDT 2008
