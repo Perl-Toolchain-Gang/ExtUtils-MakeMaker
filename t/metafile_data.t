@@ -9,7 +9,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use Data::Dumper;
 
@@ -50,6 +50,30 @@ my $new_mm = sub {
             version     => 1.4
         },
     ];
+
+
+    is_deeply [$mm->metafile_data({}, { no_index => { directory => [qw(foo)] } })], [
+        name            => 'Foo-Bar',
+        version         => 1.23,
+        abstract        => undef,
+        author          => [],
+        license         => 'unknown',
+        distribution_type       => 'module',
+
+        configure_requires      => {
+            'ExtUtils::MakeMaker'       => 0,
+        },
+
+        no_index        => {
+            directory           => [qw(t inc foo)],
+        },
+
+        generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
+        'meta-spec'  => {
+            url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
+            version     => 1.4
+        },
+    ], 'rt.cpan.org 39348';
 }
 
 
