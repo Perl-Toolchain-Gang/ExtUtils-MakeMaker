@@ -184,9 +184,10 @@ SPACE_WARN
         
         my($vol, $dirs, $file) = File::Spec->splitpath($path);
         my @dirs = File::Spec->splitdir($dirs);
-        shift @dirs;  # remove inc/
+        shift @dirs;  # remove inc
+
         $file =~ s{\.pm$}{};
         
-        return join '::', @dirs, $file;
+        return join '::', grep { length } @dirs, $file;
     }
 }
