@@ -1820,6 +1820,9 @@ They differ in how they behave if they have the same key as the
 default metadata.  META_ADD will override the default value with it's
 own.  META_MERGE will merge its value with the default.
 
+Unless you want to override the defaults, prefer META_MERGE so as to
+get the advantage of any future defaults.
+
 =item MYEXTLIB
 
 If the extension links to a library that it builds set this to the
