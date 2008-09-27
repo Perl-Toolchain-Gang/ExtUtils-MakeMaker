@@ -1,3 +1,9 @@
+6.45_02
+    Bug Fixes
+    - Updated bundled ExtUtils::Command to 1.14, ExtUtils::Install to
+      1.50 and ExtUtils::Manifest to 1.54
+
+
 6.45_01  Sat Sep  6 03:19:03 PDT 2008
     New Features
     * META_ADD and META_MERGE have been added to manipulate the META.yml.
@@ -9,7 +15,7 @@
       given.
     - META.yml now conforms to version 1.4 of the spec.
 
-    Bug Fixese
+    Bug Fixes
     - Make @MM_Sections and @Overridable global again.  It's an undocumented
       but used way to manipulate MakeMaker behavior. [rt.cpan.org 36047]
 
