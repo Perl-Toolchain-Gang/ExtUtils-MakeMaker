@@ -13,8 +13,8 @@ use File::Path;
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
 our @Get_from_Config;   # referenced by MM_Unix
-my @MM_Sections;
-my @Overridable;
+our @MM_Sections;
+our @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
 

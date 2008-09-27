@@ -1,7 +1,12 @@
-6.45  ?????????
+6.45_01
+    Bug Fixes
+    - Make @MM_Sections and @Overridable global again.  It's an undocumented
+      but used way to manipulate MakeMaker behavior. [rt.cpan.org 36047]
+
     Portability
     * Changed the name/dmake test in MM_Win32.pm to use regexs to that
       they are able to handle Perl on a Stick absolute paths.
+
 
 6.44  Thu Feb 28 16:06:04 PST 2008
     Bug Fixes
