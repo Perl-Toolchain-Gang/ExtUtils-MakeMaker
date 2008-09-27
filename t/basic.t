@@ -17,7 +17,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 83;
+use Test::More tests => 85;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -249,6 +249,15 @@ my $meta_yml = "$distdir/META.yml";
 ok( !-f 'META.yml',  'META.yml not written to source dir' );
 ok( -f $meta_yml,    'META.yml written to dist dir' );
 ok( !-e "META_new.yml", 'temp META.yml file not left around' );
+
+SKIP: {
+    # META.yml spec 1.4 was added in 0.11
+    skip "Test::YAML::Meta >= 0.11 required", 2
+      unless eval { require Test::YAML::Meta }   and
+             Test::YAML::Meta->VERSION >= 0.11;
+
+    Test::YAML::Meta::meta_spec_ok($meta_yml);
+}
 
 ok open META, $meta_yml or diag $!;
 my $meta = join '', <META>;
