@@ -164,7 +164,7 @@ VERIFY
 
 
     SKIP: {
-        skip("Can't test version objects",6) unless eval { require version };
+        skip("Can't test version objects", 8) unless eval { require version };
         version->import;
 
         my $version = version->new("1.2.3");
