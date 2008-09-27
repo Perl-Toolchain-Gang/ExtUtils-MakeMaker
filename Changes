@@ -1,4 +1,4 @@
-6.45_01
+6.45_01  Sat Sep  6 03:19:03 PDT 2008
     New Features
     * META_ADD and META_MERGE have been added to manipulate the META.yml.
       Thanks to Adriano Ferreira.                       [rt.cpan.org 21282]
@@ -9,7 +9,7 @@
       given.
     - META.yml now conforms to version 1.4 of the spec.
 
-    Bug Fixes
+    Bug Fixese
     - Make @MM_Sections and @Overridable global again.  It's an undocumented
       but used way to manipulate MakeMaker behavior. [rt.cpan.org 36047]
 
