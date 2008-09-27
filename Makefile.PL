@@ -69,21 +69,18 @@ my $MM = WriteMakefile(
 
     EXE_FILES       => [qw(bin/instmodsh)],
 
-    # EXTRA_META is an experimental feature and its not going to work
-    # like this next release.
-    EXTRA_META      => <<'META',
-no_index:
-    directory:
-        - inc
-    package:
-        - DynaLoader
-resources:
-    license:     http://dev.perl.org/licenses/
-    homepage:    http://makemaker.org
-    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker
-    repository:  http://svn.schwern.org/svn/CPAN/ExtUtils-MakeMaker
-    MailingList: makemaker@perl.org
-META
+    META_MERGE      => {
+        no_index => {
+            package => ['DynaLoader'],
+        },
+        resources => {
+            license     =>      'http://dev.perl.org/licenses/',
+            homepage    =>      'http://makemaker.org',
+            bugtracker  =>      'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
+            repository  =>      'http://svn.schwern.org/svn/CPAN/ExtUtils-MakeMaker',
+            'MailingList' =>    'makemaker@perl.org',
+        },
+    },
 
     INSTALLDIRS     => 'perl',
 

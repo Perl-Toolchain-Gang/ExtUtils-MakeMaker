@@ -256,19 +256,25 @@ ok close META;
 
 is $meta, <<"END";
 --- #YAML:1.0
-name:                Big-Dummy
-version:             0.01
-abstract:            Try "our" hot dog's
-license:             ~
-author:              
+name:               Big-Dummy
+version:            0.01
+abstract:           Try "our" hot dog's
+author:
     - Michael G Schwern <schwern\@pobox.com>
-generated_by:        ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
-distribution_type:   module
-requires:     
-    strict:                        0
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    strict:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
 END
 
 my $manifest = maniread("$distdir/MANIFEST");

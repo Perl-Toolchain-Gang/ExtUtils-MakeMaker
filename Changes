@@ -1,4 +1,14 @@
 6.45_01
+    New Features
+    * META_ADD and META_MERGE have been added to manipulate the META.yml.
+      Thanks to Adriano Ferreira.                       [rt.cpan.org 21282]
+    - META.yml now includes configure_requires ExtUtils::MakeMaker by
+      default.                                          [rt.cpan.org 32337]
+    - META.yml now excludes t/ and inc/ from indexing by default.
+    - META.yml license is now "unknown" instead of undef if a LICENSE is not
+      given.
+    - META.yml now conforms to version 1.4 of the spec.
+
     Bug Fixes
     - Make @MM_Sections and @Overridable global again.  It's an undocumented
       but used way to manipulate MakeMaker behavior. [rt.cpan.org 36047]

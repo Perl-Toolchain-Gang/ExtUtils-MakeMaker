@@ -39,7 +39,7 @@ require ExtUtils::MM;  # Things like CPAN assume loading ExtUtils::MakeMaker
 
 require ExtUtils::MY;  # XXX pre-5.8 versions of ExtUtils::Embed expect
                        # loading ExtUtils::MakeMaker will give them MY.
-                       # This will go when Embed is it's own CPAN module.
+                       # This will go when Embed is its own CPAN module.
 
 
 sub WriteMakefile {
@@ -77,6 +77,8 @@ my %Special_Sigs = (
  LIBS               => ['ARRAY',''],
  MAN1PODS           => 'HASH',
  MAN3PODS           => 'HASH',
+ META_ADD           => 'HASH',
+ META_MERGE         => 'HASH',
  PL_FILES           => 'HASH',
  PM                 => 'HASH',
  PMLIBDIRS          => 'ARRAY',
@@ -214,7 +216,7 @@ sub full_setup {
 
     AUTHOR ABSTRACT ABSTRACT_FROM BINARY_LOCATION
     C CAPI CCFLAGS CONFIG CONFIGURE DEFINE DIR DISTNAME DL_FUNCS DL_VARS
-    EXCLUDE_EXT EXE_FILES EXTRA_META FIRST_MAKEFILE
+    EXCLUDE_EXT EXE_FILES FIRST_MAKEFILE
     FULLPERL FULLPERLRUN FULLPERLRUNINST
     FUNCLIST H IMPORTS
 
@@ -233,7 +235,8 @@ sub full_setup {
     SITELIBEXP      SITEARCHEXP 
 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
-    LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET 
+    LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET
+    META_ADD META_MERGE
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
     PERL_SRC PERM_RW PERM_RWX
@@ -1806,6 +1809,16 @@ C<make> and will be installed during C<make install>.
 
 If it is intended, that a new perl binary be produced, this variable
 may hold a name for that binary. Defaults to perl
+
+=item META_ADD
+
+=item META_MERGE
+
+A hashrefs of items to add to the F<META.yml>.
+
+They differ in how they behave if they have the same key as the
+default metadata.  META_ADD will override the default value with it's
+own.  META_MERGE will merge its value with the default.
 
 =item MYEXTLIB
 
