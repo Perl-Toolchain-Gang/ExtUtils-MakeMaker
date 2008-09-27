@@ -936,25 +936,36 @@ sub _dump_hash {
         my($key, $val) = splice @pairs, 0, 2;
         $val = '~' unless defined $val;
         if(ref $val eq 'HASH') {
-            my %k_options = ( # options for recursive call
+            if ( keys %$val ) {
+                my %k_options = ( # options for recursive call
                     delta => $options->{delta},
                     use_header => 0,
                     indent => $indent . $options->{delta},
-            );
-            if (exists $customs->{$key}) {
-                my %k_custom = %{$customs->{$key}};
-                foreach my $k qw(key_sort max_key_length customs) {
-                    $k_options{$k} = $k_custom{$k} if exists $k_custom{$k};
+                );
+                if (exists $customs->{$key}) {
+                    my %k_custom = %{$customs->{$key}};
+                    foreach my $k qw(key_sort max_key_length customs) {
+                        $k_options{$k} = $k_custom{$k} if exists $k_custom{$k};
+                    }
+                }
+                $yaml .= $indent . "$key:\n" 
+                  . _dump_hash(\%k_options, %$val);
+            }
+            else {
+                $yaml .= $indent . "$key:  {}\n";
+            }
+        }
+        elsif (ref $val eq 'ARRAY') {
+            if( @$val ) {
+                $yaml .= $indent . "$key:\n";
+
+                for (@$val) {
+                    croak "only nested arrays of non-refs are supported" if ref $_;
+                    $yaml .= $indent . $options->{delta} . "- $_\n";
                 }
             }
-            $yaml .= $indent . "$key:\n" 
-                  . _dump_hash(\%k_options, %$val);
-        }
-        elsif(ref $val eq 'ARRAY') {
-            $yaml .= $indent . "$key:\n";
-            for (@$val) {
-                croak "only nested arrays of non-refs are supported" if ref $_;
-                $yaml .= $indent . $options->{delta} . "- $_\n";
+            else {
+                $yaml .= $indent . "$key:  []\n";
             }
         }
         elsif( ref $val and !blessed($val) ) {

@@ -14,7 +14,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 require ExtUtils::MM_Any;
 
@@ -99,6 +99,14 @@ YAML
 
     is($mm->metafile_file(@meta), $expected, "array of strings are handled ok");
 }
+
+is($mm->metafile_file( a => {}, b => [], c => undef ), <<'YAML', 'empty hashes and arrays');
+--- #YAML:1.0
+a:  {}
+b:  []
+c:  ~
+YAML
+
 
 {
     my @meta = ( 

@@ -78,8 +78,13 @@ my $MM = WriteMakefile(
             homepage    =>      'http://makemaker.org',
             bugtracker  =>      'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
             repository  =>      'http://svn.schwern.org/svn/CPAN/ExtUtils-MakeMaker',
-            'MailingList' =>    'makemaker@perl.org',
+            MailingList =>    'makemaker@perl.org',
         },
+    },
+
+    META_ADD        => {
+        # We don't need ourselves to install ourselves.
+        configure_requires => {}
     },
 
     INSTALLDIRS     => 'perl',
