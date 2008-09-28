@@ -9,7 +9,7 @@
       1.50 and ExtUtils::Manifest to 1.54
 
     Test Fixes
-    - t/writemakefile_args.t had the wrong skip amoung causing failures
+    - t/writemakefile_args.t had the wrong skip amount causing failures
       when run without version.pm (mostly 5.6 users)
 
 
