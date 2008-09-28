@@ -63,6 +63,8 @@ my $MM = WriteMakefile(
                          'File::Basename'   => 0,
                          DirHandle          => 0,
                        },
+    MIN_PERL_VERSION => '5.006',
+
     PMLIBDIRS       => [qw(lib inc)],
     # PMLIBPARENTDIRS is an experimental feature
     PMLIBPARENTDIRS => [qw(lib inc)],

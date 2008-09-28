@@ -57,6 +57,7 @@ t/INST.t
 t/INST_PREFIX.t
 t/INSTALL_BASE.t
 t/lib/MakeMaker/Test/Setup/BFD.pm
+t/lib/MakeMaker/Test/Setup/MPV.pm
 t/lib/MakeMaker/Test/Setup/PL_FILES.pm
 t/lib/MakeMaker/Test/Setup/Problem.pm
 t/lib/MakeMaker/Test/Setup/Recurs.pm
@@ -73,6 +74,7 @@ t/make.t
 t/maketext_filter.t
 t/metafile_data.t
 t/metafile_file.t
+t/min_perl_version.t
 t/Mkbootstrap.t
 t/MM_Any.t
 t/MM_BeOS.t

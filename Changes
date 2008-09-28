@@ -1,3 +1,11 @@
+6.47_01
+    New Features
+    * Added optional parameter MIN_PERL_VERSION, to define minimal
+      required perl version for dependency checks and to pass on to
+      META.yml and ppd files.        [rt.cpan.org 28374]
+      Thanks to David Golden, Alexandr Ciornii (chorny) and Martin Becker
+
+
 6.46  Sat Sep 27 17:34:03 EDT 2008
     Bug Fixes
     - Fix META_MERGE for more than one level of hashes.  [rt.cpan.org 39348]

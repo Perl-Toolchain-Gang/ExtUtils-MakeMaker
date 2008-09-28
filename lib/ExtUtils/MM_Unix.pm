@@ -2942,6 +2942,14 @@ sub postamble {
     "";
 }
 
+# transform dot-separated version string into comma-separated quadruple
+# examples:  '1.2.3.4.5' => '1,2,3,4'
+#            '1.2.3'     => '1,2,3,0'
+sub _ppd_version {
+    my ($self, $string) = @_;
+    return join ',', ((split /\./, $string), (0) x 4)[0..3];
+}
+
 =item ppd
 
 Defines target that creates a PPD (Perl Package Description) file
@@ -2952,7 +2960,7 @@ for a binary distribution.
 sub ppd {
     my($self) = @_;
 
-    my ($pack_ver) = join ",", (split (/\./, $self->{VERSION}), (0)x4)[0..3];
+    my $pack_ver = $self->_ppd_version($self->{VERSION});
 
     my $abstract = $self->{ABSTRACT} || '';
     $abstract =~ s/\n/\\n/sg;
@@ -2971,11 +2979,17 @@ sub ppd {
 PPD_HTML
 
     $ppd_xml .= "    <IMPLEMENTATION>\n";
+    if ( $self->{MIN_PERL_VERSION} ) {
+        my $min_perl_version = $self->_ppd_version($self->{MIN_PERL_VERSION});
+        $ppd_xml .= sprintf <<'PPD_PERLVERS', $min_perl_version;
+        <PERLCORE VERSION="%s" />
+PPD_PERLVERS
+
+    }
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
-        my ($dep_ver) = join ",", (split (/\./, $self->{PREREQ_PM}{$prereq}), 
-                                  (0) x 4) [0 .. 3];
+        my $dep_ver = $self->_ppd_version($self->{PREREQ_PM}{$prereq});
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
         <DEPENDENCY NAME="%s" VERSION="%s" />
 PPD_OUT

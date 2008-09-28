@@ -236,7 +236,7 @@ sub full_setup {
 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
     LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET
-    META_ADD META_MERGE
+    META_ADD META_MERGE MIN_PERL_VERSION
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
     PERL_SRC PERM_RW PERM_RWX
@@ -372,14 +372,22 @@ sub new {
 
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
         require Data::Dumper;
-        print Data::Dumper->Dump([$self->{PREREQ_PM}], [qw(PREREQ_PM)]);
+        my @what = ('PREREQ_PM');
+        push @what, 'MIN_PERL_VERSION' if $self->{MIN_PERL_VERSION};
+        print Data::Dumper->Dump([@{$self}{@what}], \@what);
         exit 0;
     }
 
     # PRINT_PREREQ is RedHatism.
     if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
-        print join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{$_} " } 
-                        sort keys %{$self->{PREREQ_PM}}), "\n";
+        my @prereq =
+            map { [$_, $self->{PREREQ_PM}{$_}] } keys %{$self->{PREREQ_PM}};
+        if ( $self->{MIN_PERL_VERSION} ) {
+            push @prereq, ['perl' => $self->{MIN_PERL_VERSION}];
+        }
+
+        print join(" ", map { "perl($_->[0])>=$_->[1] " }
+                        sort { $a->[0] cmp $b->[0] } @prereq), "\n";
         exit 0;
    }
 
@@ -391,6 +399,33 @@ sub new {
     $self = {} unless (defined $self);
 
     check_hints($self);
+
+    my $perl_version_ok = eval {
+        local $SIG{__WARN__} = sub { 
+            # simulate "use warnings FATAL => 'all'" for vintage perls
+            die @_;
+        };
+        !$self->{MIN_PERL_VERSION} or $self->{MIN_PERL_VERSION} <= $]
+    };
+    if (!$perl_version_ok) {
+        if (!defined $perl_version_ok) {
+            warn <<'END';
+Warning: MIN_PERL_VERSION is not in a recognized format.
+Recommended is a quoted numerical value like '5.005' or '5.008001'.
+END
+        }
+        elsif ($self->{PREREQ_FATAL}) {
+            die sprintf <<"END", $self->{MIN_PERL_VERSION}, $];
+MakeMaker FATAL: perl version too low for this distribution.
+Required is %s. We run %s.
+END
+        }
+        else {
+            warn sprintf
+                "Warning: Perl version %s or higher required. We run %s.\n",
+                $self->{MIN_PERL_VERSION}, $];
+        }
+    }
 
     my %configure_att;         # record &{$self->{CONFIGURE}} attributes
     my(%initial_att) = %$self; # record initial attributes
@@ -1823,6 +1858,10 @@ own.  META_MERGE will merge its value with the default.
 Unless you want to override the defaults, prefer META_MERGE so as to
 get the advantage of any future defaults.
 
+=item MIN_PERL_VERSION
+
+The minimum required version of Perl for this distribution.
+
 =item MYEXTLIB
 
 If the extension links to a library that it builds set this to the
@@ -2120,17 +2159,26 @@ Bool.  If this parameter is true, the prerequisites will be printed to
 stdout and MakeMaker will exit.  The output format is an evalable hash
 ref.
 
-$PREREQ_PM = {
-               'A::B' => Vers1,
-               'C::D' => Vers2,
-               ...
-             };
+  $PREREQ_PM = {
+                 'A::B' => Vers1,
+                 'C::D' => Vers2,
+                 ...
+               };
+
+If a distribution defines a minimal required perl version, this is
+added to the output as an additional line of the form:
+
+  $MIN_PERL_VERSION = '5.008001';
 
 =item PRINT_PREREQ
 
 RedHatism for C<PREREQ_PRINT>.  The output format is different, though:
 
     perl(A::B)>=Vers1 perl(C::D)>=Vers2 ...
+
+A minimal required perl version, if present, will look like this:
+
+    perl(perl)>=5.008001
 
 =item SITEPREFIX
 

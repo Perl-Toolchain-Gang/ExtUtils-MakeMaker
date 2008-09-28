@@ -6,25 +6,16 @@
 #
 # This MANIFEST.SKIP is specially crafted for MakeMaker itself.
 
-\.ppd$
-t/lib/File/
-t/Big-Dummy
-t/Problem-Module
-.gz$
-.bak$
-MANIFEST.perl$
-merge_bleadperl$
-^bleadperl\.patch$
-^ExtUtils-MakeMaker
-^bleadperl.patch
 
-
+#!start included /usr/local/perl/5.8.8/lib/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
 \bSCCS\b
 ,v$
 \B\.svn\b
+\B\.git\b
+\b_darcs\b
 
 # Avoid Makemaker generated and utility files.
 \bMANIFEST\.bak
@@ -33,7 +24,7 @@ merge_bleadperl$
 \bMakeMaker-\d
 \bpm_to_blib\.ts$
 \bpm_to_blib$
-\bblibdirs\.ts$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
 
 # Avoid Module::Build generated and utility files.
 \bBuild$
@@ -44,6 +35,24 @@ merge_bleadperl$
 \.old$
 \#$
 \b\.#
+\.bak$
 
 # Avoid Devel::Cover files.
 \bcover_db\b
+#!end included /usr/local/perl/5.8.8/lib/ExtUtils/MANIFEST.SKIP
+
+
+\.ppd$
+t/lib/File/
+t/Big-Dummy
+t/Problem-Module
+MANIFEST.perl$
+merge_bleadperl$
+
+\.patch$
+
+^ExtUtils-MakeMaker
+\.gz$
+
+\.orig$
+\.rej$
