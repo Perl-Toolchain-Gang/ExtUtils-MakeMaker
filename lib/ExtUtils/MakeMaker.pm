@@ -400,6 +400,12 @@ sub new {
 
     check_hints($self);
 
+    # Translate X.Y.Z to X.00Y00Z
+    if( defined $self->{MIN_PERL_VERSION} ) {
+        $self->{MIN_PERL_VERSION} =~ s{ ^ (\d+) \. (\d+) \. (\d+) $ }
+                                      {sprintf "%d.%03d%03d", $1, $2, $3}ex;
+    }
+
     my $perl_version_ok = eval {
         local $SIG{__WARN__} = sub { 
             # simulate "use warnings FATAL => 'all'" for vintage perls
@@ -1861,6 +1867,8 @@ get the advantage of any future defaults.
 =item MIN_PERL_VERSION
 
 The minimum required version of Perl for this distribution.
+
+Either 5.006001 or 5.6.1 format is acceptable.
 
 =item MYEXTLIB
 

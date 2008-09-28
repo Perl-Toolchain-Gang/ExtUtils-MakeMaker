@@ -63,9 +63,6 @@ ok( chdir 'Min-PerlVers', 'entering dir Min-PerlVers' ) ||
     is( $@, '',        '  nor a hard failure' );
 
 
-    TODO: {
-        local $TODO = 'Add in X.Y.Z handling';
-
     $warnings = '';
     eval {
         WriteMakefile(
@@ -73,9 +70,9 @@ ok( chdir 'Min-PerlVers', 'entering dir Min-PerlVers' ) ||
             MIN_PERL_VERSION => '5.4.4',
         );
     };
-    is( $warnings, '', 'MIN_PERL_VERSION=5.4.4 does not trigger a warning' );
+    is( $warnings, '', 'MIN_PERL_VERSION=X.Y.Z does not trigger a warning' );
     is( $@, '',        '  nor a hard failure' );
-}
+
 
     $warnings = '';
     eval {
