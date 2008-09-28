@@ -18,7 +18,7 @@ our @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
 
-our $VERSION = '6.46';
+our $VERSION = '6.47_01';
 our ($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
