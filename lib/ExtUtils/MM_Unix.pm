@@ -1976,6 +1976,11 @@ sub init_PERL {
     }
     else {
         $self->{ABSPERL} = $self->rel2abs($self->{ABSPERL});
+
+        # Quote the perl command if it contains whitespace
+        $self->{ABSPERL} = $self->quote_literal($self->{ABSPERL})
+          if $self->{ABSPERL} =~ /\s/;
+
         $self->{ABSPERL} = 'MCR '.$self->{ABSPERL} if $has_mcr;
     }
 
