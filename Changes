@@ -4,12 +4,13 @@
       required perl version for dependency checks and to pass on to
       META.yml and ppd files.        [rt.cpan.org 28374]
       Thanks to David Golden, Alexandr Ciornii (chorny) and Martin Becker
-    * Added BUILD_REQUIRES and CONFIGURE_REQUIRES.
-      Thanks to Alexandr Ciornii (chorny).
 
     Bug Fixes
-    * Guard against a patch to Perl with a space in it.
+    * Guard against a path to Perl with a space in it.
       From Max Maischein.  [bleadperl@32905]  
+
+    Test Fixes
+    - Small fix for VOS from Paul Green [bleadperl@33259]
 
 
 6.46  Sat Sep 27 17:34:03 EDT 2008
