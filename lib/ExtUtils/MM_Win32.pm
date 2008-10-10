@@ -126,8 +126,6 @@ Using \ for Windows.
 sub init_DIRFILESEP {
     my($self) = shift;
 
-    my $make = $self->make;
-
     # The ^ makes sure its not interpreted as an escape in nmake
     $self->{DIRFILESEP} = $self->is_make_type('nmake') ? '^\\' :
                           $self->is_make_type('dmake') ? '\\\\'
