@@ -12,6 +12,11 @@
     Test Fixes
     - Small fix for VOS from Paul Green [bleadperl@33259]
 
+    Other
+    * $ExtUtils::MakeMaker::Revision, $ExtUtils::MM_Unix::Revision and 
+      $ExtUtils::MM_VMS::Revision are all now based on $VERSION.  You
+      shouldn't be using them for anything anyway.
+
 
 6.46  Sat Sep 27 17:34:03 EDT 2008
     Bug Fixes

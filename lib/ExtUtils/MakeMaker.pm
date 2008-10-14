@@ -19,7 +19,11 @@ my @Prepend_parent;
 my %Recognized_Att_Keys;
 
 our $VERSION = '6.47_01';
-our ($Revision) = q$Revision$ =~ /Revision:\s+(\S+)/;
+
+# Emulate something resembling CVS $Revision$
+(our $Revision = $VERSION) =~ s{_}{};
+$Revision = int $Revision * 10000;
+
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
 our @ISA = qw(Exporter);
