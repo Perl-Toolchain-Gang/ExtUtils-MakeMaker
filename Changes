@@ -1,3 +1,8 @@
+6.47_02  Thu Oct 16 16:14:20 PDT 2008
+    Test Fixes
+    * MIN_PERL_VERSION test had some goofs on VMS. [thanks Craig Berry]
+
+
 6.47_01  Tue Oct 14 12:38:05 EDT 2008
     New Features
     * Added optional parameter MIN_PERL_VERSION, to define minimal
