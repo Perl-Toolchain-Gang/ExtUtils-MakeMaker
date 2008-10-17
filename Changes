@@ -1,3 +1,9 @@
+Next
+    Test Fixes
+    * Protect against stray environment variables effecting the tests.
+      [rt.cpan.org 14930]
+
+
 6.47_02  Thu Oct 16 16:14:20 PDT 2008
     Test Fixes
     * MIN_PERL_VERSION test had some goofs on VMS. [thanks Craig Berry]
