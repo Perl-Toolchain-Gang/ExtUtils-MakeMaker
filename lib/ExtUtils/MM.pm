@@ -58,7 +58,7 @@ if( $^O eq 'MSWin32' ) {
 $Is{UWIN}   = $^O =~ /^uwin(-nt)?$/;
 $Is{Cygwin} = $^O eq 'cygwin';
 $Is{NW5}    = $Config{osname} eq 'NetWare';  # intentional
-$Is{BeOS}   = $^O =~ /beos/i;    # XXX should this be that loose?
+$Is{BeOS}   = $^O =~ /beos/i or $^O eq 'haiku';
 $Is{DOS}    = $^O eq 'dos';
 if( $Is{NW5} ) {
     $^O = 'NetWare';

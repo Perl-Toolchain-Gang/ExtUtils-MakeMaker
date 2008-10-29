@@ -1,3 +1,8 @@
+6.49_01
+    New OS Support
+    * Recognize "Haiku", a resurrection of BeOS.
+
+
 6.48  Mon Oct 20 11:18:13 PDT 2008
     Test Fixes
     * Protect against stray environment variables effecting the tests.
