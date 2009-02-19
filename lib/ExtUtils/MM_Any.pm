@@ -832,6 +832,10 @@ sub metafile_data {
             'ExtUtils::MakeMaker'       => 0
         },
 
+        build_requires => {
+            'ExtUtils::MakeMaker'       => 0
+        },
+
         no_index     => {
             directory   => [qw(t inc)]
         },
