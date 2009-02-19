@@ -2587,7 +2587,13 @@ following parameters are recognized:
 
 An example:
 
-    WriteMakefile( 'dist' => { COMPRESS=>"bzip2", SUFFIX=>".bz2" })
+    WriteMakefile(
+        ...other options...
+        dist => {
+            COMPRESS => "bzip2",
+            SUFFIX   => ".bz2"
+        }
+    );
 
 
 =head2 Module Meta-Data
