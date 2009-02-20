@@ -10,6 +10,10 @@
     - ExtUtils::Install 1.51 changed its output breaking some tests that
       were looking for /^Writing/ [rt.cpan.org 42927]
 
+    Bug Fixes
+    - Upgrade bundled modules:  ExtUtils::Install 1.52, ExtUtils::Command
+      1.16, ExtUtils::Manifest 1.56.
+
     Other
     - The MakeMaker repository moved slightly.  Changed the metadata to
       reflect this.  [rt.cpan.org 41571]
