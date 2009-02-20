@@ -17,7 +17,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 85;
+use Test::More tests => 81;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -133,7 +133,6 @@ is( $?, 0,                                  '  exited normally' ) ||
 my $install_out = run("$make install");
 is( $?, 0, 'install' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
-like( $install_out, qr/^Writing /m );
 
 ok( -r '../dummy-install',     '  install dir created' );
 my %files = ();
@@ -159,7 +158,6 @@ SKIP: {
     $install_out = run("$make install PREFIX=elsewhere");
     is( $?, 0, 'install with PREFIX override' ) || diag $install_out;
     like( $install_out, qr/^Installing /m );
-    like( $install_out, qr/^Writing /m );
 
     ok( -r 'elsewhere',     '  install dir created' );
     %files = ();
@@ -180,7 +178,6 @@ SKIP: {
     is( $?, 0, 'install with DESTDIR' ) || 
         diag $install_out;
     like( $install_out, qr/^Installing /m );
-    like( $install_out, qr/^Writing /m );
 
     ok( -d 'other',  '  destdir created' );
     %files = ();
@@ -221,7 +218,6 @@ SKIP: {
     is( $?, 0, 'install with PREFIX override and DESTDIR' ) || 
         diag $install_out;
     like( $install_out, qr/^Installing /m );
-    like( $install_out, qr/^Writing /m );
 
     ok( !-d 'elsewhere',       '  install dir not created' );
     ok( -d 'other/elsewhere',  '  destdir created' );

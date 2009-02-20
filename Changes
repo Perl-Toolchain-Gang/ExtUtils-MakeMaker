@@ -6,6 +6,10 @@
     - META.yml now includes ExtUtils::MakeMaker in build_requires by
       default.
 
+    Test Fixes
+    - ExtUtils::Install 1.51 changed its output breaking some tests that
+      were looking for /^Writing/ [rt.cpan.org 42927]
+
 
 6.48  Mon Oct 20 11:18:13 PDT 2008
     Test Fixes
