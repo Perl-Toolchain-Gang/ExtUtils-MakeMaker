@@ -10,6 +10,10 @@
     - ExtUtils::Install 1.51 changed its output breaking some tests that
       were looking for /^Writing/ [rt.cpan.org 42927]
 
+    Other
+    - The MakeMaker repository moved slightly.  Changed the metadata to
+      reflect this.  [rt.cpan.org 41571]
+
 
 6.48  Mon Oct 20 11:18:13 PDT 2008
     Test Fixes
