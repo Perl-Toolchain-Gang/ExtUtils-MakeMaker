@@ -1,3 +1,11 @@
+6.49_02
+    Windows    
+    * Remove the special checks for compilers that need a "manifest".  Instead,
+      the code will just be a no-op if there's no manifest.  Or something.
+      I dunno, I'm hoping Jan and Steve know what they're doing.
+      [rt.perl.org 61492]
+
+
 6.49_01  Thu Feb 19 17:06:36 PST 2009
     New OS Support
     * Recognize "Haiku", a resurrection of BeOS.
