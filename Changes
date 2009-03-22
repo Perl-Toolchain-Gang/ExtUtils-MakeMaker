@@ -1,4 +1,4 @@
-6.49_02
+6.50  Sun Mar 22 12:28:06 PDT 2009
     Windows    
     * Remove the special checks for compilers that need a "manifest".  Instead,
       the code will just be a no-op if there's no manifest.  Or something.
