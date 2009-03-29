@@ -88,6 +88,7 @@ my %Special_Sigs = (
  PMLIBDIRS          => 'ARRAY',
  PMLIBPARENTDIRS    => 'ARRAY',
  PREREQ_PM          => 'HASH',
+ CONFIGURE_REQUIRES => 'HASH',
  SKIP               => 'ARRAY',
  TYPEMAPS           => 'ARRAY',
  XS                 => 'HASH',
