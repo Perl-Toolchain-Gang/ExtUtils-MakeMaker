@@ -821,6 +821,15 @@ sub metafile_data {
         meta-spec
     );
 
+    my $configure_requires;
+    if( $self->{CONFIGURE_REQUIRES} and ref($self->{CONFIGURE_REQUIRES}) eq 'HASH' ) {
+        $configure_requires = $self->{CONFIGURE_REQUIRES};
+    } else {
+        $configure_requires = {
+            'ExtUtils::MakeMaker'       => 0,
+        };
+    }
+
     my %meta = (
         name         => $self->{DISTNAME},
         version      => $self->{VERSION},
@@ -828,9 +837,7 @@ sub metafile_data {
         license      => $self->{LICENSE} || 'unknown',
         distribution_type => $self->{PM} ? 'module' : 'script',
 
-        configure_requires => {
-            'ExtUtils::MakeMaker'       => 0
-        },
+        configure_requires => $configure_requires,
 
         build_requires => {
             'ExtUtils::MakeMaker'       => 0

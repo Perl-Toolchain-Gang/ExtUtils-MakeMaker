@@ -1,3 +1,7 @@
+    New Features
+    * Optional parameter CONFIGURE_REQUIRES was added, to control
+      this section in META.yml (Alexandr Ciornii)
+
 6.50  Sun Mar 22 12:28:06 PDT 2009
     Windows    
     * Remove the special checks for compilers that need a "manifest".  Instead,
