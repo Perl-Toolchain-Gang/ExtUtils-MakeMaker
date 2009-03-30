@@ -12,7 +12,7 @@ use strict;
 
 use lib qw(lib inc);    # build ourself with ourself
 use File::Spec;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.50;
 
 
 BEGIN {
@@ -87,9 +87,11 @@ my $MM = WriteMakefile(
 
     META_ADD        => {
         # We don't need ourself to install ourself.
-        configure_requires => {},
+        #configure_requires => {},
         build_requires     => {},
     },
+
+    CONFIGURE_REQUIRES => {},
 
     INSTALLDIRS     => 'perl',
 
