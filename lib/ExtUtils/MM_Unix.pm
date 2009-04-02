@@ -1742,6 +1742,19 @@ TOUCH, CP, MV, CHMOD, UMASK_NULL, ECHO, ECHO_N
 sub init_others {	# --- Initialize Other Attributes
     my($self) = shift;
 
+    $self->{ECHO}       ||= 'echo';
+    $self->{ECHO_N}     ||= 'echo -n';
+    $self->{RM_F}       ||= "rm -f";
+    $self->{RM_RF}      ||= "rm -rf";
+    $self->{TOUCH}      ||= "touch";
+    $self->{TEST_F}     ||= "test -f";
+    $self->{CP}         ||= "cp";
+    $self->{MV}         ||= "mv";
+    $self->{CHMOD}      ||= "chmod";
+    $self->{FALSE}      ||= 'false';
+
+    $self->SUPER::init_others(@_);
+
     $self->{LD} ||= 'ld';
 
     # Compute EXTRALIBS, BSLOADLIBS and LDLOADLIBS from $self->{LIBS}
@@ -1804,34 +1817,6 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{USEMAKEFILE}        ||= '-f';
 
     $self->{SHELL}              ||= $Config{sh} || '/bin/sh';
-
-    $self->{ECHO}       ||= 'echo';
-    $self->{ECHO_N}     ||= 'echo -n';
-    $self->{RM_F}       ||= "rm -f";
-    $self->{RM_RF}      ||= "rm -rf";
-    $self->{TOUCH}      ||= "touch";
-    $self->{TEST_F}     ||= "test -f";
-    $self->{CP}         ||= "cp";
-    $self->{MV}         ||= "mv";
-    $self->{CHMOD}      ||= "chmod";
-    $self->{MKPATH}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e mkpath';
-    $self->{EQUALIZE_TIMESTAMP} ||= 
-      '$(ABSPERLRUN) "-MExtUtils::Command" -e eqtime';
-
-    $self->{UNINST}     ||= 0;
-    $self->{VERBINST}   ||= 0;
-    $self->{MOD_INSTALL} ||= 
-      $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
-install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
-CODE
-    $self->{DOC_INSTALL}        ||= 
-      '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
-    $self->{UNINSTALL}          ||= 
-      '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e uninstall';
-    $self->{WARN_IF_OLD_PACKLIST} ||= 
-      '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
-    $self->{FIXIN}              ||= 
-      q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"};
 
     $self->{UMASK_NULL}         ||= "umask 0";
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
@@ -2597,7 +2582,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	$(PERLRUN) Makefile.PL %s
 	$(NOECHO) $(ECHO) "==> Your Makefile has been rebuilt. <=="
 	$(NOECHO) $(ECHO) "==> Please rerun the $(MAKE) command.  <=="
-	false
+	$(FALSE)
 
 MAKE_FRAG
 
@@ -2797,7 +2782,7 @@ sub perldepend {
 # We do NOT just update config.h because that is not sufficient.
 # An out of date config.h is not fatal but complains loudly!
 $(PERL_INC)/config.h: $(PERL_SRC)/config.sh
-	-$(NOECHO) $(ECHO) "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; false
+	-$(NOECHO) $(ECHO) "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; $(FALSE)
 
 $(PERL_ARCHLIB)/Config.pm: $(PERL_SRC)/config.sh
 	$(NOECHO) $(ECHO) "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(PERL_SRC)/config.sh"
@@ -3540,7 +3525,7 @@ sub tools_other {
     # We set PM_FILTER as late as possible so it can see all the earlier
     # on macro-order sensitive makes such as nmake.
     for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
-                      UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP 
+                      UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP FALSE
                       ECHO ECHO_N
                       UNINST VERBINST
                       MOD_INSTALL DOC_INSTALL UNINSTALL

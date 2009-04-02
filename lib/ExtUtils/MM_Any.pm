@@ -1696,12 +1696,48 @@ Defines at least these macros.
   TEST_F            Test for a file's existence 
   CP                Copy a file                 
   MV                Move a file                 
-  CHMOD             Change permissions on a     
-                    file
+  CHMOD             Change permissions on a file
+  FALSE             Exit with non-zero
 
   UMASK_NULL        Nullify umask
   DEV_NULL          Suppress all command output
 
+=cut
+
+sub init_others {
+    my $self = shift;
+
+    $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
+    $self->{ECHO_N}   ||= $self->oneliner('print qq{@ARGV}');
+
+    $self->{TOUCH}    ||= $self->oneliner('touch', ["-MExtUtils::Command"]);
+    $self->{CHMOD}    ||= $self->oneliner('chmod', ["-MExtUtils::Command"]);
+    $self->{RM_F}     ||= $self->oneliner('rm_f',  ["-MExtUtils::Command"]);
+    $self->{RM_RF}    ||= $self->oneliner('rm_rf', ["-MExtUtils::Command"]);
+    $self->{TEST_F}   ||= $self->oneliner('test_f', ["-MExtUtils::Command"]);
+    $self->{FALSE}    ||= $self->oneliner('exit 1');
+
+    $self->{MKPATH}   ||= $self->oneliner('mkpath', ["-MExtUtils::Command"]);
+
+    $self->{CP}       ||= $self->oneliner('cp', ["-MExtUtils::Command"]);
+    $self->{MV}       ||= $self->oneliner('mv', ["-MExtUtils::Command"]);
+
+    $self->{MOD_INSTALL} ||= 
+      $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
+install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
+CODE
+    $self->{DOC_INSTALL} ||= $self->oneliner('perllocal_install', ["-MExtUtils::Command::MM"]);
+    $self->{UNINSTALL}   ||= $self->oneliner('uninstall', ["-MExtUtils::Command::MM"]);
+    $self->{WARN_IF_OLD_PACKLIST} ||= 
+      $self->oneliner('warn_if_old_packlist', ["-MExtUtils::Command::MM"]);
+    $self->{FIXIN}       ||= $self->oneliner('MY->fixin(shift)', ["-MExtUtils::MY"]);
+    $self->{EQUALIZE_TIMESTAMP} ||= $self->oneliner('eqtime', ["-MExtUtils::Command"]);
+
+    $self->{UNINST}     ||= 0;
+    $self->{VERBINST}   ||= 0;
+
+    return 1;
+}
 
 =head3 init_DIRFILESEP  I<Abstract>
 

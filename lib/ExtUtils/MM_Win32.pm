@@ -150,17 +150,8 @@ sub init_others {
     my ($self) = @_;
 
     # Used in favor of echo because echo won't strip quotes. :(
-    $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
-    $self->{ECHO_N}   ||= $self->oneliner('print qq{@ARGV}');
 
-    $self->{TOUCH}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e touch';
-    $self->{CHMOD}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e chmod'; 
-    $self->{CP}       ||= '$(ABSPERLRUN) -MExtUtils::Command -e cp';
-    $self->{RM_F}     ||= '$(ABSPERLRUN) -MExtUtils::Command -e rm_f';
-    $self->{RM_RF}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e rm_rf';
-    $self->{MV}       ||= '$(ABSPERLRUN) -MExtUtils::Command -e mv';
     $self->{NOOP}     ||= 'rem';
-    $self->{TEST_F}   ||= '$(ABSPERLRUN) -MExtUtils::Command -e test_f';
     $self->{DEV_NULL} ||= '> NUL';
 
     $self->{FIXIN}    ||= $self->{PERL_CORE} ? 

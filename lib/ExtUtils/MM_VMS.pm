@@ -469,13 +469,6 @@ sub init_others {
     $self->{MACROEND}           ||= ')';
     $self->{USEMAKEFILE}        ||= '/Descrip=';
 
-    $self->{ECHO}     ||= '$(ABSPERLRUN) -le "print qq{@ARGV}"';
-    $self->{ECHO_N}   ||= '$(ABSPERLRUN) -e  "print qq{@ARGV}"';
-    $self->{TOUCH}    ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e touch';
-    $self->{CHMOD}    ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e chmod'; 
-    $self->{RM_F}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e rm_f';
-    $self->{RM_RF}    ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e rm_rf';
-    $self->{TEST_F}   ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e test_f';
     $self->{EQUALIZE_TIMESTAMP} ||= '$(ABSPERLRUN) -we "open F,qq{>>$ARGV[1]};close F;utime(0,(stat($ARGV[0]))[9]+1,$ARGV[1])"';
 
     $self->{MOD_INSTALL} ||= 
@@ -486,10 +479,6 @@ CODE
     $self->{SHELL}    ||= 'Posix';
 
     $self->SUPER::init_others;
-
-    # So we can copy files into directories with less fuss
-    $self->{CP}         = '$(ABSPERLRUN) "-MExtUtils::Command" -e cp';
-    $self->{MV}         = '$(ABSPERLRUN) "-MExtUtils::Command" -e mv';
 
     $self->{UMASK_NULL} = '! ';  
 
