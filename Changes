@@ -10,6 +10,8 @@
       have the same mod time are out of date.  This is often the case for
       the tests which generate files and run make rapidly.
       [rt.cpan.org 29955] (Ken Hirsch)
+    * skip test numbers were wrong on VMS in t/basic.t
+      [rt.cpan.org 43511] (John E. Malmberg)
 
     VMS
     * Fixed a few calls to catfile() that should be catdir().
