@@ -2,6 +2,8 @@
     Bug Fixes
     * On 5.10 "make ppd" would generate the wrong ARCHITECTURE saying the
       version is 5.1 instead of 5.10.
+    * Our pod2man emulation now requires an argument to --perm_rw.
+      [rt.cpan.org 35190] (imacat)
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.

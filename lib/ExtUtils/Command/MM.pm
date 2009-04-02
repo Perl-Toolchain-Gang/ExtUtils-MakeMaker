@@ -103,7 +103,7 @@ sub pod2man {
                 'section|s=s', 'release|r=s', 'center|c=s',
                 'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
                 'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
-                'name|n=s', 'perm_rw:i'
+                'name|n=s', 'perm_rw=i'
     );
 
     # If there's no files, don't bother going further.
@@ -131,7 +131,7 @@ sub pod2man {
         $parser->parse_from_file($pod, $man)
           or do { warn("Could not install $man\n");  next };
 
-        if (length $options{perm_rw}) {
+        if (exists $options{perm_rw}) {
             chmod(oct($options{perm_rw}), $man)
               or do { warn("chmod $options{perm_rw} $man: $!\n"); next };
         }
