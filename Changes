@@ -3,6 +3,10 @@
     * On 5.10 "make ppd" would generate the wrong ARCHITECTURE saying the
       version is 5.1 instead of 5.10.
 
+    Test Fixes
+    * basic.t will not leave a "bin" environment variable defined on VMS.
+      [rt.cpan.org 42150]
+
 
 6.50  Sun Mar 22 12:28:06 PDT 2009
     Windows    

@@ -32,7 +32,7 @@ my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
 # GNV logical interferes with testing
-$ENV{'bin'} = '[.bin]' if $Is_VMS;
+local $ENV{'bin'} = '[.bin]' if $Is_VMS;
 
 chdir 't';
 
