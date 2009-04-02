@@ -372,7 +372,7 @@ sub init_DEST {
     # Expand DEST variables.
     foreach my $var ($self->installvars) {
         my $destvar = 'DESTINSTALL'.$var;
-        $self->{$destvar} = File::Spec->eliminate_macros($self->{$destvar});
+        $self->{$destvar} = $self->eliminate_macros($self->{$destvar});
     }
 }
 
@@ -1813,6 +1813,45 @@ sub init_linker {
 
     $self->{PERL_ARCHIVE_AFTER} ||= '';
 }
+
+
+=item catdir (override)
+
+=item catfile (override)
+
+Eliminate the macros in the output to the MMS/MMK file.
+
+(File::Spec::VMS used to do this for us, but it's being removed)
+
+=cut
+
+sub catdir {
+    my $self = shift;
+
+    # Process the macros on VMS MMS/MMK
+    my @args = map { m{\$\(} ? $self->eliminate_macros($_) : $_  } @_;
+
+    my $dir = $self->SUPER::catdir(@args);
+
+    # Fix up the directory and force it to VMS format.
+    $dir = $self->fixpath($dir, 1);
+
+    return $dir;
+}
+
+sub catfile {
+    my $self = shift;
+
+    # Process the macros on VMS MMS/MMK
+    my @args = map { m{\$\(} ? $self->eliminate_macros($_) : $_  } @_;
+
+    my $file = $self->SUPER::catfile(@args);
+
+    $file = vmsify($file);
+
+    return $file
+}
+
 
 =item eliminate_macros
 

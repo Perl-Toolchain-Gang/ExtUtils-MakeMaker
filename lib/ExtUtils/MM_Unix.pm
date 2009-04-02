@@ -1661,14 +1661,14 @@ from the perl source tree.
 	    # uninstalled Perl outside of Perl build tree
 	    my $lib;
 	    for my $dir (@INC) {
-	      $lib = $dir, last if -e $self->catdir($dir, "Config.pm");
+	      $lib = $dir, last if -e $self->catfile($dir, "Config.pm");
 	    }
 	    if ($lib) {
               # Win32 puts its header files in /perl/src/lib/CORE.
               # Unix leaves them in /perl/src.
 	      my $inc = $Is{Win32} ? $self->catdir($lib, "CORE" )
                                   : dirname $lib;
-	      if (-e $self->catdir($inc, "perl.h")) {
+	      if (-e $self->catfile($inc, "perl.h")) {
 		$self->{PERL_LIB}	   = $lib;
 		$self->{PERL_ARCHLIB}	   = $lib;
 		$self->{PERL_INC}	   = $inc;

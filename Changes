@@ -7,6 +7,13 @@
     * basic.t will not leave a "bin" environment variable defined on VMS.
       [rt.cpan.org 42150]
 
+    VMS
+    * Fixed a few calls to catfile() that should be catdir().
+      (John E. Malmberg)
+    * Override catdir() and catfile() to expand macros.  This is normally done
+      inside File::Spec::VMS but is really a MakeMaker-only thing.
+      (John E. Malmberg)
+
 
 6.50  Sun Mar 22 12:28:06 PDT 2009
     Windows    
