@@ -87,12 +87,21 @@ And the removal of:
 
 If no arguments are given to pod2man it will read from @ARGV.
 
+If Pod::Man is unavailable, this function will warn and return undef.
+
 =cut
 
 sub pod2man {
     local @ARGV = @_ ? @_ : @ARGV;
 
-    require Pod::Man;
+    {
+        local $@;
+        if( !eval { require Pod::Man } ) {
+            warn "Pod::Man is not available: $@".
+                 "Man pages will not be generated during this install.\n";
+            return undef;
+        }
+    }
     require Getopt::Long;
 
     # We will cheat and just use Getopt::Long.  We fool it by putting
