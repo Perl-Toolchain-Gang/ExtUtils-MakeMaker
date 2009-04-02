@@ -1,3 +1,9 @@
+6.51_01
+    Bug Fixes
+    * On 5.10 "make ppd" would generate the wrong ARCHITECTURE saying the
+      version is 5.1 instead of 5.10.
+
+
 6.50  Sun Mar 22 12:28:06 PDT 2009
     Windows    
     * Remove the special checks for compilers that need a "manifest".  Instead,

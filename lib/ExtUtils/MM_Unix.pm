@@ -3006,7 +3006,8 @@ PPD_OUT
         # archname did not change from 5.6 to 5.8, but those versions may
         # not be not binary compatible so now we append the part of the
         # version that changes when binary compatibility may change
-        $archname .= "-". substr($Config{version},0,3);
+        my($arch_version) = join ".", (split m{\.}, $Config{version})[0..1];
+        $archname .= "-". $arch_version;
     }
     $ppd_xml .= sprintf <<'PPD_OUT', $archname;
         <OS NAME="$(OSNAME)" />
