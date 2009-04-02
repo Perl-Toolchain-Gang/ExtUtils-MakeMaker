@@ -5,7 +5,11 @@
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.
-      [rt.cpan.org 42150]
+      [rt.cpan.org 42150] (John E. Malmberg)
+    * Made the tests work ok on systems whose makes assume that files which
+      have the same mod time are out of date.  This is often the case for
+      the tests which generate files and run make rapidly.
+      [rt.cpan.org 29955] (Ken Hirsch)
 
     VMS
     * Fixed a few calls to catfile() that should be catdir().
