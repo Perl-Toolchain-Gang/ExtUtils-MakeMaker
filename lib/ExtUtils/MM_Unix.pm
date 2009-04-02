@@ -1291,7 +1291,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    if ($txt =~ /Extracting \S+ \(with variable substitutions/) {
 		($pl_files{$name} = $name) =~ s/[._]pl\z//i ;
 	    }
-	    else { 
+	    else {
                 $pm{$name} = $self->catfile($self->{INST_LIBDIR},$name); 
             }
 	} elsif ($name =~ /\.(p[ml]|pod)\z/){
