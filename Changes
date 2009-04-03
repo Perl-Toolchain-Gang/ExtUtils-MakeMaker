@@ -11,6 +11,7 @@
     * PPD files generated with "make ppd" now use the new REQUIRES key
       rather than the now deprecated DEPENDENCY.
       [rt.cpan.org 25179] (GAAS)
+    * PPD files no longer contain the deprecated OS tag.
 
     Bug Fixes
     * On 5.10 "make ppd" would generate the wrong ARCHITECTURE saying the

@@ -2999,7 +2999,6 @@ PPD_PERLVERS
         $archname .= "-$Config{PERL_REVISION}.$Config{PERL_VERSION}";
     }
     $ppd_xml .= sprintf <<'PPD_OUT', $archname;
-        <OS NAME="$(OSNAME)" />
         <ARCHITECTURE NAME="%s" />
 PPD_OUT
 

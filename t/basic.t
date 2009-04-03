@@ -17,7 +17,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 80;
+use Test::More tests => 79;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -102,8 +102,7 @@ like( $ppd_html,
                                                            '  <AUTHOR>'  );
 like( $ppd_html, qr{^\s*<IMPLEMENTATION>}m,          '  <IMPLEMENTATION>');
 like( $ppd_html, qr{^\s*<REQUIRE NAME="strict::" />}m,  '  <REQUIRE>' );
-like( $ppd_html, qr{^\s*<OS NAME="$Config{osname}" />}m,
-                                                           '  <OS>'      );
+
 my $archname = $Config{archname};
 if( $] >= 5.008 ) {
     # XXX This is a copy of the internal logic, so it's not a great test
