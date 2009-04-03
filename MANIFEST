@@ -10,11 +10,9 @@ lib/ExtUtils/Command/MM.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
 lib/ExtUtils/MakeMaker.pm
-lib/ExtUtils/MakeMaker/bytes.pm
 lib/ExtUtils/MakeMaker/Config.pm
 lib/ExtUtils/MakeMaker/FAQ.pod
 lib/ExtUtils/MakeMaker/Tutorial.pod
-lib/ExtUtils/MakeMaker/vmsish.pm
 lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/MM.pm
