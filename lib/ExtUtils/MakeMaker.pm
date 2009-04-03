@@ -442,18 +442,22 @@ END
 
     my(%unsatisfied) = ();
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
-        # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
-        # extra statement is a workaround.
         my $file = "$prereq.pm";
         $file =~ s{::}{/}g;
-        eval { require $file };
-
-        my $pr_version = $prereq->VERSION || 0;
+        my $path;
+        for my $dir (@INC) {
+            my $tmp = "$dir/$file";
+            if( -r $tmp ) {
+                $path = $tmp;
+                last;
+            }
+        }
+        my $pr_version = defined $path ? MM->parse_version($path) : 0;
 
         # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
 
-        if ($@) {
+        if (!defined $path) {
             warn sprintf "Warning: prerequisite %s %s not found.\n", 
               $prereq, $self->{PREREQ_PM}{$prereq} 
                    unless $self->{PREREQ_FATAL};
