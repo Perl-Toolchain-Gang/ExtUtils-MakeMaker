@@ -2950,8 +2950,6 @@ for a binary distribution.
 sub ppd {
     my($self) = @_;
 
-    my $pack_ver = $self->_ppd_version($self->{VERSION});
-
     my $abstract = $self->{ABSTRACT} || '';
     $abstract =~ s/\n/\\n/sg;
     $abstract =~ s/</&lt;/g;
@@ -2961,9 +2959,8 @@ sub ppd {
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 
-    my $ppd_xml = sprintf <<'PPD_HTML', $pack_ver, $abstract, $author;
+    my $ppd_xml = sprintf <<'PPD_HTML', $self->{VERSION}, $abstract, $author;
 <SOFTPKG NAME="$(DISTNAME)" VERSION="%s">
-    <TITLE>$(DISTNAME)</TITLE>
     <ABSTRACT>%s</ABSTRACT>
     <AUTHOR>%s</AUTHOR>
 PPD_HTML
@@ -2976,14 +2973,22 @@ PPD_HTML
 PPD_PERLVERS
 
     }
-    foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
-        my $pre_req = $prereq;
-        $pre_req =~ s/::/-/g;
-        my $dep_ver = $self->_ppd_version($self->{PREREQ_PM}{$prereq});
-        $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
-        <DEPENDENCY NAME="%s" VERSION="%s" />
-PPD_OUT
 
+    # Don't add "perl" to requires.  perl dependencies are
+    # handles by ARCHITECTURE.
+    my %prereqs = %{$self->{PREREQ_PM}};
+    delete $prereqs{perl};
+
+    # Build up REQUIRE
+    foreach my $prereq (sort keys %prereqs) {
+        my $name = $prereq;
+        $name .= '::' unless $name =~ /::/;
+        my $version = $prereqs{$prereq}+0;  # force numification
+
+        my %attrs = ( NAME => $name );
+        $attrs{VERSION} = $version if $version;
+        my $attrs = join " ", map { qq[$_="$attrs{$_}"] } keys %attrs;
+        $ppd_xml .= qq(        <REQUIRE $attrs />\n);
     }
 
     my $archname = $Config{archname};
