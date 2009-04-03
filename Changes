@@ -14,6 +14,8 @@
       version is 5.1 instead of 5.10.
     * Our pod2man emulation now requires an argument to --perm_rw.
       [rt.cpan.org 35190] (imacat)
+    * DISTVNAME was documented as a WriteMakefile() param but you'd
+      get a warning if you tried to use it.  [rt.cpan.org 43217]
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.
