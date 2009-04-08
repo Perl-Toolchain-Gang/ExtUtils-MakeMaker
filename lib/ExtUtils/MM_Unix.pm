@@ -375,7 +375,7 @@ sub constants {
               VERSION    VERSION_MACRO    VERSION_SYM DEFINE_VERSION
               XS_VERSION XS_VERSION_MACRO             XS_DEFINE_VERSION
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
-              INST_MAN1DIR INST_MAN3DIR
+              INST_MAN1DIR INST_MAN3DIR INST_HTML1DIR INST_HTML3DIR
               MAN1EXT      MAN3EXT
               INSTALLDIRS INSTALL_BASE DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
@@ -1322,9 +1322,11 @@ sub init_MANPODS {
     my $self = shift;
 
     # Set up names of manual pages to generate from pods
-    foreach my $man (qw(MAN1 MAN3)) {
+    foreach my $num (1, 3) {
+        my $man = "MAN$num";
 	if ( $self->{"${man}PODS"}
-             or $self->{"INSTALL${man}DIR"} =~ /^(none|\s*)$/
+             or ($self->{"INSTALL${man}DIR"} =~ /^(none|\s*)$/ and
+                 $self->{"INSTALLHTML${num}DIR"} =~ /^(none|\s*)$/)
         ) {
             $self->{"${man}PODS"} ||= {};
         }
@@ -2111,7 +2113,9 @@ pure_perl_install ::
 		$(INST_BIN) $(DESTINSTALLBIN) \
 		$(INST_SCRIPT) $(DESTINSTALLSCRIPT) \
 		$(INST_MAN1DIR) $(DESTINSTALLMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLMAN3DIR)
+		$(INST_MAN3DIR) $(DESTINSTALLMAN3DIR) \
+		$(INST_HTML1DIR) $(DESTINSTALLHTML1DIR) \
+		$(INST_HTML3DIR) $(DESTINSTALLHTML3DIR)
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.$self->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{
 
@@ -2125,7 +2129,9 @@ pure_site_install ::
 		$(INST_BIN) $(DESTINSTALLSITEBIN) \
 		$(INST_SCRIPT) $(DESTINSTALLSITESCRIPT) \
 		$(INST_MAN1DIR) $(DESTINSTALLSITEMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLSITEMAN3DIR)
+		$(INST_MAN3DIR) $(DESTINSTALLSITEMAN3DIR) \
+		$(INST_HTML1DIR) $(DESTINSTALLSITEHTML1DIR) \
+		$(INST_HTML3DIR) $(DESTINSTALLSITEHTML3DIR)
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.$self->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{
 
@@ -2138,7 +2144,9 @@ pure_vendor_install ::
 		$(INST_BIN) $(DESTINSTALLVENDORBIN) \
 		$(INST_SCRIPT) $(DESTINSTALLVENDORSCRIPT) \
 		$(INST_MAN1DIR) $(DESTINSTALLVENDORMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR)
+		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR) \
+		$(INST_HTML1DIR) $(DESTINSTALLVENDORHTML1DIR) \
+		$(INST_HTML3DIR) $(DESTINSTALLVENDORHTML3DIR)
 
 doc_perl_install ::
 	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
@@ -3621,7 +3629,7 @@ sub all_target {
     my $self = shift;
 
     return <<'MAKE_EXT';
-all :: pure_all manifypods
+all :: pure_all manifypods htmlifypods
 	$(NOECHO) $(NOOP)
 MAKE_EXT
 }
