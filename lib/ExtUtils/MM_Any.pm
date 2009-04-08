@@ -1857,7 +1857,7 @@ CODE
     # Not the greatest default, but its something.
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
 
-    $self->{NOOP}               ||= '$(SHELL) -c $(TRUE)';
+    $self->{NOOP}               ||= '$(TRUE)';
     $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
 
     $self->{LD_RUN_PATH} = "";
