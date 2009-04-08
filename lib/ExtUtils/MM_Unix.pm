@@ -1324,7 +1324,7 @@ sub init_MANPODS {
     # Set up names of manual pages to generate from pods
     foreach my $num (1, 3) {
         my $man = "MAN$num";
-	if ( $self->{"${man}PODS"}
+        if ( $self->{"${man}PODS"}
              or ($self->{"INSTALL${man}DIR"} =~ /^(none|\s*)$/ and
                  $self->{"INSTALLHTML${num}DIR"} =~ /^(none|\s*)$/)
         ) {
@@ -1333,7 +1333,7 @@ sub init_MANPODS {
         else {
             my $init_method = "init_${man}PODS";
             $self->$init_method();
-	}
+        }
     }
 }
 
