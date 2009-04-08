@@ -702,7 +702,6 @@ END
 
     my @man_cmds;
     foreach my $section (qw(1 3)) {
-        next if $self->{"INSTALLMAN${section}DIR"} =~ /^(none|\s*)$/;
         my $pods = $self->{"MAN${section}PODS"};
         push @man_cmds, $self->split_command(<<CMD, %$pods);
 	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)
