@@ -1833,6 +1833,11 @@ CODE
     $self->{UNINST}     ||= 0;
     $self->{VERBINST}   ||= 0;
 
+    $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE} || 'Makefile';
+    $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE};
+    $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
+    $self->{MAKE_APERL_FILE}    ||= $self->{MAKEFILE}.'.aperl';
+
     return 1;
 }
 

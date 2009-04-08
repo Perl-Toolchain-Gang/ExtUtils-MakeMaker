@@ -1765,9 +1765,10 @@ sub init_others {	# --- Initialize Other Attributes
     # undefined. In any case we turn it into an anon array:
 
     # May check $Config{libs} too, thus not empty.
-    $self->{LIBS} = [$self->{LIBS}] unless ref $self->{LIBS};
+    $self->{LIBS} = !defined $self->{LIBS} ? ['']               : 
+                    !ref $self->{LIBS}     ? [$self->{LIBS}]    :
+                                             $self->{LIBS}      ;
 
-    $self->{LIBS} = [''] unless @{$self->{LIBS}} && defined $self->{LIBS}[0];
     $self->{LD_RUN_PATH} = "";
 
     foreach my $libs ( @{$self->{LIBS}} ){
@@ -1805,11 +1806,6 @@ sub init_others {	# --- Initialize Other Attributes
 
     $self->{NOOP}               ||= '$(SHELL) -c true';
     $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
-
-    $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE} || 'Makefile';
-    $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE};
-    $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
-    $self->{MAKE_APERL_FILE}    ||= $self->{MAKEFILE}.'.aperl';
 
     # Some makes require a wrapper around macros passed in on the command 
     # line.
