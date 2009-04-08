@@ -3,6 +3,7 @@
     * Module installation will not be stopped by a broken Pod::Man.
       Man pages will just not be installed.
       [rt.cpan.org 43546] (Jesse Vincent)
+    * vim swap files, *.swp, will now be ignored by MakeMaker.
 
     Feature Changes
     * Modules in PREREQ_PM are no longer loaded in order to figure out

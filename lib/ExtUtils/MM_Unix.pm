@@ -1501,8 +1501,9 @@ sub init_PM {
                 return;
             }
             return if /\#/;
-            return if /~$/;    # emacs temp files
-            return if /,v$/;   # RCS files
+            return if /~$/;             # emacs temp files
+            return if /,v$/;            # RCS files
+            return if m{\.swp$};        # vim swap files
 
             my $path   = $File::Find::name;
             my $prefix = $self->{INST_LIBDIR};
