@@ -149,8 +149,6 @@ Adjustments are made for Borland's quirks needing -L to come first.
 sub init_others {
     my ($self) = @_;
 
-    # Used in favor of echo because echo won't strip quotes. :(
-
     $self->{NOOP}     ||= 'rem';
     $self->{DEV_NULL} ||= '> NUL';
 
@@ -158,8 +156,8 @@ sub init_others {
       "\$(PERLRUN) $self->{PERL_SRC}/win32/bin/pl2bat.pl" : 
       'pl2bat.bat';
 
-    $self->{LD}     ||= $Config{ld} || 'link';
-    $self->{AR}     ||= $Config{ar} || 'lib';
+    $self->{LD}     ||= 'link';
+    $self->{AR}     ||= 'lib';
 
     $self->SUPER::init_others;
 
