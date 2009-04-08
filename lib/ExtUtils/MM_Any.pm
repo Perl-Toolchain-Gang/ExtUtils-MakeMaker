@@ -1838,6 +1838,25 @@ CODE
     $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
     $self->{MAKE_APERL_FILE}    ||= $self->{MAKEFILE}.'.aperl';
 
+    # Not everybody uses -f to indicate "use this Makefile instead"
+    $self->{USEMAKEFILE}        ||= '-f';
+
+    # Some makes require a wrapper around macros passed in on the command 
+    # line.
+    $self->{MACROSTART}         ||= '';
+    $self->{MACROEND}           ||= '';
+
+    $self->{SHELL}              ||= $Config{sh};
+
+    # UMASK_NULL is not used by MakeMaker but some CPAN modules
+    # make use of it.
+    $self->{UMASK_NULL}         ||= "umask 0";
+
+    # Not the greatest default, but its something.
+    $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
+
+    $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
+
     return 1;
 }
 

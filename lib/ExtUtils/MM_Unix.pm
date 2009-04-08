@@ -1805,20 +1805,8 @@ sub init_others {	# --- Initialize Other Attributes
     };
 
     $self->{NOOP}               ||= '$(SHELL) -c true';
-    $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
 
-    # Some makes require a wrapper around macros passed in on the command 
-    # line.
-    $self->{MACROSTART}         ||= '';
-    $self->{MACROEND}           ||= '';
-
-    # Not everybody uses -f to indicate "use this Makefile instead"
-    $self->{USEMAKEFILE}        ||= '-f';
-
-    $self->{SHELL}              ||= $Config{sh} || '/bin/sh';
-
-    $self->{UMASK_NULL}         ||= "umask 0";
-    $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
+    $self->{SHELL}              ||= '/bin/sh';
 
     return 1;
 }
