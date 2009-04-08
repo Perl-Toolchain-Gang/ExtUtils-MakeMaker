@@ -3462,41 +3462,6 @@ sub test_via_script {
 }
 
 
-=item tools_other (o)
-
-    my $make_frag = $MM->tools_other;
-
-Returns a make fragment containing definitions for the macros init_others() 
-initializes.
-
-=cut
-
-sub tools_other {
-    my($self) = shift;
-    my @m;
-
-    # We set PM_FILTER as late as possible so it can see all the earlier
-    # on macro-order sensitive makes such as nmake.
-    for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
-                      UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP
-                      FALSE TRUE
-                      ECHO ECHO_N
-                      UNINST VERBINST
-                      MOD_INSTALL DOC_INSTALL UNINSTALL
-                      WARN_IF_OLD_PACKLIST
-                      MACROSTART MACROEND
-                      USEMAKEFILE
-                      PM_FILTER
-                      FIXIN
-                    } ) 
-    {
-        next unless defined $self->{$tool};
-        push @m, "$tool = $self->{$tool}\n";
-    }
-
-    return join "", @m;
-}
-
 =item tool_xsubpp (o)
 
 Determines typemaps, xsubpp version, prototype behaviour.
