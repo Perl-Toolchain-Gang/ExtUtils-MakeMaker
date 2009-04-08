@@ -1795,6 +1795,7 @@ Defines at least these macros.
   MV                Move a file                 
   CHMOD             Change permissions on a file
   FALSE             Exit with non-zero
+  TRUE              Exit with zero
 
   UMASK_NULL        Nullify umask
   DEV_NULL          Suppress all command output
@@ -1813,6 +1814,7 @@ sub init_others {
     $self->{RM_RF}    ||= $self->oneliner('rm_rf', ["-MExtUtils::Command"]);
     $self->{TEST_F}   ||= $self->oneliner('test_f', ["-MExtUtils::Command"]);
     $self->{FALSE}    ||= $self->oneliner('exit 1');
+    $self->{TRUE}     ||= $self->oneliner('exit 0');
 
     $self->{MKPATH}   ||= $self->oneliner('mkpath', ["-MExtUtils::Command"]);
 
@@ -1855,7 +1857,53 @@ CODE
     # Not the greatest default, but its something.
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
 
+    $self->{NOOP}               ||= '$(SHELL) -c $(TRUE)';
     $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
+
+    $self->{LD_RUN_PATH} = "";
+
+    # Compute EXTRALIBS, BSLOADLIBS and LDLOADLIBS from $self->{LIBS}
+    # Lets look at $self->{LIBS} carefully: It may be an anon array, a string or
+    # undefined. In any case we turn it into an anon array:
+
+    # May check $Config{libs} too, thus not empty.
+    $self->{LIBS} = !defined $self->{LIBS} ? ['']               : 
+                    !ref $self->{LIBS}     ? [$self->{LIBS}]    :
+                                             $self->{LIBS}      ;
+
+    foreach my $libs ( @{$self->{LIBS}} ){
+        $libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
+        my(@libs) = $self->extliblist($libs);
+        if ($libs[0] or $libs[1] or $libs[2]){
+            # LD_RUN_PATH now computed by ExtUtils::Liblist
+            ($self->{EXTRALIBS},  $self->{BSLOADLIBS}, 
+             $self->{LDLOADLIBS}, $self->{LD_RUN_PATH}) = @libs;
+            last;
+        }
+    }
+
+    if ( $self->{OBJECT} ) {
+        $self->{OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
+    } else {
+        # init_dirscan should have found out, if we have C files
+        $self->{OBJECT} = "";
+        $self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{C}||[]};
+    }
+    $self->{OBJECT} =~ s/\n+/ \\\n\t/g;
+
+    $self->{BOOTDEP}  = (-f "$self->{BASEEXT}_BS") ? "$self->{BASEEXT}_BS" : "";
+    $self->{PERLMAINCC} ||= '$(CC)';
+    $self->{LDFROM} = '$(OBJECT)' unless $self->{LDFROM};
+
+    # Sanity check: don't define LINKTYPE = dynamic if we're skipping
+    # the 'dynamic' section of MM.  We don't have this problem with
+    # 'static', since we either must use it (%Config says we can't
+    # use dynamic loading) or the caller asked for it explicitly.
+    if (!$self->{LINKTYPE}) {
+       $self->{LINKTYPE} = $self->{SKIPHASH}{'dynamic'}
+                        ? 'static'
+                        : ($Config{usedl} ? 'dynamic' : 'static');
+    }
 
     return 1;
 }
