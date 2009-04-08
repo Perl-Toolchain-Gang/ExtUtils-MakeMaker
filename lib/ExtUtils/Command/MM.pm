@@ -150,12 +150,21 @@ sub pod2man {
 }
 
 
+=head3 pod2html
+
+Emulates Pod::Html's pod2html command.
+
+The interface may change, because pod2html's interface sucks.
+
+=cut
+
 sub pod2html {
     @_ = @ARGV unless @_;
+
     my $infile;
     my $outfile;
     for (@_) {
-        $infile = $1 if /^--infile=(.*)/;
+        $infile  = $1 if /^--infile=(.*)/;
         $outfile = $1 if /^--outfile=(.*)/;
     }
     die "Need to specify both --infile and --outfile" unless $infile && $outfile;
