@@ -1369,13 +1369,13 @@ sub init_MAN1PODS {
     my($self) = @_;
 
     if ( exists $self->{EXE_FILES} ) {
-	foreach my $name (@{$self->{EXE_FILES}}) {
-	    next unless $self->_has_pod($name);
+        foreach my $name (@{$self->{EXE_FILES}}) {
+            next unless $self->_has_pod($name);
 
-	    $self->{MAN1PODS}->{$name} =
-		$self->catfile("\$(INST_MAN1DIR)", 
-			       basename($name).".\$(MAN1EXT)");
-	}
+            $self->{MAN1PODS}->{$name} =
+                $self->catfile("\$(INST_MAN1DIR)", 
+                               basename($name).".\$(MAN1EXT)");
+        }
     }
 }
 
@@ -1393,13 +1393,13 @@ sub init_MAN3PODS {
                          # we have to convert to pod
 
     foreach my $name (keys %{$self->{PM}}) {
-	if ($name =~ /\.pod\z/ ) {
-	    $manifypods{$name} = $self->{PM}{$name};
-	} elsif ($name =~ /\.p[ml]\z/ ) {
-	    if( $self->_has_pod($name) ) {
-		$manifypods{$name} = $self->{PM}{$name};
-	    }
-	}
+        if ($name =~ /\.pod\z/ ) {
+            $manifypods{$name} = $self->{PM}{$name};
+        } elsif ($name =~ /\.p[ml]\z/ ) {
+            if( $self->_has_pod($name) ) {
+                $manifypods{$name} = $self->{PM}{$name};
+            }
+        }
     }
 
     my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
@@ -1408,21 +1408,21 @@ sub init_MAN3PODS {
     # To force inclusion, just name it "Configure.pod", or override 
     # MAN3PODS
     foreach my $name (keys %manifypods) {
-	if ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) {
-	    delete $manifypods{$name};
-	    next;
-	}
-	my($manpagename) = $name;
-	$manpagename =~ s/\.p(od|m|l)\z//;
-	# everything below lib is ok
-	unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
-	    $manpagename = $self->catfile(
-	        split(/::/,$self->{PARENT_NAME}),$manpagename
-	    );
-	}
-	$manpagename = $self->replace_manpage_separator($manpagename);
-	$self->{MAN3PODS}->{$name} =
-	    $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
+        if ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) {
+            delete $manifypods{$name};
+            next;
+        }
+        my($manpagename) = $name;
+        $manpagename =~ s/\.p(od|m|l)\z//;
+        # everything below lib is ok
+        unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
+            $manpagename = $self->catfile(
+                split(/::/,$self->{PARENT_NAME}),$manpagename
+            );
+        }
+        $manpagename = $self->replace_manpage_separator($manpagename);
+        $self->{MAN3PODS}->{$name} =
+            $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
     }
 }
 
@@ -1453,9 +1453,9 @@ sub init_PM {
 
     # The default installation location passed to libscan in $_[1] is:
     #
-    #  ./*.pm		=> $(INST_LIBDIR)/*.pm
-    #  ./xyz/...	=> $(INST_LIBDIR)/xyz/...
-    #  ./lib/...	=> $(INST_LIB)/...
+    #  ./*.pm           => $(INST_LIBDIR)/*.pm
+    #  ./xyz/...        => $(INST_LIBDIR)/xyz/...
+    #  ./lib/...        => $(INST_LIB)/...
     #
     # In this way the 'lib' directory is seen as the root of the actual
     # perl library whereas the others are relative to INST_LIBDIR
@@ -1480,19 +1480,19 @@ sub init_PM {
     @{$self->{PMLIBDIRS}} = ();
     my %dir = map { ($_ => $_) } @{$self->{DIR}};
     foreach my $pmlibdir (@pmlibdirs) {
-	-d $pmlibdir && !$dir{$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
+        -d $pmlibdir && !$dir{$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
     }
 
     unless( $self->{PMLIBPARENTDIRS} ) {
-	@{$self->{PMLIBPARENTDIRS}} = ('lib');
+        @{$self->{PMLIBPARENTDIRS}} = ('lib');
     }
 
     return if $self->{PM} and $self->{ARGS}{PM};
 
     if (@{$self->{PMLIBDIRS}}){
-	print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
-	    if ($Verbose >= 2);
-	require File::Find;
+        print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
+            if ($Verbose >= 2);
+        require File::Find;
         File::Find::find(sub {
             if (-d $_){
                 unless ($self->libscan($_)){
@@ -1504,22 +1504,22 @@ sub init_PM {
             return if /~$/;    # emacs temp files
             return if /,v$/;   # RCS files
 
-	    my $path   = $File::Find::name;
+            my $path   = $File::Find::name;
             my $prefix = $self->{INST_LIBDIR};
             my $striplibpath;
 
-	    my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
-	    $prefix =  $self->{INST_LIB} 
+            my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
+            $prefix =  $self->{INST_LIB} 
                 if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
-	                                       {$1}i;
+                                               {$1}i;
 
-	    my($inst) = $self->catfile($prefix,$striplibpath);
-	    local($_) = $inst; # for backwards compatibility
-	    $inst = $self->libscan($inst);
-	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
-	    return unless $inst;
-	    $self->{PM}{$path} = $inst;
-	}, @{$self->{PMLIBDIRS}});
+            my($inst) = $self->catfile($prefix,$striplibpath);
+            local($_) = $inst; # for backwards compatibility
+            $inst = $self->libscan($inst);
+            print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
+            return unless $inst;
+            $self->{PM}{$path} = $inst;
+        }, @{$self->{PMLIBDIRS}});
     }
 }
 
