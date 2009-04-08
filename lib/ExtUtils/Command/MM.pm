@@ -150,7 +150,7 @@ sub pod2man {
 }
 
 
-=head3 pod2html
+=item B<pod2html>
 
 Emulates Pod::Html's pod2html command.
 

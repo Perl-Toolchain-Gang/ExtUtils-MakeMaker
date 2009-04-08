@@ -1909,7 +1909,7 @@ CODE
 }
 
 
-=item tools_other
+=head3 tools_other
 
     my $make_frag = $MM->tools_other;
 
