@@ -450,7 +450,7 @@ sub init_others {
     $self->{NOOP}               = 'Continue';
     $self->{NOECHO}             ||= '@ ';
 
-    $self->{MAKEFILE}		||= $self->{FIRST_MAKEFILE} || 'Descrip.MMS';
+    $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE} || 'Descrip.MMS';
     $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE};
     $self->{MAKE_APERL_FILE}    ||= 'Makeaperl.MMS';
     $self->{MAKEFILE_OLD}       ||= $self->eliminate_macros('$(FIRST_MAKEFILE)_old');
@@ -476,9 +476,9 @@ sub init_others {
 install({split(' ',<STDIN>)}, '$(VERBINST)', 0, '$(UNINST)');
 CODE
 
-    $self->{SHELL}    ||= 'Posix';
-
     $self->SUPER::init_others;
+
+    $self->{SHELL}    ||= 'Posix';
 
     $self->{UMASK_NULL} = '! ';  
 
