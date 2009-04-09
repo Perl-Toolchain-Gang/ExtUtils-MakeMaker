@@ -2619,7 +2619,8 @@ It will return the string "undef" if it can't figure out what $VERSION
 is. $VERSION should be for all to see, so C<our $VERSION> or plain $VERSION
 are okay, but C<my $VERSION> is not.
 
-parse_version() will try to C<use version> before checking for C<$VERSION> so the following will work.
+parse_version() will try to C<use version> before checking for
+C<$VERSION> so the following will work.
 
     $VERSION = qv(1.2.3);
 
