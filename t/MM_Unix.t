@@ -18,7 +18,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 110;
+        plan tests => 111;
     }
 }
 
@@ -195,6 +195,8 @@ is ($t->perl_script($self_name),$self_name, 'we pass as a perl_script()');
 $t->init_PERM;
 is ($t->{PERM_RW},'644', 'PERM_RW is 644');
 is ($t->{PERM_RWX},'755', 'PERM_RWX is 755');
+is ($t->{PERM_DIR},'755', 'PERM_DIR is 755');
+
 
 ###############################################################################
 # post_constants, postamble, post_initialize

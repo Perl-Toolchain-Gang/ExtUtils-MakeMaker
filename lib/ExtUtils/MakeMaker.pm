@@ -248,7 +248,7 @@ sub full_setup {
     META_ADD META_MERGE MIN_PERL_VERSION
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
-    PERL_SRC PERM_RW PERM_RWX
+    PERL_SRC PERM_DIR PERM_RW PERM_RWX
     PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE PPM_INSTALL_EXEC
     PPM_INSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
     SIGN SKIP TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
@@ -298,7 +298,7 @@ sub full_setup {
     @Overridable = @MM_Sections;
     push @Overridable, qw[
 
- libscan makeaperl needs_linking perm_rw perm_rwx
+ libscan makeaperl needs_linking
  subdir_x test_via_harness test_via_script 
 
  init_VERSION init_dist init_INST init_INSTALL init_DEST init_dirscan
@@ -2048,15 +2048,17 @@ flags so perl can see the modules you're about to install.
 Directory containing the Perl source code (use of this should be
 avoided, it may be undefined)
 
+=item PERM_DIR
+
+Desired permission for directories. Defaults to C<755>.
+
 =item PERM_RW
 
 Desired permission for read/writable files. Defaults to C<644>.
-See also L<MM_Unix/perm_rw>.
 
 =item PERM_RWX
 
 Desired permission for executable files. Defaults to C<755>.
-See also L<MM_Unix/perm_rwx>.
 
 =item PL_FILES
 

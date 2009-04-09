@@ -4,6 +4,8 @@
       Man pages will just not be installed.
       [rt.cpan.org 43546] (Jesse Vincent)
     * vim swap files, *.swp, will now be ignored by MakeMaker.
+    * Added PERM_DIR to control permissions on directories.
+      [rt.cpan.org 3927] (Rajesh Mandalemula)
 
     Feature Changes
     * Modules in PREREQ_PM are no longer loaded in order to figure out

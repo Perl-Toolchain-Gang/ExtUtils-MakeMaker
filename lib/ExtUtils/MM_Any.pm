@@ -548,7 +548,7 @@ CODE
     my $make_frag = $mm->dir_target(@directories);
 
 Generates targets to create the specified directories and set its
-permission to 0755.
+permission to PERM_DIR.
 
 Because depending on a directory to just ensure it exists doesn't work
 too well (the modified time changes too often) dir_target() creates a
@@ -568,7 +568,7 @@ sub dir_target {
         $make .= sprintf <<'MAKE', ($dir) x 7;
 %s$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) %s
-	$(NOECHO) $(CHMOD) 755 %s
+	$(NOECHO) $(CHMOD) $(PERM_DIR) %s
 	$(NOECHO) $(TOUCH) %s$(DFSEP).exists
 
 MAKE
@@ -1822,7 +1822,7 @@ sub init_others {
 
     $self->{MOD_INSTALL} ||= 
       $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
-install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
+install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)', '$(PERM_DIR)');
 CODE
     $self->{DOC_INSTALL} ||= $self->oneliner('perllocal_install', ["-MExtUtils::Command::MM"]);
     $self->{UNINSTALL}   ||= $self->oneliner('uninstall', ["-MExtUtils::Command::MM"]);

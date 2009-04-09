@@ -393,7 +393,7 @@ sub constants {
               PERLRUN         FULLPERLRUN       ABSPERLRUN
               PERLRUNINST     FULLPERLRUNINST   ABSPERLRUNINST
               PERL_CORE
-              PERM_RW PERM_RWX
+              PERM_DIR PERM_RW PERM_RWX
 
 	      ) ) 
     {
@@ -1978,6 +1978,7 @@ Called by init_main.  Initializes PERL_*
 sub init_PERM {
     my($self) = shift;
 
+    $self->{PERM_DIR} = 755  unless defined $self->{PERM_DIR};
     $self->{PERM_RW}  = 644  unless defined $self->{PERM_RW};
     $self->{PERM_RWX} = 755  unless defined $self->{PERM_RWX};
 
@@ -2809,7 +2810,7 @@ pm_to_blib : $(TO_INST_PM)
 };
 
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)')
+pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)', '\$(PERM_DIR)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});
