@@ -13,8 +13,9 @@ chdir 't';
 
 use File::Spec;
 
-use Test::More tests => 6;
+use Test::More tests => 11;
 
+use Config;
 use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
@@ -43,3 +44,30 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     is $\, "bar", '$\ not clobbered';
 }
 
+
+# [rt.cpan.org 29442]
+{
+    my $file = "fixin.test";
+    ok open my $fh, ">", $file;
+    print $fh <<END;
+#!/foo/bar/perl -w
+
+blah blah blah
+END
+
+    close $fh;
+
+    MY->fixin($file);
+
+    ok open $fh, "<", $file;
+    my @lines = <$fh>;
+    close $fh;
+
+    is $lines[0], "$Config{startperl} -w\n", "#! replaced";
+
+    # In between might be that "not running under some shell" madness.
+
+    is $lines[-1], "blah blah blah\n", "Program text retained";
+
+    ok unlink $file;
+}
