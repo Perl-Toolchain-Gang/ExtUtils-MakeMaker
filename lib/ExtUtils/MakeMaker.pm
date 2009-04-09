@@ -1863,6 +1863,15 @@ EXE_FILES files that include POD directives. The files listed
 here will be converted to man pages and installed as was requested
 at Configure time.
 
+This hash should map POD files (or scripts containing POD) to the
+man file names under the C<blib/man1/> directory, as in the following
+example:
+
+  MAN1PODS            => {
+    'doc/command.pod'    => 'blib/man1/command.1',
+    'scripts/script.pl'  => 'blib/man1/script.1',
+  }
+
 =item MAN3PODS
 
 Hashref that assigns to *.pm and *.pod files the files into which the
@@ -1870,6 +1879,8 @@ manpages are to be written. MakeMaker parses all *.pod and *.pm files
 for POD directives. Files that contain POD will be the default keys of
 the MAN3PODS hashref. These will then be converted to man pages during
 C<make> and will be installed during C<make install>.
+
+Example similar to MAN1PODS.
 
 =item MAP_TARGET
 
