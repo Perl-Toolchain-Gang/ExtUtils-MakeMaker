@@ -477,12 +477,10 @@ sub escape_newlines {
 dmake can handle Unix style cd'ing but nmake (at least 1.5) cannot.  It
 wants:
 
-    cd dir
+    cd dir1\dir2
     command
     another_command
-    cd ..
-
-NOTE: This only works with simple relative directories.  Throw it an absolute dir or something with .. in it and things will go wrong.
+    cd ..\..
 
 =cut
 
