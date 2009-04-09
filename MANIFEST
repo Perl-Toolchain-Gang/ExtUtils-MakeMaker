@@ -1,3 +1,4 @@
+.gitignore
 bin/instmodsh
 Changes
 inc/ExtUtils/Command.pm
@@ -41,6 +42,7 @@ NOTES
 PATCHING
 README
 t/00compile.t
+t/arch_check.t
 t/backwards.t
 t/basic.t
 t/build_man.t
@@ -86,6 +88,7 @@ t/oneliner.t
 t/parse_version.t
 t/PL_FILES.t
 t/pm.t
+t/pod2html.t
 t/pod2man.t
 t/postamble.t
 t/prefixify.t
