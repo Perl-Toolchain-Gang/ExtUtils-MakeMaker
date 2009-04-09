@@ -23,6 +23,8 @@
       [rt.cpan.org 35190] (imacat)
     * DISTVNAME was documented as a WriteMakefile() param but you'd
       get a warning if you tried to use it.  [rt.cpan.org 43217]
+    * Better support for parallel make installs.
+      [rt.cpan.org 32758] (Brendan O'Dea)
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.
