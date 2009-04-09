@@ -31,6 +31,17 @@ my %versions = (q[$VERSION = '1.00']            => '1.00',
                 q[local $FOO::VERSION = '1.30'] => 'undef',
                 q[if( $Foo::VERSION >= 3.00 ) {]=> 'undef',
                 q[our $VERSION = '1.23';]       => '1.23',
+
+                '$Something::VERSION == 1.0'    => 'undef',
+                '$Something::VERSION <= 1.0'    => 'undef',
+                '$Something::VERSION >= 1.0'    => 'undef',
+                '$Something::VERSION != 1.0'    => 'undef',
+
+                qq[\$Something::VERSION == 1.0\n\$VERSION = 2.3\n]                     => '2.3',
+                qq[\$Something::VERSION == 1.0\n\$VERSION = 2.3\n\$VERSION = 4.5\n]    => '2.3',
+
+                '$VERSION = sprintf("%d.%03d", q$Revision: 3.74 $ =~ /(\d+)\.(\d+)/);' => '3.074',
+                '$VERSION = substr(q$Revision: 2.8 $, 10) + 2 . "";'                   => '4.8',
                );
 
 if( $Has_Version ) {

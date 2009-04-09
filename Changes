@@ -35,6 +35,8 @@
       [rt.cpan.org 33532] (DAGOLDEN)
     * maybe_command() will recognize Windows executables in
       /cygdrive on Cygwin [rt.cpan.org 16375] (PJF)
+    * parse_version() will now look for the first use of $VERSION
+      that results in $VERSION being set.
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.

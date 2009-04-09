@@ -2638,7 +2638,7 @@ sub parse_version {
         next if $inpod || /^\s*#/;
         chop;
         next if /^\s*(if|unless)/;
-        next unless /(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+        next unless m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* =}x;
         my $eval = qq{
             package ExtUtils::MakeMaker::_version;
             no strict;
@@ -2661,7 +2661,7 @@ sub parse_version {
         local $^W = 0;
         $result = eval($eval);  ## no critic
         warn "Could not eval '$eval' in $parsefile: $@" if $@;
-        last;
+        last if defined $result;
     }
     close $fh;
 
