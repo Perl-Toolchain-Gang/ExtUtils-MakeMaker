@@ -2794,35 +2794,6 @@ $(OBJECT) : $(PERL_HDRS)
 }
 
 
-=item perm_rw (o)
-
-Returns the attribute C<PERM_RW> or the string C<644>.
-Used as the string that is passed
-to the C<chmod> command to set the permissions for read/writeable files.
-MakeMaker chooses C<644> because it has turned out in the past that
-relying on the umask provokes hard-to-track bug reports.
-When the return value is used by the perl function C<chmod>, it is
-interpreted as an octal value.
-
-=cut
-
-sub perm_rw {
-    return shift->{PERM_RW};
-}
-
-=item perm_rwx (o)
-
-Returns the attribute C<PERM_RWX> or the string C<755>,
-i.e. the string that is passed
-to the C<chmod> command to set the permissions for executable files.
-See also perl_rw.
-
-=cut
-
-sub perm_rwx {
-    return shift->{PERM_RWX};
-}
-
 =item pm_to_blib
 
 Defines target that copies all files in the hash PM to their

@@ -15,6 +15,7 @@
     * PPD files no longer contain the deprecated OS tag.
     * fixin is a bit less restrictive allowing things like 
       #!perl5.8.8 and #!perl-debug [rt.cpan.org 29442]
+    * Remove the unused perm_rw() and perm_rwx() methods.
 
     Bug Fixes
     * On 5.10 "make ppd" would generate the wrong ARCHITECTURE saying the
