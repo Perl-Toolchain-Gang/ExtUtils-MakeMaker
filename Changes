@@ -13,6 +13,8 @@
       rather than the now deprecated DEPENDENCY.
       [rt.cpan.org 25179] (GAAS)
     * PPD files no longer contain the deprecated OS tag.
+    * fixin is a bit less restrictive allowing things like 
+      #!perl5.8.8 and #!perl-debug [rt.cpan.org 29442]
 
     Bug Fixes
     * On 5.10 "make ppd" would generate the wrong ARCHITECTURE saying the

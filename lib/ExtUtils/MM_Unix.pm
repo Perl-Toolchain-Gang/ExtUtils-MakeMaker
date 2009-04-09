@@ -1094,7 +1094,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
 
         # Now look (in reverse) for interpreter in absolute PATH (unless perl).
         my $interpreter;
-        if ( $cmd eq "perl" ) {
+        if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
             if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
                 $interpreter = $Config{startperl};
                 $interpreter =~ s,^\#!,,;
@@ -1105,7 +1105,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
         }
         else {
             my (@absdirs)
-                = reverse grep { $self->file_name_is_absolute } $self->path;
+                = reverse grep { $self->file_name_is_absolute($_) } $self->path;
             $interpreter = '';
 
             foreach my $dir (@absdirs) {

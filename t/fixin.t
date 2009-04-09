@@ -13,7 +13,7 @@ chdir 't';
 
 use File::Spec;
 
-use Test::More tests => 11;
+use Test::More tests => 20;
 
 use Config;
 use TieOut;
@@ -45,16 +45,12 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 }
 
 
-# [rt.cpan.org 29442]
-{
+sub test_fixin {
+    my($code, $test) = @_;
+
     my $file = "fixin.test";
     ok open my $fh, ">", $file;
-    print $fh <<END;
-#!/foo/bar/perl -w
-
-blah blah blah
-END
-
+    print $fh $code;
     close $fh;
 
     MY->fixin($file);
@@ -63,11 +59,60 @@ END
     my @lines = <$fh>;
     close $fh;
 
-    is $lines[0], "$Config{startperl} -w\n", "#! replaced";
-
-    # In between might be that "not running under some shell" madness.
-
-    is $lines[-1], "blah blah blah\n", "Program text retained";
+    $test->(@lines);
 
     ok unlink $file;
 }
+
+
+# A simple test of fixin
+test_fixin(<<END,
+#!/foo/bar/perl -w
+
+blah blah blah
+END
+    sub {
+        my @lines = @_;
+        is $lines[0], "$Config{startperl} -w\n", "#! replaced";
+        
+        # In between might be that "not running under some shell" madness.
+               
+        is $lines[-1], "blah blah blah\n", "Program text retained";
+    }
+);
+
+
+# [rt.cpan.org 29442]
+test_fixin(<<END,
+#!/foo/bar/perl5.8.8 -w
+
+blah blah blah
+END
+
+    sub {
+        my @lines = @_;
+
+        is $lines[0], "$Config{startperl} -w\n", "#! replaced";
+
+        # In between might be that "not running under some shell" madness.
+
+        is $lines[-1], "blah blah blah\n", "Program text retained";
+    }
+);
+
+
+# fixin shouldn't pick this up.
+test_fixin(<<END,
+#!/foo/bar/perly -w
+
+blah blah blah
+END
+
+    sub {
+        is join("", @_), <<END;
+#!/foo/bar/perly -w
+
+blah blah blah
+END
+    }
+);
