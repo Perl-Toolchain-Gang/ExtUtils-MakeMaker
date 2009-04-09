@@ -1561,6 +1561,20 @@ map_clean :
     join '', @m;
 }
 
+
+=item arch_check (override)
+
+vmsify all arguments for consistency
+
+=cut
+
+sub arch_check {
+    my $self = shift;
+
+    return $self->SUPER::arch_check(map { vmsify($_) } @_);
+}
+
+
 # --- Output postprocessing section ---
 
 =item maketext_filter (override)
@@ -1600,10 +1614,10 @@ sub prefixify {
 
     # Translate $(PERLPREFIX) to a real path.
     $rprefix = $self->eliminate_macros($rprefix);
-    $rprefix = VMS::Filespec::vmspath($rprefix) if $rprefix;
-    $sprefix = VMS::Filespec::vmspath($sprefix) if $sprefix;
+    $rprefix = vmspath($rprefix) if $rprefix;
+    $sprefix = vmspath($sprefix) if $sprefix;
 
-    $default = VMS::Filespec::vmsify($default) 
+    $default = vmsify($default) 
       unless $default =~ /\[.*\]/;
 
     (my $var_no_install = $var) =~ s/^install//;

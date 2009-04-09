@@ -580,30 +580,10 @@ END
     $self->init_linker;
     $self->init_ABSTRACT;
 
-    if (! $self->{PERL_SRC} ) {
-        require VMS::Filespec if $Is_VMS;
-        my($pthinks) = $self->canonpath($INC{'Config.pm'});
-        my($cthinks) = $self->catfile($Config{'archlibexp'},'Config.pm');
-        $pthinks = VMS::Filespec::vmsify($pthinks) if $Is_VMS;
-        if ($pthinks ne $cthinks &&
-            !($Is_Win32 and lc($pthinks) eq lc($cthinks))) {
-            print "Have $pthinks expected $cthinks\n";
-            if ($Is_Win32) {
-                $pthinks =~ s![/\\]Config\.pm$!!i; $pthinks =~ s!.*[/\\]!!;
-            }
-            else {
-                $pthinks =~ s!/Config\.pm$!!; $pthinks =~ s!.*/!!;
-            }
-            print STDOUT <<END unless $self->{UNINSTALLED_PERL};
-Your perl and your Config.pm seem to have different ideas about the 
-architecture they are running on.
-Perl thinks: [$pthinks]
-Config says: [$Config{archname}]
-This may or may not cause problems. Please check your installation of perl 
-if you have problems building this extension.
-END
-        }
-    }
+    $self->arch_check(
+        $INC{'Config.pm'},
+        $Config{'archlibexp'}
+    );
 
     $self->init_others();
     $self->init_platform();

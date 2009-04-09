@@ -30,6 +30,9 @@
       [rt.cpan.org 32758] (Brendan O'Dea)
     * parse_version() will now skip uses of $VERSION in conditions
       [rt.cpan.org 9452] (jc@unser.net)
+    * The architecture mismatch warning could show up on Win32 due
+      to long vs short filenames being used to compare.
+      [rt.cpan.org 33532] (DAGOLDEN)
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.

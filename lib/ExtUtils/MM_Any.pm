@@ -5,6 +5,7 @@ our $VERSION = '6.50';
 
 use Carp;
 use File::Spec;
+use File::Basename;
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
@@ -2181,6 +2182,56 @@ MAKE_FRAG
 
 }
 
+
+=head3 arch_check
+
+    my $arch_ok = $mm->arch_check(
+        $INC{"Config.pm"},
+        $Config{archlibexp}
+    );
+
+A sanity check that what Perl thinks the architecture is and what
+Config thinks the architecture is are the same.  If they're not it
+will return false and show a diagnostic message.
+
+When building Perl it will always return true, as nothing is installed
+yet.
+
+The interface is a bit odd because this is the result of a
+refactoring.  Don't rely on it.
+
+=cut
+
+sub arch_check {
+    my $self = shift;
+    my($config, $archlib) = @_;
+
+    return 1 if $self->{PERL_SRC};
+
+    my $pthinks = File::Spec->canonpath(dirname($config));
+    my $cthinks = File::Spec->canonpath($archlib);
+
+    my $ret = 1;
+    if ($pthinks ne $cthinks) {
+        print "Have $pthinks\n";
+        print "Want $cthinks\n";
+
+        $ret = 0;
+
+        my $arch = basename($pthinks);
+
+        print STDOUT <<END unless $self->{UNINSTALLED_PERL};
+Your perl and your Config.pm seem to have different ideas about the 
+architecture they are running on.
+Perl thinks: [$arch]
+Config says: [$Config{archname}]
+This may or may not cause problems. Please check your installation of perl 
+if you have problems building this extension.
+END
+    }
+
+    return $ret;
+}
 
 
 

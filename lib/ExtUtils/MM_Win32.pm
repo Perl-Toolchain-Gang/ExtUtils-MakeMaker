@@ -405,6 +405,19 @@ sub pasthru {
 }
 
 
+=item arch_check (override)
+
+Normalize all arguments for consistency of comparison.
+
+=cut
+
+sub arch_check {
+    my $self = shift;
+
+    return $self->SUPER::arch_check( map { lc(Win32::GetShortPath($_)) } @_ );
+}
+
+
 =item oneliner
 
 These are based on what command.com does on Win98.  They may be wrong
