@@ -2637,6 +2637,7 @@ sub parse_version {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if $inpod || /^\s*#/;
         chop;
+        next if /^\s*(if|unless)/;
         next unless /(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
         my $eval = qq{
             package ExtUtils::MakeMaker::_version;

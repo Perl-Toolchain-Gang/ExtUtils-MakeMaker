@@ -28,6 +28,8 @@
       get a warning if you tried to use it.  [rt.cpan.org 43217]
     * Better support for parallel make installs.
       [rt.cpan.org 32758] (Brendan O'Dea)
+    * parse_version() will now skip uses of $VERSION in conditions
+      [rt.cpan.org 9452] (jc@unser.net)
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.
