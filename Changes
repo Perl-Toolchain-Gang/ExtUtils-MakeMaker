@@ -33,6 +33,8 @@
     * The architecture mismatch warning could show up on Win32 due
       to long vs short filenames being used to compare.
       [rt.cpan.org 33532] (DAGOLDEN)
+    * maybe_command() will recognize Windows executables in
+      /cygdrive on Cygwin [rt.cpan.org 16375] (PJF)
 
     Test Fixes
     * basic.t will not leave a "bin" environment variable defined on VMS.
