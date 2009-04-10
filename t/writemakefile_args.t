@@ -204,7 +204,7 @@ VERIFY
     };
     is( $warnings, '' );
     is( $mm->{DISTNAME},  "Hooballa" );
-    is( $mm->{DISTVNAME}, 'Hooballa-1.00' );
+    is( $mm->{DISTVNAME}, $Is_VMS ? "Hooballa-1_00" : "Hooballa-1.00" );
 
 
     # DISTVNAME (rt.cpan.org 43217)

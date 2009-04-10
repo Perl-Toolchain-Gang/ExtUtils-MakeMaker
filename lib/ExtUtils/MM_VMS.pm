@@ -841,7 +841,10 @@ sub init_dist {
 
     $self->SUPER::init_dist;
 
-    $self->{DISTVNAME}    = "$self->{DISTNAME}-$self->{VERSION_SYM}";
+    $self->{DISTVNAME} = "$self->{DISTNAME}-$self->{VERSION_SYM}"
+      unless $self->{ARGS}{DISTVNAME};
+
+    return;
 }
 
 =item c_o (override)
