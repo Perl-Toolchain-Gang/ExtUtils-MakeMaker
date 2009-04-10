@@ -106,8 +106,7 @@ like( $ppd_html, qr{^\s*<REQUIRE NAME="strict::" />}m,  '  <REQUIRE>' );
 my $archname = $Config{archname};
 if( $] >= 5.008 ) {
     # XXX This is a copy of the internal logic, so it's not a great test
-    my $arch_version = join ".", (split m{\.}, $Config{version})[0..1];
-    $archname .= "-". $arch_version;
+    $archname .= "-$Config{PERL_REVISION}.$Config{PERL_VERSION}";
 }
 like( $ppd_html, qr{^\s*<ARCHITECTURE NAME="$archname" />}m,
                                                            '  <ARCHITECTURE>');
