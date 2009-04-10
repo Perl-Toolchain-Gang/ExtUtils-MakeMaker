@@ -582,7 +582,7 @@ END
 
     $self->arch_check(
         $INC{'Config.pm'},
-        File::Spec->catfile($Config{'archlibexp'}, "Config.pm")
+        $self->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
     $self->init_others();
