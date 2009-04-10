@@ -2811,8 +2811,9 @@ sub pm_to_blib {
 pm_to_blib : $(TO_INST_PM)
 };
 
+    # VMS will swallow '' and PM_FILTER is often empty.  So use q[]
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)', '\$(PERM_DIR)')
+pm_to_blib({\@ARGV}, '$autodir', q[\$(PM_FILTER)], '\$(PERM_DIR)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});
