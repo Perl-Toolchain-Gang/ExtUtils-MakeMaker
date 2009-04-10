@@ -2208,8 +2208,8 @@ sub arch_check {
 
     return 1 if $self->{PERL_SRC};
 
-    my $pthinks = $self->canonpath(dirname($pconfig));
-    my $cthinks = $self->canonpath(dirname($cconfig));
+    my($pvol, $pthinks) = $self->splitpath($pconfig);
+    my($cvol, $cthinks) = $self->splitpath($cconfig);
 
     my $ret = 1;
     if ($pthinks ne $cthinks) {
@@ -2218,8 +2218,7 @@ sub arch_check {
 
         $ret = 0;
 
-        my($vol, $dirs, $file) = $self->splitpath($pthinks);
-        my $arch = ($self->splitdir($dirs))[-1];
+        my $arch = (grep length, $self->splitdir($pthinks))[-1];
 
         print STDOUT <<END unless $self->{UNINSTALLED_PERL};
 Your perl and your Config.pm seem to have different ideas about the 
