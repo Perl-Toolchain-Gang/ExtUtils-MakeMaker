@@ -62,6 +62,7 @@
     Other
     * Remove ExtUtils::MakeMaker::bytes and vmsish which are unused and
       seem to never have been used.
+    * Repository now on github.
 
 
 6.50  Sun Mar 22 12:28:06 PDT 2009
