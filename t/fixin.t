@@ -51,20 +51,21 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 sub test_fixin {
     my($code, $test) = @_;
 
-    my $file = "fixin.test";
-    ok open my $fh, ">", $file;
+    my $file = "fixin_test";
+    ok(open(my $fh, ">", $file), "write $file") or diag "Can't write $file: $!";
     print $fh $code;
     close $fh;
 
     MY->fixin($file);
 
-    ok open $fh, "<", $file;
+    ok(open($fh, "<", $file), "read $file") or diag "Can't read $file: $!";
     my @lines = <$fh>;
     close $fh;
 
     $test->(@lines);
 
-    ok unlink $file;
+    1 while unlink $file;
+    ok !-e $file, "cleaned up $file";
 }
 
 
