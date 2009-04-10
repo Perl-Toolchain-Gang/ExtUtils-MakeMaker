@@ -12,21 +12,14 @@ use ExtUtils::MakeMaker;
 ok( my $stdout = tie *STDOUT, 'TieOut' );    
 
 # Create a normalized MM object to test with
-my $mm = MM->new({
-    NAME        => "Foo"
-});
+my $mm = bless {}, "MM";
 $mm->{PERL_SRC} = 0;
 $mm->{UNINSTALLED_PERL} = 0;
 
 
 ok $mm->arch_check(
     "/foo/bar/arch/Config.pm",
-    "/foo/bar/arch"
-);
-
-ok $mm->arch_check(
-    "/foo/bar/arch/Config.pm",
-    "/foo/bar/arch/"
+    "/foo/bar/arch/Config.pm"
 );
 
 
@@ -34,7 +27,7 @@ ok $mm->arch_check(
 {
     ok !$mm->arch_check(
         "/foo/bar/arch1/Config.pm",
-        "/foo/bar/arch2"
+        "/foo/bar/arch2/Config.pm"
     );
 
     like $stdout->read, qr{\Q
