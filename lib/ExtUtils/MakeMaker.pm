@@ -452,7 +452,7 @@ END
         $file =~ s{::}{/}g;
         my $path;
         for my $dir (@INC) {
-            my $tmp = "$dir/$file";
+            my $tmp = File::Spec->catfile($dir, $file);
             if( -r $tmp ) {
                 $path = $tmp;
                 last;
