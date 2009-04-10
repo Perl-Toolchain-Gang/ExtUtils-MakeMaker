@@ -1,4 +1,4 @@
-6.51_01
+6.51_01  Fri Apr 10 14:30:27 PDT 2009
     New Features
     * Module installation will not be stopped by a broken Pod::Man.
       Man pages will just not be installed.
