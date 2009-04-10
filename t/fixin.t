@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
 
+# Try to test fixin.  I say "try" because what fixin will actually do
+# is highly variable from system to system.
+
 BEGIN {
     if( $ENV{PERL_CORE} ) {
         chdir 't';
@@ -13,7 +16,7 @@ chdir 't';
 
 use File::Spec;
 
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 use Config;
 use TieOut;
@@ -73,7 +76,8 @@ blah blah blah
 END
     sub {
         my @lines = @_;
-        is $lines[0], "$Config{startperl} -w\n", "#! replaced";
+        unlike $lines[0], qr[/foo/bar/perl], "#! replaced";
+        like   $lines[0], qr[ -w\b], "switch retained";
         
         # In between might be that "not running under some shell" madness.
                
@@ -91,8 +95,8 @@ END
 
     sub {
         my @lines = @_;
-
-        is $lines[0], "$Config{startperl} -w\n", "#! replaced";
+        unlike $lines[0], qr[/foo/bar/perl5.8.8], "#! replaced";
+        like   $lines[0], qr[ -w\b], "switch retained";
 
         # In between might be that "not running under some shell" madness.
 
