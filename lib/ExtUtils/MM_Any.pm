@@ -1823,7 +1823,7 @@ sub init_others {
 
     $self->{MOD_INSTALL} ||= 
       $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
-install([ from_to => {@ARGV}, verbose => '$(VERBINST)', dry_run => 0, uninstall_shadows => '$(UNINST)', dir_mode => '$(PERM_DIR)' ]);
+install([ from_to => {@ARGV}, verbose => '$(VERBINST)', uninstall_shadows => '$(UNINST)', dir_mode => '$(PERM_DIR)' ]);
 CODE
     $self->{DOC_INSTALL} ||= $self->oneliner('perllocal_install', ["-MExtUtils::Command::MM"]);
     $self->{UNINSTALL}   ||= $self->oneliner('uninstall', ["-MExtUtils::Command::MM"]);
