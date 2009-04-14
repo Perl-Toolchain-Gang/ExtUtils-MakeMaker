@@ -1,7 +1,8 @@
-6.51_02
+6.51_02  Mon Apr 13 21:19:56 PDT 2009
     Bug Fixes
     * Fix a minor bug with the new PERM_DIR stuff which caused EUI to think
       PERM_DIR was an install skip file.
+    * A Win32 function call in the last alpha broke Win32 builds.
 
 
 6.51_01  Fri Apr 10 14:30:27 PDT 2009
