@@ -8,7 +8,6 @@ use Test::More 'no_plan';
 
 use Config;
 use ExtUtils::MakeMaker;
-use File::Spec::Functions qw/catfile rel2abs/;
 
 ok( my $stdout = tie *STDOUT, 'TieOut' );    
 
@@ -17,18 +16,19 @@ my $mm = bless {}, "MM";
 $mm->{PERL_SRC} = 0;
 $mm->{UNINSTALLED_PERL} = 0;
 
+my $rel2abs = sub { $mm->rel2abs($mm->catfile(@_)) };
 
 ok $mm->arch_check(
-    rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch1 Config.pm))),
-    rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch1 Config.pm))),
+    $rel2abs->(qw(. t testdata reallylongdirectoryname arch1 Config.pm)),
+    $rel2abs->(qw(. t testdata reallylongdirectoryname arch1 Config.pm)),
 );
 
 
 # Different architecures.
 {
     ok !$mm->arch_check(
-    rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch1 Config.pm))),
-    rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch2 Config.pm))),
+        $rel2abs->(qw(. t testdata reallylongdirectoryname arch1 Config.pm)),
+        $rel2abs->(qw(. t testdata reallylongdirectoryname arch2 Config.pm)),
     );
 
     like $stdout->read, qr{\Q
@@ -47,8 +47,8 @@ if you have problems building this extension.
 {
     local $mm->{PERL_SRC} = 1;
     ok $mm->arch_check(
-      rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch1 Config.pm))),
-      rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch2 Config.pm))),
+      $rel2abs->(qw(. t testdata reallylongdirectoryname arch1 Config.pm)),
+      $rel2abs->(qw(. t testdata reallylongdirectoryname arch2 Config.pm)),
     );
 
     is $stdout->read, '';
@@ -59,8 +59,8 @@ if you have problems building this extension.
 {
     local $mm->{UNINSTALLED_PERL} = 1;
     ok !$mm->arch_check(
-      rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch1 Config.pm))),
-      rel2abs(catfile(qw(. t testdata reallylongdirectoryname arch2 Config.pm))),
+      $rel2abs->(qw(. t testdata reallylongdirectoryname arch1 Config.pm)),
+      $rel2abs->(qw(. t testdata reallylongdirectoryname arch2 Config.pm)),
     );
 
     like $stdout->read, qr{^Have .*\nWant .*$};
