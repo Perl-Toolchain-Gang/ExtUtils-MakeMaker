@@ -414,7 +414,7 @@ Normalize all arguments for consistency of comparison.
 sub arch_check {
     my $self = shift;
 
-    return $self->SUPER::arch_check( map { lc(Win32::GetShortPath($_)) } @_ );
+    return $self->SUPER::arch_check( map {lc Win32::GetShortPathName($_) } @_);
 }
 
 
