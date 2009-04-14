@@ -473,7 +473,7 @@ sub init_others {
 
     $self->{MOD_INSTALL} ||= 
       $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
-install({split(' ',<STDIN>)}, '$(VERBINST)', 0, '$(UNINST)', '$(PERM_DIR)');
+install([ from_to => {split(' ', <STDIN>)}, verbose => '$(VERBINST)', uninstall_shadows => '$(UNINST)', dir_mode => '$(PERM_DIR)' ]);
 CODE
 
     $self->SUPER::init_others;
