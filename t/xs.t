@@ -40,7 +40,10 @@ $| = 1;
 ok( setup_xs(), 'setup' );
 END {
     chdir File::Spec->updir or die;
-    teardown_xs(), 'teardown' or die;
+
+    # XS-Test might never have been created.  In that case we wind up
+    # in the source dir and probably shouldn't just start deleting things.
+    do { teardown_xs(), 'teardown' or die } if -d "XS-Test";
 }
 
 ok( chdir('XS-Test'), "chdir'd to XS-Test" ) ||
