@@ -21,7 +21,7 @@ use File::Spec;
 use File::Path;
 
 my $Skipped = 0;
-if( 0 ) { # have_compiler() ) {
+if( have_compiler() ) {
     plan tests => 5;
 }
 else {
