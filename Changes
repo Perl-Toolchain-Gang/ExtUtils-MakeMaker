@@ -1,3 +1,9 @@
+6.51_03
+    Bug Fixes
+    * Building *.C files was broken in 6.37. [rt.cpan.org 45557]
+      Thanks to Rajesh Mandalemula for spotting it.
+
+
 6.51_02  Mon Apr 13 21:19:56 PDT 2009
     Bug Fixes
     * Fix a minor bug with the new PERM_DIR stuff which caused EUI to think

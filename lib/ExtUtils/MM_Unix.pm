@@ -160,7 +160,7 @@ sub c_o {
 
     push @m, qq{
 .C\$(OBJ_EXT):
-	$command \$*.C
+	$command $flags \$*.C
 } if !$Is{OS2} and !$Is{Win32} and !$Is{Dos}; #Case-specific
 
     return join "", @m;
