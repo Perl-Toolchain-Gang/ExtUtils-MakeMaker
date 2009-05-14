@@ -1,10 +1,11 @@
 package ExtUtils::MM_Any;
 
 use strict;
-our $VERSION = '6.50';
+our $VERSION = '6.51_02';
 
 use Carp;
 use File::Spec;
+use File::Basename;
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
@@ -381,7 +382,7 @@ sub all_target {
     my $self = shift;
 
     return <<'MAKE_EXT';
-all :: pure_all
+all :: pure_all htmlifypods
 	$(NOECHO) $(NOOP)
 MAKE_EXT
 
@@ -485,6 +486,9 @@ clean :: clean_subdirs
     push(@files, qw[core core.*perl.*.? *perl.core]);
     push(@files, map { "core." . "[0-9]"x$_ } (1..5));
 
+    # pod2html caches
+    push(@files, qw[pod2htm?.tmp]);
+
     # OS specific things to clean up.  Use @dirs since we don't know
     # what might be in here.
     push @dirs, $self->extra_clean_files;
@@ -545,7 +549,7 @@ CODE
     my $make_frag = $mm->dir_target(@directories);
 
 Generates targets to create the specified directories and set its
-permission to 0755.
+permission to PERM_DIR.
 
 Because depending on a directory to just ensure it exists doesn't work
 too well (the modified time changes too often) dir_target() creates a
@@ -565,7 +569,7 @@ sub dir_target {
         $make .= sprintf <<'MAKE', ($dir) x 7;
 %s$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) %s
-	$(NOECHO) $(CHMOD) 755 %s
+	$(NOECHO) $(CHMOD) $(PERM_DIR) %s
 	$(NOECHO) $(TOUCH) %s$(DFSEP).exists
 
 MAKE
@@ -709,6 +713,52 @@ CMD
     $manify .= join '', map { "$_\n" } @man_cmds;
 
     return $manify;
+}
+
+
+=head3 htmlifypods_target
+
+  my $htmlifypods_target = $self->htmlifypods_target;
+
+Generates the htmlifypods target.  This target generates html pages from
+all POD files in MAN1PODS and MAN3PODS.
+
+=cut
+
+sub htmlifypods_target {
+    my($self) = shift;
+
+    my $dependencies  = '';
+
+    # populate dependencies:
+    foreach my $name (keys %{$self->{MAN1PODS}}, keys %{$self->{MAN3PODS}}) {
+        $dependencies .= " \\\n\t$name";
+    }
+
+    my $htmlify = <<END;
+htmlifypods : pure_all $dependencies
+END
+
+    my $cmds;
+    foreach my $section (qw(1 3)) {
+        next if $self->{"INSTALLHTML${section}DIR"} =~ /^(none|\s*)$/;
+        my $pods = $self->{"MAN${section}PODS"};
+        for my $name (sort keys %$pods) {
+            my $html = $pods->{$name};
+            $html =~ s/\$\(INST_MAN(\d)DIR\)/\$(INST_HTML$1DIR)/g;
+            $html =~ s/\$\(MAN\dEXT\)/html/g;
+            my @hpath = split(/::/, $html);
+            $html = $self->catfile(@hpath);
+            my $htmlroot = @hpath == 1 ? $Curdir : $self->catdir(($Updir) x (@hpath - 1));
+            $htmlify .= "\t\$(NOECHO) \$(POD2HTML) --infile=$name --outfile=$html --podpath=script:lib --htmlroot=$htmlroot --podroot=blib\n";
+            $cmds++;
+        }
+    }
+    unless ($cmds) {
+        $htmlify .= "\t\$(NOECHO) \$(NOOP)\n";
+    }
+
+    return $htmlify;
 }
 
 
@@ -1306,6 +1356,8 @@ sub init_INST {
 
     $self->{INST_MAN1DIR} ||= $self->catdir($Curdir,'blib','man1');
     $self->{INST_MAN3DIR} ||= $self->catdir($Curdir,'blib','man3');
+    $self->{INST_HTML1DIR} ||= $self->catdir($Curdir,'blib','html', 'bin');
+    $self->{INST_HTML3DIR} ||= $self->catdir($Curdir,'blib','html', 'lib');
 
     return 1;
 }
@@ -1366,6 +1418,20 @@ sub init_INSTALL_from_PREFIX {
         }
     }
 
+    if ($Config{installhtmldir}) {
+        for my $type ('', 'site', 'vendor') {
+            for my $num (1, 3) {
+                my $k = 'install' . $type . 'html' . $num . 'dir';
+                unless( $Config{$k} ) {
+                    $self->{uc $k} ||= ($type ne "vendor" || $Config{usevendorprefix})
+                                     ? $self->catdir($Config{installhtmldir},
+                                                     $num == 1 ? "bin" : "lib")
+                                     : '';
+                }
+            }
+        }
+    }
+
     $self->{INSTALLSITEBIN} ||= '$(INSTALLBIN)'
       unless $Config{installsitebin};
     $self->{INSTALLSITESCRIPT} ||= '$(INSTALLSCRIPT)'
@@ -1422,9 +1488,11 @@ sub init_INSTALL_from_PREFIX {
 
     # Some systems, like VOS, set installman*dir to '' if they can't
     # read man pages.
-    for my $num (1, 3) {
-        $self->{'INSTALLMAN'.$num.'DIR'} ||= 'none'
-          unless $Config{'installman'.$num.'dir'};
+    for my $type ("man", "html") {
+        for my $num (1, 3) {
+            $self->{'INSTALL'.uc($type).$num.'DIR'} ||= 'none'
+                unless $Config{'install'.$type.$num.'dir'};
+        }
     }
 
     my %bin_layouts = 
@@ -1478,6 +1546,35 @@ sub init_INSTALL_from_PREFIX {
                              style => $manstyle, },
     );
 
+    my %html_layouts =
+    (
+        html1dir        => { s => $iprefix,
+                             t => 'perl',
+                             d => 'html/bin',
+                             style => $manstyle, },
+        sitehtml1dir    => { s => $sprefix,
+                             t => 'site',
+                             d => 'html/bin',
+                             style => $manstyle, },
+        vendorhtml1dir  => { s => $vprefix,
+                             t => 'vendor',
+                             d => 'html/bin',
+                             style => $manstyle, },
+
+        html3dir        => { s => $iprefix,
+                             t => 'perl',
+                             d => 'html/lib',
+                             style => $manstyle, },
+        sitehtml3dir    => { s => $sprefix,
+                             t => 'site',
+                             d => 'html/lib',
+                             style => $manstyle, },
+        vendorhtml3dir  => { s => $vprefix,
+                             t => 'vendor',
+                             d => 'html/lib',
+                             style => $manstyle, },
+    );
+
     my %lib_layouts =
     (
         privlib     => { s => $iprefix,
@@ -1528,7 +1625,7 @@ sub init_INSTALL_from_PREFIX {
                         vendor  => 'VENDORPREFIX'
                       );
 
-    my %layouts = (%bin_layouts, %man_layouts, %lib_layouts);
+    my %layouts = (%bin_layouts, %man_layouts, %html_layouts, %lib_layouts);
     while( my($var, $layout) = each(%layouts) ) {
         my($s, $t, $d, $style) = @{$layout}{qw(s t d style)};
         my $r = '$('.$type2prefix{$t}.')';
@@ -1672,7 +1769,7 @@ sub init_VERSION {
 }
 
 
-=head3 init_others  I<Abstract>
+=head3 init_others
 
     $MM->init_others();
 
@@ -1703,11 +1800,156 @@ Defines at least these macros.
   TEST_F            Test for a file's existence 
   CP                Copy a file                 
   MV                Move a file                 
-  CHMOD             Change permissions on a     
-                    file
+  CHMOD             Change permissions on a file
+  FALSE             Exit with non-zero
+  TRUE              Exit with zero
 
   UMASK_NULL        Nullify umask
   DEV_NULL          Suppress all command output
+
+=cut
+
+sub init_others {
+    my $self = shift;
+
+    $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
+    $self->{ECHO_N}   ||= $self->oneliner('print qq{@ARGV}');
+
+    $self->{TOUCH}    ||= $self->oneliner('touch', ["-MExtUtils::Command"]);
+    $self->{CHMOD}    ||= $self->oneliner('chmod', ["-MExtUtils::Command"]);
+    $self->{RM_F}     ||= $self->oneliner('rm_f',  ["-MExtUtils::Command"]);
+    $self->{RM_RF}    ||= $self->oneliner('rm_rf', ["-MExtUtils::Command"]);
+    $self->{TEST_F}   ||= $self->oneliner('test_f', ["-MExtUtils::Command"]);
+    $self->{FALSE}    ||= $self->oneliner('exit 1');
+    $self->{TRUE}     ||= $self->oneliner('exit 0');
+
+    $self->{MKPATH}   ||= $self->oneliner('mkpath', ["-MExtUtils::Command"]);
+
+    $self->{CP}       ||= $self->oneliner('cp', ["-MExtUtils::Command"]);
+    $self->{MV}       ||= $self->oneliner('mv', ["-MExtUtils::Command"]);
+
+    $self->{MOD_INSTALL} ||= 
+      $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
+install([ from_to => {@ARGV}, verbose => '$(VERBINST)', uninstall_shadows => '$(UNINST)', dir_mode => '$(PERM_DIR)' ]);
+CODE
+    $self->{DOC_INSTALL} ||= $self->oneliner('perllocal_install', ["-MExtUtils::Command::MM"]);
+    $self->{UNINSTALL}   ||= $self->oneliner('uninstall', ["-MExtUtils::Command::MM"]);
+    $self->{WARN_IF_OLD_PACKLIST} ||= 
+      $self->oneliner('warn_if_old_packlist', ["-MExtUtils::Command::MM"]);
+    $self->{FIXIN}       ||= $self->oneliner('MY->fixin(shift)', ["-MExtUtils::MY"]);
+    $self->{EQUALIZE_TIMESTAMP} ||= $self->oneliner('eqtime', ["-MExtUtils::Command"]);
+
+    $self->{UNINST}     ||= 0;
+    $self->{VERBINST}   ||= 0;
+
+    $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE} || 'Makefile';
+    $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE};
+    $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
+    $self->{MAKE_APERL_FILE}    ||= $self->{MAKEFILE}.'.aperl';
+
+    # Not everybody uses -f to indicate "use this Makefile instead"
+    $self->{USEMAKEFILE}        ||= '-f';
+
+    # Some makes require a wrapper around macros passed in on the command 
+    # line.
+    $self->{MACROSTART}         ||= '';
+    $self->{MACROEND}           ||= '';
+
+    $self->{SHELL}              ||= $Config{sh};
+
+    # UMASK_NULL is not used by MakeMaker but some CPAN modules
+    # make use of it.
+    $self->{UMASK_NULL}         ||= "umask 0";
+
+    # Not the greatest default, but its something.
+    $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
+
+    $self->{NOOP}               ||= '$(TRUE)';
+    $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
+
+    $self->{LD_RUN_PATH} = "";
+
+    # Compute EXTRALIBS, BSLOADLIBS and LDLOADLIBS from $self->{LIBS}
+    # Lets look at $self->{LIBS} carefully: It may be an anon array, a string or
+    # undefined. In any case we turn it into an anon array:
+
+    # May check $Config{libs} too, thus not empty.
+    $self->{LIBS} = !defined $self->{LIBS} ? ['']               : 
+                    !ref $self->{LIBS}     ? [$self->{LIBS}]    :
+                                             $self->{LIBS}      ;
+
+    foreach my $libs ( @{$self->{LIBS}} ){
+        $libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
+        my(@libs) = $self->extliblist($libs);
+        if ($libs[0] or $libs[1] or $libs[2]){
+            # LD_RUN_PATH now computed by ExtUtils::Liblist
+            ($self->{EXTRALIBS},  $self->{BSLOADLIBS}, 
+             $self->{LDLOADLIBS}, $self->{LD_RUN_PATH}) = @libs;
+            last;
+        }
+    }
+
+    if ( $self->{OBJECT} ) {
+        $self->{OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
+    } else {
+        # init_dirscan should have found out, if we have C files
+        $self->{OBJECT} = "";
+        $self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{C}||[]};
+    }
+    $self->{OBJECT} =~ s/\n+/ \\\n\t/g;
+
+    $self->{BOOTDEP}  = (-f "$self->{BASEEXT}_BS") ? "$self->{BASEEXT}_BS" : "";
+    $self->{PERLMAINCC} ||= '$(CC)';
+    $self->{LDFROM} = '$(OBJECT)' unless $self->{LDFROM};
+
+    # Sanity check: don't define LINKTYPE = dynamic if we're skipping
+    # the 'dynamic' section of MM.  We don't have this problem with
+    # 'static', since we either must use it (%Config says we can't
+    # use dynamic loading) or the caller asked for it explicitly.
+    if (!$self->{LINKTYPE}) {
+       $self->{LINKTYPE} = $self->{SKIPHASH}{'dynamic'}
+                        ? 'static'
+                        : ($Config{usedl} ? 'dynamic' : 'static');
+    }
+
+    return 1;
+}
+
+
+=head3 tools_other
+
+    my $make_frag = $MM->tools_other;
+
+Returns a make fragment containing definitions for the macros init_others() 
+initializes.
+
+=cut
+
+sub tools_other {
+    my($self) = shift;
+    my @m;
+
+    # We set PM_FILTER as late as possible so it can see all the earlier
+    # on macro-order sensitive makes such as nmake.
+    for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
+                      UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP
+                      FALSE TRUE
+                      ECHO ECHO_N
+                      UNINST VERBINST
+                      MOD_INSTALL DOC_INSTALL UNINSTALL
+                      WARN_IF_OLD_PACKLIST
+                      MACROSTART MACROEND
+                      USEMAKEFILE
+                      PM_FILTER
+                      FIXIN
+                    } ) 
+    {
+        next unless defined $self->{$tool};
+        push @m, "$tool = $self->{$tool}\n";
+    }
+
+    return join "", @m;
+}
 
 
 =head3 init_DIRFILESEP  I<Abstract>
@@ -1838,6 +2080,53 @@ END_OF_DEF
 }
 
 
+=head3 htmlifypods
+
+Defines targets and routines to translate the pods into html and
+put them into the INST_* directories.
+
+=cut
+
+sub htmlifypods {
+    my $self          = shift;
+
+    my $POD2HTML_macro = $self->POD2HTML_macro();
+    my $htmlifypods_target = $self->htmlifypods_target();
+
+    return <<END_OF_TARGET;
+
+$POD2HTML_macro
+
+$htmlifypods_target
+
+END_OF_TARGET
+
+}
+
+=head3 POD2HTML_macro
+
+  my $pod2html_macro = $self->POD2HTML_macro
+
+Returns a definition for the POD2HTML macro.  This is a program
+which emulates the pod2html utility.  You can add more switches to the
+command by simply appending them on the macro.
+
+Typical usage:
+
+    $(POD2HTML) --infile=podfile1 --outfile=html_page1
+
+=cut
+
+sub POD2HTML_macro {
+    my $self = shift;
+
+    return <<'END_OF_DEF';
+POD2HTML_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2html "--"
+POD2HTML = $(POD2HTML_EXE)
+END_OF_DEF
+}
+
+
 =head3 test_via_harness
 
   my $command = $mm->test_via_harness($perl, $tests);
@@ -1900,6 +2189,56 @@ MAKE_FRAG
 
 }
 
+
+=head3 arch_check
+
+    my $arch_ok = $mm->arch_check(
+        $INC{"Config.pm"},
+        File::Spec->catfile($Config{archlibexp}, "Config.pm")
+    );
+
+A sanity check that what Perl thinks the architecture is and what
+Config thinks the architecture is are the same.  If they're not it
+will return false and show a diagnostic message.
+
+When building Perl it will always return true, as nothing is installed
+yet.
+
+The interface is a bit odd because this is the result of a
+quick refactoring.  Don't rely on it.
+
+=cut
+
+sub arch_check {
+    my $self = shift;
+    my($pconfig, $cconfig) = @_;
+
+    return 1 if $self->{PERL_SRC};
+
+    my($pvol, $pthinks) = $self->splitpath($pconfig);
+    my($cvol, $cthinks) = $self->splitpath($cconfig);
+
+    my $ret = 1;
+    if ($pthinks ne $cthinks) {
+        print "Have $pthinks\n";
+        print "Want $cthinks\n";
+
+        $ret = 0;
+
+        my $arch = (grep length, $self->splitdir($pthinks))[-1];
+
+        print STDOUT <<END unless $self->{UNINSTALLED_PERL};
+Your perl and your Config.pm seem to have different ideas about the 
+architecture they are running on.
+Perl thinks: [$arch]
+Config says: [$Config{archname}]
+This may or may not cause problems. Please check your installation of perl 
+if you have problems building this extension.
+END
+    }
+
+    return $ret;
+}
 
 
 
@@ -1975,6 +2314,8 @@ sub installvars {
               SCRIPT  SITESCRIPT  VENDORSCRIPT
               MAN1DIR SITEMAN1DIR VENDORMAN1DIR
               MAN3DIR SITEMAN3DIR VENDORMAN3DIR
+              HTML1DIR SITEHTML1DIR VENDORHTML1DIR
+              HTML3DIR SITEHTML3DIR VENDORHTML3DIR
              );
 }
 

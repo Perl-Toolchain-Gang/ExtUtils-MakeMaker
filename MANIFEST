@@ -1,3 +1,4 @@
+.gitignore
 bin/instmodsh
 Changes
 inc/ExtUtils/Command.pm
@@ -10,11 +11,9 @@ lib/ExtUtils/Command/MM.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
 lib/ExtUtils/MakeMaker.pm
-lib/ExtUtils/MakeMaker/bytes.pm
 lib/ExtUtils/MakeMaker/Config.pm
 lib/ExtUtils/MakeMaker/FAQ.pod
 lib/ExtUtils/MakeMaker/Tutorial.pod
-lib/ExtUtils/MakeMaker/vmsish.pm
 lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/MM.pm
@@ -43,6 +42,7 @@ NOTES
 PATCHING
 README
 t/00compile.t
+t/arch_check.t
 t/backwards.t
 t/basic.t
 t/build_man.t
@@ -88,6 +88,8 @@ t/oneliner.t
 t/parse_version.t
 t/PL_FILES.t
 t/pm.t
+t/pod2html.t
+t/pod2man.t
 t/postamble.t
 t/prefixify.t
 t/prereq.t
@@ -97,6 +99,8 @@ t/prompt.t
 t/recurs.t
 t/revision.t
 t/split_command.t
+t/testdata/reallylongdirectoryname/arch1/Config.pm
+t/testdata/reallylongdirectoryname/arch2/Config.pm
 t/testlib.t
 t/VERSION_FROM.t
 t/vmsish.t

@@ -1,10 +1,12 @@
 # THIS IS NOT THE REAL MANIFEST.SKIP FILE!!!!
 #
-# There is a MANIFEST.SKIP file which is installed with MakeMaker.  This
-# is not it.  It lives in lib/ExtUtils/MANIFEST.SKIP and gets installed
-# with the rest of the distribution.
+# There is a default MANIFEST.SKIP file which ExtUtils::Manifest
+# uses and gets installed.  This is not it.  This is the normal
+# MANIFEST.SKIP that governs a distribution and should not be
+# installed.
 #
-# This MANIFEST.SKIP is specially crafted for MakeMaker itself.
+# The default MANIFEST.SKIP file comes with the ExtUtils-Manifest
+# distribution.
 
 
 #!start included /usr/local/perl/5.8.8/lib/ExtUtils/MANIFEST.SKIP
@@ -56,3 +58,6 @@ merge_bleadperl$
 
 \.orig$
 \.rej$
+
+^website
+^old_versions

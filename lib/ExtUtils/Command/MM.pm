@@ -8,9 +8,9 @@ use warnings;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our @EXPORT  = qw(test_harness pod2man perllocal_install uninstall 
+our @EXPORT  = qw(test_harness pod2man pod2html perllocal_install uninstall 
                   warn_if_old_packlist);
-our $VERSION = '6.50';
+our $VERSION = '6.51_02';
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -87,12 +87,21 @@ And the removal of:
 
 If no arguments are given to pod2man it will read from @ARGV.
 
+If Pod::Man is unavailable, this function will warn and return undef.
+
 =cut
 
 sub pod2man {
     local @ARGV = @_ ? @_ : @ARGV;
 
-    require Pod::Man;
+    {
+        local $@;
+        if( !eval { require Pod::Man } ) {
+            warn "Pod::Man is not available: $@".
+                 "Man pages will not be generated during this install.\n";
+            return undef;
+        }
+    }
     require Getopt::Long;
 
     # We will cheat and just use Getopt::Long.  We fool it by putting
@@ -103,7 +112,7 @@ sub pod2man {
                 'section|s=s', 'release|r=s', 'center|c=s',
                 'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
                 'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
-                'name|n=s', 'perm_rw:i'
+                'name|n=s', 'perm_rw=i'
     );
 
     # If there's no files, don't bother going further.
@@ -131,11 +140,51 @@ sub pod2man {
         $parser->parse_from_file($pod, $man)
           or do { warn("Could not install $man\n");  next };
 
-        if (length $options{perm_rw}) {
+        if (exists $options{perm_rw}) {
             chmod(oct($options{perm_rw}), $man)
               or do { warn("chmod $options{perm_rw} $man: $!\n"); next };
         }
     }} while @ARGV;
+
+    return 1;
+}
+
+
+=item B<pod2html>
+
+Emulates Pod::Html's pod2html command.
+
+The interface may change, because pod2html's interface sucks.
+
+=cut
+
+sub pod2html {
+    @_ = @ARGV unless @_;
+
+    my $infile;
+    my $outfile;
+    for (@_) {
+        $infile  = $1 if /^--infile=(.*)/;
+        $outfile = $1 if /^--outfile=(.*)/;
+    }
+    die "Need to specify both --infile and --outfile" unless $infile && $outfile;
+
+    return 0 if ((-e $outfile) &&
+                 (-M $outfile < -M $infile) &&
+                 (-M $outfile < -M "Makefile"));
+
+    print "HTMLifying $outfile\n";
+
+    require File::Basename;
+    my $outdir = File::Basename::dirname($outfile);
+    unless (-d $outdir) {
+        require File::Path;
+        File::Path::mkpath($outdir, 0, 0755);
+    }
+
+    $0 = "pod2html";
+    require Pod::Html;
+    Pod::Html::pod2html(@_);
 
     return 1;
 }
