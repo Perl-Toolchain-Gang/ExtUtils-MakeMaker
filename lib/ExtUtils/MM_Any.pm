@@ -1483,7 +1483,7 @@ sub init_INSTALL_from_PREFIX {
     # read man pages.
     for my $type ("man", "html") {
         for my $num (1, 3) {
-            $self->{'INSTALL'.uc($type).$num.'DIR'} ||= 'none'
+            $self->{'INSTALL'.uc($type).$num.'DIR'} ||= ''
                 unless $Config{'install'.$type.$num.'dir'};
         }
     }

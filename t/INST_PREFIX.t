@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 52;
+use Test::More tests => 58;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use ExtUtils::MakeMaker;
@@ -115,9 +115,12 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 # Every INSTALL* variable must start with some PREFIX.
 my %Install_Vars = (
- PERL   => [qw(archlib    privlib   bin       man1dir       man3dir   script)],
- SITE   => [qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)],
- VENDOR => [qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)]
+ PERL   => [qw(archlib    privlib   bin       man1dir       man3dir
+               html1dir         html3dir  script)],
+ SITE   => [qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir
+               sitehtml1dir     sitehtml3dir)],
+ VENDOR => [qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir
+               vendorhtml1dir   vendorhtml3dir)]
 );
 
 while( my($type, $vars) = each %Install_Vars) {
@@ -135,10 +138,9 @@ while( my($type, $vars) = each %Install_Vars) {
                 skip uc($installvar).' set to another INSTALL variable', 1
                   if $mm->{uc $installvar} =~ /^\$\(INSTALL.*\)$/;
 
-                # support for man page skipping
-                $prefix = 'none' if $type eq 'PERL' && 
-                                    $var =~ /man/ && 
-                                    !$Config{$installvar};
+                # support for doc skipping
+                $prefix = '' if !$Config{$installvar} and $var =~ /man|html/;
+
                 like( $mm->{uc $installvar}, qr/^\Q$prefix\E/, 
                       "$prefix + $var" );
             }
@@ -164,7 +166,7 @@ while( my($type, $vars) = each %Install_Vars) {
                           );
 
     is( $mm->{INSTALLMAN1DIR}, $wibble );
-    is( $mm->{INSTALLMAN3DIR}, 'none'  );
+    is( $mm->{INSTALLMAN3DIR}, ''  );
 }
 
 # Check that when installvendorman*dir is set in Config it is honored
