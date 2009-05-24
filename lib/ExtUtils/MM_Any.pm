@@ -382,7 +382,7 @@ sub all_target {
     my $self = shift;
 
     return <<'MAKE_EXT';
-all :: pure_all htmlifypods
+all :: pure_all
 	$(NOECHO) $(NOOP)
 MAKE_EXT
 
@@ -485,9 +485,6 @@ clean :: clean_subdirs
     # core files
     push(@files, qw[core core.*perl.*.? *perl.core]);
     push(@files, map { "core." . "[0-9]"x$_ } (1..5));
-
-    # pod2html caches
-    push(@files, qw[pod2htm?.tmp]);
 
     # OS specific things to clean up.  Use @dirs since we don't know
     # what might be in here.
@@ -713,52 +710,6 @@ CMD
     $manify .= join '', map { "$_\n" } @man_cmds;
 
     return $manify;
-}
-
-
-=head3 htmlifypods_target
-
-  my $htmlifypods_target = $self->htmlifypods_target;
-
-Generates the htmlifypods target.  This target generates html pages from
-all POD files in MAN1PODS and MAN3PODS.
-
-=cut
-
-sub htmlifypods_target {
-    my($self) = shift;
-
-    my $dependencies  = '';
-
-    # populate dependencies:
-    foreach my $name (keys %{$self->{MAN1PODS}}, keys %{$self->{MAN3PODS}}) {
-        $dependencies .= " \\\n\t$name";
-    }
-
-    my $htmlify = <<END;
-htmlifypods : pure_all $dependencies
-END
-
-    my $cmds;
-    foreach my $section (qw(1 3)) {
-        next if $self->{"INSTALLHTML${section}DIR"} =~ /^(none|\s*)$/;
-        my $pods = $self->{"MAN${section}PODS"};
-        for my $name (sort keys %$pods) {
-            my $html = $pods->{$name};
-            $html =~ s/\$\(INST_MAN(\d)DIR\)/\$(INST_HTML$1DIR)/g;
-            $html =~ s/\$\(MAN\dEXT\)/html/g;
-            my @hpath = split(/::/, $html);
-            $html = $self->catfile(@hpath);
-            my $htmlroot = @hpath == 1 ? $Curdir : $self->catdir(($Updir) x (@hpath - 1));
-            $htmlify .= "\t\$(NOECHO) \$(POD2HTML) --infile=$name --outfile=$html --podpath=script:lib --htmlroot=$htmlroot --podroot=blib\n";
-            $cmds++;
-        }
-    }
-    unless ($cmds) {
-        $htmlify .= "\t\$(NOECHO) \$(NOOP)\n";
-    }
-
-    return $htmlify;
 }
 
 
@@ -1349,8 +1300,6 @@ sub init_INST {
 
     $self->{INST_MAN1DIR} ||= $self->catdir($Curdir,'blib','man1');
     $self->{INST_MAN3DIR} ||= $self->catdir($Curdir,'blib','man3');
-    $self->{INST_HTML1DIR} ||= $self->catdir($Curdir,'blib','html', 'bin');
-    $self->{INST_HTML3DIR} ||= $self->catdir($Curdir,'blib','html', 'lib');
 
     return 1;
 }
@@ -1411,20 +1360,6 @@ sub init_INSTALL_from_PREFIX {
         }
     }
 
-    if ($Config{installhtmldir}) {
-        for my $type ('', 'site', 'vendor') {
-            for my $num (1, 3) {
-                my $k = 'install' . $type . 'html' . $num . 'dir';
-                unless( $Config{$k} ) {
-                    $self->{uc $k} ||= ($type ne "vendor" || $Config{usevendorprefix})
-                                     ? $self->catdir($Config{installhtmldir},
-                                                     $num == 1 ? "bin" : "lib")
-                                     : '';
-                }
-            }
-        }
-    }
-
     $self->{INSTALLSITEBIN} ||= '$(INSTALLBIN)'
       unless $Config{installsitebin};
     $self->{INSTALLSITESCRIPT} ||= '$(INSTALLSCRIPT)'
@@ -1481,11 +1416,9 @@ sub init_INSTALL_from_PREFIX {
 
     # Some systems, like VOS, set installman*dir to '' if they can't
     # read man pages.
-    for my $type ("man", "html") {
-        for my $num (1, 3) {
-            $self->{'INSTALL'.uc($type).$num.'DIR'} ||= ''
-                unless $Config{'install'.$type.$num.'dir'};
-        }
+    for my $num (1, 3) {
+        $self->{'INSTALLMAN'.$num.'DIR'} ||= 'none'
+          unless $Config{'installman'.$num.'dir'};
     }
 
     my %bin_layouts = 
@@ -1539,35 +1472,6 @@ sub init_INSTALL_from_PREFIX {
                              style => $manstyle, },
     );
 
-    my %html_layouts =
-    (
-        html1dir        => { s => $iprefix,
-                             t => 'perl',
-                             d => 'html/bin',
-                             style => $manstyle, },
-        sitehtml1dir    => { s => $sprefix,
-                             t => 'site',
-                             d => 'html/bin',
-                             style => $manstyle, },
-        vendorhtml1dir  => { s => $vprefix,
-                             t => 'vendor',
-                             d => 'html/bin',
-                             style => $manstyle, },
-
-        html3dir        => { s => $iprefix,
-                             t => 'perl',
-                             d => 'html/lib',
-                             style => $manstyle, },
-        sitehtml3dir    => { s => $sprefix,
-                             t => 'site',
-                             d => 'html/lib',
-                             style => $manstyle, },
-        vendorhtml3dir  => { s => $vprefix,
-                             t => 'vendor',
-                             d => 'html/lib',
-                             style => $manstyle, },
-    );
-
     my %lib_layouts =
     (
         privlib     => { s => $iprefix,
@@ -1618,7 +1522,7 @@ sub init_INSTALL_from_PREFIX {
                         vendor  => 'VENDORPREFIX'
                       );
 
-    my %layouts = (%bin_layouts, %man_layouts, %html_layouts, %lib_layouts);
+    my %layouts = (%bin_layouts, %man_layouts, %lib_layouts);
     while( my($var, $layout) = each(%layouts) ) {
         my($s, $t, $d, $style) = @{$layout}{qw(s t d style)};
         my $r = '$('.$type2prefix{$t}.')';
@@ -2073,53 +1977,6 @@ END_OF_DEF
 }
 
 
-=head3 htmlifypods
-
-Defines targets and routines to translate the pods into html and
-put them into the INST_* directories.
-
-=cut
-
-sub htmlifypods {
-    my $self          = shift;
-
-    my $POD2HTML_macro = $self->POD2HTML_macro();
-    my $htmlifypods_target = $self->htmlifypods_target();
-
-    return <<END_OF_TARGET;
-
-$POD2HTML_macro
-
-$htmlifypods_target
-
-END_OF_TARGET
-
-}
-
-=head3 POD2HTML_macro
-
-  my $pod2html_macro = $self->POD2HTML_macro
-
-Returns a definition for the POD2HTML macro.  This is a program
-which emulates the pod2html utility.  You can add more switches to the
-command by simply appending them on the macro.
-
-Typical usage:
-
-    $(POD2HTML) --infile=podfile1 --outfile=html_page1
-
-=cut
-
-sub POD2HTML_macro {
-    my $self = shift;
-
-    return <<'END_OF_DEF';
-POD2HTML_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2html "--"
-POD2HTML = $(POD2HTML_EXE)
-END_OF_DEF
-}
-
-
 =head3 test_via_harness
 
   my $command = $mm->test_via_harness($perl, $tests);
@@ -2307,8 +2164,6 @@ sub installvars {
               SCRIPT  SITESCRIPT  VENDORSCRIPT
               MAN1DIR SITEMAN1DIR VENDORMAN1DIR
               MAN3DIR SITEMAN3DIR VENDORMAN3DIR
-              HTML1DIR SITEHTML1DIR VENDORHTML1DIR
-              HTML3DIR SITEHTML3DIR VENDORHTML3DIR
              );
 }
 

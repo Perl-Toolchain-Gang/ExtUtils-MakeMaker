@@ -375,7 +375,7 @@ sub constants {
               VERSION    VERSION_MACRO    VERSION_SYM DEFINE_VERSION
               XS_VERSION XS_VERSION_MACRO             XS_DEFINE_VERSION
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
-              INST_MAN1DIR INST_MAN3DIR INST_HTML1DIR INST_HTML3DIR
+              INST_MAN1DIR INST_MAN3DIR
               MAN1EXT      MAN3EXT
               INSTALLDIRS INSTALL_BASE DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
@@ -1322,11 +1322,9 @@ sub init_MANPODS {
     my $self = shift;
 
     # Set up names of manual pages to generate from pods
-    foreach my $num (1, 3) {
-        my $man = "MAN$num";
+    foreach my $man (qw(MAN1 MAN3)) {
         if ( $self->{"${man}PODS"}
-             or ($self->{"INSTALL${man}DIR"} =~ /^(none|\s*)$/ and
-                 $self->{"INSTALLHTML${num}DIR"} =~ /^(none|\s*)$/)
+             or $self->{"INSTALL${man}DIR"} =~ /^(none|\s*)$/
         ) {
             $self->{"${man}PODS"} ||= {};
         }
@@ -1369,13 +1367,13 @@ sub init_MAN1PODS {
     my($self) = @_;
 
     if ( exists $self->{EXE_FILES} ) {
-        foreach my $name (@{$self->{EXE_FILES}}) {
-            next unless $self->_has_pod($name);
+	foreach my $name (@{$self->{EXE_FILES}}) {
+	    next unless $self->_has_pod($name);
 
-            $self->{MAN1PODS}->{$name} =
-                $self->catfile("\$(INST_MAN1DIR)", 
-                               basename($name).".\$(MAN1EXT)");
-        }
+	    $self->{MAN1PODS}->{$name} =
+		$self->catfile("\$(INST_MAN1DIR)", 
+			       basename($name).".\$(MAN1EXT)");
+	}
     }
 }
 
@@ -1393,13 +1391,13 @@ sub init_MAN3PODS {
                          # we have to convert to pod
 
     foreach my $name (keys %{$self->{PM}}) {
-        if ($name =~ /\.pod\z/ ) {
-            $manifypods{$name} = $self->{PM}{$name};
-        } elsif ($name =~ /\.p[ml]\z/ ) {
-            if( $self->_has_pod($name) ) {
-                $manifypods{$name} = $self->{PM}{$name};
-            }
-        }
+	if ($name =~ /\.pod\z/ ) {
+	    $manifypods{$name} = $self->{PM}{$name};
+	} elsif ($name =~ /\.p[ml]\z/ ) {
+	    if( $self->_has_pod($name) ) {
+		$manifypods{$name} = $self->{PM}{$name};
+	    }
+	}
     }
 
     my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
@@ -1408,21 +1406,21 @@ sub init_MAN3PODS {
     # To force inclusion, just name it "Configure.pod", or override 
     # MAN3PODS
     foreach my $name (keys %manifypods) {
-        if ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) {
-            delete $manifypods{$name};
-            next;
-        }
-        my($manpagename) = $name;
-        $manpagename =~ s/\.p(od|m|l)\z//;
-        # everything below lib is ok
-        unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
-            $manpagename = $self->catfile(
-                split(/::/,$self->{PARENT_NAME}),$manpagename
-            );
-        }
-        $manpagename = $self->replace_manpage_separator($manpagename);
-        $self->{MAN3PODS}->{$name} =
-            $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
+	if ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) {
+	    delete $manifypods{$name};
+	    next;
+	}
+	my($manpagename) = $name;
+	$manpagename =~ s/\.p(od|m|l)\z//;
+	# everything below lib is ok
+	unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
+	    $manpagename = $self->catfile(
+	        split(/::/,$self->{PARENT_NAME}),$manpagename
+	    );
+	}
+	$manpagename = $self->replace_manpage_separator($manpagename);
+	$self->{MAN3PODS}->{$name} =
+	    $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
     }
 }
 
@@ -1453,9 +1451,9 @@ sub init_PM {
 
     # The default installation location passed to libscan in $_[1] is:
     #
-    #  ./*.pm           => $(INST_LIBDIR)/*.pm
-    #  ./xyz/...        => $(INST_LIBDIR)/xyz/...
-    #  ./lib/...        => $(INST_LIB)/...
+    #  ./*.pm		=> $(INST_LIBDIR)/*.pm
+    #  ./xyz/...	=> $(INST_LIBDIR)/xyz/...
+    #  ./lib/...	=> $(INST_LIB)/...
     #
     # In this way the 'lib' directory is seen as the root of the actual
     # perl library whereas the others are relative to INST_LIBDIR
@@ -1480,19 +1478,19 @@ sub init_PM {
     @{$self->{PMLIBDIRS}} = ();
     my %dir = map { ($_ => $_) } @{$self->{DIR}};
     foreach my $pmlibdir (@pmlibdirs) {
-        -d $pmlibdir && !$dir{$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
+	-d $pmlibdir && !$dir{$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
     }
 
     unless( $self->{PMLIBPARENTDIRS} ) {
-        @{$self->{PMLIBPARENTDIRS}} = ('lib');
+	@{$self->{PMLIBPARENTDIRS}} = ('lib');
     }
 
     return if $self->{PM} and $self->{ARGS}{PM};
 
     if (@{$self->{PMLIBDIRS}}){
-        print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
-            if ($Verbose >= 2);
-        require File::Find;
+	print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
+	    if ($Verbose >= 2);
+	require File::Find;
         File::Find::find(sub {
             if (-d $_){
                 unless ($self->libscan($_)){
@@ -1505,22 +1503,22 @@ sub init_PM {
             return if /,v$/;            # RCS files
             return if m{\.swp$};        # vim swap files
 
-            my $path   = $File::Find::name;
+	    my $path   = $File::Find::name;
             my $prefix = $self->{INST_LIBDIR};
             my $striplibpath;
 
-            my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
-            $prefix =  $self->{INST_LIB} 
+	    my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
+	    $prefix =  $self->{INST_LIB} 
                 if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
-                                               {$1}i;
+	                                       {$1}i;
 
-            my($inst) = $self->catfile($prefix,$striplibpath);
-            local($_) = $inst; # for backwards compatibility
-            $inst = $self->libscan($inst);
-            print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
-            return unless $inst;
-            $self->{PM}{$path} = $inst;
-        }, @{$self->{PMLIBDIRS}});
+	    my($inst) = $self->catfile($prefix,$striplibpath);
+	    local($_) = $inst; # for backwards compatibility
+	    $inst = $self->libscan($inst);
+	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
+	    return unless $inst;
+	    $self->{PM}{$path} = $inst;
+	}, @{$self->{PMLIBDIRS}});
     }
 }
 
@@ -2056,9 +2054,7 @@ pure_perl_install :: all
 		$(INST_BIN) $(DESTINSTALLBIN) \
 		$(INST_SCRIPT) $(DESTINSTALLSCRIPT) \
 		$(INST_MAN1DIR) $(DESTINSTALLMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLMAN3DIR) \
-		$(INST_HTML1DIR) $(DESTINSTALLHTML1DIR) \
-		$(INST_HTML3DIR) $(DESTINSTALLHTML3DIR)
+		$(INST_MAN3DIR) $(DESTINSTALLMAN3DIR)
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.$self->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{
 
@@ -2072,9 +2068,7 @@ pure_site_install :: all
 		$(INST_BIN) $(DESTINSTALLSITEBIN) \
 		$(INST_SCRIPT) $(DESTINSTALLSITESCRIPT) \
 		$(INST_MAN1DIR) $(DESTINSTALLSITEMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLSITEMAN3DIR) \
-		$(INST_HTML1DIR) $(DESTINSTALLSITEHTML1DIR) \
-		$(INST_HTML3DIR) $(DESTINSTALLSITEHTML3DIR)
+		$(INST_MAN3DIR) $(DESTINSTALLSITEMAN3DIR)
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
 		}.$self->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{
 
@@ -2087,9 +2081,7 @@ pure_vendor_install :: all
 		$(INST_BIN) $(DESTINSTALLVENDORBIN) \
 		$(INST_SCRIPT) $(DESTINSTALLVENDORSCRIPT) \
 		$(INST_MAN1DIR) $(DESTINSTALLVENDORMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR) \
-		$(INST_HTML1DIR) $(DESTINSTALLVENDORHTML1DIR) \
-		$(INST_HTML3DIR) $(DESTINSTALLVENDORHTML3DIR)
+		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR)
 
 doc_perl_install :: all
 	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
@@ -3512,7 +3504,7 @@ sub all_target {
     my $self = shift;
 
     return <<'MAKE_EXT';
-all :: pure_all manifypods htmlifypods
+all :: pure_all manifypods
 	$(NOECHO) $(NOOP)
 MAKE_EXT
 }

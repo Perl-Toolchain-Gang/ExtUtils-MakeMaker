@@ -8,7 +8,7 @@ use warnings;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our @EXPORT  = qw(test_harness pod2man pod2html perllocal_install uninstall 
+our @EXPORT  = qw(test_harness pod2man perllocal_install uninstall 
                   warn_if_old_packlist);
 our $VERSION = '6.51_02';
 
@@ -145,46 +145,6 @@ sub pod2man {
               or do { warn("chmod $options{perm_rw} $man: $!\n"); next };
         }
     }} while @ARGV;
-
-    return 1;
-}
-
-
-=item B<pod2html>
-
-Emulates Pod::Html's pod2html command.
-
-The interface may change, because pod2html's interface sucks.
-
-=cut
-
-sub pod2html {
-    @_ = @ARGV unless @_;
-
-    my $infile;
-    my $outfile;
-    for (@_) {
-        $infile  = $1 if /^--infile=(.*)/;
-        $outfile = $1 if /^--outfile=(.*)/;
-    }
-    die "Need to specify both --infile and --outfile" unless $infile && $outfile;
-
-    return 0 if ((-e $outfile) &&
-                 (-M $outfile < -M $infile) &&
-                 (-M $outfile < -M "Makefile"));
-
-    print "HTMLifying $outfile\n";
-
-    require File::Basename;
-    my $outdir = File::Basename::dirname($outfile);
-    unless (-d $outdir) {
-        require File::Path;
-        File::Path::mkpath($outdir, 0, 0755);
-    }
-
-    $0 = "pod2html";
-    require Pod::Html;
-    Pod::Html::pod2html(@_);
 
     return 1;
 }

@@ -225,8 +225,7 @@ sub full_setup {
     FULLPERL FULLPERLRUN FULLPERLRUNINST
     FUNCLIST H IMPORTS
 
-    INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
-    INST_MAN1DIR INST_MAN3DIR INST_HTML1DIR INST_HTML3DIR
+    INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB INST_MAN1DIR INST_MAN3DIR
     INSTALLDIRS
     DESTDIR PREFIX INSTALL_BASE
     PERLPREFIX      SITEPREFIX      VENDORPREFIX
@@ -236,9 +235,6 @@ sub full_setup {
     INSTALLMAN1DIR          INSTALLMAN3DIR
     INSTALLSITEMAN1DIR      INSTALLSITEMAN3DIR
     INSTALLVENDORMAN1DIR    INSTALLVENDORMAN3DIR
-    INSTALLHTML1DIR          INSTALLHTML3DIR
-    INSTALLSITEHTML1DIR      INSTALLSITEHTML3DIR
-    INSTALLVENDORHTML1DIR    INSTALLVENDORHTML3DIR
     INSTALLSCRIPT   INSTALLSITESCRIPT  INSTALLVENDORSCRIPT
     PERL_LIB        PERL_ARCHLIB 
     SITELIBEXP      SITEARCHEXP 
@@ -286,7 +282,7 @@ sub full_setup {
  special_targets
  c_o xs_c xs_o
  top_targets blibdirs linkext dlsyms dynamic dynamic_bs
- dynamic_lib static static_lib manifypods htmlifypods processPL
+ dynamic_lib static static_lib manifypods processPL
  installbin subdirs
  clean_subdirs clean realclean_subdirs realclean 
  metafile signature
@@ -345,9 +341,8 @@ sub full_setup {
     #
     @Prepend_parent = qw(
            INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT
-           MAP_TARGET INST_MAN1DIR INST_MAN3DIR
-           INST_HTML1DIR INST_HTML3DIR
-           PERL_SRC PERL FULLPERL
+           MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
+           PERL FULLPERL
     );
 }
 
@@ -1127,9 +1122,8 @@ want to specify some other option, set the C<TESTDB_SW> variable:
 =head2 make install
 
 make alone puts all relevant files into directories that are named by
-the macros INST_LIB, INST_ARCHLIB, INST_SCRIPT, INST_BIN, INST_MAN1DIR,
-INST_MAN3DIR, INST_HTML1DIR and INST_HTML3DIR.
-All these default to something below ./blib if you are
+the macros INST_LIB, INST_ARCHLIB, INST_SCRIPT, INST_MAN1DIR and
+INST_MAN3DIR.  All these default to something below ./blib if you are
 I<not> building below the perl source directory. If you I<are>
 building below the perl source, INST_LIB and INST_ARCHLIB default to
 ../../lib, and INST_SCRIPT is not defined.
@@ -1149,8 +1143,6 @@ INSTALLDIRS according to the following table:
   INST_SCRIPT    INSTALLSCRIPT   INSTALLSITESCRIPT   INSTALLVENDORSCRIPT
   INST_MAN1DIR   INSTALLMAN1DIR  INSTALLSITEMAN1DIR  INSTALLVENDORMAN1DIR
   INST_MAN3DIR   INSTALLMAN3DIR  INSTALLSITEMAN3DIR  INSTALLVENDORMAN3DIR
-  INST_HTML1DIR  INSTALLHTML1DIR INSTALLSITEHTML1DIR INSTALLVENDORHTML1DIR
-  INST_HTML3DIR  INSTALLHTML3DIR INSTALLSITEHTML3DIR INSTALLVENDORHTML3DIR
 
 The INSTALL... macros in turn default to their %Config
 ($Config{installprivlib}, $Config{installarchlib}, etc.) counterparts.
@@ -1724,14 +1716,6 @@ Directory to hold the man pages at 'make' time
 =item INST_MAN3DIR
 
 Directory to hold the man pages at 'make' time
-
-=item INST_HTML1DIR
-
-Directory to hold the html man pages at 'make' time
-
-=item INST_HTML3DIR
-
-Directory to hold the html man pages at 'make' time
 
 =item INST_SCRIPT
 

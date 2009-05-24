@@ -18,7 +18,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 111;
+        plan tests => 110;
     }
 }
 
@@ -97,7 +97,6 @@ foreach ( qw /
   makeaperl
   makefile
   manifypods
-  htmlifypods
   needs_linking
   pasthru
   perldepend
