@@ -1,14 +1,13 @@
-6.52
+6.51_04  Sun May 24 14:04:11 PDT 2009
+    Other
+    * All work on INSTALLHTML* has been reverted pending a fix for
+      [rt.cpan.org 45600]
 
 
 6.51_03  Sat May 23 22:38:26 PDT 2009
     Bug Fixes
     * Building *.C files was broken in 6.37. [rt.cpan.org 45557]
       Thanks to Rajesh Mandalemula for spotting it.
-
-    Other
-    * All work on INSTALLHTML* has been reverted pending a fix for
-      [rt.cpan.org 45600]
 
 
 6.51_02  Mon Apr 13 21:19:56 PDT 2009
