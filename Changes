@@ -1,4 +1,4 @@
-6.51_03
+6.51_03  Sat May 23 22:38:26 PDT 2009
     Bug Fixes
     * Building *.C files was broken in 6.37. [rt.cpan.org 45557]
       Thanks to Rajesh Mandalemula for spotting it.
