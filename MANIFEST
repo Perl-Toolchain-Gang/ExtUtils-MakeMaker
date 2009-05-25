@@ -88,7 +88,6 @@ t/oneliner.t
 t/parse_version.t
 t/PL_FILES.t
 t/pm.t
-t/pod2html.t
 t/pod2man.t
 t/postamble.t
 t/prefixify.t
