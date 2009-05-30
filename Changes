@@ -1,3 +1,9 @@
+6.52  Sat May 30 11:22:04 PDT 2009
+    Docs
+    * Documented CONFIGURE_REQUIRES (Alexandr Ciornii)
+    * Modnerized the docs for PREREQ_PM
+
+
 6.51_04  Sun May 24 14:04:11 PDT 2009
     Other
     * All work on INSTALLHTML* has been reverted pending a fix for
