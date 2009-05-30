@@ -2075,6 +2075,9 @@ sub arch_check {
     my($pvol, $pthinks) = $self->splitpath($pconfig);
     my($cvol, $cthinks) = $self->splitpath($cconfig);
 
+    $pthinks = $self->canonpath($pthinks);
+    $cthinks = $self->canonpath($cthinks);
+
     my $ret = 1;
     if ($pthinks ne $cthinks) {
         print "Have $pthinks\n";
