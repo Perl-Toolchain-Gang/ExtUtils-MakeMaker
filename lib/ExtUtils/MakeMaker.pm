@@ -1457,12 +1457,14 @@ be determined by some evaluation method.
 
 =item CONFIGURE_REQUIRES
 
-Hashref: List of modules that are required to run Makefile.PL itself.
-Names of modules are the keys of the hash and the desired version is the value.
-This data will be put into META.yml's 'configure_requires' key and modules listed
-will be installed by CPAN or CPANPLUS before running Makefile.PL. Only recent
-versions of CPAN/CPANPLUS support this key, so you may want to provide some
-fallback code.
+A hash of modules that are required to run Makefile.PL itself, but not
+to run your distribution.
+
+This will go into the C<configure_requires> field of your F<META.yml>.
+
+Defaults to C<{ "ExtUtils::MakeMaker" => 0 }>
+
+The format is the same as PREREQ_PM.
 
 =item DEFINE
 
@@ -1482,8 +1484,8 @@ slash on your DESTDIR.  F<~/tmp/> not F<~/tmp>.
 
 =item DIR
 
-Ref to array of subdirectories containing Makefile.PLs e.g. [ 'sdbm'
-] in ext/SDBM_File
+Ref to array of subdirectories containing Makefile.PLs e.g. ['sdbm']
+in ext/SDBM_File
 
 =item DISTNAME
 
@@ -2168,10 +2170,19 @@ use your module with an incomplete environment.
 
 =item PREREQ_PM
 
-Hashref: Names of modules that need to be available to run this
-extension (e.g. Fcntl for SDBM_File) are the keys of the hash and the
-desired version is the value. If the required version number is 0, we
-only check if any version is installed already.
+A hash of modules that are needed to run your module.  The keys are
+the module names ie. Test::More, and the minimum version is the
+value. If the required version number is 0 any version will do.
+
+This will go into the C<requires> field of your F<META.yml>.
+
+    PREREQ_PM => {
+        # Require Test::More at least 0.47
+        "Test::More" => "0.47",
+
+        # Require any version of Acme::Buffy
+        "Acme::Buffy" => 0,
+    }
 
 =item PREREQ_PRINT
 
