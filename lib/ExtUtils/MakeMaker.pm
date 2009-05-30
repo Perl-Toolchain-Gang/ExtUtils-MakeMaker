@@ -1463,6 +1463,15 @@ CODE reference. The subroutine should return a hash reference. The
 hash may contain further attributes, e.g. {LIBS =E<gt> ...}, that have to
 be determined by some evaluation method.
 
+=item CONFIGURE_REQUIRES
+
+Hashref: List of modules that are required to run Makefile.PL itself.
+Names of modules are the keys of the hash and the desired version is the value.
+This data will be put into META.yml's 'configure_requires' key and modules listed
+will be installed by CPAN or CPANPLUS before running Makefile.PL. Only recent
+versions of CPAN/CPANPLUS support this key, so you may want to provide some
+fallback code.
+
 =item DEFINE
 
 Something like C<"-DHAVE_UNISTD_H">
