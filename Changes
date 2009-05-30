@@ -8,6 +8,9 @@
     Bug Fixes
     * Building *.C files was broken in 6.37. [rt.cpan.org 45557]
       Thanks to Rajesh Mandalemula for spotting it.
+    New Features
+    * Optional parameter CONFIGURE_REQUIRES was added, to control
+      this section in META.yml (Alexandr Ciornii)
 
 
 6.51_02  Mon Apr 13 21:19:56 PDT 2009

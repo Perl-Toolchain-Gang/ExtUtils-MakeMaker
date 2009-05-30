@@ -88,6 +88,7 @@ my %Special_Sigs = (
  PMLIBDIRS          => 'ARRAY',
  PMLIBPARENTDIRS    => 'ARRAY',
  PREREQ_PM          => 'HASH',
+ CONFIGURE_REQUIRES => 'HASH',
  SKIP               => 'ARRAY',
  TYPEMAPS           => 'ARRAY',
  XS                 => 'HASH',
@@ -241,7 +242,7 @@ sub full_setup {
 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
     LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET
-    META_ADD META_MERGE MIN_PERL_VERSION
+    META_ADD META_MERGE MIN_PERL_VERSION CONFIGURE_REQUIRES
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
     PERL_SRC PERM_DIR PERM_RW PERM_RWX
@@ -1453,6 +1454,15 @@ so
 CODE reference. The subroutine should return a hash reference. The
 hash may contain further attributes, e.g. {LIBS =E<gt> ...}, that have to
 be determined by some evaluation method.
+
+=item CONFIGURE_REQUIRES
+
+Hashref: List of modules that are required to run Makefile.PL itself.
+Names of modules are the keys of the hash and the desired version is the value.
+This data will be put into META.yml's 'configure_requires' key and modules listed
+will be installed by CPAN or CPANPLUS before running Makefile.PL. Only recent
+versions of CPAN/CPANPLUS support this key, so you may want to provide some
+fallback code.
 
 =item DEFINE
 
