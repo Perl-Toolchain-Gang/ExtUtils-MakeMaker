@@ -1,3 +1,9 @@
+6.53_01
+    Cygwin
+    * Fixed MM_Cygwin.t when the path prefix (ie. cygdrive) has been
+      changed by the user. [rt.cpan.org 46585] (JDHEDDEN)
+
+
 6.52  Sat May 30 11:22:04 PDT 2009
     Docs
     * Documented CONFIGURE_REQUIRES (Alexandr Ciornii)
