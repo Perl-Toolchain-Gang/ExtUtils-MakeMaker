@@ -46,7 +46,6 @@ t/arch_check.t
 t/backwards.t
 t/basic.t
 t/build_man.t
-t/bytes.t
 t/cd.t
 t/config.t
 t/dir_target.t

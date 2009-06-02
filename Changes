@@ -3,6 +3,10 @@
     * Fixed MM_Cygwin.t when the path prefix (ie. cygdrive) has been
       changed by the user. [rt.cpan.org 46585] (JDHEDDEN)
 
+    Tests
+    * Forgot to get rid of the tests for bytes and vmsish
+      which were removed in 6.51_01.
+
 
 6.52  Sat May 30 11:22:04 PDT 2009
     Docs
