@@ -103,7 +103,6 @@ t/testdata/reallylongdirectoryname/arch1/Config.pm
 t/testdata/reallylongdirectoryname/arch2/Config.pm
 t/testlib.t
 t/VERSION_FROM.t
-t/vmsish.t
 t/WriteEmptyMakefile.t
 t/writemakefile_args.t
 t/xs.t
