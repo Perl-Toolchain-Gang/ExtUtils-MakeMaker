@@ -8,7 +8,6 @@ use lib 't/lib';
 use Test::More 'no_plan';
 
 use ExtUtils::MakeMaker;
-use Shell::Command;
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
