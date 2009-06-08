@@ -109,6 +109,22 @@ sub os_flavor_is {
 }
 
 
+=head3 can_load_xs
+
+    my $can_load_xs = $self->can_load_xs;
+
+Returns true if we have the ability to load XS.
+
+This is important because miniperl, used to build XS modules in the
+core, can not load XS.
+
+=cut
+
+sub can_load_xs {
+    return defined &DynaLoader::boot_DynaLoader ? 1 : 0;
+}
+
+
 =head3 split_command
 
     my @cmds = $MM->split_command($cmd, @args);

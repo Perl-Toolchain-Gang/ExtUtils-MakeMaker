@@ -414,6 +414,10 @@ Normalize all arguments for consistency of comparison.
 sub arch_check {
     my $self = shift;
 
+    # Win32 is an XS module, minperl won't have it.
+    # arch_check() is not critical, so just fake it.
+    return 1 unless $self->can_load_xs;
+
     require Win32;
     return $self->SUPER::arch_check( map { lc Win32::GetShortPathName($_) } @_);
 }

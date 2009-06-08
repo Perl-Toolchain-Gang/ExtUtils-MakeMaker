@@ -50,13 +50,14 @@ t/cd.t
 t/config.t
 t/dir_target.t
 t/FIRST_MAKEFILE.t
-t/fixin.t
 t/fix_libs.t
+t/fixin.t
 t/hints.t
 t/INST.t
 t/INST_PREFIX.t
 t/INSTALL_BASE.t
 t/is_of_type.t
+t/lib/MakeMaker/Test/NoXS.pm
 t/lib/MakeMaker/Test/Setup/BFD.pm
 t/lib/MakeMaker/Test/Setup/MPV.pm
 t/lib/MakeMaker/Test/Setup/PL_FILES.pm
@@ -76,6 +77,7 @@ t/maketext_filter.t
 t/metafile_data.t
 t/metafile_file.t
 t/min_perl_version.t
+t/miniperl.t
 t/Mkbootstrap.t
 t/MM_Any.t
 t/MM_BeOS.t
