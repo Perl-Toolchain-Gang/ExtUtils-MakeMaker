@@ -1,3 +1,12 @@
+6.53_02  Sun Jun  7 19:24:56 PDT 2009
+    Test Fixes
+    * Stray use of Shell::Command broke older perls
+
+    Other
+    * MakeMaker will now automatically test itself with multiple
+      perl versions before releasing.
+
+
 6.53_01  Sun Jun  7 19:02:20 PDT 2009
     Bug Fixes
     * blib will now be rebuilt if the Makefile is changed
