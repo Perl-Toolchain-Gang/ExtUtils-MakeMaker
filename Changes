@@ -12,10 +12,16 @@
       by some versions of GNV, Craig says they're futile.
       Put a warning into the Makefile.PL instead.
       [rt.cpan.org 46679]
+    * Removed the arch_check() special case for VMS.
+      [rt.cpan.org 46678]
+
 
     Tests
     * Forgot to get rid of the tests for bytes and vmsish
       which were removed in 6.51_01.
+    * Stopped running a Windows specific arch_check.t test
+      on non-Windows.
+      [rt.cpan.org 46678]
 
 
 6.52  Sat May 30 11:22:04 PDT 2009

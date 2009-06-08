@@ -1565,19 +1565,6 @@ map_clean :
 }
 
 
-=item arch_check (override)
-
-vmsify all arguments for consistency
-
-=cut
-
-sub arch_check {
-    my $self = shift;
-
-    return $self->SUPER::arch_check(map { vmsify($_) } @_);
-}
-
-
 # --- Output postprocessing section ---
 
 =item maketext_filter (override)
