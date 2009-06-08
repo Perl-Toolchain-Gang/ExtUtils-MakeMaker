@@ -1,4 +1,8 @@
 6.53_01
+    Bug Fixes
+    * blib will now be rebuilt if the Makefile is changed
+      [rt.cpan.org 46658]
+
     Cygwin
     * Fixed MM_Cygwin.t when the path prefix (ie. cygdrive) has been
       changed by the user. [rt.cpan.org 46585] (JDHEDDEN)
