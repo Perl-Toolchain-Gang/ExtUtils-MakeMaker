@@ -107,18 +107,18 @@ SKIP: {
 
     $comspec = Cygwin::win_to_posix_path($comspec);
 
-    ok MM->maybe_command($comspec), qq{'$comspec' should be executable"};
+    ok(MM->maybe_command($comspec), qq{'$comspec' should be executable"});
 }
 
 # 'C:/' should *never* be executable, it's a directory.
 {
     my $cdrive = Cygwin::win_to_posix_path("C:/");
 
-    ok !MM->maybe_command($cdrive), qq{'$cdrive' should never be executable};
+    ok(!MM->maybe_command($cdrive), qq{'$cdrive' should never be executable});
 }
 
 # Our copy of Perl (with a unix-path) should always be executable.
-ok MM->maybe_command($Config{perlpath}), qq{'$Config{perlpath}' should be executable};
+ok(MM->maybe_command($Config{perlpath}), qq{'$Config{perlpath}' should be executable});
 
 
 package FakeOut;
