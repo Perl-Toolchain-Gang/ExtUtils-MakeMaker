@@ -49,6 +49,9 @@ my %prereq = ( );
 $prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 
 
+check_environment();
+
+
 my $MM = WriteMakefile(
     NAME            => $PACKAGE,
     VERSION_FROM    => "lib/$PACKAGE_FILE.pm", # finds $VERSION
@@ -114,6 +117,21 @@ Test::Harness from CPAN, then run the MakeMaker tests.
 
 SPACE_WARN
 
+}
+
+
+# Display warnings about the environment.
+sub check_environment {
+    if( $Is_VMS && $ENV{bin} ) {
+        print <<BIN_WARN;
+
+The logical name BIN may be present.  This may interfere with MakeMaker's
+tests and operations.  GNV is the prime suspect for setting this.
+
+BIN_WARN
+
+        sleep 2;
+    }
 }
 
 

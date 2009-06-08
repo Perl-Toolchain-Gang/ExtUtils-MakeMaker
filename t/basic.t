@@ -27,9 +27,6 @@ use File::Path;
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
-# GNV logical interferes with testing
-local $ENV{'bin'} = '[.bin]' if $Is_VMS;
-
 chdir 't';
 
 perl_lib;
