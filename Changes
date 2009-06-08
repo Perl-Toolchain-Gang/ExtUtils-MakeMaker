@@ -1,3 +1,8 @@
+6.53_03
+    Test Fixes
+    * Upgrade the version of Test::More we ship with to 0.88.
+
+
 6.53_02  Sun Jun  7 19:24:56 PDT 2009
     Test Fixes
     * Stray use of Shell::Command broke older perls

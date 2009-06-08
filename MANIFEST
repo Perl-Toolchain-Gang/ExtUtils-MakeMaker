@@ -66,6 +66,7 @@ t/lib/MakeMaker/Test/Setup/Recurs.pm
 t/lib/MakeMaker/Test/Setup/XS.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
+t/lib/Test/Builder/IO/Scalar.pm
 t/lib/Test/Builder/Module.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
