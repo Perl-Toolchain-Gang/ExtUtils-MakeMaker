@@ -2,6 +2,9 @@
     Bug Fixes
     * blib will now be rebuilt if the Makefile is changed
       [rt.cpan.org 46658]
+    * 6.52 broke the setting of EXTRALIBS, LDLOADLIBS and BSLOADLIBS
+      when $self->{LIBS}[0] is undefined.
+      [rt.cpan.org 46633]
 
     Cygwin
     * Fixed MM_Cygwin.t when the path prefix (ie. cygdrive) has been
