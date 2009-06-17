@@ -394,14 +394,16 @@ sub new {
         require Data::Dumper;
         my @what = ('PREREQ_PM');
         push @what, 'MIN_PERL_VERSION' if $self->{MIN_PERL_VERSION};
+        push @what, 'BUILD_REQUIRES' if $self->{BUILD_REQUIRES};
         print Data::Dumper->Dump([@{$self}{@what}], \@what);
         exit 0;
     }
 
     # PRINT_PREREQ is RedHatism.
     if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
+        my %prereqs=(%{$self->{PREREQ_PM}},%{$self->{BUILD_REQUIRES}});
         my @prereq =
-            map { [$_, $self->{PREREQ_PM}{$_}] } keys %{$self->{PREREQ_PM}};
+            map { [$_, $prereqs{$_}] } keys %prereqs;
         if ( $self->{MIN_PERL_VERSION} ) {
             push @prereq, ['perl' => $self->{MIN_PERL_VERSION}];
         }
@@ -457,38 +459,39 @@ END
     my(%initial_att) = %$self; # record initial attributes
 
     my(%unsatisfied) = ();
-    foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
-        my $file = "$prereq.pm";
-        $file =~ s{::}{/}g;
-        my $path;
-        for my $dir (@INC) {
-            my $tmp = File::Spec->catfile($dir, $file);
-            if( -r $tmp ) {
-                $path = $tmp;
-                last;
+    foreach my $prereq_type ($self->{BUILD_REQUIRES},$self->{PREREQ_PM}) {
+        foreach my $prereq (sort keys %{$self->{$prereq_type}}) {
+            my $file = "$prereq.pm";
+            $file =~ s{::}{/}g;
+            my $path;
+            for my $dir (@INC) {
+                my $tmp = File::Spec->catfile($dir, $file);
+                if( -r $tmp ) {
+                    $path = $tmp;
+                    last;
+                }
+            }
+            my $pr_version = defined $path ? MM->parse_version($path) : 0;
+    
+            # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
+            $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
+    
+            if (!defined $path) {
+                warn sprintf "Warning: prerequisite %s %s not found.\n", 
+                  $prereq, $self->{$prereq_type}{$prereq} 
+                       unless $self->{PREREQ_FATAL};
+                $unsatisfied{$prereq} = 'not installed';
+            } elsif ($pr_version < $self->{$prereq_type}->{$prereq} ){
+                warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
+                  $prereq, $self->{$prereq_type}{$prereq}, 
+                    ($pr_version || 'unknown version') 
+                      unless $self->{PREREQ_FATAL};
+                $unsatisfied{$prereq} = $self->{$prereq_type}->{$prereq} ? 
+                  $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
             }
         }
-        my $pr_version = defined $path ? MM->parse_version($path) : 0;
-
-        # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
-        $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
-
-        if (!defined $path) {
-            warn sprintf "Warning: prerequisite %s %s not found.\n", 
-              $prereq, $self->{PREREQ_PM}{$prereq} 
-                   unless $self->{PREREQ_FATAL};
-            $unsatisfied{$prereq} = 'not installed';
-        } elsif ($pr_version < $self->{PREREQ_PM}->{$prereq} ){
-            warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
-              $prereq, $self->{PREREQ_PM}{$prereq}, 
-                ($pr_version || 'unknown version') 
-                  unless $self->{PREREQ_FATAL};
-            $unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
-              $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
-        }
     }
-    
-     if (%unsatisfied && $self->{PREREQ_FATAL}){
+    if (%unsatisfied && $self->{PREREQ_FATAL}){
         my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"} 
                             sort { $a cmp $b } keys %unsatisfied;
         die <<"END";
@@ -615,6 +618,14 @@ END
 #
 #   MakeMaker Parameters:
 END
+
+    if (exists $initial_att{'BUILD_REQUIRES'} and keys %{$initial_att{'BUILD_REQUIRES'}}>0) {
+      #can modify %initial_att because it's life is short
+      $initial_att{'PREREQ_PM'} ||= {};
+      %{$initial_att{'PREREQ_PM'}} = (%{$initial_att{'PREREQ_PM'}}, %{$initial_att{'BUILD_REQUIRES'}});
+      #CPAN.pm takes prereqs from this field in 'Makefile'
+      #and does not know about BUILD_REQUIRES
+    }
 
     foreach my $key (sort keys %initial_att){
         next if $key eq 'ARGS';
