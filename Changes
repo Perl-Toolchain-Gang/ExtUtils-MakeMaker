@@ -1,4 +1,8 @@
 6.53_01
+    New Features
+    * Optional parameter BUILD_REQUIRES was added. It is similar to
+      PREREQ_PM, but has separate section in META.yml (Alexandr Ciornii)
+
     Cygwin
     * Fixed MM_Cygwin.t when the path prefix (ie. cygdrive) has been
       changed by the user. [rt.cpan.org 46585] (JDHEDDEN)

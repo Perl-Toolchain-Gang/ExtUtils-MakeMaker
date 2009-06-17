@@ -401,7 +401,7 @@ sub new {
 
     # PRINT_PREREQ is RedHatism.
     if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
-        my %prereqs=(%{$self->{PREREQ_PM}},%{$self->{BUILD_REQUIRES}});
+        my %prereqs=(%{$self->{PREREQ_PM}},%{$self->{BUILD_REQUIRES}||{}});
         my @prereq =
             map { [$_, $prereqs{$_}] } keys %prereqs;
         if ( $self->{MIN_PERL_VERSION} ) {
@@ -459,8 +459,8 @@ END
     my(%initial_att) = %$self; # record initial attributes
 
     my(%unsatisfied) = ();
-    foreach my $prereq_type ($self->{BUILD_REQUIRES},$self->{PREREQ_PM}) {
-        foreach my $prereq (sort keys %{$self->{$prereq_type}}) {
+    foreach my $prereq_type ($self->{BUILD_REQUIRES}||{},$self->{PREREQ_PM}) {
+        foreach my $prereq (sort keys %{$prereq_type}) {
             my $file = "$prereq.pm";
             $file =~ s{::}{/}g;
             my $path;
@@ -478,15 +478,15 @@ END
     
             if (!defined $path) {
                 warn sprintf "Warning: prerequisite %s %s not found.\n", 
-                  $prereq, $self->{$prereq_type}{$prereq} 
+                  $prereq, $prereq_type->{$prereq} 
                        unless $self->{PREREQ_FATAL};
                 $unsatisfied{$prereq} = 'not installed';
-            } elsif ($pr_version < $self->{$prereq_type}->{$prereq} ){
+            } elsif ($pr_version < $prereq_type->{$prereq} ){
                 warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
-                  $prereq, $self->{$prereq_type}{$prereq}, 
+                  $prereq, $prereq_type->{$prereq}, 
                     ($pr_version || 'unknown version') 
                       unless $self->{PREREQ_FATAL};
-                $unsatisfied{$prereq} = $self->{$prereq_type}->{$prereq} ? 
+                $unsatisfied{$prereq} = $prereq_type->{$prereq} ? 
                   $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
             }
         }
