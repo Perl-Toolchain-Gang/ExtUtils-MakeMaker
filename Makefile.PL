@@ -86,10 +86,8 @@ my $MM = WriteMakefile(
     },
 
     # We don't need ourself to install ourself.
-    META_ADD        => {
-        build_requires     => {},
-    },
     CONFIGURE_REQUIRES => {},
+    BUILD_REQUIRES => {},
 
     INSTALLDIRS     => 'perl',
 
