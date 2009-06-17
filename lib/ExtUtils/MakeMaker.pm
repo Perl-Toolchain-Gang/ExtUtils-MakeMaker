@@ -1442,6 +1442,14 @@ architecture.  For example:
 builds a PPD package that references a binary of the C<Agent> package,
 located in the C<x86> directory relative to the PPD itself.
 
+=item BUILD_REQUIRES
+
+A hash of modules that are needed to build your module.  The keys are
+the module names ie. Test::More, and the minimum version is the
+value. If the required version number is 0 any version will do.
+
+This will go into the C<build_requires> field of your F<META.yml>.
+
 =item C
 
 Ref to array of *.c file names. Initialised from a directory scan
@@ -2225,6 +2233,8 @@ If a distribution defines a minimal required perl version, this is
 added to the output as an additional line of the form:
 
   $MIN_PERL_VERSION = '5.008001';
+
+If BUILD_REQUIRES is not empty, it will be dumped as $BUILD_REQUIRES hasref.
 
 =item PRINT_PREREQ
 
