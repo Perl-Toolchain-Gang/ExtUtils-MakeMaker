@@ -830,6 +830,14 @@ sub metafile_data {
             'ExtUtils::MakeMaker'       => 0,
         };
     }
+    my $build_requires;
+    if( $self->{BUILD_REQUIRES} and ref($self->{BUILD_REQUIRES}) eq 'HASH' ) {
+        $build_requires = $self->{BUILD_REQUIRES};
+    } else {
+        $build_requires = {
+            'ExtUtils::MakeMaker'       => 0,
+        };
+    }
 
     my %meta = (
         name         => $self->{DISTNAME},
@@ -840,9 +848,7 @@ sub metafile_data {
 
         configure_requires => $configure_requires,
 
-        build_requires => {
-            'ExtUtils::MakeMaker'       => 0
-        },
+        build_requires => $build_requires,
 
         no_index     => {
             directory   => [qw(t inc)]
