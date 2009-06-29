@@ -457,22 +457,12 @@ END
 
     my(%unsatisfied) = ();
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
-        my $file = "$prereq.pm";
-        $file =~ s{::}{/}g;
-        my $path;
-        for my $dir (@INC) {
-            my $tmp = File::Spec->catfile($dir, $file);
-            if( -r $tmp ) {
-                $path = $tmp;
-                last;
-            }
-        }
-        my $pr_version = defined $path ? MM->parse_version($path) : 0;
+        my($is_installed, $pr_version) = MM->_installed_version($prereq);
 
         # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
 
-        if (!defined $path) {
+        if (!$is_installed) {
             warn sprintf "Warning: prerequisite %s %s not found.\n", 
               $prereq, $self->{PREREQ_PM}{$prereq} 
                    unless $self->{PREREQ_FATAL};
@@ -717,6 +707,44 @@ test :
 EOP
     close $mfh or die "close $new for write: $!";
 }
+
+
+=begin private
+
+=head3 _installed_version
+
+  my($is_installed, $version) = MM->_installed_version($module);
+
+Return the $version of the installed $module and if its installed at all.
+
+$module is something like "strict" or "Test::More".
+
+=end private
+
+=cut
+
+sub _installed_version {
+    my $class  = shift;
+    my $prereq = shift;
+
+    my $file = "$prereq.pm";
+    $file =~ s{::}{/}g;
+
+    my $path;
+    for my $dir (@INC) {
+        my $tmp = File::Spec->catfile($dir, $file);
+        if ( -r $tmp ) {
+            $path = $tmp;
+            last;
+        }
+    }
+
+    my $is_installed = defined $path;
+    my $version = defined $path ? MM->parse_version($path) : 0;
+
+    return($is_installed, $version);
+}
+
 
 sub check_manifest {
     print STDOUT "Checking if your kit is complete...\n";
