@@ -11,6 +11,8 @@
       work for Win32.pm
     * Old versions of version.pm, like what ships with OS X, dent Foo->VERSION
       causing prereq.t to fail.  [rt.cpan.org 47296]
+    * Add missing core test boilerplates
+      [blead e39d780342f3e91579069fdc80eda72bfe639ae7]
 
 
 6.53_02  Sun Jun  7 19:24:56 PDT 2009
