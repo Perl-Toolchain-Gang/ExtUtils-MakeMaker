@@ -56,6 +56,7 @@ t/hints.t
 t/INST.t
 t/INST_PREFIX.t
 t/INSTALL_BASE.t
+t/installed_file.t
 t/is_of_type.t
 t/lib/MakeMaker/Test/NoXS.pm
 t/lib/MakeMaker/Test/Setup/BFD.pm

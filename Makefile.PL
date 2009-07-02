@@ -64,7 +64,7 @@ my $MM = WriteMakefile(
                          'Pod::Man'         => 0,
 
                          'File::Basename'   => 0,
-                         DirHandle          => 0,
+                         DirHandle          => 0,       
                        },
     MIN_PERL_VERSION => '5.006',
 

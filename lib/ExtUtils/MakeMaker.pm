@@ -457,12 +457,15 @@ END
 
     my(%unsatisfied) = ();
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
-        my($is_installed, $pr_version) = MM->_installed_version($prereq);
+        my $installed_file = MM->_installed_file_for_module($prereq);
+        my $pr_version = 0;
+        $pr_version = MM->parse_version($installed_file) if $installed_file;
+        $pr_version = 0 if $pr_version eq 'undef';
 
         # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
 
-        if (!$is_installed) {
+        if (!$installed_file) {
             warn sprintf "Warning: prerequisite %s %s not found.\n", 
               $prereq, $self->{PREREQ_PM}{$prereq} 
                    unless $self->{PREREQ_FATAL};
@@ -711,11 +714,12 @@ EOP
 
 =begin private
 
-=head3 _installed_version
+=head3 _installed_file_for_module
 
-  my($is_installed, $version) = MM->_installed_version($module);
+  my $file = MM->_installed_file_for_module($module);
 
-Return the $version of the installed $module and if its installed at all.
+Return the first installed .pm $file associated with the $module.  The
+one which will show up when you C<use $module>.
 
 $module is something like "strict" or "Test::More".
 
@@ -723,7 +727,7 @@ $module is something like "strict" or "Test::More".
 
 =cut
 
-sub _installed_version {
+sub _installed_file_for_module {
     my $class  = shift;
     my $prereq = shift;
 
@@ -739,10 +743,7 @@ sub _installed_version {
         }
     }
 
-    my $is_installed = defined $path;
-    my $version = defined $path ? MM->parse_version($path) : 0;
-
-    return($is_installed, $version);
+    return $path;
 }
 
 
