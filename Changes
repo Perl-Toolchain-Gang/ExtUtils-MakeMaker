@@ -9,6 +9,8 @@
       broken in 6.53_01.
     * Fix miniperl.t for Windows.  Our method of shutting off XS didn't
       work for Win32.pm
+    * Old versions of version.pm, like what ships with OS X, dent Foo->VERSION
+      causing prereq.t to fail.  [rt.cpan.org 47296]
 
 
 6.53_02  Sun Jun  7 19:24:56 PDT 2009
