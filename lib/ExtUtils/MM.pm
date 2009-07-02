@@ -44,8 +44,9 @@ away.
 sub _is_win95 {
     # miniperl might not have the Win32 functions available and we need
     # to run in miniperl.
-    return defined &Win32::IsWin95 ? Win32::IsWin95() 
-                                   : ! defined $ENV{SYSTEMROOT}; 
+    my $have_win32 = eval { require Win32 };
+    return $have_win32 && defined &Win32::IsWin95 ? Win32::IsWin95()
+                                                  : ! defined $ENV{SYSTEMROOT};
 }
 
 my %Is = ();

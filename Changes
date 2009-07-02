@@ -1,10 +1,10 @@
 6.53_03
     Test Fixes
     * Upgrade the version of Test::More we ship with to 0.88.
-
-    Cygwin
-    * Fix MM_Cygwin for older Perls missing Cygwin::win_to_posix_path()
+    * Fix MM_Cygwin.t for older Perls missing Cygwin::win_to_posix_path()
       broken in 6.53_01.
+    * Fix miniperl.t for Windows.  Our method of shutting off XS didn't
+      work for Win32.pm
 
 
 6.53_02  Sun Jun  7 19:24:56 PDT 2009
