@@ -3,6 +3,8 @@
     * The tests got a bit overzealous and removed the LIB environment variable
       while is necessary for some compilers to work. [rt.cpan.org 47722]
       (Jan Dubois)
+    * Another fix for arch_check() on Windows changing how we normalize
+      long and short filenames. [rt.cpan.org 47723] (Jan Dubois)
 
 
 6.54  Tue Jul  7 16:48:22 PDT 2009

@@ -417,9 +417,16 @@ sub arch_check {
     # Win32 is an XS module, minperl won't have it.
     # arch_check() is not critical, so just fake it.
     return 1 unless $self->can_load_xs;
+    return $self->SUPER::arch_check( map { $self->_normalize_path_name($_) } @_);
+}
+
+sub _normalize_path_name {
+    my $self = shift;
+    my $file = shift;
 
     require Win32;
-    return $self->SUPER::arch_check( map { lc Win32::GetShortPathName($_) } @_);
+    my $short = Win32::GetShortPathName($file);
+    return defined $short ? lc $short : lc $file;
 }
 
 
