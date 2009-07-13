@@ -390,11 +390,7 @@ sub new {
     }
 
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
-        require Data::Dumper;
-        my @what = ('PREREQ_PM');
-        push @what, 'MIN_PERL_VERSION' if $self->{MIN_PERL_VERSION};
-        print Data::Dumper->Dump([@{$self}{@what}], \@what);
-        exit 0;
+        $self->_PREREQ_PRINT;
     }
 
     # PRINT_PREREQ is RedHatism.

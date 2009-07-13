@@ -2236,6 +2236,29 @@ sub platform_constants {
     return '';
 }
 
+=begin private
+
+=head3 _PREREQ_PRINT
+
+    $self->_PREREQ_PRINT;
+
+Implements PREREQ_PRINT.
+
+Refactored out of MakeMaker->new().
+
+=end private
+
+=cut
+
+sub _PREREQ_PRINT {
+    my $self = shift;
+
+    require Data::Dumper;
+    my @what = ('PREREQ_PM');
+    push @what, 'MIN_PERL_VERSION' if $self->{MIN_PERL_VERSION};
+    print Data::Dumper->Dump([@{$self}{@what}], \@what);
+    exit 0;
+}
 
 =head1 AUTHOR
 
