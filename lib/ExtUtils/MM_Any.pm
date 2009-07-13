@@ -74,7 +74,7 @@ Windows, VMS, OS/2, etc...) and the rest are sub families.
 Some examples:
 
     Cygwin98       ('Unix',  'Cygwin', 'Cygwin9x')
-    Windows NT     ('Win32', 'WinNT')
+    Windows        ('Win32')
     Win98          ('Win32', 'Win9x')
     Linux          ('Unix',  'Linux')
     MacOS X        ('Unix',  'Darwin', 'MacOS', 'MacOS X')
