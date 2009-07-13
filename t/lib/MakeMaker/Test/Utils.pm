@@ -29,7 +29,6 @@ our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
         HARNESS_OPTIONS
         HARNESS_VERBOSE
         PREFIX
-        LIB
         MAKEFLAGS
     );
 
