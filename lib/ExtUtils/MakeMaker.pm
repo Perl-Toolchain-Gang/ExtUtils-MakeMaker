@@ -395,15 +395,7 @@ sub new {
 
     # PRINT_PREREQ is RedHatism.
     if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
-        my @prereq =
-            map { [$_, $self->{PREREQ_PM}{$_}] } keys %{$self->{PREREQ_PM}};
-        if ( $self->{MIN_PERL_VERSION} ) {
-            push @prereq, ['perl' => $self->{MIN_PERL_VERSION}];
-        }
-
-        print join(" ", map { "perl($_->[0])>=$_->[1] " }
-                        sort { $a->[0] cmp $b->[0] } @prereq), "\n";
-        exit 0;
+        $self->_PRINT_PREREQ;
    }
 
     print STDOUT "MakeMaker (v$VERSION)\n" if $Verbose;

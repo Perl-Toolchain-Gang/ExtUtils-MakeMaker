@@ -2260,6 +2260,37 @@ sub _PREREQ_PRINT {
     exit 0;
 }
 
+
+=begin private
+
+=head3 _PRINT_PREREQ
+
+  $mm->_PRINT_PREREQ;
+
+Implements PRINT_PREREQ, a slightly different version of PREREQ_PRINT
+added by Redhat to, I think, support generating RPMs from Perl modules.
+
+Refactored out of MakeMaker->new().
+
+=end private
+
+=cut
+
+sub _PRINT_PREREQ {
+    my $self = shift;
+
+    my @prereq =
+      map { [$_, $self->{PREREQ_PM}{$_}] } keys %{$self->{PREREQ_PM}};
+    if ( $self->{MIN_PERL_VERSION} ) {
+        push @prereq, ['perl' => $self->{MIN_PERL_VERSION}];
+    }
+
+    print join(" ", map { "perl($_->[0])>=$_->[1] " }
+                 sort { $a->[0] cmp $b->[0] } @prereq), "\n";
+    exit 0;
+}
+
+
 =head1 AUTHOR
 
 Michael G Schwern <schwern@pobox.com> and the denizens of
