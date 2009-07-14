@@ -605,26 +605,9 @@ END
 #
 #   MakeMaker ARGV: $argv
 #
-#   MakeMaker Parameters:
 END
 
-    # CPAN.pm takes prereqs from this field in 'Makefile'
-    # and does not know about BUILD_REQUIRES
-    if (exists $initial_att{'BUILD_REQUIRES'} and keys %{$initial_att{'BUILD_REQUIRES'}}) {
-        # Can modify %initial_att because it's life is short
-        $initial_att{'PREREQ_PM'} ||= {};
-        @{$initial_att{'PREREQ_PM'}} = (%{$initial_att{'PREREQ_PM'}}, %{$initial_att{'BUILD_REQUIRES'}});
-    }
-
-    foreach my $key (sort keys %initial_att){
-        next if $key eq 'ARGS';
-
-        my($v) = neatvalue($initial_att{$key});
-        $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
-        $v =~ tr/\n/ /s;
-        push @{$self->{RESULT}}, "#     $key => $v";
-    }
-    undef %initial_att;        # free memory
+    push @{$self->{RESULT}}, $self->_MakeMaker_Parameters_section(\%initial_att);
 
     if (defined $self->{CONFIGURE}) {
        push @{$self->{RESULT}}, <<END;
@@ -752,6 +735,34 @@ sub _installed_file_for_module {
     }
 
     return $path;
+}
+
+
+# Extracted from MakeMaker->new so we can test it
+sub _MakeMaker_Parameters_section {
+    my $self = shift;
+    my $att  = shift;
+
+    my @result = <<'END';
+    #   MakeMaker Parameters:
+END
+
+    # CPAN.pm takes prereqs from this field in 'Makefile'
+    # and does not know about BUILD_REQUIRES
+    if( $att->{PREREQ_PM} || $att->{BUILD_REQUIRES} ) {
+        %{$att->{'PREREQ_PM'}} = (%{$att->{'PREREQ_PM'}||{}}, %{$att->{'BUILD_REQUIRES'}||{}});
+    }
+
+    foreach my $key (sort keys %$att){
+        next if $key eq 'ARGS';
+
+        my($v) = neatvalue($att->{$key});
+        $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
+        $v =~ tr/\n/ /s;
+        push @result, "#     $key => $v";
+    }
+
+    return @result;
 }
 
 

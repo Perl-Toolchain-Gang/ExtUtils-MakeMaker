@@ -75,6 +75,7 @@ t/lib/TieIn.pm
 t/lib/TieOut.pm
 t/Liblist.t
 t/make.t
+t/MakeMaker_Parameters.t
 t/maketext_filter.t
 t/metafile_data.t
 t/metafile_file.t
