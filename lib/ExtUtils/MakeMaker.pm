@@ -445,6 +445,8 @@ END
 
     my(%unsatisfied) = ();
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
+        my $required_version = $self->{PREREQ_PM}{$prereq};
+
         my $installed_file = MM->_installed_file_for_module($prereq);
         my $pr_version = 0;
         $pr_version = MM->parse_version($installed_file) if $installed_file;
@@ -455,16 +457,17 @@ END
 
         if (!$installed_file) {
             warn sprintf "Warning: prerequisite %s %s not found.\n", 
-              $prereq, $self->{PREREQ_PM}{$prereq} 
+              $prereq, $required_version
                    unless $self->{PREREQ_FATAL};
+
             $unsatisfied{$prereq} = 'not installed';
-        } elsif ($pr_version < $self->{PREREQ_PM}->{$prereq} ){
+        }
+        elsif ($pr_version < $required_version ){
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
-              $prereq, $self->{PREREQ_PM}{$prereq}, 
-                ($pr_version || 'unknown version') 
+              $prereq, $required_version, ($pr_version || 'unknown version') 
                   unless $self->{PREREQ_FATAL};
-            $unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
-              $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
+
+            $unsatisfied{$prereq} = $required_version ? $required_version : 'unknown version' ;
         }
     }
     
