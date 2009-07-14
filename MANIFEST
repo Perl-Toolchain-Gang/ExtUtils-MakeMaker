@@ -50,12 +50,15 @@ t/cd.t
 t/config.t
 t/dir_target.t
 t/FIRST_MAKEFILE.t
+t/fix_libs.t
 t/fixin.t
 t/hints.t
 t/INST.t
 t/INST_PREFIX.t
 t/INSTALL_BASE.t
+t/installed_file.t
 t/is_of_type.t
+t/lib/MakeMaker/Test/NoXS.pm
 t/lib/MakeMaker/Test/Setup/BFD.pm
 t/lib/MakeMaker/Test/Setup/MPV.pm
 t/lib/MakeMaker/Test/Setup/PL_FILES.pm
@@ -64,6 +67,7 @@ t/lib/MakeMaker/Test/Setup/Recurs.pm
 t/lib/MakeMaker/Test/Setup/XS.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
+t/lib/Test/Builder/IO/Scalar.pm
 t/lib/Test/Builder/Module.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
@@ -75,6 +79,7 @@ t/maketext_filter.t
 t/metafile_data.t
 t/metafile_file.t
 t/min_perl_version.t
+t/miniperl.t
 t/Mkbootstrap.t
 t/MM_Any.t
 t/MM_BeOS.t
@@ -88,6 +93,7 @@ t/oneliner.t
 t/parse_version.t
 t/PL_FILES.t
 t/pm.t
+t/pm_to_blib.t
 t/pod2man.t
 t/postamble.t
 t/prefixify.t
@@ -98,6 +104,7 @@ t/prompt.t
 t/recurs.t
 t/revision.t
 t/split_command.t
+t/test_boilerplate.t
 t/testdata/reallylongdirectoryname/arch1/Config.pm
 t/testdata/reallylongdirectoryname/arch2/Config.pm
 t/testlib.t

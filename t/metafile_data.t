@@ -16,7 +16,7 @@ use Data::Dumper;
 require ExtUtils::MM_Any;
 
 my $new_mm = sub {
-    return bless {@_}, 'ExtUtils::MM_Any';
+    return bless { ARGS => {@_}, @_ }, 'ExtUtils::MM_Any';
 };
 
 {

@@ -49,6 +49,9 @@ my %prereq = ( );
 $prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 
 
+check_environment();
+
+
 my $MM = WriteMakefile(
     NAME            => $PACKAGE,
     VERSION_FROM    => "lib/$PACKAGE_FILE.pm", # finds $VERSION
@@ -61,7 +64,7 @@ my $MM = WriteMakefile(
                          'Pod::Man'         => 0,
 
                          'File::Basename'   => 0,
-                         DirHandle          => 0,
+                         DirHandle          => 0,       
                        },
     MIN_PERL_VERSION => '5.006',
 
@@ -87,7 +90,7 @@ my $MM = WriteMakefile(
 
     # We don't need ourself to install ourself.
     CONFIGURE_REQUIRES => {},
-    BUILD_REQUIRES => {},
+#    BUILD_REQUIRES => {},
 
     INSTALLDIRS     => 'perl',
 
@@ -112,6 +115,21 @@ Test::Harness from CPAN, then run the MakeMaker tests.
 
 SPACE_WARN
 
+}
+
+
+# Display warnings about the environment.
+sub check_environment {
+    if( $Is_VMS && $ENV{bin} ) {
+        print <<BIN_WARN;
+
+The logical name BIN may be present.  This may interfere with MakeMaker's
+tests and operations.  GNV is the prime suspect for setting this.
+
+BIN_WARN
+
+        sleep 2;
+    }
 }
 
 
@@ -191,5 +209,34 @@ SPACE_WARN
         $file =~ s{\.pm$}{};
         
         return join '::', grep { length } @dirs, $file;
+    }
+
+
+    # Test with multiple versions of perl
+    sub dist_test {
+        my $self = shift;
+
+        my $make = $self->SUPER::dist_test(@_);
+        return $make unless $ENV{AUTHOR_TESTING} and $ENV{AUTHOR_TESTING} eq 'MSCHWERN';
+
+        # Strip off all the whitespace at the end, we'll put our own in.
+        $make =~ s{\s+\z}{\n};
+
+        my @perls = qw(
+            perl5.8.9
+            perl5.8.8
+            perl5.6.2
+            perl5.6.1
+        );
+
+        for my $perl (@perls) {
+            $make .= sprintf <<'END', $perl;
+	cd $(DISTVNAME) && $(MAKE) clean && %s Makefile.PL && $(MAKE) test $(PASTHRU)
+END
+        }
+
+        $make .= "\n";
+
+        return $make;
     }
 }

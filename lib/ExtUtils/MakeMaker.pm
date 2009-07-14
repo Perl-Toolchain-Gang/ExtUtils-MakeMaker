@@ -18,7 +18,7 @@ our @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
 
-our $VERSION = '6.53_01';
+our $VERSION = '6.54';
 
 # Emulate something resembling CVS $Revision$
 (our $Revision = $VERSION) =~ s{_}{};
@@ -390,35 +390,28 @@ sub new {
         $self->{ARGS}{$k} = $self->{$k};
     }
 
+    $self = {} unless defined $self;
+
+    $self->{PREREQ_PM}      ||= {};
+    $self->{BUILD_REQUIRES} ||= {};
+
+    # Temporarily bless it into MM so it can be used as an
+    # object.  It will be blessed into a temp package later.
+    bless $self, "MM";
+
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
-        require Data::Dumper;
-        my @what = ('PREREQ_PM');
-        push @what, 'MIN_PERL_VERSION' if $self->{MIN_PERL_VERSION};
-        push @what, 'BUILD_REQUIRES' if $self->{BUILD_REQUIRES};
-        print Data::Dumper->Dump([@{$self}{@what}], \@what);
-        exit 0;
+        $self->_PREREQ_PRINT;
     }
 
     # PRINT_PREREQ is RedHatism.
     if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
-        my %prereqs=(%{$self->{PREREQ_PM}},%{$self->{BUILD_REQUIRES}||{}});
-        my @prereq =
-            map { [$_, $prereqs{$_}] } keys %prereqs;
-        if ( $self->{MIN_PERL_VERSION} ) {
-            push @prereq, ['perl' => $self->{MIN_PERL_VERSION}];
-        }
-
-        print join(" ", map { "perl($_->[0])>=$_->[1] " }
-                        sort { $a->[0] cmp $b->[0] } @prereq), "\n";
-        exit 0;
+        $self->_PRINT_PREREQ;
    }
 
     print STDOUT "MakeMaker (v$VERSION)\n" if $Verbose;
     if (-f "MANIFEST" && ! -f "Makefile"){
         check_manifest();
     }
-
-    $self = {} unless (defined $self);
 
     check_hints($self);
 
@@ -459,38 +452,34 @@ END
     my(%initial_att) = %$self; # record initial attributes
 
     my(%unsatisfied) = ();
-    foreach my $prereq_type ($self->{BUILD_REQUIRES}||{},$self->{PREREQ_PM}) {
-        foreach my $prereq (sort keys %{$prereq_type}) {
-            my $file = "$prereq.pm";
-            $file =~ s{::}{/}g;
-            my $path;
-            for my $dir (@INC) {
-                my $tmp = File::Spec->catfile($dir, $file);
-                if( -r $tmp ) {
-                    $path = $tmp;
-                    last;
-                }
-            }
-            my $pr_version = defined $path ? MM->parse_version($path) : 0;
-    
-            # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
-            $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
-    
-            if (!defined $path) {
-                warn sprintf "Warning: prerequisite %s %s not found.\n", 
-                  $prereq, $prereq_type->{$prereq} 
-                       unless $self->{PREREQ_FATAL};
-                $unsatisfied{$prereq} = 'not installed';
-            } elsif ($pr_version < $prereq_type->{$prereq} ){
-                warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
-                  $prereq, $prereq_type->{$prereq}, 
-                    ($pr_version || 'unknown version') 
-                      unless $self->{PREREQ_FATAL};
-                $unsatisfied{$prereq} = $prereq_type->{$prereq} ? 
-                  $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
-            }
+    my $prereqs = $self->_all_prereqs;
+    foreach my $prereq (sort keys %$prereqs) {
+        my $required_version = $prereqs->{$prereq};
+
+        my $installed_file = MM->_installed_file_for_module($prereq);
+        my $pr_version = 0;
+        $pr_version = MM->parse_version($installed_file) if $installed_file;
+        $pr_version = 0 if $pr_version eq 'undef';
+
+        # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
+        $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
+
+        if (!$installed_file) {
+            warn sprintf "Warning: prerequisite %s %s not found.\n", 
+              $prereq, $required_version
+                   unless $self->{PREREQ_FATAL};
+
+            $unsatisfied{$prereq} = 'not installed';
+        }
+        elsif ($pr_version < $required_version ){
+            warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
+              $prereq, $required_version, ($pr_version || 'unknown version') 
+                  unless $self->{PREREQ_FATAL};
+
+            $unsatisfied{$prereq} = $required_version ? $required_version : 'unknown version' ;
         }
     }
+
     if (%unsatisfied && $self->{PREREQ_FATAL}){
         my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"} 
                             sort { $a cmp $b } keys %unsatisfied;
@@ -619,12 +608,12 @@ END
 #   MakeMaker Parameters:
 END
 
-    if (exists $initial_att{'BUILD_REQUIRES'} and keys %{$initial_att{'BUILD_REQUIRES'}}>0) {
-      #can modify %initial_att because it's life is short
-      $initial_att{'PREREQ_PM'} ||= {};
-      %{$initial_att{'PREREQ_PM'}} = (%{$initial_att{'PREREQ_PM'}}, %{$initial_att{'BUILD_REQUIRES'}});
-      #CPAN.pm takes prereqs from this field in 'Makefile'
-      #and does not know about BUILD_REQUIRES
+    # CPAN.pm takes prereqs from this field in 'Makefile'
+    # and does not know about BUILD_REQUIRES
+    if (exists $initial_att{'BUILD_REQUIRES'} and keys %{$initial_att{'BUILD_REQUIRES'}}) {
+        # Can modify %initial_att because it's life is short
+        $initial_att{'PREREQ_PM'} ||= {};
+        @{$initial_att{'PREREQ_PM'}} = (%{$initial_att{'PREREQ_PM'}}, %{$initial_att{'BUILD_REQUIRES'}});
     }
 
     foreach my $key (sort keys %initial_att){
@@ -729,6 +718,42 @@ test :
 EOP
     close $mfh or die "close $new for write: $!";
 }
+
+
+=begin private
+
+=head3 _installed_file_for_module
+
+  my $file = MM->_installed_file_for_module($module);
+
+Return the first installed .pm $file associated with the $module.  The
+one which will show up when you C<use $module>.
+
+$module is something like "strict" or "Test::More".
+
+=end private
+
+=cut
+
+sub _installed_file_for_module {
+    my $class  = shift;
+    my $prereq = shift;
+
+    my $file = "$prereq.pm";
+    $file =~ s{::}{/}g;
+
+    my $path;
+    for my $dir (@INC) {
+        my $tmp = File::Spec->catfile($dir, $file);
+        if ( -r $tmp ) {
+            $path = $tmp;
+            last;
+        }
+    }
+
+    return $path;
+}
+
 
 sub check_manifest {
     print STDOUT "Checking if your kit is complete...\n";
@@ -1444,11 +1469,11 @@ located in the C<x86> directory relative to the PPD itself.
 
 =item BUILD_REQUIRES
 
-A hash of modules that are needed to build your module.  The keys are
-the module names ie. Test::More, and the minimum version is the
-value. If the required version number is 0 any version will do.
+A hash of modules that are needed to build your module but not run it.
 
 This will go into the C<build_requires> field of your F<META.yml>.
+
+The format is the same as PREREQ_PM.
 
 =item C
 

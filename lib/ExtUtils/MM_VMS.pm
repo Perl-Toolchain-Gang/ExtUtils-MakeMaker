@@ -15,7 +15,7 @@ BEGIN {
 
 use File::Basename;
 
-our $VERSION = '6.53_01';
+our $VERSION = '6.54';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -1562,19 +1562,6 @@ map_clean :
 ";
 
     join '', @m;
-}
-
-
-=item arch_check (override)
-
-vmsify all arguments for consistency
-
-=cut
-
-sub arch_check {
-    my $self = shift;
-
-    return $self->SUPER::arch_check(map { vmsify($_) } @_);
 }
 
 
