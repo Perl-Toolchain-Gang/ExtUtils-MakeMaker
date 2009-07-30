@@ -1774,7 +1774,7 @@ If set to 'none', no man pages will be installed.
 =item INSTALLVENDORSCRIPT
 
 Used by 'make install' which copies files from INST_SCRIPT to this
-directory if INSTALLDIRS is set to is set to vendor.
+directory if INSTALLDIRS is set to vendor.
 
 =item INST_ARCHLIB
 
