@@ -1,3 +1,9 @@
+6.55_02
+    Feature Changes
+    * PREFIX now applies to relative directories.  This is a change since
+      6.20 when they were ignored.  Its necessary for relocatable Perls.
+
+
 6.55_01  Tue Jul 14 15:53:30 PDT 2009
     Test Fixes
     * The tests got a bit overzealous and removed the LIB environment variable
