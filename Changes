@@ -3,6 +3,10 @@
     * PREFIX now applies to relative directories.  This is a change since
       6.20 when they were ignored.  Its necessary for relocatable Perls.
 
+    VMS
+    * Refactoring of "MakeMaker Parameters" section in 6.55_01 broke VMS.
+      (Craig Berry)
+
 
 6.55_01  Tue Jul 14 15:53:30 PDT 2009
     Test Fixes
