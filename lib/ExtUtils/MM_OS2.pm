@@ -83,7 +83,8 @@ $self->{BASEEXT}.def: Makefile.PL
 	# print "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp\n";
 	system "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp" 
 	    and die "Cannot make import library: $!, \$?=$?";
-	unlink <tmp_imp/*>;
+	# May be running under miniperl, so have no glob...
+	eval "unlink <tmp_imp/*>; 1" or system "rm tmp_imp/*";
 	system "cd tmp_imp; $Config::Config{ar} x ../tmpimp$Config::Config{lib_ext}" 
 	    and die "Cannot extract import objects: $!, \$?=$?";      
     }
