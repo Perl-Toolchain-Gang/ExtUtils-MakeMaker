@@ -2279,6 +2279,8 @@ sub _PREREQ_PRINT {
 Implements PRINT_PREREQ, a slightly different version of PREREQ_PRINT
 added by Redhat to, I think, support generating RPMs from Perl modules.
 
+Should not include BUILD_REQUIRES as RPMs do not incluide them.
+
 Refactored out of MakeMaker->new().
 
 =end private

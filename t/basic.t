@@ -95,6 +95,7 @@ like( $ppd_html,
                                                            '  <AUTHOR>'  );
 like( $ppd_html, qr{^\s*<IMPLEMENTATION>}m,          '  <IMPLEMENTATION>');
 like( $ppd_html, qr{^\s*<REQUIRE NAME="strict::" />}m,  '  <REQUIRE>' );
+unlike( $ppd_html, qr{^\s*<REQUIRE NAME="warnings::" />}m,  'no <REQUIRE> for build_require' );
 
 my $archname = $Config{archname};
 if( $] >= 5.008 ) {
@@ -264,7 +265,7 @@ distribution_type:  module
 configure_requires:
     ExtUtils::MakeMaker:  0
 build_requires:
-    ExtUtils::MakeMaker:  0
+    warnings:  0
 requires:
     strict:  0
 no_index:
