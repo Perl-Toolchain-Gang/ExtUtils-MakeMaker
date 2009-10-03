@@ -1,3 +1,7 @@
+    Bug Fixes
+    * BUILD_REQUIRES will not be used when generating ppd, PRINT_PREREQ and
+    'requires' section of META.yml (Alexandr Ciornii)
+
 6.55_02  Wed Aug  5 00:36:36 PDT 2009
     Feature Changes
     * PREFIX now applies to relative directories.  This is a change since
