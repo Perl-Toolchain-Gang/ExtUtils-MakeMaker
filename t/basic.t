@@ -17,7 +17,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 79;
+use Test::More tests => 80;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
