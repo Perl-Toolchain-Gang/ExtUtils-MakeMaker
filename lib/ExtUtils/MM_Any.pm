@@ -2290,7 +2290,7 @@ Refactored out of MakeMaker->new().
 sub _PRINT_PREREQ {
     my $self = shift;
 
-    my $prereqs= $self->_all_prereqs;
+    my $prereqs= $self->{PREREQ_PM};
     my @prereq = map { [$_, $prereqs->{$_}] } keys %$prereqs;
 
     if ( $self->{MIN_PERL_VERSION} ) {
