@@ -65,7 +65,8 @@ if( $] >= 5.011001 ) {
 
 plan tests => (2 * keys %versions) + 4;
 
-while( my($code, $expect) = each %versions ) {
+for my $code ( sort keys %versions ) {
+    my $expect = $versions{$code};
     (my $label = $code) =~ s/\n/\\n/g;
     is( parse_version_string($code), $expect, $label );
 }
