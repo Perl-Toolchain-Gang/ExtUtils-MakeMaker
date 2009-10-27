@@ -2633,9 +2633,7 @@ sub parse_version {
         next if /^\s*(if|unless)/;
         if ( m{^ \s* (package \s+ \w[\w\:\']* \s+ (v?[0-9._]+) \s* ;)  }x ) {
             local $^W = 0;
-            my ($code, $eval) = ($1,$2);
-            $result = eval($eval);
-            warn "Could not eval '$eval' from '$code' in $parsefile: $@" if $@;
+            $result = $2;
         }
         elsif ( m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* =}x ) {
             my $eval = qq{

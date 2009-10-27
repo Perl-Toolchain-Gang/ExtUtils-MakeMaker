@@ -51,13 +51,16 @@ if( $Has_Version ) {
 }
 
 if( $] >= 5.011001 ) {
-    $versions{'package Foo 1.23;'         } = 1.23;
-    $versions{'package Foo::Bar 1.23;'    } = 1.23;
-    $versions{'package Foo v1.2.3;'       } = v1.2.3;
-    $versions{'package Foo::Bar v1.2.3;'  } = v1.2.3;
-    $versions{' package Foo::Bar 1.23 ;'  } = 1.23;
-    $versions{"package Foo'Bar 1.23;"     } = 1.23;
-    $versions{"package Foo::Bar 1.2.3;"   } = v1.2.3;
+    $versions{'package Foo 1.23;'         } = '1.23';
+    $versions{'package Foo::Bar 1.23;'    } = '1.23';
+    $versions{'package Foo v1.2.3;'       } = 'v1.2.3';
+    $versions{'package Foo::Bar v1.2.3;'  } = 'v1.2.3';
+    $versions{' package Foo::Bar 1.23 ;'  } = '1.23';
+    $versions{"package Foo'Bar 1.23;"     } = '1.23';
+    $versions{"package Foo::Bar 1.2.3;"   } = '1.2.3';
+    $versions{'package Foo 1.230;'        } = '1.230';
+    $versions{'package Foo 1.23_01;'      } = '1.23_01';
+    $versions{'package Foo v1.23_01;'     } = 'v1.23_01';
 }
 
 plan tests => (2 * keys %versions) + 4;
