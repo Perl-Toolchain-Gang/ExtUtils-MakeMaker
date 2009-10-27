@@ -50,6 +50,13 @@ if( $Has_Version ) {
     $versions{q[$VERSION = qv("1.2.3")]}               = qv("1.2.3");
 }
 
+if( $] >= 5.011001 ) {
+    $versions{'package Foo 1.23;'        } = 1.23;
+    $versions{'package Foo::Bar 1.23;'   } = 1.23;
+    $versions{'package Foo v1.2.3;'      } = v1.2.3;
+    $versions{'package Foo::Bar v1.2.3;' } = v1.2.3;
+}
+
 plan tests => (2 * keys %versions) + 4;
 
 while( my($code, $expect) = each %versions ) {
