@@ -42,6 +42,7 @@ my %versions = (q[$VERSION = '1.00']            => '1.00',
 
                 '$VERSION = sprintf("%d.%03d", q$Revision: 3.74 $ =~ /(\d+)\.(\d+)/);' => '3.074',
                 '$VERSION = substr(q$Revision: 2.8 $, 10) + 2 . "";'                   => '4.8',
+
                );
 
 if( $Has_Version ) {
@@ -52,7 +53,8 @@ if( $Has_Version ) {
 plan tests => (2 * keys %versions) + 4;
 
 while( my($code, $expect) = each %versions ) {
-    is( parse_version_string($code), $expect, $code );
+    (my $label = $code) =~ s/\n/\\n/g;
+    is( parse_version_string($code), $expect, $label );
 }
 
 
@@ -66,9 +68,9 @@ sub parse_version_string {
     $_ = 'foo';
     my $version = MM->parse_version('VERSION.tmp');
     is( $_, 'foo', '$_ not leaked by parse_version' );
-    
+
     unlink "VERSION.tmp";
-    
+
     return $version;
 }
 
@@ -79,7 +81,7 @@ sub parse_version_string {
 SKIP: {
     skip "need version.pm", 4 unless $Has_Version;
     is parse_version_string(q[ $VERSION = '1.00'; sub version { $VERSION } ]),
-       '1.00';
+       '1.00', "eval 'sub version {...} in version string";
     is parse_version_string(q[ use version; $VERSION = version->new("1.2.3") ]),
-       qv("1.2.3");
+       qv("1.2.3"), "version.pm not confused by version sub";
 }
