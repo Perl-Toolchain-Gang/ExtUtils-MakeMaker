@@ -747,16 +747,17 @@ sub _MakeMaker_Parameters_section {
 #   MakeMaker Parameters:
 END
 
-    # CPAN.pm takes prereqs from this field in 'Makefile'
-    # and does not know about BUILD_REQUIRES
-    if( $att->{PREREQ_PM} || $att->{BUILD_REQUIRES} ) {
-        %{$att->{'PREREQ_PM'}} = (%{$att->{'PREREQ_PM'}||{}}, %{$att->{'BUILD_REQUIRES'}||{}});
-    }
-
     foreach my $key (sort keys %$att){
         next if $key eq 'ARGS';
+        my ($v) = neatvalue($att->{$key});
+        if ($key eq 'PREREQ_PM') {
+            # CPAN.pm takes prereqs from this field in 'Makefile'
+            # and does not know about BUILD_REQUIRES
+            $v = neatvalue({ %{ $att->{PREREQ_PM} || {} }, %{ $att->{BUILD_REQUIRES} || {} } });
+        } else {
+            $v = neatvalue($att->{$key});
+        }
 
-        my($v) = neatvalue($att->{$key});
         $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
         $v =~ tr/\n/ /s;
         push @result, "#     $key => $v";
@@ -1531,7 +1532,7 @@ to run your distribution.
 
 This will go into the C<configure_requires> field of your F<META.yml>.
 
-Defaults to C<{ "ExtUtils::MakeMaker" => 0 }>
+Defaults to C<{ "ExtUtils::MakeMaker" =E<gt> 0 }>
 
 The format is the same as PREREQ_PM.
 
