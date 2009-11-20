@@ -4,10 +4,6 @@
 
 BEGIN {
     chdir 't' if -d 't';
-
-    if( $ENV{PERL_CORE} ) {
-        @INC = '../lib';
-    }
 }
 
 use strict;

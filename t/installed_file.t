@@ -4,14 +4,11 @@
 
 BEGIN {
     chdir 't' if -d 't';
-
-    if( $ENV{PERL_CORE} ) {
-        @INC = '../lib';
-    }
 }
 
 use strict;
 use warnings;
+use less;
 
 use lib './lib';
 use ExtUtils::MakeMaker;
@@ -37,8 +34,8 @@ sub path_is {
 
 # Try a single name module
 {
-    my $want = $INC{'strict.pm'};
-    path_is( MM->_installed_file_for_module("strict"), $want,  "single name module" );
+    my $want = $INC{'less.pm'};
+    path_is( MM->_installed_file_for_module("less"), $want,  "single name module" );
 }
 
 # And a tuple

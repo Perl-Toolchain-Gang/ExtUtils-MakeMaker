@@ -1,14 +1,8 @@
 #!/usr/bin/perl -Tw
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    else {
-        # ./lib is there so t/lib can be seen even after we chdir.
-        unshift @INC, 't/lib', './lib';
-    }
+    # ./lib is there so t/lib can be seen even after we chdir.
+    unshift @INC, 't/lib', './lib';
 }
 chdir 't';
 

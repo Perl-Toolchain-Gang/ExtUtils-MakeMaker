@@ -7,11 +7,6 @@
 BEGIN {
     # Always run in t to unify behavor with core
     chdir 't' if -d 't';
-
-    # Only use the about to be installed modules
-    if( $ENV{PERL_CORE} ) {
-        @INC = '../lib';
-    }
 }
 
 # Use things from t/lib/
