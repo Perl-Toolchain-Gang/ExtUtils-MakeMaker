@@ -1,14 +1,6 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = ('../lib', 'lib/');
-    }
-    else {
-        unshift @INC, 't/lib/';
-    }
-}
+use lib 't/lib';
 chdir 't';
 
 use Test::More tests => 1;
