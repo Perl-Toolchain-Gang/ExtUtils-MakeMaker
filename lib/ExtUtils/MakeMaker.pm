@@ -1532,7 +1532,7 @@ to run your distribution.
 
 This will go into the C<configure_requires> field of your F<META.yml>.
 
-Defaults to C<{ "ExtUtils::MakeMaker" =E<gt> 0 }>
+Defaults to C<<< { "ExtUtils::MakeMaker" => 0 } >>>
 
 The format is the same as PREREQ_PM.
 
