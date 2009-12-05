@@ -55,6 +55,21 @@ if( $] >= 5.011001 ) {
     $versions{'package Foo 1.230;'        } = '1.230';
     $versions{'package Foo 1.23_01;'      } = '1.23_01';
     $versions{'package Foo v1.23_01;'     } = 'v1.23_01';
+    $versions{q["package Foo 1.23"]}        = 'undef';
+    $versions{<<'END'}                      = '1.23';
+package Foo 1.23;
+our $VERSION = 2.34;
+END
+
+    $versions{<<'END'}                      = '2.34';
+our $VERSION = 2.34;
+package Foo 1.23;
+END
+
+    $versions{<<'END'}                      = '2.34';
+package Foo::100;
+our $VERSION = 2.34;
+END
 }
 
 plan tests => (2 * keys %versions) + 4;
