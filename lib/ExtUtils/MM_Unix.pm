@@ -2611,6 +2611,10 @@ It will return the string "undef" if it can't figure out what $VERSION
 is. $VERSION should be for all to see, so C<our $VERSION> or plain $VERSION
 are okay, but C<my $VERSION> is not.
 
+C<<package Foo VERSION>> is also checked for.  The first version
+declaration found is used, but this may change as it differs from how
+Perl does it.
+
 parse_version() will try to C<use version> before checking for
 C<$VERSION> so the following will work.
 

@@ -2343,19 +2343,16 @@ Instead of specifying the VERSION in the Makefile.PL you can let
 MakeMaker parse a file to determine the version number. The parsing
 routine requires that the file named by VERSION_FROM contains one
 single line to compute the version number. The first line in the file
-that contains the regular expression
+that contains something like a $VERSION assignment or C<package Name
+VERSION> will be used. The following lines will be parsed o.k.:
 
-    /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/
-
-will be evaluated with eval() and the value of the named variable
-B<after> the eval() will be assigned to the VERSION attribute of the
-MakeMaker object. The following lines will be parsed o.k.:
-
-    $VERSION   = '1.00';
-    *VERSION   = \'1.01';
-    ($VERSION) = q$Revision$ =~ /(\d+)/g;
-    $FOO::VERSION = '1.10';
-    *FOO::VERSION = \'1.11';
+    # Good
+    package Foo::Bar 1.23;                      # 1.23
+    $VERSION   = '1.00';                        # 1.00
+    *VERSION   = \'1.01';                       # 1.01
+    ($VERSION) = q$Revision$ =~ /(\d+)/g;       # The digits in $Revision$
+    $FOO::VERSION = '1.10';                     # 1.10
+    *FOO::VERSION = \'1.11';                    # 1.11
 
 but these will fail:
 
