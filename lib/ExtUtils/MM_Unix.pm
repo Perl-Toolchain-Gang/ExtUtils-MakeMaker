@@ -2631,9 +2631,9 @@ sub parse_version {
         next if $inpod || /^\s*#/;
         chop;
         next if /^\s*(if|unless)/;
-        if ( m{^ \s* (package \s+ \w[\w\:\']* \s+ (v?[0-9._]+) \s* ;)  }x ) {
+        if ( m{^ \s* package \s+ \w[\w\:\']* \s+ (v?[0-9._]+) \s* ;  }x ) {
             local $^W = 0;
-            $result = $2;
+            $result = $1;
         }
         elsif ( m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* =}x ) {
             my $eval = qq{
