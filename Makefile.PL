@@ -224,9 +224,6 @@ BIN_WARN
 
         my @perls = qw(
             perl5.8.9
-            perl5.8.8
-            perl5.6.2
-            perl5.6.1
         );
 
         for my $perl (@perls) {
