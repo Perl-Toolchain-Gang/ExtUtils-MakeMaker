@@ -90,7 +90,9 @@ my $MM = WriteMakefile(
 
     # We don't need ourself to install ourself.
     CONFIGURE_REQUIRES => {},
-    BUILD_REQUIRES => {},
+    BUILD_REQUIRES => {
+        'Data::Dumper' => 0,
+    },
 
     INSTALLDIRS     => 'perl',
 
