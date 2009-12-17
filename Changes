@@ -1,3 +1,7 @@
+6.56  Thu Dec 17 14:02:14 PST 2009
+    * Stable release of 6.55_03
+
+
 6.55_03  Fri Dec  4 23:08:02 PDT 2009 
     Bug Fixes
     * BUILD_REQUIRES will not be used when generating ppd, PRINT_PREREQ and
