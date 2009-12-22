@@ -998,10 +998,12 @@ sub flush {
         or die "Unable to open MakeMaker.tmp: $!";
 
     for my $chunk (@{$self->{RESULT}}) {
-        print $fh "$chunk\n";
+        print $fh "$chunk\n"
+            or die "Can't write to MakeMaker.tmp: $!";
     }
 
-    close $fh;
+    close $fh
+        or die "Can't write to MakeMaker.tmp: $!";
     _rename("MakeMaker.tmp", $finalname) or
       warn "rename MakeMaker.tmp => $finalname: $!";
     chmod 0644, $finalname unless $Is_VMS;
