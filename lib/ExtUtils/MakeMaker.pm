@@ -2798,6 +2798,8 @@ generated Makefile along with your report.
 
 For more up-to-date information, see L<http://www.makemaker.org>.
 
+Repository available at L<http://github.com/schwern/extutils-makemaker>.
+
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or 
