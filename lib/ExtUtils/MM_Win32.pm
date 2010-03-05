@@ -289,17 +289,6 @@ sub dynamic_lib {
     my($ldfrom) = '$(LDFROM)';
     my(@m);
 
-# one thing for GCC/Mingw32:
-# we try to overcome non-relocateable-DLL problems by generating
-#    a (hopefully unique) image-base from the dll's name
-# -- BKS, 10-19-1999
-    if ($GCC) { 
-	my $dllname = $self->{BASEEXT} . "." . $self->{DLEXT};
-	$dllname =~ /(....)(.{0,4})/;
-	my $baseaddr = unpack("n", $1 ^ $2);
-	$otherldflags .= sprintf("-Wl,--image-base,0x%x0000 ", $baseaddr);
-    }
-
     push(@m,'
 # This section creates the dynamically loadable $(INST_DYNAMIC)
 # from $(OBJECT) and possibly $(MYEXTLIB).
