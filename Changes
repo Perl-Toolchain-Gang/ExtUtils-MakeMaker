@@ -4,6 +4,10 @@
     * Remove manual image-base generation on Win32/gcc [rt.cpan.org 47138]
       (Yasuhiro Matsumoto)
 
+    Test Fixes
+    * Guard against old versions of YAML::Tiny that worked differently.
+      [rt.cpan.org 55500]
+
 
 6.56  Thu Dec 17 14:02:14 PST 2009
     * Stable release of 6.55_03
