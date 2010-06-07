@@ -1,0 +1,69 @@
+This is the ExtUtils::MakeMaker Perl module which adds functionality
+to Perl.  It is a newer version of a module which comes with Perl by
+default.
+
+
+REQUIREMENTS
+
+    * Perl 5.6.0 or newer
+    * make
+      * Windows can use nmake or dmake
+        * Some Perls, such as Strawberry Perl, come with dmake
+        * dmake can be found at http://search.cpan.org/dist/dmake/
+      * Unix (Linux, OS X, Cygwin, etc...) can use GNU make or BSD make
+      * VMS can use MMS or MMK
+
+
+TO INSTALL
+
+For all users on most Unix systems:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+For all users on most Windows systems:
+
+    perl Makefile.PL
+    dmake
+    dmake test
+    dmake install
+
+For just you:
+
+    perl Makefile.PL INSTALL_BASE=~
+    make
+    make test
+    make install
+
+Run "perldoc ExtUtils::MakeMaker" while in this source directory for
+more instructions.
+
+
+SPECIAL NOTE TO PACKAGERS
+
+ExtUtils::MakeMaker is designed to have no dependencies which don't
+ship with Perl (except make).  In reality, it does, so it ships with
+copies of these modules.  They only install if newer versions of those
+modules aren't already installed.
+
+That these dependencies are undeclared in order to avoid confusing the
+normal CPAN source installation process.  A naive packaging of
+MakeMaker will incorrectly include these other modules in the
+ExtUtils-MakeMaker package.
+
+ExtUtils-Install, ExtUtils-Manifest and ExtUtils-Command should be
+shipped as *separate packages* from ExtUtils-MakeMaker.  They have
+their own releases and schedules.
+
+Packagers should:
+
+1. Delete the inc/ directory which contains those dependencies before
+   packaging ExtUtils-MakeMaker.  This will prevent them from becoming
+   part of the MakeMaker package.
+
+2. Insert runtime dependencies upon ExtUtils-Install,
+   ExtUtils-Manifest and ExtUtils-Command.  Check
+   inc/ExtUtils/Install.pm, inc/ExtUtils/Manifest.pm and
+   inc/ExtUtils/Command.pm for their current versions.
