@@ -9,9 +9,12 @@ REQUIREMENTS
     * make
       * Windows can use nmake or dmake
         * Some Perls, such as Strawberry Perl, come with dmake
-        * dmake can be found at http://search.cpan.org/dist/dmake/
-      * Unix (Linux, OS X, Cygwin, etc...) can use GNU make or BSD make
+        * dmake http://search.cpan.org/dist/dmake/
+        * nmake ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+      * Unix (Linux, OS X, Cygwin, etc...) can use GNU make, BSD make...
+        most any Unix make.
       * VMS can use MMS or MMK
+        * MMK http://www.madgoat.com/mmk.html
 
 
 TO INSTALL
@@ -39,6 +42,9 @@ For just you:
 
 Run "perldoc ExtUtils::MakeMaker" while in this source directory for
 more instructions.
+
+We recommend against installing into a path with a space or other
+special character in the name (such as C:\Program Files on Windows).
 
 
 SPECIAL NOTE TO PACKAGERS
