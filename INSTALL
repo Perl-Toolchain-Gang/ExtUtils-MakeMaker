@@ -2,6 +2,9 @@ This is the ExtUtils::MakeMaker Perl module which adds functionality
 to Perl.  It is a newer version of a module which comes with Perl by
 default.
 
+Please report any bugs via http://rt.cpan.org.
+Send questions and discussion to makemaker@perl.org
+
 
 REQUIREMENTS
 
