@@ -159,17 +159,20 @@ BIN_WARN
             next unless $inc =~ /\.pm$/;
 
             my $installed = _find_installed($inc);
-            next unless defined $installed;
 
             # Shut up "isn't numeric" warning on X.Y_Z versions.
             local $^W = 0;
-            my $installed_version = $self->parse_version($installed);
+            my $installed_version = $installed ? $self->parse_version($installed) : undef;
             my $inc_version       = $self->parse_version($inc);
-            if( $installed_version >= $inc_version ) {
+            my $module = _module_name($inc)
+;
+            if( !$installed ) {
+                print qq{Using included version of $module ($inc_version) because it is not already installed.\n};
+            }
+            elsif( $installed_version >= $inc_version ) {
                 delete $self->{PM}{$inc};
             }
             else {
-                my $module = _module_name($inc);
                 print qq{Using included version of $module ($inc_version) as it is newer than the installed version ($installed_version).\n};
             }
         }
