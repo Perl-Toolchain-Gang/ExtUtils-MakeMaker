@@ -52,6 +52,8 @@ sub WriteMakefile {
     require ExtUtils::MY;
     my %att = @_;
 
+    _convert_compat_attrs(\%att);
+    
     _verify_att(\%att);
 
     my $mm = MM->new(\%att);
@@ -66,6 +68,7 @@ sub WriteMakefile {
 # scalar.
 my %Att_Sigs;
 my %Special_Sigs = (
+ AUTHOR             => 'ARRAY',
  C                  => 'ARRAY',
  CONFIG             => 'ARRAY',
  CONFIGURE          => 'CODE',
@@ -111,6 +114,13 @@ my %Special_Sigs = (
 @Att_Sigs{keys %Recognized_Att_Keys} = ('') x keys %Recognized_Att_Keys;
 @Att_Sigs{keys %Special_Sigs} = values %Special_Sigs;
 
+sub _convert_compat_attrs {
+    my($att) = @_;
+    if ($att->{AUTHOR} and !ref($att->{AUTHOR})) {
+        my $t = $att->{AUTHOR};
+        $att->{AUTHOR} = [$t];
+    }
+}
 
 sub _verify_att {
     my($att) = @_;

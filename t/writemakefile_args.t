@@ -61,7 +61,7 @@ VERIFY
     };
 
     is( $warnings, <<VERIFY );
-WARNING: AUTHOR takes a string/number not a CODE reference.
+WARNING: AUTHOR takes a ARRAY reference not a CODE reference.
          Please inform the author.
 VERIFY
 

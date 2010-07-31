@@ -880,7 +880,7 @@ sub metafile_data {
     );
 
     # The author key is required and it takes a list.
-    $meta{author}   = defined $self->{AUTHOR}    ? [$self->{AUTHOR}] : [];
+    $meta{author}   = defined $self->{AUTHOR}    ? $self->{AUTHOR} : [];
 
     $meta{requires} = $self->{PREREQ_PM} if defined $self->{PREREQ_PM};
     $meta{requires}{perl} = $self->{MIN_PERL_VERSION} if $self->{MIN_PERL_VERSION};
