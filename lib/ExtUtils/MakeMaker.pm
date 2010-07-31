@@ -2228,18 +2228,17 @@ will C<die> instead of simply informing the user of the missing dependencies.
 
 It is I<extremely> rare to have to use C<PREREQ_FATAL>. Its use by module
 authors is I<strongly discouraged> and should never be used lightly.
+
 Module installation tools have ways of resolving umet dependencies but
 to do that they need a F<Makefile>.  Using C<PREREQ_FATAL> breaks this.
 That's bad.
 
-The only situation where it is appropriate is when you have
-dependencies that are indispensible to actually I<write> a
-F<Makefile>. For example, MakeMaker's F<Makefile.PL> needs L<File::Spec>.
-If its not available it cannot write the F<Makefile>.
+Assuming you have good test coverage, your tests should fail with
+missing dependencies informing the user more strongly that something
+is wrong.  You can write a F<t/00compile.t> test which will simply
+check that your code compiles and stop "make test" prematurely if it
+doesn't.  See L<Test::More/BAIL_OUT> for more details.
 
-Note: see L<Test::Harness> for a shortcut for stopping tests early
-if you are missing dependencies and are afraid that users might
-use your module with an incomplete environment.
 
 =item PREREQ_PM
 
