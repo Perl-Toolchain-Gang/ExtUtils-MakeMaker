@@ -1,4 +1,7 @@
 6.57_01
+    New Features
+    * Accept several values (arrayref) in AUTHOR (Alexandr Ciornii)
+
     Improvements
     * parse_abstract() is more robust supporting "Package.pm" and multiple
       dashes and spaces. [rt.perl.org 74438]

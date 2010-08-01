@@ -1477,8 +1477,8 @@ the first line in the "=head1 NAME" section. $2 becomes the abstract.
 
 =item AUTHOR
 
-String containing name (and email address) of package author(s). Is used
-in META.yml and PPD (Perl Package Description) files for PPM (Perl
+Array of strings containing name (and email address) of package author(s).
+Is used in META.yml and PPD (Perl Package Description) files for PPM (Perl
 Package Manager).
 
 =item BINARY_LOCATION
