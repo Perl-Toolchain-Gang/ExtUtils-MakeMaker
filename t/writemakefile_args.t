@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 35;
+use Test::More tests => 39;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -212,4 +212,31 @@ VERIFY
     };
     is( $warnings, '' );
     is( $mm->{DISTVNAME}, 'Hooballoo' );
+
+
+    # AUTHOR / scalar
+    $warnings = '';
+    eval {
+        $mm = WriteMakefile(
+            NAME       => 'Big::Dummy',
+            VERSION    => '1.00',
+            AUTHOR     => "test",
+        );
+    };
+    is( $warnings, '' );
+    is_deeply( $mm->{AUTHOR},  ["test"] );
+    
+
+    # AUTHOR / array
+    $warnings = '';
+    eval {
+        $mm = WriteMakefile(
+            NAME       => 'Big::Dummy',
+            VERSION    => '1.00',
+            AUTHOR     => ["test1", "test2"],
+        );
+    };
+    is( $warnings, '' );
+    is_deeply( $mm->{AUTHOR},  ["test1","test2"] );
+    
 }
