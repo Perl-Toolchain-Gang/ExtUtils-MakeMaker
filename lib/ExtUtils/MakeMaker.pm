@@ -1943,7 +1943,7 @@ may hold a name for that binary. Defaults to perl
 A hashrefs of items to add to the F<META.yml>.
 
 They differ in how they behave if they have the same key as the
-default metadata.  META_ADD will override the default value with it's
+default metadata.  META_ADD will override the default value with its
 own.  META_MERGE will merge its value with the default.
 
 Unless you want to override the defaults, prefer META_MERGE so as to
