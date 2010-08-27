@@ -687,7 +687,7 @@ sub WriteEmptyMakefile {
 
     my %att = @_;
     my $self = MM->new(\%att);
-    
+
     my $new = $self->{MAKEFILE};
     my $old = $self->{MAKEFILE_OLD};
     if (-f $old) {
@@ -1018,8 +1018,19 @@ sub flush {
       warn "rename MakeMaker.tmp => $finalname: $!";
     chmod 0644, $finalname unless $Is_VMS;
 
-    my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
+    # Write MYMETA.yml to communicate metadata up to the CPAN clients
+    print STDOUT "Writing MYMETA.yml\n";
+    my @metadata   = $self->metafile_data(
+        $self->{META_ADD}   || {},
+        $self->{META_MERGE} || {},
+    );
+    my $mymeta = $self->metafile_file(@metadata);
+    open(my $myfh,">", "MYMETA.yml")
+        or die "Unable to open MYMETA.yml: $!";
+    print $myfh $mymeta;
+    close $myfh;
 
+    my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
         foreach (keys %$self) { # safe memory
             delete $self->{$_} unless $keep{$_};
@@ -1028,7 +1039,6 @@ sub flush {
 
     system("$Config::Config{eunicefix} $finalname") unless $Config::Config{eunicefix} eq ":";
 }
-
 
 # This is a rename for OS's where the target must be unlinked first.
 sub _rename {

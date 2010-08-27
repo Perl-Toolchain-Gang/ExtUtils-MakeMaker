@@ -22,6 +22,7 @@
 # Avoid Makemaker generated and utility files.
 \bMANIFEST\.bak
 \bMakefile$
+\bMYMETA.yml$
 \bblib/
 \bMakeMaker-\d
 \bpm_to_blib\.ts$
