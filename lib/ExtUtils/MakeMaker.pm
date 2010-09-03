@@ -267,8 +267,8 @@ sub full_setup {
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
     LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET
     META_ADD META_MERGE MIN_PERL_VERSION BUILD_REQUIRES CONFIGURE_REQUIRES
-    MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
-    PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
+    MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NO_MYMETA NORECURS NO_VC OBJECT
+    OPTIMIZE PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
     PERL_SRC PERM_DIR PERM_RW PERM_RWX
     PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE PPM_INSTALL_EXEC
     PPM_INSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
@@ -1024,12 +1024,13 @@ sub flush {
         $self->{META_ADD}   || {},
         $self->{META_MERGE} || {},
     );
-    my $mymeta = $self->metafile_file(@metadata);
-    open(my $myfh,">", "MYMETA.yml")
-        or die "Unable to open MYMETA.yml: $!";
-    print $myfh $mymeta;
-    close $myfh;
-
+    unless ($self->{NO_MYMETA}) {
+        my $mymeta = $self->metafile_file(@metadata);
+        open(my $myfh,">", "MYMETA.yml")
+            or die "Unable to open MYMETA.yml: $!";
+        print $myfh $mymeta;
+        close $myfh;
+    }
     my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
         foreach (keys %$self) { # safe memory
@@ -2010,6 +2011,13 @@ Boolean.  Attribute to inhibit descending into subdirectories.
 
 When true, suppresses the generation and addition to the MANIFEST of
 the META.yml module meta-data file during 'make distdir'.
+
+Defaults to false.
+
+=item NO_MYMETA
+
+When true, suppresses the generation of MYMETA.yml module meta-data file
+during 'perl Makefile.PL'.
 
 Defaults to false.
 

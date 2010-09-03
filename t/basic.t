@@ -11,7 +11,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 84;
+use Test::More tests => 92;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -286,12 +286,25 @@ is( $manifest->{'meta.yml'}, 'Module meta-data (added by MakeMaker)' );
 
 # Test NO_META META.yml suppression
 unlink $meta_yml;
+unlink 'MYMETA.yml';
 ok( !-f $meta_yml,   'META.yml deleted' );
+ok( !-f 'MYMETA.yml','MYMETA.yml deleted' );
 @mpl_out = run(qq{$perl Makefile.PL "NO_META=1"});
+ok( -f 'MYMETA.yml', 'MYMETA.yml generation not suppressed by NO_META' );
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
+ok( !-f $meta_yml,   'META.yml generation suppressed by NO_META' );
 my $distdir_out = run("$make distdir");
 is( $?, 0, 'distdir' ) || diag($distdir_out);
 ok( !-f $meta_yml,   'META.yml generation suppressed by NO_META' );
+unlink 'MYMETA.yml';
+
+ok( !-f 'MYMETA.yml','MYMETA.yml deleted' );
+@mpl_out = run(qq{$perl Makefile.PL "NO_MYMETA=1"});
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
+my $distdir_out = run("$make distdir");
+is( $?, 0, 'distdir' ) || diag($distdir_out);
+ok( !-f 'MYMETA.yml','MYMETA.yml generation suppressed by NO_MYMETA' );
+ok( -f $meta_yml,    'META.yml generation not suppressed by NO_MYMETA' );
 
 
 # Make sure init_dirscan doesn't go into the distdir
