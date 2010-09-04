@@ -1027,7 +1027,7 @@ sub flush {
         $self->{META_MERGE} || {},
     );
     unless ($self->{NO_MYMETA}) {
-        my $mymeta = $self->metafile_file(@metadata);
+        my $mymeta = $self->metafile_file(@metadata,'dynamic_config'=>0);
         open(my $myfh,">", "MYMETA.yml")
             or die "Unable to open MYMETA.yml: $!";
         print $myfh $mymeta;

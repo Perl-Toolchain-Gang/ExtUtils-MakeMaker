@@ -11,7 +11,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 92;
+use Test::More tests => 95;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -235,8 +235,8 @@ ok( !-f 'META.yml',  'META.yml not written to source dir' );
 ok( -f $meta_yml,    'META.yml written to dist dir' );
 ok( !-e "META_new.yml", 'temp META.yml file not left around' );
 
-ok( -f 'MYMETA.yml',  'META.yml is written to source dir' );
-ok( -f $mymeta_yml,    'META.yml is written to dist dir on disttest' );
+ok( -f 'MYMETA.yml',  'MYMETA.yml is written to source dir' );
+ok( -f $mymeta_yml,    'MYMETA.yml is written to dist dir on disttest' );
 
 SKIP: {
     # META.yml spec 1.4 was added in 0.11
@@ -277,6 +277,36 @@ meta-spec:
     version:  1.4
 END
 
+ok open META, $mymeta_yml or diag $!;
+my $mymeta_content = join '', <META>;
+ok close META;
+
+is $mymeta_content, <<"END";
+--- #YAML:1.0
+name:               Big-Dummy
+version:            0.01
+abstract:           Try "our" hot dog's
+author:
+    - Michael G Schwern <schwern\@pobox.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    warnings:  0
+requires:
+    strict:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+dynamic_config:     0
+END
+
 my $manifest = maniread("$distdir/MANIFEST");
 # VMS is non-case preserving, so we can't know what the MANIFEST will
 # look like. :(
@@ -301,7 +331,7 @@ unlink 'MYMETA.yml';
 ok( !-f 'MYMETA.yml','MYMETA.yml deleted' );
 @mpl_out = run(qq{$perl Makefile.PL "NO_MYMETA=1"});
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
-my $distdir_out = run("$make distdir");
+$distdir_out = run("$make distdir");
 is( $?, 0, 'distdir' ) || diag($distdir_out);
 ok( !-f 'MYMETA.yml','MYMETA.yml generation suppressed by NO_MYMETA' );
 ok( -f $meta_yml,    'META.yml generation not suppressed by NO_MYMETA' );
