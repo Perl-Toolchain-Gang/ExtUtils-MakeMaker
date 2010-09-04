@@ -1026,13 +1026,13 @@ sub flush {
       warn "rename MakeMaker.tmp => $finalname: $!";
     chmod 0644, $finalname unless $Is_VMS;
 
-    # Write MYMETA.yml to communicate metadata up to the CPAN clients
-    print STDOUT "Writing MYMETA.yml\n";
-    my @metadata   = $self->metafile_data(
-        $self->{META_ADD}   || {},
-        $self->{META_MERGE} || {},
-    );
     unless ($self->{NO_MYMETA}) {
+        # Write MYMETA.yml to communicate metadata up to the CPAN clients
+        print STDOUT "Writing MYMETA.yml\n";
+        my @metadata   = $self->metafile_data(
+            $self->{META_ADD}   || {},
+            $self->{META_MERGE} || {},
+        );
         my $mymeta = $self->metafile_file(@metadata,'dynamic_config'=>0);
         open(my $myfh,">", "MYMETA.yml")
             or die "Unable to open MYMETA.yml: $!";
