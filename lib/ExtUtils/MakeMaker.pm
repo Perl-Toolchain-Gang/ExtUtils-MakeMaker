@@ -116,9 +116,15 @@ my %Special_Sigs = (
 
 sub _convert_compat_attrs {
     my($att) = @_;
-    if ($att->{AUTHOR} and !ref($att->{AUTHOR})) {
-        my $t = $att->{AUTHOR};
-        $att->{AUTHOR} = [$t];
+    if (exists $att->{AUTHOR}) {
+        if ($att->{AUTHOR}) {
+            if (!ref($att->{AUTHOR})) {
+                my $t = $att->{AUTHOR};
+                $att->{AUTHOR} = [$t];
+            }
+        } else {
+                $att->{AUTHOR} = [];
+        }
     }
 }
 
