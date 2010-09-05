@@ -11,7 +11,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 95;
+use Test::More tests => 98;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -277,35 +277,47 @@ meta-spec:
     version:  1.4
 END
 
-ok open META, $mymeta_yml or diag $!;
-my $mymeta_content = join '', <META>;
-ok close META;
-
-is $mymeta_content, <<"END";
+my $mymeta_expected_content=<<"END";
 --- #YAML:1.0
-name:               Big-Dummy
-version:            0.01
 abstract:           Try "our" hot dog's
 author:
     - Michael G Schwern <schwern\@pobox.com>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
 build_requires:
     warnings:  0
-requires:
-    strict:  0
+configure_requires:
+    ExtUtils::MakeMaker:  0
+distribution_type:  module
+dynamic_config:     0
+generated_by:       ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
+license:            unknown
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+name:               Big-Dummy
 no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
-meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-dynamic_config:     0
+requires:
+    strict:  0
+version:            0.01
 END
+
+{
+ok open META, $mymeta_yml or diag $!;
+my $mymeta_content = join '', <META>;
+ok close META;
+
+is($mymeta_content,$mymeta_expected_content,"MYMETA.yml (using Parse::CPAN::Meta) content is correct");
+}
+
+{
+ok open META, 'MYMETA.yml' or diag $!;
+my $mymeta_content = join '', <META>;
+ok close META;
+
+is($mymeta_content,$mymeta_expected_content,"MYMETA.yml (generated from scratch)content is correct");
+}
 
 my $manifest = maniread("$distdir/MANIFEST");
 # VMS is non-case preserving, so we can't know what the MANIFEST will
