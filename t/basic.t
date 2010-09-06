@@ -278,29 +278,29 @@ meta-spec:
 END
 
 my $mymeta_expected_content=<<"END";
---- #YAML:1.0
-abstract:           Try "our" hot dog's
+---
+abstract: "Try \\"our\\" hot dog's"
 author:
-    - Michael G Schwern <schwern\@pobox.com>
+  - 'Michael G Schwern <schwern\@pobox.com>'
 build_requires:
-    warnings:  0
+  warnings: 0
 configure_requires:
-    ExtUtils::MakeMaker:  0
-distribution_type:  module
-dynamic_config:     0
-generated_by:       ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION
-license:            unknown
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-name:               Big-Dummy
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Big-Dummy
 no_index:
-    directory:
-        - t
-        - inc
+  directory:
+    - t
+    - inc
 requires:
-    strict:  0
-version:            0.01
+  strict: 0
+version: 0.01
 END
 
 {

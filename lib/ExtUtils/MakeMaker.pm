@@ -1031,20 +1031,22 @@ sub flush {
         print STDOUT "Writing MYMETA.yml\n";
 
         my $meta;
-	if ( -e 'META.yml' and eval { require Parse::CPAN::Meta; 1; } ) {
-	    my @yaml = Parse::CPAN::Meta::LoadFile('META.yml');
-	    $meta = $yaml[0];
+        require ExtUtils::MakeMaker::YAML;
+        if ( -e 'META.yml') {
 
-	    # Overwrite the non-configure dependency hashs
-	    delete $meta->{requires};
-	    delete $meta->{build_requires};
-	    delete $meta->{recommends};
-	    if ( exists $self->{PREREQ_PM} ) {
-	        $meta->{requires} = $self->{PREREQ_PM} || {};
-	    }
-	    if ( exists $self->{BUILD_REQUIRES} ) {
-	        $meta->{build_requires} = $self->{BUILD_REQUIRES} || {};
-	    }
+            my @yaml = ExtUtils::MakeMaker::YAML::LoadFile('META.yml');
+            $meta = $yaml[0];
+
+            # Overwrite the non-configure dependency hashs
+            delete $meta->{requires};
+            delete $meta->{build_requires};
+            delete $meta->{recommends};
+            if ( exists $self->{PREREQ_PM} ) {
+                $meta->{requires} = $self->{PREREQ_PM} || {};
+            }
+            if ( exists $self->{BUILD_REQUIRES} ) {
+                $meta->{build_requires} = $self->{BUILD_REQUIRES} || {};
+            }
 	} else {
             my @metadata   = $self->metafile_data(
                 $self->{META_ADD}   || {},
@@ -1053,12 +1055,8 @@ sub flush {
             $meta={@metadata};
         }
         $meta->{dynamic_config}=0;
-        my %dump_options = (
-            use_header => 1, 
-            delta      => ' ' x 4, 
-            #key_sort   => 1,
-        );
-        my $mymeta_content=ExtUtils::MM_Any::_dump_hash(\%dump_options, %$meta);
+        my $mymeta_content=ExtUtils::MakeMaker::YAML::Dump($meta);
+        #my $mymeta_content=ExtUtils::MM_Any::_dump_hash(\%dump_options, %$meta);
         open(my $myfh,">", "MYMETA.yml")
             or die "Unable to open MYMETA.yml: $!";
         print $myfh $mymeta_content;
