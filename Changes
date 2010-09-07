@@ -1,3 +1,5 @@
+6.57_02  Wed Sep 08 02:40:00 EEST 2010
+    Bug Fixes
     * Don't do MANIFEST checks in PERL_CORE (Robin Barker)
     
     New Features
