@@ -425,7 +425,7 @@ sub new {
    }
 
     print STDOUT "MakeMaker (v$VERSION)\n" if $Verbose;
-    if (-f "MANIFEST" && ! -f "Makefile"){
+    if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}){
         check_manifest();
     }
 

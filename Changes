@@ -1,3 +1,5 @@
+    * Don't do MANIFEST checks in PERL_CORE (Robin Barker)
+    
     New Features
     * Accept several values (arrayref) in AUTHOR (Alexandr Ciornii)
     * Add MYMETA.yml support (Adam Kennedy, Alexandr Ciornii)
