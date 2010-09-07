@@ -1005,6 +1005,38 @@ sub skipcheck {
     return '';
 }
 
+sub _mymeta_from_meta {
+    my $self = shift;
+
+    my $meta;
+    eval {
+        my @yaml = ExtUtils::MakeMaker::YAML::LoadFile('META.yml');
+        $meta = $yaml[0];
+    };
+    return undef unless $meta;
+    
+    #copied from CPAN.pm
+    if ($meta->{generated_by} &&
+        $meta->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
+        my $eummv = do { local $^W = 0; $1+0; };
+        if ($eummv < 6.2501) {
+            return undef;
+        }
+    }
+
+    # Overwrite the non-configure dependency hashs
+    delete $meta->{requires};
+    delete $meta->{build_requires};
+    delete $meta->{recommends};
+    if ( exists $self->{PREREQ_PM} ) {
+        $meta->{requires} = $self->{PREREQ_PM} || {};
+    }
+    if ( exists $self->{BUILD_REQUIRES} ) {
+        $meta->{build_requires} = $self->{BUILD_REQUIRES} || {};
+    }
+    return $meta;
+}
+
 sub flush {
     my $self = shift;
 
@@ -1032,22 +1064,10 @@ sub flush {
 
         my $meta;
         require ExtUtils::MakeMaker::YAML;
-        if ( -e 'META.yml') {
-
-            my @yaml = ExtUtils::MakeMaker::YAML::LoadFile('META.yml');
-            $meta = $yaml[0];
-
-            # Overwrite the non-configure dependency hashs
-            delete $meta->{requires};
-            delete $meta->{build_requires};
-            delete $meta->{recommends};
-            if ( exists $self->{PREREQ_PM} ) {
-                $meta->{requires} = $self->{PREREQ_PM} || {};
-            }
-            if ( exists $self->{BUILD_REQUIRES} ) {
-                $meta->{build_requires} = $self->{BUILD_REQUIRES} || {};
-            }
-	} else {
+        if ( -e 'META.yml' ) {
+            $meta = $self->_mymeta_from_meta();
+        }
+        unless ( $meta ) {
             my @metadata   = $self->metafile_data(
                 $self->{META_ADD}   || {},
                 $self->{META_MERGE} || {},
@@ -1056,7 +1076,6 @@ sub flush {
         }
         $meta->{dynamic_config}=0;
         my $mymeta_content=ExtUtils::MakeMaker::YAML::Dump($meta);
-        #my $mymeta_content=ExtUtils::MM_Any::_dump_hash(\%dump_options, %$meta);
         open(my $myfh,">", "MYMETA.yml")
             or die "Unable to open MYMETA.yml: $!";
         print $myfh $mymeta_content;
