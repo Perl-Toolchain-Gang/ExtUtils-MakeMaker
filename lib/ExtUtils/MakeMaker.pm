@@ -1062,24 +1062,7 @@ sub flush {
         # Write MYMETA.yml to communicate metadata up to the CPAN clients
         print STDOUT "Writing MYMETA.yml\n";
 
-        my $meta;
-        require ExtUtils::MakeMaker::YAML;
-        if ( -e 'META.yml' ) {
-            $meta = $self->_mymeta_from_meta();
-        }
-        unless ( $meta ) {
-            my @metadata   = $self->metafile_data(
-                $self->{META_ADD}   || {},
-                $self->{META_MERGE} || {},
-            );
-            $meta={@metadata};
-        }
-        $meta->{dynamic_config}=0;
-        my $mymeta_content=ExtUtils::MakeMaker::YAML::Dump($meta);
-        open(my $myfh,">", "MYMETA.yml")
-            or die "Unable to open MYMETA.yml: $!";
-        print $myfh $mymeta_content;
-        close $myfh;
+        $self->write_mymeta( $self->mymeta );
     }
     my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {

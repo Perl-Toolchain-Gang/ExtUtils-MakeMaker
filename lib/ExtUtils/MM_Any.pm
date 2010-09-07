@@ -1085,6 +1085,63 @@ MAKE
 }
 
 
+=head3 mymeta
+
+    my $mymeta = $mm->mymeta;
+
+Generate MYMETA information as a hash.
+
+=cut
+
+sub mymeta {
+    my $self = shift;
+
+    my $mymeta;
+
+    if ( -e 'META.yml' ) {
+        $mymeta = $self->_mymeta_from_meta();
+    }
+
+    unless ( $mymeta ) {
+        my @metadata = $self->metafile_data(
+            $self->{META_ADD}   || {},
+            $self->{META_MERGE} || {},
+        );
+        $mymeta = {@metadata};
+    }
+
+    $mymeta->{dynamic_config} = 0;
+
+    return $mymeta;
+}
+
+
+=head3 write_mymeta
+
+    $self->write_mymeta( $mymeta );
+
+Write MYMETA information to MYMETA.yml.
+
+This will probably be refactored into a more generic YAML dumping method.
+
+=cut
+
+sub write_mymeta {
+    my $self = shift;
+    my $mymeta = shift;
+
+    require ExtUtils::MakeMaker::YAML;
+    my $mymeta_content = ExtUtils::MakeMaker::YAML::Dump($mymeta);
+
+    open(my $myfh, ">", "MYMETA.yml")
+      or die "Unable to open MYMETA.yml: $!";
+    print $myfh $mymeta_content;
+    close $myfh;
+
+    return;
+}
+
+
 =head3 realclean (o)
 
 Defines the realclean target.
