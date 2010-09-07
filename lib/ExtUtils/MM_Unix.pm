@@ -2884,7 +2884,7 @@ sub ppd {
     $abstract =~ s/</&lt;/g;
     $abstract =~ s/>/&gt;/g;
 
-    my $author = $self->{AUTHOR} || '';
+    my $author = join(', ',@{$self->{AUTHOR} || []});
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 

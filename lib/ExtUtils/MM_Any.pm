@@ -487,7 +487,7 @@ clean :: clean_subdirs
     }
 
     push(@files, qw[$(MAKE_APERL_FILE) 
-                    perlmain.c tmon.out mon.out so_locations 
+                    MYMETA.yml perlmain.c tmon.out mon.out so_locations 
                     blibdirs.ts pm_to_blib pm_to_blib.ts
                     *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
                     $(BOOTSTRAP) $(BASEEXT).bso
@@ -880,7 +880,7 @@ sub metafile_data {
     );
 
     # The author key is required and it takes a list.
-    $meta{author}   = defined $self->{AUTHOR}    ? [$self->{AUTHOR}] : [];
+    $meta{author}   = defined $self->{AUTHOR}    ? $self->{AUTHOR} : [];
 
     $meta{requires} = $self->{PREREQ_PM} if defined $self->{PREREQ_PM};
     $meta{requires}{perl} = $self->{MIN_PERL_VERSION} if $self->{MIN_PERL_VERSION};
