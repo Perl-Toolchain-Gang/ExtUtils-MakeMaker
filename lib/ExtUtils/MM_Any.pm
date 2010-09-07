@@ -1089,7 +1089,8 @@ MAKE
 
     my $mymeta = $mm->mymeta;
 
-Generate MYMETA information as a hash.
+Generate MYMETA information as a hash either from an existing META.yml
+or from internal data.
 
 =cut
 
@@ -1113,6 +1114,41 @@ sub mymeta {
     $mymeta->{dynamic_config} = 0;
 
     return $mymeta;
+}
+
+
+sub _mymeta_from_meta {
+    my $self = shift;
+
+    my $meta;
+    eval {
+        my @yaml = ExtUtils::MakeMaker::YAML::LoadFile('META.yml');
+        $meta = $yaml[0];
+    };
+    return undef unless $meta;
+    
+    # META.yml before 6.25_01 cannot be trusted.  META.yml lived in the source directory.
+    # There was a good chance the author accidentally uploaded a stale META.yml if they
+    # rolled their own tarball rather than using "make dist".
+    if ($meta->{generated_by} &&
+        $meta->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
+        my $eummv = do { local $^W = 0; $1+0; };
+        if ($eummv < 6.2501) {
+            return undef;
+        }
+    }
+
+    # Overwrite the non-configure dependency hashs
+    delete $meta->{requires};
+    delete $meta->{build_requires};
+    delete $meta->{recommends};
+    if ( exists $self->{PREREQ_PM} ) {
+        $meta->{requires} = $self->{PREREQ_PM} || {};
+    }
+    if ( exists $self->{BUILD_REQUIRES} ) {
+        $meta->{build_requires} = $self->{BUILD_REQUIRES} || {};
+    }
+    return $meta;
 }
 
 

@@ -1005,38 +1005,6 @@ sub skipcheck {
     return '';
 }
 
-sub _mymeta_from_meta {
-    my $self = shift;
-
-    my $meta;
-    eval {
-        my @yaml = ExtUtils::MakeMaker::YAML::LoadFile('META.yml');
-        $meta = $yaml[0];
-    };
-    return undef unless $meta;
-    
-    #copied from CPAN.pm
-    if ($meta->{generated_by} &&
-        $meta->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
-        my $eummv = do { local $^W = 0; $1+0; };
-        if ($eummv < 6.2501) {
-            return undef;
-        }
-    }
-
-    # Overwrite the non-configure dependency hashs
-    delete $meta->{requires};
-    delete $meta->{build_requires};
-    delete $meta->{recommends};
-    if ( exists $self->{PREREQ_PM} ) {
-        $meta->{requires} = $self->{PREREQ_PM} || {};
-    }
-    if ( exists $self->{BUILD_REQUIRES} ) {
-        $meta->{build_requires} = $self->{BUILD_REQUIRES} || {};
-    }
-    return $meta;
-}
-
 sub flush {
     my $self = shift;
 
