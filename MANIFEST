@@ -12,10 +12,10 @@ lib/ExtUtils/Command/MM.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
 lib/ExtUtils/MakeMaker.pm
-lib/ExtUtils/MakeMaker/YAML.pm
 lib/ExtUtils/MakeMaker/Config.pm
 lib/ExtUtils/MakeMaker/FAQ.pod
 lib/ExtUtils/MakeMaker/Tutorial.pod
+lib/ExtUtils/MakeMaker/YAML.pm
 lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/MM.pm
@@ -66,6 +66,7 @@ t/lib/MakeMaker/Test/Setup/MPV.pm
 t/lib/MakeMaker/Test/Setup/PL_FILES.pm
 t/lib/MakeMaker/Test/Setup/Problem.pm
 t/lib/MakeMaker/Test/Setup/Recurs.pm
+t/lib/MakeMaker/Test/Setup/SAS.pm
 t/lib/MakeMaker/Test/Setup/XS.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
@@ -107,6 +108,7 @@ t/problems.t
 t/prompt.t
 t/recurs.t
 t/revision.t
+t/several_authors.t
 t/split_command.t
 t/test_boilerplate.t
 t/testdata/reallylongdirectoryname/arch1/Config.pm
