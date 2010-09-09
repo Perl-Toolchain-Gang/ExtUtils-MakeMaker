@@ -34,7 +34,7 @@ END {
     ok( teardown_recurs(), 'teardown' );
 }
 
-ok( chdir 'multiple-authors', 'entering dir multiple-authors' ) ||
+ok( chdir $MakeMaker::Test::Setup::SAS::dirname, "entering dir $MakeMaker::Test::Setup::SAS::dirname" ) ||
     diag("chdir failed: $!");
 
 {
