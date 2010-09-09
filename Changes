@@ -1,5 +1,7 @@
+6.57_04  Thu Sep 09 23:59:00 EEST 2010
     Bug Fixes
     * Fix several_authors.t
+    * Upgrade bundled modules: ExtUtils::Manifest 1.58.
 
 6.57_03  Thu Sep 09 01:31:00 EEST 2010
     Bug Fixes
