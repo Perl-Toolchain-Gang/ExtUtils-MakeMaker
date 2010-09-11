@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 18;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -54,6 +54,30 @@ ok( chdir $MakeMaker::Test::Setup::SAS::dirname, "entering dir $MakeMaker::Test:
         );
     };
     is( $warnings, '', 'arrayref in AUTHOR does not trigger a warning' );
+    is( $@, '',        '  nor a hard failure' );
+
+}
+
+
+{
+    # ----- argument verification -----
+
+    my $stdout = tie *STDOUT, 'TieOut';
+    ok( $stdout, 'capturing stdout' );
+    my $warnings = '';
+    local $SIG{__WARN__} = sub {
+        $warnings .= join '', @_;
+    };
+
+    eval {
+        WriteMakefile(
+            NAME             => 'Multiple::Authors',
+            CONFIGURE => sub { 
+               return {AUTHOR => 'John Doe <jd@example.com>',};
+            },
+        );
+    };
+    is( $warnings, '', 'scalar in AUTHOR inside CONFIGURE does not trigger a warning' );
     is( $@, '',        '  nor a hard failure' );
 
 }

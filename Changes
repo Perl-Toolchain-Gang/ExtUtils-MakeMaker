@@ -1,3 +1,5 @@
+    * AUTHOR compatibility code should also be called after CONFIGURE callback
+
 6.57_04  Thu Sep 09 23:59:00 EEST 2010
     Bug Fixes
     * Fix several_authors.t
