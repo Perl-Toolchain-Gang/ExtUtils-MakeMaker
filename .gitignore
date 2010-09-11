@@ -8,3 +8,4 @@ Build
 _build
 cover_db/
 MYMETA.yml
+ExtUtils-MakeMaker-*
