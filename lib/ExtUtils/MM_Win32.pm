@@ -195,6 +195,8 @@ sub init_platform {
     my($self) = shift;
 
     $self->{MM_Win32_VERSION} = $VERSION;
+
+    return;
 }
 
 sub platform_constants {
@@ -208,6 +210,36 @@ sub platform_constants {
     }
 
     return $make_frag;
+}
+
+
+=item constants
+
+Add MAXLINELENGTH for dmake before all the constants are output.
+
+=cut
+
+sub constants {
+    my $self = shift;
+
+    my $make_text = $self->SUPER::constants;
+    return $make_text unless $self->is_make_type('dmake');
+
+    # dmake won't read any single "line" (even those with escaped newlines)
+    # larger than a certain size which can be as small as 8k.  PM_TO_BLIB
+    # on large modules like DateTime::TimeZone can create lines over 32k.
+    # So we'll crank it up to a <ironic>WHOPPING</ironic> 64k.
+    #
+    # This has to come here before all the constants and not in
+    # platform_constants which is after constants.
+    my $size = $self->{MAXLINELENGTH} || 64 ** 1024;
+    my $prefix = qq{
+# Get dmake to read long commands like PM_TO_BLIB
+MAXLINELENGTH = $size
+
+};
+
+    return $prefix . $make_text;
 }
 
 
