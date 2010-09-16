@@ -83,7 +83,7 @@ my $MM = WriteMakefile(
             license     =>      'http://dev.perl.org/licenses/',
             homepage    =>      'http://makemaker.org',
             bugtracker  =>      'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
-            repository  =>      'http://github.com/schwern/extutils-makemaker',
+            repository  =>      'http://github.com/Perl-Toolchain-Gang/Extutils-MakeMaker',
             MailingList =>      'makemaker@perl.org',
         },
     },
@@ -100,6 +100,12 @@ my $MM = WriteMakefile(
 
     ABSTRACT_FROM   => "lib/$PACKAGE_FILE.pm",
     AUTHOR          => 'Michael G Schwern <schwern@pobox.com>',
+    $^O =~/win/i ? (
+        dist => {
+            TAR      => 'ptar',
+            TARFLAGS => '-c -C -f',
+        },
+    ) : (),
 );
 
 if( !$Is_VMS && $MM->{PERL} =~ /\S\s+\S/ ) {
