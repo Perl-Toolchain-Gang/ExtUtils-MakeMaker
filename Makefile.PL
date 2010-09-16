@@ -83,7 +83,7 @@ my $MM = WriteMakefile(
             license     =>      'http://dev.perl.org/licenses/',
             homepage    =>      'http://makemaker.org',
             bugtracker  =>      'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
-            repository  =>      'http://github.com/Perl-Toolchain-Gang/Extutils-MakeMaker',
+            repository  =>      'http://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker',
             MailingList =>      'makemaker@perl.org',
         },
     },
