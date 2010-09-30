@@ -31,9 +31,17 @@ our $VERSION = '6.57_05';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my $BORLAND = $Config{'cc'} =~ /^bcc/i ? 1 : 0;
-my $GCC     = $Config{'cc'} =~ /\bgcc\b/i ? 1 : 0;
-my $DLLTOOL = $Config{'dlltool'} || 'dlltool';
+my ( $BORLAND, $GCC, $DLLTOOL ) = _identify_compiler_environment( \%Config );
+
+sub _identify_compiler_environment {
+	my ( $config ) = @_;
+
+	my $BORLAND = $config->{cc} =~ /^bcc/i ? 1 : 0;
+	my $GCC     = $config->{cc} =~ /\bgcc\b/i ? 1 : 0;
+	my $DLLTOOL = $config->{dlltool} || 'dlltool';
+
+	return ( $BORLAND, $GCC, $DLLTOOL );
+}
 
 
 =head2 Overridden methods
