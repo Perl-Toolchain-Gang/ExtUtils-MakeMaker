@@ -32,7 +32,7 @@ our $VERSION = '6.57_05';
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
 my $BORLAND = $Config{'cc'} =~ /^bcc/i ? 1 : 0;
-my $GCC     = $Config{'cc'} =~ /\bgcc$/i ? 1 : 0;
+my $GCC     = $Config{'cc'} =~ /\bgcc\b/i ? 1 : 0;
 my $DLLTOOL = $Config{'dlltool'} || 'dlltool';
 
 
