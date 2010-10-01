@@ -2,6 +2,7 @@
     Win32
     * Work around dmake's limitations on how long a "line" can be.
       [rt.cpan.org 61286]
+    * ActivePerl 1007 can now see gcc. [rt.cpan.org 55752] (Christian Walde)
 
 6.57_05  Sat Sep 11 23:24:00 EEST 2010
     Bug Fixes
