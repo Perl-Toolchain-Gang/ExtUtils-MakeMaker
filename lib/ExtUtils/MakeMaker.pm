@@ -114,7 +114,7 @@ my %Special_Sigs = (
 @Att_Sigs{keys %Recognized_Att_Keys} = ('') x keys %Recognized_Att_Keys;
 @Att_Sigs{keys %Special_Sigs} = values %Special_Sigs;
 
-sub _convert_compat_attrs {
+sub _convert_compat_attrs { #result of running several times should be same
     my($att) = @_;
     if (exists $att->{AUTHOR}) {
         if ($att->{AUTHOR}) {
@@ -400,6 +400,8 @@ END
 sub new {
     my($class,$self) = @_;
     my($key);
+
+    _convert_compat_attrs($self) if defined $self && $self;
 
     # Store the original args passed to WriteMakefile()
     foreach my $k (keys %$self) {
