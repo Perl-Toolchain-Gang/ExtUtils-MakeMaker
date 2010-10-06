@@ -1,8 +1,10 @@
-6.57_06
+6.57_06  Wed Oct 06 13:49:00 EEST 2010
     Win32
     * Work around dmake's limitations on how long a "line" can be.
       [rt.cpan.org 61286]
     * ActivePerl 1007 can now see gcc. [rt.cpan.org 55752] (Christian Walde)
+
+    Improvements
     * Fix for AUTHOR and undocumented usage of MM->new() (Alexandr Ciornii)
 
 6.57_05  Sat Sep 11 23:24:00 EEST 2010
