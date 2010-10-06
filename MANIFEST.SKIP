@@ -64,3 +64,4 @@ merge_bleadperl$
 ^old_versions
 
 admin
+.gitignore
