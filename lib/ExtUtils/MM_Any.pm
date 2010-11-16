@@ -1122,6 +1122,7 @@ sub _mymeta_from_meta {
 
     my $meta;
     eval {
+        require ExtUtils::MakeMaker::YAML;
         my @yaml = ExtUtils::MakeMaker::YAML::LoadFile('META.yml');
         $meta = $yaml[0];
     };

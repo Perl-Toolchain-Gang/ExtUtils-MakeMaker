@@ -1,3 +1,5 @@
+    * MYMETA.yml generation from META.yml actually works (Matt S Trout)
+
 6.57_06  Wed Oct 06 13:49:00 EEST 2010
     Win32
     * Work around dmake's limitations on how long a "line" can be.
