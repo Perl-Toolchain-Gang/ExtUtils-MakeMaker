@@ -19,6 +19,7 @@ my @Prepend_parent;
 my %Recognized_Att_Keys;
 
 our $VERSION = '6.57_06';
+$VERSION = eval $VERSION;
 
 # Emulate something resembling CVS $Revision$
 (our $Revision = $VERSION) =~ s{_}{};
