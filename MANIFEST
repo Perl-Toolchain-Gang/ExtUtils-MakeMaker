@@ -118,3 +118,4 @@ t/WriteEmptyMakefile.t
 t/writemakefile_args.t
 t/xs.t
 TODO
+META.yml                                 Module meta-data (added by MakeMaker)
