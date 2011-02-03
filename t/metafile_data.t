@@ -22,12 +22,13 @@ my $new_mm = sub {
         },
     );
 
-    is_deeply [$mm->metafile_data], [
+    is_deeply {$mm->metafile_data}, {
         name            => 'Foo-Bar',
         version         => 1.23,
-        abstract        => undef,
+        abstract        => 'unknown',
         author          => [],
         license         => 'unknown',
+        dynamic_config  => 1,
         distribution_type       => 'module',
 
         configure_requires      => {
@@ -46,15 +47,16 @@ my $new_mm = sub {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
         },
-    ];
+    };
 
 
-    is_deeply [$mm->metafile_data({}, { no_index => { directory => [qw(foo)] } })], [
+    is_deeply {$mm->metafile_data({}, { no_index => { directory => [qw(foo)] } })}, {
         name            => 'Foo-Bar',
         version         => 1.23,
-        abstract        => undef,
+        abstract        => 'unknown',
         author          => [],
         license         => 'unknown',
+        dynamic_config  => 1,
         distribution_type       => 'module',
 
         configure_requires      => {
@@ -73,7 +75,7 @@ my $new_mm = sub {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
         },
-    ], 'rt.cpan.org 39348';
+    }, 'rt.cpan.org 39348';
 }
 
 
@@ -88,7 +90,7 @@ my $new_mm = sub {
         },
     );
 
-    is_deeply [$mm->metafile_data(
+    is_deeply {$mm->metafile_data(
         {
             configure_requires => {
                 Stuff   => 2.34
@@ -101,13 +103,14 @@ my $new_mm = sub {
             },
             wibble      => 23
         },
-    )],
-    [
+    )},
+    {
         name            => 'Foo-Bar',
         version         => 1.23,
-        abstract        => undef,
+        abstract        => 'unknown',
         author          => ['Some Guy'],
         license         => 'unknown',
+        dynamic_config  => 1,
         distribution_type       => 'script',
 
         configure_requires      => {
@@ -135,7 +138,7 @@ my $new_mm = sub {
 
         wibble  => 23,
         wobble  => 42,
-    ];
+    };
 }
 
 
@@ -150,12 +153,13 @@ my $new_mm = sub {
         MIN_PERL_VERSION => 5.006,
     );
 
-    is_deeply [$mm->metafile_data], [
+    is_deeply {$mm->metafile_data}, {
         name            => 'Foo-Bar',
         version         => 1.23,
-        abstract        => undef,
+        abstract        => 'unknown',
         author          => [],
         license         => 'unknown',
+        dynamic_config  => 1,
         distribution_type       => 'module',
 
         configure_requires      => {
@@ -178,7 +182,7 @@ my $new_mm = sub {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
         },
-    ];
+    };
 }
 
 
@@ -196,12 +200,13 @@ my $new_mm = sub {
         },
     );
 
-    is_deeply [$mm->metafile_data], [
+    is_deeply {$mm->metafile_data}, {
         name            => 'Foo-Bar',
         version         => 1.23,
-        abstract        => undef,
+        abstract        => 'unknown',
         author          => [],
         license         => 'unknown',
+        dynamic_config  => 1,
         distribution_type       => 'module',
 
         configure_requires      => {
@@ -225,7 +230,7 @@ my $new_mm = sub {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
         },
-    ];
+    };
 }
 
 # Test CONFIGURE_REQUIRES
@@ -241,12 +246,13 @@ my $new_mm = sub {
         },
     );
 
-    is_deeply [$mm->metafile_data], [
+    is_deeply {$mm->metafile_data}, {
         name            => 'Foo-Bar',
         version         => 1.23,
-        abstract        => undef,
+        abstract        => 'unknown',
         author          => [],
         license         => 'unknown',
+        dynamic_config  => 1,
         distribution_type       => 'module',
 
         configure_requires      => {
@@ -265,7 +271,7 @@ my $new_mm = sub {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
         },
-    ],'CONFIGURE_REQUIRES';
+    },'CONFIGURE_REQUIRES';
 }
 
 # Test BUILD_REQUIRES
@@ -281,12 +287,13 @@ my $new_mm = sub {
         },
     );
 
-    is_deeply [$mm->metafile_data], [
+    is_deeply {$mm->metafile_data}, {
         name            => 'Foo-Bar',
         version         => 1.23,
-        abstract        => undef,
+        abstract        => 'unknown',
         author          => [],
         license         => 'unknown',
+        dynamic_config  => 1,
         distribution_type       => 'module',
 
         configure_requires      => {
@@ -305,5 +312,5 @@ my $new_mm = sub {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
         },
-    ],'CONFIGURE_REQUIRES';
+    },'CONFIGURE_REQUIRES';
 }

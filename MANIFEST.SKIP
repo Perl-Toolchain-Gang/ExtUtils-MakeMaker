@@ -23,6 +23,7 @@
 \bMANIFEST\.bak
 \bMakefile$
 \bMYMETA.yml$
+\bMYMETA.json$
 \bblib/
 \bMakeMaker-\d
 \bpm_to_blib\.ts$

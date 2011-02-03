@@ -1032,9 +1032,10 @@ sub flush {
 
     unless ($self->{NO_MYMETA}) {
         # Write MYMETA.yml to communicate metadata up to the CPAN clients
-        print STDOUT "Writing MYMETA.yml\n";
+        if ( $self->write_mymeta( $self->mymeta ) ) {;
+            print STDOUT "Writing MYMETA.yml and MYMETA.json\n";
+        }
 
-        $self->write_mymeta( $self->mymeta );
     }
     my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
