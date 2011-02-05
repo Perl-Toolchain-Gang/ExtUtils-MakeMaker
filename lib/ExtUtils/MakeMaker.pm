@@ -1495,8 +1495,8 @@ the first line in the "=head1 NAME" section. $2 becomes the abstract.
 =item AUTHOR
 
 Array of strings containing name (and email address) of package author(s).
-Is used in META.yml and PPD (Perl Package Description) files for PPM (Perl
-Package Manager).
+Is used in CPAN Meta files (META.yml or META.json) and PPD
+(Perl Package Description) files for PPM (Perl Package Manager).
 
 =item BINARY_LOCATION
 
@@ -1513,7 +1513,8 @@ located in the C<x86> directory relative to the PPD itself.
 
 A hash of modules that are needed to build your module but not run it.
 
-This will go into the C<build_requires> field of your F<META.yml>.
+This will go into the C<build_requires> field of your CPAN Meta file.
+(F<META.yml> or F<META.json>).
 
 The format is the same as PREREQ_PM.
 
@@ -1560,7 +1561,8 @@ be determined by some evaluation method.
 A hash of modules that are required to run Makefile.PL itself, but not
 to run your distribution.
 
-This will go into the C<configure_requires> field of your F<META.yml>.
+This will go into the C<configure_requires> field of your CPAN Meta file
+(F<META.yml> or F<META.json>)
 
 Defaults to C<<< { "ExtUtils::MakeMaker" => 0 } >>>
 
@@ -1967,7 +1969,8 @@ may hold a name for that binary. Defaults to perl
 
 =item META_MERGE
 
-A hashrefs of items to add to the F<META.yml>.
+A hashrefs of items to add to the CPAN Meta file (F<META.yml> or
+F<META.json>).
 
 They differ in how they behave if they have the same key as the
 default metadata.  META_ADD will override the default value with its
@@ -2016,14 +2019,14 @@ Boolean.  Attribute to inhibit descending into subdirectories.
 =item NO_META
 
 When true, suppresses the generation and addition to the MANIFEST of
-the META.yml module meta-data file during 'make distdir'.
+the META.yml and META.json module meta-data files during 'make distdir'.
 
 Defaults to false.
 
 =item NO_MYMETA
 
-When true, suppresses the generation of MYMETA.yml module meta-data file
-during 'perl Makefile.PL'.
+When true, suppresses the generation of MYMETA.yml and MYMETA.json module
+meta-data files during 'perl Makefile.PL'.
 
 Defaults to false.
 
@@ -2280,7 +2283,8 @@ A hash of modules that are needed to run your module.  The keys are
 the module names ie. Test::More, and the minimum version is the
 value. If the required version number is 0 any version will do.
 
-This will go into the C<requires> field of your F<META.yml>.
+This will go into the C<requires> field of your CPAN Meta file
+(F<META.yml> or F<META.json>).
 
     PREREQ_PM => {
         # Require Test::More at least 0.47
@@ -2645,8 +2649,8 @@ Copies all the files that are in the MANIFEST file to a newly created
 directory with the name C<$(DISTNAME)-$(VERSION)>. If that directory
 exists, it will be removed first.
 
-Additionally, it will create a META.yml module meta-data file in the
-distdir and add this to the distdir's MANIFEST.  You can shut this
+Additionally, it will create META.yml and META.json module meta-data file
+in the distdir and add this to the distdir's MANIFEST.  You can shut this
 behavior off with the NO_META flag.
 
 =item   make disttest
@@ -2720,26 +2724,37 @@ An example:
     );
 
 
-=head2 Module Meta-Data
+=head2 Module Meta-Data (META and MYMETA)
 
 Long plaguing users of MakeMaker based modules has been the problem of
 getting basic information about the module out of the sources
 I<without> running the F<Makefile.PL> and doing a bunch of messy
-heuristics on the resulting F<Makefile>.  To this end a simple module
-meta-data file has been introduced, F<META.yml>.
+heuristics on the resulting F<Makefile>.  Over the years, it has become
+standard to keep this information in one or more CPAN Meta files
+distributed with each distribution.
 
-F<META.yml> is a YAML document (see http://www.yaml.org) containing
-basic information about the module (name, version, prerequisites...)
-in an easy to read format.  The format is developed and defined by the
-Module::Build developers (see 
-http://module-build.sourceforge.net/META-spec.html)
+The original format of CPAN Meta files was L<YAML> and the corresponding
+file was called F<META.yml>.  In 2010, version 2 of the L<CPAN::Meta::Spec>
+was released, which mandates JSON format for the metadata in order to
+overcome certain compatibility issues between YAML serializers and to
+avoid breaking older clients unable to handle a new version of the spec.
+The L<CPAN::Meta> library is now standard for accessing old and new-style
+Meta files.
 
-MakeMaker will automatically generate a F<META.yml> file for you and
-add it to your F<MANIFEST> as part of the 'distdir' target (and thus
-the 'dist' target).  This is intended to seamlessly and rapidly
-populate CPAN with module meta-data.  If you wish to shut this feature
-off, set the C<NO_META> C<WriteMakefile()> flag to true.
+If L<CPAN::Meta> is installed, MakeMaker will automatically generate
+F<META.json> and F<META.yml> files for you and add them to your F<MANIFEST> as
+part of the 'distdir' target (and thus the 'dist' target).  This is intended to
+seamlessly and rapidly populate CPAN with module meta-data.  If you wish to
+shut this feature off, set the C<NO_META> C<WriteMakefile()> flag to true.
 
+At the 2008 QA Hackathon in Oslo, Perl module toolchain maintainers agrees
+to use the CPAN Meta format to communicate post-configuration requirements
+between toolchain components.  These files, F<MYMETA.json> and F<MYMETA.yml>,
+are generated when F<Makefile.PL> generates a F<Makefile> (if L<CPAN::Meta>
+is installed).  Clients like L<CPAN> or L<CPANPLUS> will read this
+files to see what prerequisites must be fulfilled before building or testing
+the distribution.  If you with to shut this feature off, set the C<NO_MYMETA>
+C<WriteMakeFile()> flag to true.
 
 =head2 Disabling an extension
 
@@ -2815,6 +2830,8 @@ not normally available.
 
 L<ExtUtils::ModuleMaker> and L<Module::Starter> are both modules to
 help you setup your distribution.
+
+L<CPAN::Meta> and L<CPAN::Meta::Spec> explain CPAN Meta files in detail.
 
 =head1 AUTHORS
 
