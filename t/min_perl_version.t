@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 34;
+use Test::More tests => 32;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -102,13 +102,11 @@ END
             MIN_PERL_VERSION => 'foobar',
         );
     };
-    ok( '' ne $warnings,    'MIN_PERL_VERSION=foobar triggers a warning' );
-    is( $warnings, <<'END', '  with expected message text' );
+    is( $@, <<'END', 'Invalid MIN_PERL_VERSION is fatal' );
 Warning: MIN_PERL_VERSION is not in a recognized format.
 Recommended is a quoted numerical value like '5.005' or '5.008001'.
 END
 
-    is( $@, '',             '  and without a hard failure' );
 }
 
 

@@ -728,6 +728,13 @@ CMD
     return $manify;
 }
 
+sub _has_cpan_meta {
+    return eval {
+      $INC{'CPAN/Meta.pm'} or require CPAN::Meta;
+      CPAN::Meta->VERSION(2.110350);
+      1;
+    };
+}
 
 =head3 metafile_target
 
@@ -743,12 +750,7 @@ possible.
 
 sub metafile_target {
     my $self = shift;
-    my $have_CPAN_Meta = eval {
-      $INC{'CPAN/Meta.pm'} or require CPAN::Meta;
-      CPAN::Meta->VERSION(2.110350);
-      1;
-    };
-    return <<'MAKE_FRAG' if $self->{NO_META} or ! $have_CPAN_Meta;
+    return <<'MAKE_FRAG' if $self->{NO_META} or ! _has_cpan_meta();
 metafile :
 	$(NOECHO) $(NOOP)
 MAKE_FRAG
@@ -779,7 +781,6 @@ metafile : create_distdir
 MAKE_FRAG
 
 }
-
 
 =begin private
 
@@ -1155,11 +1156,12 @@ sub mymeta {
 sub _mymeta_from_meta {
     my $self = shift;
 
+    return unless _has_cpan_meta();
+
     my $meta;
     for my $file ( qw/META.json META.yml/ ) {
       next unless -e $file;
       eval {
-          require CPAN::Meta;
           $meta = CPAN::Meta->load_file($file)->as_struct( version => "1.4" );
       };
       last if $meta;
@@ -1194,14 +1196,12 @@ sub write_mymeta {
     my $self = shift;
     my $mymeta = shift;
 
-    return eval {
-      require CPAN::Meta;
-      my $meta_obj = CPAN::Meta->new( $mymeta );
+    return unless _has_cpan_meta();
 
-      $meta_obj->save( 'MYMETA.json' );
-      $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );
-      1;
-    };
+    my $meta_obj = CPAN::Meta->new( $mymeta );
+    $meta_obj->save( 'MYMETA.json' );
+    $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );
+    return 1;
 }
 
 

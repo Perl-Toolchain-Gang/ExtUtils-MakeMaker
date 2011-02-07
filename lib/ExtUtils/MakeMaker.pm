@@ -449,7 +449,7 @@ sub new {
     };
     if (!$perl_version_ok) {
         if (!defined $perl_version_ok) {
-            warn <<'END';
+            die <<'END';
 Warning: MIN_PERL_VERSION is not in a recognized format.
 Recommended is a quoted numerical value like '5.005' or '5.008001'.
 END
