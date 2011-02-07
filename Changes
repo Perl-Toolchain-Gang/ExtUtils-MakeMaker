@@ -3,11 +3,11 @@
     INCOMPATIBLE CHANGES
     * META and MYMETA files will only be created if CPAN::Meta is
       installed to ensure consistent and valid META file generation
-      [David Golden]
+      (David Golden)
 
     Enhancements
     * Generates META.json and MYMETA.json in addition to
-      META.yml and MYMETA.yml [David Golden]
+      META.yml and MYMETA.yml (David Golden)
     * MYMETA has the runtime requirements made priority over META_*
       keys to allow generation of a correct META.* into the dist while
       still generating an accurate MYMETA.* locally (Matt S Trout)
@@ -15,7 +15,7 @@
     Bug Fixes
     * MYMETA.yml generation from META.yml actually works (Matt S Trout)
     * All required META fields are generated, even if they must be filled
-      with "unknown" in place of real data [David Golden]
+      with "unknown" in place of real data (David Golden)
 
     Test Fixes
     * miniperl.t is no longer run outside of the perl core.  Its only relevant
