@@ -48,6 +48,23 @@ CHANGE_WARN
 my %prereq = ( );
 $prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 
+# CPAN::Meta is now required for generating META files.  Tests will skip
+# without it, but so that authors who upgrade EU::MM don't lose the ability
+# to generate META files, we list CPAN::Meta as a prereq.  However, we only
+# want to do that if the system EU::MM already supports INSTALL_BASE, so
+# that we avoid a bootstrapping problem when trying to upgrade old Perls with
+# a new EU::MM
+
+my $inst_eumm_version = 0;
+foreach my $inc (grep { $_ ne 'inc' && $_ ne 'lib' } @INC) {
+  my $path = File::Spec->catfile($inc, 'ExtUtils', 'MakeMaker.pm');
+  if (-r $path) {
+    $inst_eumm_version = MM->parse_version($path);
+    last;
+  }
+}
+$prereq{'CPAN::Meta'} = 2.110350 if $inst_eumm_version ge '6.31';
+
 
 check_environment();
 
