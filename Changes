@@ -8,6 +8,9 @@
     Enhancements
     * Generates META.json and MYMETA.json in addition to
       META.yml and MYMETA.yml [David Golden]
+    * MYMETA has the runtime requirements made priority over META_*
+      keys to allow generation of a correct META.* into the dist while
+      still generating an accurate MYMETA.* locally (Matt S Trout)
 
     Bug Fixes
     * MYMETA.yml generation from META.yml actually works (Matt S Trout)

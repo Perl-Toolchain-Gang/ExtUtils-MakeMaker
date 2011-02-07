@@ -3,7 +3,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 9;
 
 use Data::Dumper;
 
@@ -313,4 +313,72 @@ my $new_mm = sub {
             version     => 1.4
         },
     },'CONFIGURE_REQUIRES';
+}
+
+# Test _REQUIRES key priority over META_ADD
+
+{
+    my $mm = $new_mm->(
+        DISTNAME        => 'Foo-Bar',
+        VERSION         => 1.23,
+        BUILD_REQUIRES => {
+            "Fake::Module1" => 1.01,
+        },
+        META_ADD => (my $meta_add = { build_requires => {} }),
+        PM              => {
+            "Foo::Bar"          => 'lib/Foo/Bar.pm',
+        },
+    );
+
+    is_deeply {$mm->metafile_data($meta_add)}, {
+        name            => 'Foo-Bar',
+        version         => 1.23,
+        abstract        => 'unknown',
+        author          => [],
+        license         => 'unknown',
+        dynamic_config  => 1,
+        distribution_type       => 'module',
+
+        configure_requires      => {
+            'ExtUtils::MakeMaker'       => 0,
+        },
+        build_requires      => { },
+
+        no_index        => {
+            directory           => [qw(t inc)],
+        },
+
+        generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
+        'meta-spec'  => {
+            url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
+            version     => 1.4
+        },
+    },'META.yml data (META_ADD wins)';
+
+    is_deeply $mm->mymeta, {
+        name            => 'Foo-Bar',
+        version         => 1.23,
+        abstract        => 'unknown',
+        author          => [],
+        license         => 'unknown',
+        dynamic_config  => 0,
+        distribution_type       => 'module',
+
+        configure_requires      => {
+            'ExtUtils::MakeMaker'       => 0,
+        },
+        build_requires      => {
+            'Fake::Module1'       => 1.01,
+        },
+
+        no_index        => {
+            directory           => [qw(t inc)],
+        },
+
+        generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
+        'meta-spec'  => {
+            url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
+            version     => 1.4
+        },
+    },'MYMETA data (BUILD_REQUIRES wins)';
 }
