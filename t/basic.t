@@ -11,7 +11,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 153;
+use Test::More tests => 171;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -355,6 +355,36 @@ SKIP: {
     ok( -f $meta_yml,    'META.yml generation not suppressed by NO_MYMETA' );
     ok( -f $meta_json,    'META.json generation not suppressed by NO_MYMETA' );
 
+    # Test MYMETA really comes from META except for prereqs
+    for my $f ( $meta_yml, $meta_json, 'MYMETA.yml', 'MYMETA.json' ) {
+      1 while unlink $f;
+    }
+    @mpl_out = run(qq{$perl Makefile.PL});
+    cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
+    $distdir_out = run("$make distdir");
+    is( $?, 0, 'distdir' ) || diag($distdir_out);
+    ok( -f $meta_yml,    'META.yml generated in distdir' );
+    ok( -f $meta_json,    'META.json generated in distdir' );
+    ok( ! -f $mymeta_yml,    'MYMETA.yml not yet generated in distdir' );
+    ok( ! -f $mymeta_json,    'MYMETA.json generated in distdir' );
+    my $edit_meta = CPAN::Meta->load_file($meta_json)->as_struct;
+    $edit_meta->{abstract} = "New abstract";
+    my $meta_obj = CPAN::Meta->new($edit_meta);
+    is( $meta_obj->abstract, "New abstract", "MYMETA abstract from META, not Makefile.PL");
+    ok( $meta_obj->save($meta_json), "Saved edited META.json in distdir" );
+    ok( $meta_obj->save($meta_yml, {version => 1.4}), "Saved edited META.yml in distdir");
+    ok( chdir $distdir );
+    ok( -f 'META.yml',    'META.yml confirmed in distdir' );
+    ok( -f 'META.json',    'META.json confirmed in distdir' );
+    @mpl_out = run(qq{$perl Makefile.PL});
+    cmp_ok( $?, '==', 0, 'Makefile.PL in distdir exited with zero' ) || diag(@mpl_out);
+    ok( chdir File::Spec->updir );
+    ok( -f $mymeta_yml,    'MYMETA.yml generated in distdir' );
+    ok( -f $mymeta_json,    'MYMETA.json generated in distdir' );
+    $meta_obj = CPAN::Meta->load_file($meta_json);
+    is( $meta_obj->abstract, "New abstract", "META abstract is same as was saved");
+    $meta_obj = CPAN::Meta->load_file($mymeta_json);
+    is( $meta_obj->abstract, "New abstract", "MYMETA abstract from META, not Makefile.PL");
 }
 
 

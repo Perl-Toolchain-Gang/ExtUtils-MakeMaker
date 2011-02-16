@@ -1131,7 +1131,7 @@ sub mymeta {
 
     my $mymeta;
 
-    if ( -e 'META.yml' ) {
+    if ( -e 'META.yml' || -e 'META.json' ) {
         $mymeta = $self->_mymeta_from_meta();
     }
 
@@ -1162,7 +1162,7 @@ sub _mymeta_from_meta {
     for my $file ( qw/META.json META.yml/ ) {
       next unless -e $file;
       eval {
-          $meta = CPAN::Meta->load_file($file)->as_struct( version => "1.4" );
+          $meta = CPAN::Meta->load_file($file)->as_struct( {version => "1.4"} );
       };
       last if $meta;
     }
