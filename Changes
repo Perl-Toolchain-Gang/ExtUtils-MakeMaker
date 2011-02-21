@@ -11,6 +11,8 @@
     * MYMETA has the runtime requirements made priority over META_*
       keys to allow generation of a correct META.* into the dist while
       still generating an accurate MYMETA.* locally (Matt S Trout)
+    * Distributions should not depend on cc_runtime.h from core as it is
+      only needed for B::CC
 
     Bug Fixes
     * MYMETA.yml generation from META.yml actually works (Matt S Trout)
