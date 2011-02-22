@@ -23,6 +23,10 @@
     * miniperl.t is no longer run outside of the perl core.  Its only relevant
       to bleadperl and requires no backwards compatibility [rt.cpan.org 61868]
 
+    Cygwin
+    * Rebase behaviour was improved (Reini Urban)
+    * Build man pages (Reini Urban)
+
 6.57_06  Wed Oct 06 13:49:00 EEST 2010
     Win32
     * Work around dmake's limitations on how long a "line" can be.
