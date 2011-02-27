@@ -278,14 +278,13 @@ sub _win32_ext {
     $libpth         =~ s,\\,/,g;
     $potential_libs =~ s,\\,/,g;
 
-    # compute $extralibs from $potential_libs
+    # compute @extralibs from $potential_libs
 
     my @searchpath;    # from "-L/path" in $potential_libs
     my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
     my @extralibs;
     my $pwd    = cwd();    # from Cwd.pm
     my $lib    = '';
-    my $found  = 0;
     my $search = 1;
     my ( $fullname );
 
@@ -313,7 +312,6 @@ sub _win32_ext {
             s/^-l(.+)$/$1.lib/ unless $GC;
             s/^-L/-libpath:/ if $VC;
             push( @extralibs, $_ );
-            $found++;
             next;
         }
 
@@ -343,7 +341,6 @@ sub _win32_ext {
         # look for the file itself
         if ( -f ) {
             _debug( "'$thislib' found as '$_'\n", $verbose );
-            $found++;
             push( @extralibs, $_ );
             next;
         }
@@ -355,7 +352,6 @@ sub _win32_ext {
                 next;
             }
             _debug( "'$thislib' found as '$fullname'\n", $verbose );
-            $found++;
             $found_lib++;
             push( @extralibs, $fullname );
             push @libs, $fullname unless $libs_seen{$fullname}++;
@@ -380,7 +376,7 @@ sub _win32_ext {
 
     }
 
-    return ( '', '', '', '', ( $give_libs ? \@libs : () ) ) unless $found;
+    return ( '', '', '', '', ( $give_libs ? \@libs : () ) ) unless @extralibs;
 
     # make sure paths with spaces are properly quoted
     @extralibs = map { /\s/ ? qq["$_"] : $_ } @extralibs;
