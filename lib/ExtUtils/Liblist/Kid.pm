@@ -394,6 +394,36 @@ sub _win32_ext {
     wantarray ? ( $lib, '', $lib, '', ( $give_libs ? \@libs : () ) ) : $lib;
 }
 
+sub _win32_build_file_list {
+    my ( $lib, @extensions ) = @_;
+
+    my @pre_fixed = _win32_build_prefixed_list( $lib );
+    return map _win32_attach_extensions( $_, @extensions ), @pre_fixed;
+}
+
+sub _win32_build_prefixed_list {
+    my ( $lib ) = @_;
+
+    return $lib if $lib !~ s/^-l//;
+
+    ( my $no_prefix = $lib ) =~ s/^lib//i;
+    $lib = "lib$lib" if $no_prefix eq $lib;
+
+    return ( $no_prefix, $lib );
+}
+
+sub _win32_attach_extensions {
+    my ( $lib, @extensions ) = @_;
+    return map _win32_try_attach_extension( $lib, $_ ), @extensions;
+}
+
+sub _win32_try_attach_extension {
+    my ( $lib, $extension ) = @_;
+
+    return $lib if $lib =~ /\Q$extension\E$/i;
+    return "$lib$extension";
+}
+
 sub _debug {
     my ( $message, $verbose ) = @_;
     return if !$verbose;
