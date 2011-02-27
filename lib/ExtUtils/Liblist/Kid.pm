@@ -261,7 +261,7 @@ sub _win32_ext {
     my $libs   = $Config{'perllibs'};
     my $libpth = $Config{'libpth'};
     my $libext = $Config{'lib_ext'} || ".lib";
-    my ( @libs, %libs_seen );
+    my %libs_seen;
 
     if ( $libs and $potential_libs !~ /:nodefault/i ) {
 
@@ -354,7 +354,7 @@ sub _win32_ext {
             _debug( "'$thislib' found as '$fullname'\n", $verbose );
             $found_lib++;
             push( @extralibs, $fullname );
-            push @libs, $fullname unless $libs_seen{$fullname}++;
+            $libs_seen{$fullname} = 1;
             last;
         }
 
@@ -375,6 +375,8 @@ sub _win32_ext {
           unless $found_lib > 0;
 
     }
+
+    my @libs = keys %libs_seen;
 
     return ( '', '', '', '', ( $give_libs ? \@libs : () ) ) unless @extralibs;
 
