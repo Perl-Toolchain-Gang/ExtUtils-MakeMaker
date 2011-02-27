@@ -487,9 +487,26 @@ sub oneliner {
 sub quote_literal {
     my($self, $text) = @_;
 
-    # I don't know if this is correct, but it seems to work on
-    # Win98's command.com
-    $text =~ s{"}{\\"}g;
+    # DOS batch processing is hilarious:
+    # Quotes need to be converted into triple quotes.
+    # Certain special characters need to be escaped with a caret if an odd
+    # number of quotes came before them.
+    my @text        = split '', $text;
+    my $quote_count = 0;
+    my %caret_chars = map { $_ => 1 } qw( < > | );
+    for my $char ( @text ) {
+        if ( $char eq '"' ) {
+            $quote_count++;
+            $char = '"""';
+        }
+        elsif ( $caret_chars{$char} and $quote_count % 2 ) {
+            $char = "^$char";
+        }
+        elsif ( $char eq "\\" ) {
+            $char = "\\\\";
+        }
+    }
+    $text = join '', @text;
 
     # dmake eats '{' inside double quotes and leaves alone { outside double
     # quotes; however it transforms {{ into { either inside and outside double
