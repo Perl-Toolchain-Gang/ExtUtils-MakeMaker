@@ -31,8 +31,8 @@ $| = 1;
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok( chdir File::Spec->updir );
-    ok( teardown_recurs(), 'teardown' );
+    ok chdir File::Spec->updir or die;
+    ok teardown_recurs, "teardown";
 }
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
@@ -234,8 +234,7 @@ my $meta_json = "$distdir/META.json";
 my $mymeta_json = "$distdir/MYMETA.json";
 
 SKIP: {
-    skip "CPAN::Meta required", 86 
-      unless eval { require CPAN::Meta };
+    skip "CPAN::Meta required", 104 unless eval { require CPAN::Meta };
 
     ok( !-f 'META.yml',  'META.yml not written to source dir' );
     ok( -f $meta_yml,    'META.yml written to dist dir' );
