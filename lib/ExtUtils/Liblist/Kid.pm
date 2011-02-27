@@ -328,10 +328,8 @@ sub _win32_ext {
             next;
         }
 
-        my @file_list = _win32_build_file_list( $_, $GC, $libext );
-
         my @paths = ( @searchpath, @libpath );
-        my ( $fullname, $path ) = _win32_search_file( \@file_list, \@paths, $verbose, $thislib );
+        my ( $fullname, $path ) = _win32_search_file( $thislib, $libext, \@paths, $verbose, $GC );
 
         if ( !$fullname ) {
             warn "Note (probably harmless): No library found for $thislib\n";
@@ -362,9 +360,11 @@ sub _win32_ext {
 }
 
 sub _win32_search_file {
-    my ( $file_list, $paths, $verbose, $thislib ) = @_;
+    my ( $thislib, $libext, $paths, $verbose, $GC ) = @_;
 
-    for my $lib_file ( @{$file_list} ) {
+    my @file_list = _win32_build_file_list( $thislib, $GC, $libext );
+
+    for my $lib_file ( @file_list ) {
         for my $path ( @{$paths} ) {
             my $fullname = $lib_file;
             $fullname = "$path\\$fullname" if $path;
