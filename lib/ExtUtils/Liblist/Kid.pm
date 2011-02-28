@@ -17,6 +17,20 @@ use Cwd 'cwd';
 use File::Basename;
 use File::Spec;
 
+# for testing
+sub _make_config_writable {
+    no strict 'refs';
+    *{__PACKAGE__."::Config"} = {};
+    return;
+}
+
+# for testing
+sub _config {
+    my ( $key, $value ) = @_;
+    $Config{$key} = $value if defined $value;
+    return $Config{$key};
+}
+
 sub ext {
     if    ( $^O eq 'VMS' )     { return &_vms_ext; }
     elsif ( $^O eq 'MSWin32' ) { return &_win32_ext; }
