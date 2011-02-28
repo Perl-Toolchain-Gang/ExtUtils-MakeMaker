@@ -1,10 +1,4 @@
 6.57_07
-
-    INCOMPATIBLE CHANGES
-    * META and MYMETA files will only be created if CPAN::Meta is
-      installed to ensure consistent and valid META file generation
-      (David Golden)
-
     Enhancements
     * Generates META.json and MYMETA.json in addition to
       META.yml and MYMETA.yml (David Golden)
@@ -13,6 +7,7 @@
       still generating an accurate MYMETA.* locally (Matt S Trout)
     * Distributions should not depend on cc_runtime.h from core as it is
       only needed for B::CC
+    * Now uses CPAN::Meta to generate META files.
 
     Bug Fixes
     * MYMETA.yml generation from META.yml actually works (Matt S Trout)
