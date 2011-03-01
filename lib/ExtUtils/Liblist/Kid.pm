@@ -385,8 +385,8 @@ sub _win32_ext {
     return ( '', '', '', '', ( $give_libs ? \@libs : () ) ) unless $found;
 
     # make sure paths with spaces are properly quoted
-    @extralibs = map { ( /\s/ && !/^".*"$/ ) ? qq["$_"] : $_ } @extralibs;
-    @libs      = map { ( /\s/ && !/^".*"$/ ) ? qq["$_"] : $_ } @libs;
+    @extralibs = map { /\s/ ? qq["$_"] : $_ } @extralibs;
+    @libs      = map { /\s/ ? qq["$_"] : $_ } @libs;
     $lib = join( ' ', @extralibs );
 
     # normalize back to backward slashes (to help braindead tools)
