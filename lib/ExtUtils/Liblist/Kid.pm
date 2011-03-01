@@ -369,7 +369,8 @@ sub _win32_ext {
         # do another pass with (or without) leading 'lib' if they used -l
         if ( !$found_lib and $thislib =~ /^-l/ and !$secondpass++ ) {
             if ( $GC ) {
-                goto LOOKAGAIN if s/^lib//i;
+                s/^lib//i;
+                goto LOOKAGAIN;
             }
             elsif ( !/^lib/i ) {
                 $_ = "lib$_";
