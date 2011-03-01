@@ -3,11 +3,17 @@
 use strict;
 use warnings;
 
+# This makes sure the test is run from the same place, with the same @INC,
+# no matter whether it's started via prove or via Komodo IDE.
+
 BEGIN {
     use Cwd;
     chdir 't' if -d 't';
     use lib getcwd() . '/lib', getcwd() . '/../lib';
 }
+
+# Liblist wants to be an object which has File::Spec capabilities, so we
+# mock one.
 
 BEGIN {
 
@@ -26,8 +32,6 @@ run();
 done_testing();
 
 exit;
-
-sub _kid_ext;
 
 sub run {
     use_ok( 'ExtUtils::Liblist::Kid' );
@@ -48,6 +52,9 @@ sub conf_reset {
     delete $Config{$_} for keys %Config;
 }
 
+# This keeps the directory paths in the tests short and allows easy
+# separation of OS-specific files.
+
 sub move_to_os_test_data_dir {
     my %os_test_dirs = ( MSWin32 => 'liblist/win32', );
     chdir $os_test_dirs{$^O} if $os_test_dirs{$^O};
@@ -55,12 +62,22 @@ sub move_to_os_test_data_dir {
     return;
 }
 
+# With this we can use a short function name in the tests and use the same
+# one everywhere.
+
 sub alias_kid_ext_for_convenience {
     my %os_ext_funcs = ( MSWin32 => \&ExtUtils::Liblist::Kid::_win32_ext, );
     *_kid_ext = $os_ext_funcs{$^O};
 
     return;
 }
+sub _kid_ext;
+
+# Since liblist is object-based, we need to provide a mock object.
+
+sub _ext { _kid_ext( MockEUMM->new, @_ ); }
+
+# tests go here
 
 sub test_kid_win32 {
 
@@ -97,6 +114,4 @@ sub test_kid_win32 {
 
     return;
 }
-
-sub _ext { _kid_ext( MockEUMM->new, @_ ); }
 
