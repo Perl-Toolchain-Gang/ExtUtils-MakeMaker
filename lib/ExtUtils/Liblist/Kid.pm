@@ -257,9 +257,7 @@ sub _win32_ext {
     # TODO: make this use MM_Win32.pm's compiler detection
     my $cc     = $Config{cc};
     my $VC     = $cc =~ /^cl/i;
-    my $BC     = $cc =~ /^bcc/i;
     my $GC     = $cc =~ /^gcc/i;
-    my $so     = $Config{'so'};
     my $libs   = $Config{'perllibs'};
     my $libpth = $Config{'libpth'};
     my $libext = $Config{'lib_ext'} || ".lib";
@@ -271,7 +269,7 @@ sub _win32_ext {
         # tack them on to the user-supplied list, unless the user
         # specified :nodefault
 
-        $potential_libs .= " " if $potential_libs;
+        $potential_libs .= " ";
         $potential_libs .= $libs;
     }
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
