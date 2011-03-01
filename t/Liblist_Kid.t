@@ -19,7 +19,7 @@ BEGIN {
 package liblist_kid_test;
 
 use Test::More;
-use Config;
+use ExtUtils::MakeMaker::Config;
 use File::Spec;
 
 run();
@@ -32,33 +32,20 @@ sub _kid_ext;
 sub run {
     use_ok( 'ExtUtils::Liblist::Kid' );
 
-    prepare_kid_config();
-
     move_to_os_test_data_dir();
     alias_kid_ext_for_convenience();
+
+    conf_reset();
 
     return test_kid_win32() if $^O eq 'MSWin32';
     return;
 }
 
-sub prepare_kid_config {
+# This allows us to get a clean playing field and ensure that the current
+# system configuration does not affect the test results.
 
-    *kid_conf       = \&ExtUtils::Liblist::Kid::_config;
-    *kid_conf_reset = \&ExtUtils::Liblist::Kid::_make_config_writable;
-
-    ok( kid_conf( 'PERL_VERSION' ), 'kid has a readable %Config' );
-    is( eval { kid_conf( 'cc', $Config{cc} ) }, undef, 'kid has an unwritable %Config' );
-
-    kid_conf_reset();
-
-    is( kid_conf( 'cc', $Config{cc} ), $Config{cc}, 'kid has a writable %Config' );
-    is( eval { $Config{cc} = $Config{cc} }, undef, 'local %Config remains unchanged' );
-
-    kid_conf_reset();
-
-    is( kid_conf( 'cc' ), undef, 'kid %Config can be reset' );
-
-    return;
+sub conf_reset {
+    delete $Config{$_} for keys %Config;
 }
 
 sub move_to_os_test_data_dir {
@@ -77,7 +64,7 @@ sub alias_kid_ext_for_convenience {
 
 sub test_kid_win32 {
 
-    kid_conf( 'installarchlib', 'lib' );
+    $Config{installarchlib} = 'lib';
 
     is_deeply( [ _ext() ],                           [ '',                                     '', '',                                     '' ], 'empty input results in empty output' );
     is_deeply( [ _ext( 'unreal_test' ) ],            [ '',                                     '', '',                                     '' ], 'non-existent file results in empty output' );
@@ -106,7 +93,7 @@ sub test_kid_win32 {
     is_deeply( [ _ext( "-Ldir dir_test" ) ],       [ $curr . '\dir\dir_test.lib',         '', $curr . '\dir\dir_test.lib',         '' ], 'relative -L directories work' );
     is_deeply( [ _ext( "-L\"di r\" dir_test" ) ],  [ '"' . $curr . '\di r\dir_test.lib"', '', '"' . $curr . '\di r\dir_test.lib"', '' ], '-L directories with spaces work' );
 
-    kid_conf( 'libpth', 'lib with space' );
+    $Config{libpth} = 'lib with space';
 
     return;
 }

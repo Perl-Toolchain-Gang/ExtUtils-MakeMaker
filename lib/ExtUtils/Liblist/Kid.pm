@@ -12,24 +12,10 @@ use 5.006;
 use strict;
 our $VERSION = '6.57_07';
 
-use Config;
+use ExtUtils::MakeMaker::Config;
 use Cwd 'cwd';
 use File::Basename;
 use File::Spec;
-
-# for testing
-sub _make_config_writable {
-    no strict 'refs';
-    *{__PACKAGE__."::Config"} = {};
-    return;
-}
-
-# for testing
-sub _config {
-    my ( $key, $value ) = @_;
-    $Config{$key} = $value if defined $value;
-    return $Config{$key};
-}
 
 sub ext {
     if    ( $^O eq 'VMS' )     { return &_vms_ext; }
