@@ -92,13 +92,16 @@ sub test_kid_win32 {
     is_deeply( [ _ext( 'test.a' ) ],                 [ 'lib\CORE\test.a.lib',                  '', 'lib\CORE\test.a.lib',                  '' ], 'but it will be tacked onto filenamess with other kinds of library extension' );
     is_deeply( [ _ext( 'test test2' ) ],             [ 'lib\CORE\test.lib lib\CORE\test2.lib', '', 'lib\CORE\test.lib lib\CORE\test2.lib', '' ], 'multiple existing files end up separated by spaces' );
     is_deeply( [ _ext( 'test test2 unreal_test' ) ], [ 'lib\CORE\test.lib lib\CORE\test2.lib', '', 'lib\CORE\test.lib lib\CORE\test2.lib', '' ], "some existing files don't cause false positives" );
+    is_deeply( [ _ext( '-l_test' ) ],                [ 'lib\CORE\lib_test.lib',                '', 'lib\CORE\lib_test.lib',                '' ], 'prefixing a lib with -l triggers a second search with prefix "lib" when gcc is not in use' );
+    is_deeply( [ _ext( '-lunreal_test' ) ],          [ '',                                     '', '',                                     '' ], 'searching with -l for a non-existent library does not cause an endless loop' );
 
     is_deeply( [ scalar _ext( 'test' ) ], ['lib\CORE\test.lib'], 'asking for a scalar gives a single string' );
 
-    is_deeply( [ _ext( undef,              undef, 1 ) ], [ '',                                  '', '',                                  '', [] ],                    'asking for real names with empty input results in an empty extra array' );
-    is_deeply( [ _ext( 'unreal_test',      undef, 1 ) ], [ '',                                  '', '',                                  '', [] ],                    'asking for real names with non-existent file results in an empty extra array' );
-    is_deeply( [ _ext( 'test',             undef, 1 ) ], [ 'lib\CORE\test.lib',                 '', 'lib\CORE\test.lib',                 '', ['lib/CORE\test.lib'] ], 'asking for real names with an existent file results in an extra array with a mixed-os file path?!' );
-    is_deeply( [ _ext( 'direct_test test', undef, 1 ) ], [ 'direct_test.lib lib\CORE\test.lib', '', 'direct_test.lib lib\CORE\test.lib', '', ['lib/CORE\test.lib'] ], 'files in cwd do not appear in the real name list?!' );
+    is_deeply( [ _ext( undef,              0, 1 ) ], [ '',                                    '', '',                                    '', [] ],                    'asking for real names with empty input results in an empty extra array' );
+    is_deeply( [ _ext( 'unreal_test',      0, 1 ) ], [ '',                                    '', '',                                    '', [] ],                    'asking for real names with non-existent file results in an empty extra array' );
+    is_deeply( [ _ext( 'test',             0, 1 ) ], [ 'lib\CORE\test.lib',                   '', 'lib\CORE\test.lib',                   '', ['lib/CORE\test.lib'] ], 'asking for real names with an existent file results in an extra array with a mixed-os file path?!' );
+    is_deeply( [ _ext( 'direct_test test', 0, 1 ) ], [ 'direct_test.lib lib\CORE\test.lib',   '', 'direct_test.lib lib\CORE\test.lib',   '', ['lib/CORE\test.lib'] ], 'files in cwd do not appear in the real name list?!' );
+    is_deeply( [ _ext( '-ltest test',      0, 1 ) ], [ 'lib\CORE\test.lib lib\CORE\test.lib', '', 'lib\CORE\test.lib lib\CORE\test.lib', '', ['lib/CORE\test.lib'] ], 'finding the same lib in a search dir both with and without -l results in a single listing in the array' );
 
     is_deeply( [ _ext( 'test :nosearch unreal_test test2' ) ],         [ 'lib\CORE\test.lib unreal_test test2',              '', 'lib\CORE\test.lib unreal_test test2',              '' ], ':nosearch can force passing through of filenames as they are' );
     is_deeply( [ _ext( 'test :nosearch unreal_test :search test2' ) ], [ 'lib\CORE\test.lib unreal_test lib\CORE\test2.lib', '', 'lib\CORE\test.lib unreal_test lib\CORE\test2.lib', '' ], ':search enables file searching again' );
