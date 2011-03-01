@@ -272,7 +272,7 @@ sub _win32_ext {
         $potential_libs .= " ";
         $potential_libs .= $libs;
     }
-    warn "Potential libraries are '$potential_libs':\n" if $verbose;
+    _debug( "Potential libraries are '$potential_libs':\n", $verbose );
 
     # normalize to forward slashes
     $libpth         =~ s,\\,/,g;
@@ -304,8 +304,7 @@ sub _win32_ext {
         if ( /^:\w+$/ ) {
             $search = 0 if lc eq ':nosearch';
             $search = 1 if lc eq ':search';
-            warn "Ignoring unknown flag '$thislib'\n"
-              if $verbose and !/^:(no)?(search|default)$/i;
+            _debug( "Ignoring unknown flag '$thislib'\n", $verbose ) if !/^:(no)?(search|default)$/i;
             next;
         }
 
@@ -320,8 +319,7 @@ sub _win32_ext {
 
         # handle possible linker path arguments
         if ( s/^-L// and not -d ) {
-            warn "$thislib ignored, directory does not exist\n"
-              if $verbose;
+            _debug( "$thislib ignored, directory does not exist\n", $verbose );
             next;
         }
         elsif ( -d ) {
@@ -344,7 +342,7 @@ sub _win32_ext {
 
         # look for the file itself
         if ( -f ) {
-            warn "'$thislib' found as '$_'\n" if $verbose;
+            _debug( "'$thislib' found as '$_'\n", $verbose );
             $found++;
             push( @extralibs, $_ );
             next;
@@ -353,10 +351,10 @@ sub _win32_ext {
         my $found_lib = 0;
         foreach my $thispth ( @searchpath, @libpath ) {
             unless ( -f ( $fullname = "$thispth\\$_" ) ) {
-                warn "'$thislib' not found as '$fullname'\n" if $verbose;
+                _debug( "'$thislib' not found as '$fullname'\n", $verbose );
                 next;
             }
-            warn "'$thislib' found as '$fullname'\n" if $verbose;
+            _debug( "'$thislib' found as '$fullname'\n", $verbose );
             $found++;
             $found_lib++;
             push( @extralibs, $fullname );
@@ -394,8 +392,15 @@ sub _win32_ext {
     # backslashes, either.  Seems like one can't win here.  Cursed be CP/M.
     $lib =~ s,/,\\,g;
 
-    warn "Result: $lib\n" if $verbose;
+    _debug( "Result: $lib\n", $verbose );
     wantarray ? ( $lib, '', $lib, '', ( $give_libs ? \@libs : () ) ) : $lib;
+}
+
+sub _debug {
+    my ( $message, $verbose ) = @_;
+    return if !$verbose;
+    warn $message;
+    return;
 }
 
 sub _vms_ext {
