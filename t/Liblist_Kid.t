@@ -50,6 +50,9 @@ sub run {
 
 sub conf_reset {
     delete $Config{$_} for keys %Config;
+    delete $ENV{LIB};
+    
+    return;
 }
 
 # This keeps the directory paths in the tests short and allows easy
@@ -142,15 +145,11 @@ sub test_kid_win32 {
     $Config{cc} = 'cl';
 
     is_deeply( [ _ext( 'test' ) ], [ 'test.lib', '', 'test.lib', '' ], '[vc] searching for straight lib names remains unchanged' );
-
-    delete $ENV{LIB};
     is_deeply( [ _ext( ':nosearch -Lunreal_test' ) ], [ '-libpath:unreal_test', '', '-libpath:unreal_test', '' ], '[vc] lib dirs with -L after a :nosearch are prefixed with -libpath:' );
     ok( !exists $ENV{LIB}, '[vc] $ENV{LIB} is not autovivified' );
 
     $ENV{LIB} = 'vc';
     is_deeply( [ _ext( 'vctest.lib' ) ], [ 'vc\vctest.lib', '', 'vc\vctest.lib', '' ], '[vc] $ENV{LIB} adds search paths' );
-
-    #is_deeply( [ _ext( 'unreal_test' ) ], [ '',              '', '',              '' ], 'searching with -l for a non-existent library does not cause an endless loop' );
 
     return;
 }
