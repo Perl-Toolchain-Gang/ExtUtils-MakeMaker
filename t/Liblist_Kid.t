@@ -83,29 +83,29 @@ sub test_kid_win32 {
 
     $Config{installarchlib} = 'lib';
 
-    is_deeply( [ _ext() ],                           [ '',                                     '', '',                                     '' ], 'empty input results in empty output' );
-    is_deeply( [ _ext( 'unreal_test' ) ],            [ '',                                     '', '',                                     '' ], 'non-existent file results in empty output' );
-    is_deeply( [ _ext( 'direct_test' ) ],            [ 'direct_test.lib',                      '', 'direct_test.lib',                      '' ], 'existent file results in a path to the file. .lib is default extension with empty %Config' );
-    is_deeply( [ _ext( 'test' ) ],                   [ 'lib\CORE\test.lib',                    '', 'lib\CORE\test.lib',                    '' ], '$Config{installarchlib}/CORE is the default search dir aside from cwd' );
-    is_deeply( [ _ext( 'double' ) ],                 [ 'double.lib',                           '', 'double.lib',                           '' ], 'once an instance of a lib is found, the search stops' );
-    is_deeply( [ _ext( 'test.lib' ) ],               [ 'lib\CORE\test.lib',                    '', 'lib\CORE\test.lib',                    '' ], 'the extension is not tacked on twice' );
-    is_deeply( [ _ext( 'test.a' ) ],                 [ 'lib\CORE\test.a.lib',                  '', 'lib\CORE\test.a.lib',                  '' ], 'but it will be tacked onto filenamess with other kinds of library extension' );
-    is_deeply( [ _ext( 'test test2' ) ],             [ 'lib\CORE\test.lib lib\CORE\test2.lib', '', 'lib\CORE\test.lib lib\CORE\test2.lib', '' ], 'multiple existing files end up separated by spaces' );
-    is_deeply( [ _ext( 'test test2 unreal_test' ) ], [ 'lib\CORE\test.lib lib\CORE\test2.lib', '', 'lib\CORE\test.lib lib\CORE\test2.lib', '' ], "some existing files don't cause false positives" );
-    is_deeply( [ _ext( '-l_test' ) ],                [ 'lib\CORE\lib_test.lib',                '', 'lib\CORE\lib_test.lib',                '' ], 'prefixing a lib with -l triggers a second search with prefix "lib" when gcc is not in use' );
-    is_deeply( [ _ext( '-lunreal_test' ) ],          [ '',                                     '', '',                                     '' ], 'searching with -l for a non-existent library does not cause an endless loop' );
+    is_deeply( [ _ext() ],                           [ '',                    '', '',                    '' ], 'empty input results in empty output' );
+    is_deeply( [ _ext( 'unreal_test' ) ],            [ '',                    '', '',                    '' ], 'non-existent file results in empty output' );
+    is_deeply( [ _ext( 'test' ) ],                   [ 'test.lib',            '', 'test.lib',            '' ], 'existent file results in a path to the file. .lib is default extension with empty %Config' );
+    is_deeply( [ _ext( 'c_test' ) ],                 [ 'lib\CORE\c_test.lib', '', 'lib\CORE\c_test.lib', '' ], '$Config{installarchlib}/CORE is the default search dir aside from cwd' );
+    is_deeply( [ _ext( 'double' ) ],                 [ 'double.lib',          '', 'double.lib',          '' ], 'once an instance of a lib is found, the search stops' );
+    is_deeply( [ _ext( 'test.lib' ) ],               [ 'test.lib',            '', 'test.lib',            '' ], 'the extension is not tacked on twice' );
+    is_deeply( [ _ext( 'test.a' ) ],                 [ 'test.a.lib',          '', 'test.a.lib',          '' ], 'but it will be tacked onto filenamess with other kinds of library extension' );
+    is_deeply( [ _ext( 'test test2' ) ],             [ 'test.lib test2.lib',  '', 'test.lib test2.lib',  '' ], 'multiple existing files end up separated by spaces' );
+    is_deeply( [ _ext( 'test test2 unreal_test' ) ], [ 'test.lib test2.lib',  '', 'test.lib test2.lib',  '' ], "some existing files don't cause false positives" );
+    is_deeply( [ _ext( '-l_test' ) ],                [ 'lib_test.lib',        '', 'lib_test.lib',        '' ], 'prefixing a lib with -l triggers a second search with prefix "lib" when gcc is not in use' );
+    is_deeply( [ _ext( '-lunreal_test' ) ],          [ '',                    '', '',                    '' ], 'searching with -l for a non-existent library does not cause an endless loop' );
 
-    is_deeply( [ scalar _ext( 'test' ) ], ['lib\CORE\test.lib'], 'asking for a scalar gives a single string' );
+    is_deeply( [ scalar _ext( 'test' ) ], ['test.lib'], 'asking for a scalar gives a single string' );
 
-    is_deeply( [ _ext( undef,              0, 1 ) ], [ '',                                    '', '',                                    '', [] ],                    'asking for real names with empty input results in an empty extra array' );
-    is_deeply( [ _ext( 'unreal_test',      0, 1 ) ], [ '',                                    '', '',                                    '', [] ],                    'asking for real names with non-existent file results in an empty extra array' );
-    is_deeply( [ _ext( 'test',             0, 1 ) ], [ 'lib\CORE\test.lib',                   '', 'lib\CORE\test.lib',                   '', ['lib/CORE\test.lib'] ], 'asking for real names with an existent file results in an extra array with a mixed-os file path?!' );
-    is_deeply( [ _ext( 'direct_test test', 0, 1 ) ], [ 'direct_test.lib lib\CORE\test.lib',   '', 'direct_test.lib lib\CORE\test.lib',   '', ['lib/CORE\test.lib'] ], 'files in cwd do not appear in the real name list?!' );
-    is_deeply( [ _ext( '-ltest test',      0, 1 ) ], [ 'lib\CORE\test.lib lib\CORE\test.lib', '', 'lib\CORE\test.lib lib\CORE\test.lib', '', ['lib/CORE\test.lib'] ], 'finding the same lib in a search dir both with and without -l results in a single listing in the array' );
+    is_deeply( [ _ext( undef,             0, 1 ) ], [ '',                                        '', '',                                        '', [] ],                      'asking for real names with empty input results in an empty extra array' );
+    is_deeply( [ _ext( 'unreal_test',     0, 1 ) ], [ '',                                        '', '',                                        '', [] ],                      'asking for real names with non-existent file results in an empty extra array' );
+    is_deeply( [ _ext( 'c_test',          0, 1 ) ], [ 'lib\CORE\c_test.lib',                     '', 'lib\CORE\c_test.lib',                     '', ['lib/CORE\c_test.lib'] ], 'asking for real names with an existent file in search dir results in an extra array with a mixed-os file path?!' );
+    is_deeply( [ _ext( 'test c_test',     0, 1 ) ], [ 'test.lib lib\CORE\c_test.lib',            '', 'test.lib lib\CORE\c_test.lib',            '', ['lib/CORE\c_test.lib'] ], 'files in cwd do not appear in the real name list?!' );
+    is_deeply( [ _ext( '-lc_test c_test', 0, 1 ) ], [ 'lib\CORE\c_test.lib lib\CORE\c_test.lib', '', 'lib\CORE\c_test.lib lib\CORE\c_test.lib', '', ['lib/CORE\c_test.lib'] ], 'finding the same lib in a search dir both with and without -l results in a single listing in the array' );
 
-    is_deeply( [ _ext( 'test :nosearch unreal_test test2' ) ],         [ 'lib\CORE\test.lib unreal_test test2',              '', 'lib\CORE\test.lib unreal_test test2',              '' ], ':nosearch can force passing through of filenames as they are' );
-    is_deeply( [ _ext( 'test :nosearch unreal_test :search test2' ) ], [ 'lib\CORE\test.lib unreal_test lib\CORE\test2.lib', '', 'lib\CORE\test.lib unreal_test lib\CORE\test2.lib', '' ], ':search enables file searching again' );
-    is_deeply( [ _ext( 'test :meep test2' ) ],                         [ 'lib\CORE\test.lib lib\CORE\test2.lib',             '', 'lib\CORE\test.lib lib\CORE\test2.lib',             '' ], 'unknown :flags are safely ignored' );
+    is_deeply( [ _ext( 'test :nosearch unreal_test test2' ) ],         [ 'test.lib unreal_test test2',     '', 'test.lib unreal_test test2',     '' ], ':nosearch can force passing through of filenames as they are' );
+    is_deeply( [ _ext( 'test :nosearch unreal_test :search test2' ) ], [ 'test.lib unreal_test test2.lib', '', 'test.lib unreal_test test2.lib', '' ], ':search enables file searching again' );
+    is_deeply( [ _ext( 'test :meep test2' ) ],                         [ 'test.lib test2.lib',             '', 'test.lib test2.lib',             '' ], 'unknown :flags are safely ignored' );
 
     my $curr = File::Spec->rel2abs( '' );
     is_deeply( [ _ext( "-L$curr/dir dir_test" ) ], [ $curr . '\dir\dir_test.lib',         '', $curr . '\dir\dir_test.lib',         '' ], 'directories in -L parameters are searched' );
