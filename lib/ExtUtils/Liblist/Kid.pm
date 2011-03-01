@@ -254,6 +254,7 @@ sub _win32_ext {
     # (caller should probably use the list in $Config{libs})
     return ( "", "", "", "", ( $give_libs ? [] : () ) ) unless $potential_libs;
 
+    # TODO: make this use MM_Win32.pm's compiler detection
     my $cc     = $Config{cc};
     my $VC     = $cc =~ /^cl/i;
     my $BC     = $cc =~ /^bcc/i;
