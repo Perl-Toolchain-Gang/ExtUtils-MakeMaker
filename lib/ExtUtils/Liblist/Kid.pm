@@ -10,6 +10,7 @@ use 5.006;
 # Broken out of MakeMaker from version 4.11
 
 use strict;
+use warnings;
 our $VERSION = '6.57_07';
 
 use ExtUtils::MakeMaker::Config;
@@ -257,7 +258,7 @@ sub _win32_ext {
     # TODO: make this use MM_Win32.pm's compiler detection
     my %libs_seen;
     my @extralibs;
-    my $cc         = $Config{cc};
+    my $cc         = $Config{cc} || '';
     my $VC         = $cc =~ /^cl/i;
     my $GC         = $cc =~ /^gcc/i;
     my $libext     = _win32_lib_extensions();
@@ -354,7 +355,7 @@ sub _win32_make_lib_search_list {
 sub _win32_default_search_paths {
     my ( $VC ) = @_;
 
-    my $libpth = $Config{'libpth'};
+    my $libpth = $Config{'libpth'} || '';
     $libpth =~ s,\\,/,g;            # normalize to forward slashes
 
     my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
