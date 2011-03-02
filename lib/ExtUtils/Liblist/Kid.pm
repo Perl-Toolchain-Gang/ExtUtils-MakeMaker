@@ -280,13 +280,12 @@ sub _win32_ext {
 
     # compute @extralibs from $potential_libs
 
-    my @searchpath;    # from "-L/path" in $potential_libs
+    my @searchpath = ( '' );                                           # from "-L/path" entries in $potential_libs
     my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
     my @extralibs;
-    my $pwd    = cwd();    # from Cwd.pm
+    my $pwd    = cwd();                                                # from Cwd.pm
     my $lib    = '';
     my $search = 1;
-    my ( $fullname );
 
     # add "$Config{installarchlib}/CORE" to default search path
     push @libpath, "$Config{installarchlib}/CORE";
@@ -295,6 +294,7 @@ sub _win32_ext {
         push @libpath, split /;/, $ENV{LIB};
     }
 
+  LIB:
     foreach ( Text::ParseWords::quotewords( '\s+', 0, $potential_libs ) ) {
 
         my $thislib = $_;
@@ -329,51 +329,28 @@ sub _win32_ext {
             next;
         }
 
-        # handle possible library arguments
-        if ( s/^-l// and $GC and !/^lib/i ) {
-            $_ = "lib$_";
-        }
-        $_ .= $libext if !/\Q$libext\E$/i;
+        my @file_list = _win32_build_file_list( $_, $GC, $libext );
 
-        my $secondpass = 0;
-      LOOKAGAIN:
+        for my $lib_file ( @file_list ) {
+            foreach my $thispth ( @searchpath, @libpath ) {
+                my $fullname = $lib_file;
+                $fullname = "$thispth\\$fullname" if $thispth;
 
-        # look for the file itself
-        if ( -f ) {
-            _debug( "'$thislib' found as '$_'\n", $verbose );
-            push( @extralibs, $_ );
-            next;
-        }
+                unless ( -f $fullname ) {
+                    _debug( "'$thislib' not found as '$fullname'\n", $verbose );
+                    next;
+                }
 
-        my $found_lib = 0;
-        foreach my $thispth ( @searchpath, @libpath ) {
-            unless ( -f ( $fullname = "$thispth\\$_" ) ) {
-                _debug( "'$thislib' not found as '$fullname'\n", $verbose );
-                next;
-            }
-            _debug( "'$thislib' found as '$fullname'\n", $verbose );
-            $found_lib++;
-            push( @extralibs, $fullname );
-            $libs_seen{$fullname} = 1;
-            last;
-        }
+                _debug( "'$thislib' found as '$fullname'\n", $verbose );
+                push( @extralibs, $fullname );
+                $libs_seen{$fullname} = 1 if $thispth;
 
-        # do another pass with (or without) leading 'lib' if they used -l
-        if ( !$found_lib and $thislib =~ /^-l/ and !$secondpass++ ) {
-            if ( $GC ) {
-                s/^lib//i;
-                goto LOOKAGAIN;
-            }
-            elsif ( !/^lib/i ) {
-                $_ = "lib$_";
-                goto LOOKAGAIN;
+                next LIB;
             }
         }
 
         # give up
-        warn "Note (probably harmless): " . "No library found for $thislib\n"
-          unless $found_lib > 0;
-
+        warn "Note (probably harmless): No library found for $thislib\n";
     }
 
     my @libs = keys %libs_seen;
@@ -395,20 +372,22 @@ sub _win32_ext {
 }
 
 sub _win32_build_file_list {
-    my ( $lib, @extensions ) = @_;
+    my ( $lib, $GC, @extensions ) = @_;
 
-    my @pre_fixed = _win32_build_prefixed_list( $lib );
+    my @pre_fixed = _win32_build_prefixed_list( $lib, $GC );
     return map _win32_attach_extensions( $_, @extensions ), @pre_fixed;
 }
 
 sub _win32_build_prefixed_list {
-    my ( $lib ) = @_;
+    my ( $lib, $GC ) = @_;
 
     return $lib if $lib !~ s/^-l//;
+    return $lib if $lib =~ /^lib/ and !$GC;
 
     ( my $no_prefix = $lib ) =~ s/^lib//i;
     $lib = "lib$lib" if $no_prefix eq $lib;
 
+    return ( $lib, $no_prefix ) if $GC;
     return ( $no_prefix, $lib );
 }
 
