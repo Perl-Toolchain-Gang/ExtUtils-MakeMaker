@@ -294,7 +294,6 @@ sub _win32_ext {
         push @libpath, split /;/, $ENV{LIB};
     }
 
-  LIB:
     foreach ( Text::ParseWords::quotewords( '\s+', 0, $potential_libs ) ) {
 
         my $thislib = $_;
@@ -331,27 +330,18 @@ sub _win32_ext {
 
         my @file_list = _win32_build_file_list( $_, $GC, $libext );
 
-        for my $lib_file ( @file_list ) {
-            foreach my $thispth ( @searchpath, @libpath ) {
-                my $fullname = $lib_file;
-                $fullname = "$thispth\\$fullname" if $thispth;
+        my @paths = ( @searchpath, @libpath );
+        my ( $fullname, $path ) = _win32_search_file( \@file_list, \@paths, $verbose, $thislib );
 
-                unless ( -f $fullname ) {
-                    _debug( "'$thislib' not found as '$fullname'\n", $verbose );
+        if ( !$fullname ) {
+            warn "Note (probably harmless): No library found for $thislib\n";
                     next;
                 }
 
                 _debug( "'$thislib' found as '$fullname'\n", $verbose );
                 push( @extralibs, $fullname );
-                $libs_seen{$fullname} = 1 if $thispth;
-
-                next LIB;
+        $libs_seen{$fullname} = 1 if $path;    # why is this a special case?
             }
-        }
-
-        # give up
-        warn "Note (probably harmless): No library found for $thislib\n";
-    }
 
     my @libs = keys %libs_seen;
 
@@ -369,6 +359,23 @@ sub _win32_ext {
 
     _debug( "Result: $lib\n", $verbose );
     wantarray ? ( $lib, '', $lib, '', ( $give_libs ? \@libs : () ) ) : $lib;
+}
+
+sub _win32_search_file {
+    my ( $file_list, $paths, $verbose, $thislib ) = @_;
+
+    for my $lib_file ( @{$file_list} ) {
+        for my $path ( @{$paths} ) {
+            my $fullname = $lib_file;
+            $fullname = "$path\\$fullname" if $path;
+
+            return ( $fullname, $path ) if -f $fullname;
+
+            _debug( "'$thislib' not found as '$fullname'\n", $verbose );
+        }
+    }
+
+    return;
 }
 
 sub _win32_build_file_list {
