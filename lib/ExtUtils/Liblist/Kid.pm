@@ -255,46 +255,20 @@ sub _win32_ext {
     return ( "", "", "", "", ( $give_libs ? [] : () ) ) unless $potential_libs;
 
     # TODO: make this use MM_Win32.pm's compiler detection
-    my $cc     = $Config{cc};
-    my $VC     = $cc =~ /^cl/i;
-    my $GC     = $cc =~ /^gcc/i;
-    my $libs   = $Config{'perllibs'};
-    my $libpth = $Config{'libpth'};
-    my $libext = _win32_lib_extensions();
     my %libs_seen;
-
-    if ( $libs and $potential_libs !~ /:nodefault/i ) {
-
-        # If Config.pm defines a set of default libs, we always
-        # tack them on to the user-supplied list, unless the user
-        # specified :nodefault
-
-        $potential_libs .= " ";
-        $potential_libs .= $libs;
-    }
-    _debug( "Potential libraries are '$potential_libs':\n", $verbose );
-
-    # normalize to forward slashes
-    $libpth         =~ s,\\,/,g;
-    $potential_libs =~ s,\\,/,g;
+    my @extralibs;
+    my $cc         = $Config{cc};
+    my $VC         = $cc =~ /^cl/i;
+    my $GC         = $cc =~ /^gcc/i;
+    my $libext     = _win32_lib_extensions();
+    my @searchpath = ( '' );                               # from "-L/path" entries in $potential_libs
+    my @libpath    = _win32_default_search_paths( $VC );
+    my $pwd        = cwd();                                # from Cwd.pm
+    my $search     = 1;
 
     # compute @extralibs from $potential_libs
-
-    my @searchpath = ( '' );                                           # from "-L/path" entries in $potential_libs
-    my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
-    my @extralibs;
-    my $pwd    = cwd();                                                # from Cwd.pm
-    my $lib    = '';
-    my $search = 1;
-
-    # add "$Config{installarchlib}/CORE" to default search path
-    push @libpath, "$Config{installarchlib}/CORE";
-
-    if ( $VC and exists $ENV{LIB} and $ENV{LIB} ) {
-        push @libpath, split /;/, $ENV{LIB};
-    }
-
-    foreach ( Text::ParseWords::quotewords( '\s+', 0, $potential_libs ) ) {
+    my @lib_search_list = _win32_make_lib_search_list( $potential_libs, $verbose );
+    for ( @lib_search_list ) {
 
         my $thislib = $_;
 
@@ -333,13 +307,13 @@ sub _win32_ext {
 
         if ( !$fullname ) {
             warn "Note (probably harmless): No library found for $thislib\n";
-                    next;
-                }
+            next;
+        }
 
-                _debug( "'$thislib' found as '$fullname'\n", $verbose );
-                push( @extralibs, $fullname );
+        _debug( "'$thislib' found as '$fullname'\n", $verbose );
+        push( @extralibs, $fullname );
         $libs_seen{$fullname} = 1 if $path;    # why is this a special case?
-            }
+    }
 
     my @libs = keys %libs_seen;
 
@@ -348,7 +322,8 @@ sub _win32_ext {
     # make sure paths with spaces are properly quoted
     @extralibs = map { /\s/ ? qq["$_"] : $_ } @extralibs;
     @libs      = map { /\s/ ? qq["$_"] : $_ } @libs;
-    $lib = join( ' ', @extralibs );
+
+    my $lib = join( ' ', @extralibs );
 
     # normalize back to backward slashes (to help braindead tools)
     # XXX this may break equally braindead GNU tools that don't understand
@@ -357,6 +332,39 @@ sub _win32_ext {
 
     _debug( "Result: $lib\n", $verbose );
     wantarray ? ( $lib, '', $lib, '', ( $give_libs ? \@libs : () ) ) : $lib;
+}
+
+sub _win32_make_lib_search_list {
+    my ( $potential_libs, $verbose ) = @_;
+
+    # If Config.pm defines a set of default libs, we always
+    # tack them on to the user-supplied list, unless the user
+    # specified :nodefault
+    my $libs = $Config{'perllibs'};
+    $potential_libs = join( ' ', $potential_libs, $libs ) if $libs and $potential_libs !~ /:nodefault/i;
+    _debug( "Potential libraries are '$potential_libs':\n", $verbose );
+
+    $potential_libs =~ s,\\,/,g;    # normalize to forward slashes
+
+    my @list = Text::ParseWords::quotewords( '\s+', 0, $potential_libs );
+
+    return @list;
+}
+
+sub _win32_default_search_paths {
+    my ( $VC ) = @_;
+
+    my $libpth = $Config{'libpth'};
+    $libpth =~ s,\\,/,g;            # normalize to forward slashes
+
+    my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
+    push @libpath, "$Config{installarchlib}/CORE";    # add "$Config{installarchlib}/CORE" to default search path
+
+    if ( $VC and exists $ENV{LIB} and $ENV{LIB} ) {
+        push @libpath, split /;/, $ENV{LIB};
+    }
+
+    return @libpath;
 }
 
 sub _win32_search_file {
