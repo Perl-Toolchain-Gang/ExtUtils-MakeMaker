@@ -260,7 +260,7 @@ sub _win32_ext {
     my $GC     = $cc =~ /^gcc/i;
     my $libs   = $Config{'perllibs'};
     my $libpth = $Config{'libpth'};
-    my $libext = $Config{'lib_ext'} || ".lib";
+    my $libext = _win32_lib_extensions();
     my %libs_seen;
 
     if ( $libs and $potential_libs !~ /:nodefault/i ) {
@@ -372,10 +372,10 @@ sub _win32_ext {
 }
 
 sub _win32_build_file_list {
-    my ( $lib, $GC, @extensions ) = @_;
+    my ( $lib, $GC, $extensions ) = @_;
 
     my @pre_fixed = _win32_build_prefixed_list( $lib, $GC );
-    return map _win32_attach_extensions( $_, @extensions ), @pre_fixed;
+    return map _win32_attach_extensions( $_, $extensions ), @pre_fixed;
 }
 
 sub _win32_build_prefixed_list {
@@ -392,8 +392,8 @@ sub _win32_build_prefixed_list {
 }
 
 sub _win32_attach_extensions {
-    my ( $lib, @extensions ) = @_;
-    return map _win32_try_attach_extension( $lib, $_ ), @extensions;
+    my ( $lib, $extensions ) = @_;
+    return map _win32_try_attach_extension( $lib, $_ ), @{$extensions};
 }
 
 sub _win32_try_attach_extension {
@@ -401,6 +401,13 @@ sub _win32_try_attach_extension {
 
     return $lib if $lib =~ /\Q$extension\E$/i;
     return "$lib$extension";
+}
+
+sub _win32_lib_extensions {
+    my %extensions;
+    $extensions{ $Config{'lib_ext'} } = 1 if $Config{'lib_ext'};
+    $extensions{".lib"} = 1;
+    return [ keys %extensions ];
 }
 
 sub _debug {
