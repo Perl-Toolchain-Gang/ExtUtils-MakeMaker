@@ -507,6 +507,11 @@ sub quote_literal {
         }
     }
     $text = join '', @text;
+    
+    # There is a terribly confusing edge case here, where this will do entirely the wrong thing:
+    # perl -e "use Data::Dumper; @ARGV = '%PATH%'; print Dumper( \@ARGV );print qq{@ARGV};" --
+    # I have no idea how to fix this manually, much less programmatically.
+    # However as it is such a rare edge case i'll just leave this documentation here and hope it never happens.
 
     # dmake eats '{' inside double quotes and leaves alone { outside double
     # quotes; however it transforms {{ into { either inside and outside double
