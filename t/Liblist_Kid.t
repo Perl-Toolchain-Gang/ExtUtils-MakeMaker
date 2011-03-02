@@ -70,7 +70,7 @@ sub move_to_os_test_data_dir {
 
 sub alias_kid_ext_for_convenience {
     my %os_ext_funcs = ( MSWin32 => \&ExtUtils::Liblist::Kid::_win32_ext, );
-    *_kid_ext = $os_ext_funcs{$^O};
+    *_kid_ext = $os_ext_funcs{$^O} if $os_ext_funcs{$^O};
 
     return;
 }
