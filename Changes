@@ -22,6 +22,13 @@
     * Rebase behaviour was improved (Reini Urban)
     * Build man pages (Reini Urban)
 
+    Win32
+    * Spot valid lib files on Win32 when .a and .lib are mixed.
+      (Christian Walde) [github #3]
+    * Extensive testing of ExtUtils::Liblist::Kid for Win32
+      (Christian Walde)
+
+
 6.57_06  Wed Oct 06 13:49:00 EEST 2010
     Win32
     * Work around dmake's limitations on how long a "line" can be.
