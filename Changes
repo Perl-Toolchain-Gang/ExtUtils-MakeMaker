@@ -27,6 +27,8 @@
       (Christian Walde) [github #3]
     * Extensive testing of ExtUtils::Liblist::Kid for Win32
       (Christian Walde)
+    * Implemented proper emulation of DOS escaping rules in ExtUtils::MM_Win32
+      (Christian Walde)
 
 
 6.57_06  Wed Oct 06 13:49:00 EEST 2010
