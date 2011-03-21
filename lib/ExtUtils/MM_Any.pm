@@ -1128,12 +1128,9 @@ or from internal data.
 
 sub mymeta {
     my $self = shift;
+    my $file = shift || ''; # for testing
 
-    my $mymeta;
-
-    if ( -e 'META.yml' || -e 'META.json' ) {
-        $mymeta = $self->_mymeta_from_meta();
-    }
+    my $mymeta = $self->_mymeta_from_meta($file);
 
     unless ( $mymeta ) {
         my @metadata = $self->metafile_data(
@@ -1155,11 +1152,12 @@ sub mymeta {
 
 sub _mymeta_from_meta {
     my $self = shift;
+    my $metafile = shift || ''; # for testing
 
     return unless _has_cpan_meta();
 
     my $meta;
-    for my $file ( qw/META.json META.yml/ ) {
+    for my $file ( $metafile, "META.json", "META.yml" ) {
       next unless -e $file;
       eval {
           $meta = CPAN::Meta->load_file($file)->as_struct( {version => "1.4"} );
