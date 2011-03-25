@@ -16,7 +16,6 @@ BEGIN {
 # mock one.
 
 BEGIN {
-
     package MockEUMM;
     use base 'File::Spec';    # what.
     sub new { return bless {}, 'MockEUMM'; }
@@ -24,12 +23,11 @@ BEGIN {
 
 package liblist_kid_test;
 
-use Test::More;
+use Test::More 'no_plan';
 use ExtUtils::MakeMaker::Config;
 use File::Spec;
 
 run();
-done_testing();
 
 exit;
 
