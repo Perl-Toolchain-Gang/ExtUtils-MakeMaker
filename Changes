@@ -1,3 +1,8 @@
+6.57_08
+    VMS
+    * Removed dependency on cc_runtime.h for VMS as well.
+
+
 6.57_07  Fri, 25 Mar 2011 14:31:31 +1100
     Enhancements
     * Generates META.json and MYMETA.json in addition to
