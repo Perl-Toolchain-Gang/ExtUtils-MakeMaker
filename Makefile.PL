@@ -157,6 +157,9 @@ BIN_WARN
             if ( !$installed ) {
                 print qq{Using included version of $module ($inc_version) because it is not already installed.\n};
             }
+            elsif ( $module =~ /^Scalar::Util/ and _scalar_util_is_fine( $installed ) ) {
+                delete $self->{PM}{$inc};
+            }
             elsif ( $installed_version >= $inc_version ) {
                 delete $self->{PM}{$inc};
             }
@@ -166,6 +169,56 @@ BIN_WARN
         }
 
         _remove_MANIFEST_SKIP( $self );
+    }
+
+    sub _scalar_util_is_fine {
+        my ( $file ) = @_;
+        my @exports = extract_exports( $file );
+        return 1 if grep /^blessed$/, @exports;
+        return 0;
+    }
+
+    sub extract_exports {
+        my ( $parsefile ) = @_;
+
+        my $code = do {
+            open my $fh, "<", $parsefile or die "Could not open '$parsefile': $!";
+            local $/;
+            <$fh>;
+        };
+
+        $code =~ s/[\r\n]//g;
+
+        my $exports = '';
+        for my $export_var_name ( qw( EXPORT EXPORT_OK ) ) {
+            my ( $export ) = (
+                $code =~ /
+                    (
+                        \@$export_var_name  # A possible export var starts here,
+                        \s*                 # sometimes followed by whitespace,
+                        =                   # a mandatory assignment,
+                        \s*                 # some more optional whitespace,
+                        qw\(                # then the start of a word list,
+                            [\w\s]+         # then the exports, consisting of alphanum + optional whitespace,
+                        \)                  # followed by the word list closing,
+                        \s*                 # some more optional whitespace,
+                        ;                   # and a mandatory semicolon.
+                    )
+                /x
+            );
+            $exports .= $export if $export;
+        }
+
+        my $eval = qq{
+            my \@EXPORT;
+            my \@EXPORT_OK;
+            $exports
+            return ( \@EXPORT, \@EXPORT_OK );
+        };
+        my @EXPORTS = eval( $eval );    ## no critic
+        warn "Could not eval '$eval' in $parsefile: $@" if $@;
+
+        return @EXPORTS;
     }
 
     # If ExtUtils::Manifest isn't included don't include MANIFEST.SKIP either.
@@ -219,7 +272,7 @@ BIN_WARN
 
         for my $perl ( @perls ) {
             $make .= sprintf <<'END', $perl;
-	cd $(DISTVNAME) && $(MAKE) clean && %s Makefile.PL && $(MAKE) test $(PASTHRU)
+        cd $(DISTVNAME) && $(MAKE) clean && %s Makefile.PL && $(MAKE) test $(PASTHRU)
 END
         }
 
