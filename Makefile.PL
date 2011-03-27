@@ -77,7 +77,7 @@ my $MM = WriteMakefile(
         },
     },
 
-    CONFIGURE_REQUIRES => {},                                        # We don't need ourself to install ourself.
+    CONFIGURE_REQUIRES => {},                  # We don't need ourself to install ourself.
     BUILD_REQUIRES     => { 'Data::Dumper' => 0, },
     INSTALLDIRS        => 'perl',
     LICENSE            => 'perl',
@@ -272,7 +272,7 @@ BIN_WARN
 
         for my $perl ( @perls ) {
             $make .= sprintf <<'END', $perl;
-        cd $(DISTVNAME) && $(MAKE) clean && %s Makefile.PL && $(MAKE) test $(PASTHRU)
+	cd $(DISTVNAME) && $(MAKE) clean && %s Makefile.PL && $(MAKE) test $(PASTHRU)
 END
         }
 
