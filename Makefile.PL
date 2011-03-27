@@ -72,7 +72,8 @@ my $MM = WriteMakefile(
 
     META_MERGE => {
         no_index => {
-            package => [ 'DynaLoader', 'in' ],    # "in" is a PAUSE misparse.
+            package   => [ 'DynaLoader', 'in' ],    # "in" is a PAUSE misparse.
+            directory => [ 'bundled', 'my' ],
         },
         resources => {
             license     => 'http://dev.perl.org/licenses/',
