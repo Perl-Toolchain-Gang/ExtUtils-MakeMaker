@@ -1,6 +1,10 @@
-6.57_08
+6.57_08  Sun, 27 Mar 2011 21:52:47 +1100
     VMS
     * Removed dependency on cc_runtime.h for VMS as well.
+
+    Misc
+    * Changed how modules are bundled to avoid replacing XS version of
+      Scalar::Util with a pure Perl version [github #4]
 
 
 6.57_07  Fri, 25 Mar 2011 14:31:31 +1100

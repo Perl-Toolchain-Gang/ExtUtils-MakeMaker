@@ -15,7 +15,7 @@ BEGIN {
 	require 5.004;
 	require Exporter;
 	require Carp;
-	$ExtUtils::MakeMaker::YAML::VERSION   = '6.57_07';
+	$ExtUtils::MakeMaker::YAML::VERSION   = '6.57_08';
 	@ExtUtils::MakeMaker::YAML::ISA       = qw{ Exporter  };
 	@ExtUtils::MakeMaker::YAML::EXPORT    = qw{ Load Dump };
 	@ExtUtils::MakeMaker::YAML::EXPORT_OK = qw{ LoadFile DumpFile freeze thaw };
