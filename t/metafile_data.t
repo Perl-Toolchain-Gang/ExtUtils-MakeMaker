@@ -356,6 +356,7 @@ my $new_mm = sub {
     },'META.yml data (META_ADD wins)';
 
 
+    # Yes, this is all hard coded.
     require CPAN::Meta;
     my $want_mymeta = {
         name            => 'ExtUtils-MakeMaker',
@@ -392,7 +393,7 @@ my $new_mm = sub {
             package             => ["DynaLoader", "in"],
         },
 
-        generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION, CPAN::Meta::Converter version $CPAN::Meta::VERSION",
+        generated_by => "ExtUtils::MakeMaker version 6.5707, CPAN::Meta::Converter version $CPAN::Meta::VERSION",
         'meta-spec'  => {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
