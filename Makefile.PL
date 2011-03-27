@@ -10,7 +10,11 @@
 BEGIN { require 5.006; }
 use strict;
 
-use lib qw(lib inc);    # build ourself with ourself
+use lib ".";
+use my::bundles;  # Must be used before anything else to set up bundled dependencies
+
+use lib qw(lib);    # build ourself with ourself
+
 use File::Spec;
 use ExtUtils::MakeMaker 6.50;
 
@@ -46,6 +50,8 @@ my %prereq = ();
 $prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 
 check_environment();
+
+my::bundles::copy_bundles("bundled", "inc");
 
 my $MM = WriteMakefile(
     NAME         => $PACKAGE,
@@ -135,127 +141,6 @@ BIN_WARN
         $self->SUPER::init_PERL;
 
         $self->{$_} .= q[ "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"] for qw( PERLRUN FULLPERLRUN ABSPERLRUN );
-    }
-
-    sub init_PM {
-        my $self = shift;
-
-        $self->SUPER::init_PM;
-
-        # Only override older versions of modules with ours in inc/
-        for my $inc ( grep /^inc/, keys %{ $self->{PM} } ) {
-            next unless $inc =~ /\.pm$/;
-
-            my $installed = _find_installed( $inc );
-
-            # Shut up "isn't numeric" warning on X.Y_Z versions.
-            local $^W = 0;
-            my $installed_version = $installed ? $self->parse_version( $installed ) : undef;
-            my $inc_version       = $self->parse_version( $inc );
-            my $module            = _module_name( $inc );
-
-            if ( !$installed ) {
-                print qq{Using included version of $module ($inc_version) because it is not already installed.\n};
-            }
-            elsif ( $module =~ /^Scalar::Util/ and _scalar_util_is_fine( $installed ) ) {
-                delete $self->{PM}{$inc};
-            }
-            elsif ( $installed_version >= $inc_version ) {
-                delete $self->{PM}{$inc};
-            }
-            else {
-                print qq{Using included version of $module ($inc_version) as it is newer than the installed version ($installed_version).\n};
-            }
-        }
-
-        _remove_MANIFEST_SKIP( $self );
-    }
-
-    sub _scalar_util_is_fine {
-        my ( $file ) = @_;
-        my @exports = extract_exports( $file );
-        return 1 if grep /^blessed$/, @exports;
-        return 0;
-    }
-
-    sub extract_exports {
-        my ( $parsefile ) = @_;
-
-        my $code = do {
-            open my $fh, "<", $parsefile or die "Could not open '$parsefile': $!";
-            local $/;
-            <$fh>;
-        };
-
-        $code =~ s/[\r\n]//g;
-
-        my $exports = '';
-        for my $export_var_name ( qw( EXPORT EXPORT_OK ) ) {
-            my ( $export ) = (
-                $code =~ /
-                    (
-                        \@$export_var_name  # A possible export var starts here,
-                        \s*                 # sometimes followed by whitespace,
-                        =                   # a mandatory assignment,
-                        \s*                 # some more optional whitespace,
-                        qw\(                # then the start of a word list,
-                            [\w\s]+         # then the exports, consisting of alphanum + optional whitespace,
-                        \)                  # followed by the word list closing,
-                        \s*                 # some more optional whitespace,
-                        ;                   # and a mandatory semicolon.
-                    )
-                /x
-            );
-            $exports .= $export if $export;
-        }
-
-        my $eval = qq{
-            my \@EXPORT;
-            my \@EXPORT_OK;
-            $exports
-            return ( \@EXPORT, \@EXPORT_OK );
-        };
-        my @EXPORTS = eval( $eval );    ## no critic
-        warn "Could not eval '$eval' in $parsefile: $@" if $@;
-
-        return @EXPORTS;
-    }
-
-    # If ExtUtils::Manifest isn't included don't include MANIFEST.SKIP either.
-    sub _remove_MANIFEST_SKIP {
-        my $self = shift;
-
-        return if grep /Manifest\.pm$/i, keys %{ $self->{PM} };
-
-        my ( $maniskip_key ) = grep /MANIFEST\.SKIP$/i, keys %{ $self->{PM} };
-        return unless $maniskip_key;
-
-        return delete $self->{PM}{$maniskip_key};
-    }
-
-    sub _find_installed {
-        my $file = shift;
-
-        $file =~ s{^(\W*)inc\W}{$1}i;
-
-        for my $inc ( grep { $_ ne 'inc' } @INC ) {
-            my $path = File::Spec->catfile( $inc, $file );
-            return $path if -r $path;
-        }
-
-        return;
-    }
-
-    sub _module_name {
-        my $path = shift;
-
-        my ( $vol, $dirs, $file ) = File::Spec->splitpath( $path );
-        my @dirs = File::Spec->splitdir( $dirs );
-        shift @dirs;    # remove inc
-
-        $file =~ s{\.pm$}{};
-
-        return join '::', grep { length } @dirs, $file;
     }
 
     # Test with multiple versions of perl
