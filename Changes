@@ -1,4 +1,4 @@
-6.57_09
+6.57_09  Mon, 28 Mar 2011 11:13:39 +1100
     Misc
     * Make CPAN ignore bundled modules
     * Accidentally rolled Version::Requirements into the version bundle
