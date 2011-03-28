@@ -48,8 +48,9 @@
 
 \.ppd$
 t/lib/File/
-t/Big-Dummy
-t/Problem-Module
+t/Big-Dummy/
+t/Problem-Module/
+t/dummy-install/
 MANIFEST.perl$
 merge_bleadperl$
 
