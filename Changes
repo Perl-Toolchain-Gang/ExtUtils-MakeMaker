@@ -1,3 +1,9 @@
+6.57_10
+    Bug Fixes
+    * Relaxed strictures on prerequisite versions.  Invalid versions now
+      issue a warning and are set to 0 rather than dying.
+
+
 6.57_09  Mon, 28 Mar 2011 11:13:39 +1100
     Misc
     * Make CPAN ignore bundled modules

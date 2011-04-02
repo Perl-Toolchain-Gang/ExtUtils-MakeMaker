@@ -7,7 +7,7 @@ BEGIN {require 5.006;}
 
 require Exporter;
 use ExtUtils::MakeMaker::Config;
-use Carp ();
+use Carp;
 use File::Path;
 
 our $Verbose = 0;       # exported
@@ -48,7 +48,7 @@ require ExtUtils::MY;  # XXX pre-5.8 versions of ExtUtils::Embed expect
 
 
 sub WriteMakefile {
-    Carp::croak "WriteMakefile: Need even number of args" if @_ % 2;
+    croak "WriteMakefile: Need even number of args" if @_ % 2;
 
     require ExtUtils::MY;
     my %att = @_;
@@ -177,7 +177,7 @@ sub _format_att {
 
 sub prompt ($;$) {  ## no critic
     my($mess, $def) = @_;
-    Carp::confess("prompt function called without an argument") 
+    confess("prompt function called without an argument") 
         unless defined $mess;
 
     my $isa_tty = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;
@@ -225,7 +225,7 @@ sub eval_in_subdirs {
 
 sub eval_in_x {
     my($self,$dir) = @_;
-    chdir $dir or Carp::carp("Couldn't change to directory $dir: $!");
+    chdir $dir or carp("Couldn't change to directory $dir: $!");
 
     {
         package main;
@@ -411,12 +411,16 @@ sub new {
 
     $self = {} unless defined $self;
 
-    $self->{PREREQ_PM}      ||= {};
-    $self->{BUILD_REQUIRES} ||= {};
-
     # Temporarily bless it into MM so it can be used as an
     # object.  It will be blessed into a temp package later.
     bless $self, "MM";
+
+    # Cleanup all the module requirement bits
+    for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES)) {
+        $self->{$key}      ||= {};
+        $self->clean_versions( $key );
+    }
+
 
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
         $self->_PREREQ_PRINT;
@@ -518,13 +522,13 @@ END
             _convert_compat_attrs(\%configure_att);
             $self = { %$self, %configure_att };
         } else {
-            Carp::croak "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
+            croak "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
         }
     }
 
     # This is for old Makefiles written pre 5.00, will go away
     if ( Carp::longmess("") =~ /runsubdirpl/s ){
-        Carp::carp("WARNING: Please rerun 'perl Makefile.PL' to regenerate your Makefiles\n");
+        carp("WARNING: Please rerun 'perl Makefile.PL' to regenerate your Makefiles\n");
     }
 
     my $newclass = ++$PACKNAME;
@@ -695,7 +699,7 @@ END
 }
 
 sub WriteEmptyMakefile {
-    Carp::croak "WriteEmptyMakefile: Need an even number of args" if @_ % 2;
+    croak "WriteEmptyMakefile: Need an even number of args" if @_ % 2;
 
     my %att = @_;
     my $self = MM->new(\%att);
@@ -1105,6 +1109,22 @@ sub neatvalue {
         push(@m,"$key=>".neatvalue($val)) ;
     }
     return "{ ".join(', ',@m)." }";
+}
+
+# Look for weird version numbers, warn about them and set them to 0
+# before CPAN::Meta chokes.
+sub clean_versions {
+    my($self, $key) = @_;
+
+    my $reqs = $self->{$key};
+    for my $module (keys %$reqs) {
+        my $version = $reqs->{$module};
+
+        if( !defined $version or $version !~ /^[\d_\.]+$/ ) {
+            carp "Unparsable version '$version' for prerequisite $module";
+            $reqs->{$module} = 0;
+        }
+    }
 }
 
 sub selfdocument {
