@@ -3,11 +3,35 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 15;
 
 use Data::Dumper;
+use File::Temp;
+use Cwd;
 
 require ExtUtils::MM_Any;
+
+sub in_dir(&;$) {
+    my $code = shift;
+    my $dir = shift || File::Temp->newdir;
+
+    # chdir to the new directory
+    my $orig_dir = cwd();
+    chdir $dir or die "Can't chdir to $dir: $!";
+
+    # Run the code, but trap the error so we can chdir back
+    my $return;
+    my $ok = eval { $return = $code->(); 1; };
+    my $err = $@;
+
+    # chdir back
+    chdir $orig_dir or die "Can't chdir to $orig_dir: $!";
+
+    # rethrow if necessary
+    die $err unless $ok;
+
+    return $return;
+}
 
 my $new_mm = sub {
     return bless { ARGS => {@_}, @_ }, 'ExtUtils::MM_Any';
@@ -407,4 +431,35 @@ my $new_mm = sub {
     is_deeply $mm->mymeta("t/META_for_testing.yml"),
               $want_mymeta,
               'MYMETA YAML data (BUILD_REQUIRES wins)';
+}
+
+
+note "CPAN::Meta bug using the module version instead of the meta spec version"; {
+    my $mm = $new_mm->(
+        NAME      => 'GD::Barcode::Code93',
+        AUTHOR    => 'Chris DiMartino',
+        ABSTRACT  => 'Code 93 implementation of GD::Barcode family',
+        PREREQ_PM => {
+            'GD::Barcode' => 0,
+            'GD'          => 0
+        },
+        VERSION   => '1.4',
+    );
+
+    my $meta = $mm->mymeta("t/META_for_testing_tricky_version.yml");
+    is $meta->{'meta-spec'}{version}, 1.4;
+
+    in_dir {
+        $mm->write_mymeta($meta);
+        ok -e "MYMETA.yml";
+        ok -e "MYMETA.json";
+
+        require CPAN::Meta;
+        my $meta_yml = CPAN::Meta->load_file("MYMETA.yml");
+        is $meta_yml->{'meta-spec'}{version}, 1.4, "MYMETA.yml correctly downgraded to 1.4";
+
+        my $meta_json = CPAN::Meta->load_file("MYMETA.json");
+        cmp_ok $meta_json->{'meta-spec'}{version}, ">=", 2, "MYMETA.json at 2 or better";
+    };
+
 }
