@@ -91,6 +91,10 @@ my $MM = WriteMakefile(
     ABSTRACT_FROM      => "lib/$PACKAGE_FILE.pm",
     AUTHOR             => 'Michael G Schwern <schwern@pobox.com>',
 
+    realclean              => {
+        FILES   => "inc"
+    },
+
     $^O =~ /win/i
     ? (
         dist => {
