@@ -4,6 +4,8 @@
       issue a warning and are set to 0 rather than dying. [github #7]
     * Upgraded CPAN::Meta to 2.110930 which fixes a glitch in writing
       MYMETA.yml if your module's version number was 1.4. [github #9]
+    * Convert LICENSE entries which are unknown to CPAN::Meta to
+      "unknown" rather than dying. [github #10]
 
 
 6.57_09  Mon, 28 Mar 2011 11:13:39 +1100

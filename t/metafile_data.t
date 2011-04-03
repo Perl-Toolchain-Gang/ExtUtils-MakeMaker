@@ -3,7 +3,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 use Data::Dumper;
 use File::Temp;
@@ -476,4 +476,24 @@ note "CPAN::Meta bug using the module version instead of the meta spec version";
         cmp_ok $meta_json->{'meta-spec'}{version}, ">=", 2, "MYMETA.json at 2 or better";
     };
 
+}
+
+
+note "A bad license string"; {
+    my $mm = $new_mm->(
+        DISTNAME  => 'Foo::Bar',
+        VERSION   => '1.4',
+        LICENSE   => 'death and retribution',
+    );
+
+    my $meta = $mm->mymeta;
+    in_dir {
+        $mm->write_mymeta($meta);
+
+        my $meta_yml = Parse::CPAN::Meta->load_file("MYMETA.yml");
+        is $meta_yml->{license}, "unknown", "in yaml";
+
+        my $meta_json = Parse::CPAN::Meta->load_file("MYMETA.json");
+        is_deeply $meta_json->{license}, ["unknown"], "in json";
+    };
 }

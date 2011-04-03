@@ -1196,7 +1196,7 @@ sub write_mymeta {
 
     return unless _has_cpan_meta();
 
-    my $meta_obj = CPAN::Meta->new( $mymeta );
+    my $meta_obj = CPAN::Meta->new( $mymeta, { lazy_validation => 1 } );
     $meta_obj->save( 'MYMETA.json' );
     $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );
     return 1;
