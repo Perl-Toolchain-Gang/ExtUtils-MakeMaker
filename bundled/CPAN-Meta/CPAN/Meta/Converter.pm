@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package CPAN::Meta::Converter;
 BEGIN {
-  $CPAN::Meta::Converter::VERSION = '2.110580';
+  $CPAN::Meta::Converter::VERSION = '2.110930';
 }
 # ABSTRACT: Convert CPAN distribution metadata structures
 
@@ -142,15 +142,18 @@ my @valid_licenses_2 = qw(
   unknown
 );
 
+# The "old" values were defined by Module::Build, and were often vague.  I have
+# made the decisions below based on reading Module::Build::API and how clearly
+# it specifies the version of the license.
 my %license_map_2 = (
-  ( map { $_ => $_ } @valid_licenses_2 ),
-  apache => 'apache_2_0',
-  artistic => 'artistic_1',
-  artistic2 => 'artistic_2',
-  gpl => 'gpl_1',
-  lgpl => 'lgpl_2_1',
-  mozilla => 'mozilla_1_0',
-  perl => 'perl_5',
+  (map { $_ => $_ } @valid_licenses_2),
+  apache      => 'apache_2_0',  # clearly stated as 2.0
+  artistic    => 'artistic_1',  # clearly stated as 1
+  artistic2   => 'artistic_2',  # clearly stated as 2
+  gpl         => 'open_source', # we don't know which GPL; punt
+  lgpl        => 'open_source', # we don't know which LGPL; punt
+  mozilla     => 'open_source', # we don't know which MPL; punt
+  perl        => 'perl_5',      # clearly Perl 5
   restrictive => 'restricted',
 );
 
@@ -1250,7 +1253,7 @@ CPAN::Meta::Converter - Convert CPAN distribution metadata structures
 
 =head1 VERSION
 
-version 2.110580
+version 2.110930
 
 =head1 SYNOPSIS
 

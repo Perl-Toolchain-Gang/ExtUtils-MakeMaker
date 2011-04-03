@@ -3,11 +3,12 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 17;
 
 use Data::Dumper;
 use File::Temp;
 use Cwd;
+use Parse::CPAN::Meta;
 
 require ExtUtils::MM_Any;
 
@@ -31,6 +32,20 @@ sub in_dir(&;$) {
     die $err unless $ok;
 
     return $return;
+}
+
+sub mymeta_ok {
+    my($have, $want, $name) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $have_gen = delete $have->{generated_by};
+    my $want_gen = delete $want->{generated_by};
+
+    is_deeply $have, $want, $name;
+    like $have_gen, qr{CPAN::Meta}, "CPAN::Meta mentioned in the generated_by";
+
+    return;
 }
 
 my $new_mm = sub {
@@ -417,18 +432,18 @@ my $new_mm = sub {
             package             => ["DynaLoader", "in"],
         },
 
-        generated_by => "ExtUtils::MakeMaker version 6.5707, CPAN::Meta::Converter version $CPAN::Meta::VERSION",
+        generated_by => "ExtUtils::MakeMaker version 6.5707, CPAN::Meta::Converter version 2.110580",
         'meta-spec'  => {
             url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html', 
             version     => 1.4
         },
     };
 
-    is_deeply $mm->mymeta("t/META_for_testing.json"),
+    mymeta_ok $mm->mymeta("t/META_for_testing.json"),
               $want_mymeta,
               'MYMETA JSON data (BUILD_REQUIRES wins)';
 
-    is_deeply $mm->mymeta("t/META_for_testing.yml"),
+    mymeta_ok $mm->mymeta("t/META_for_testing.yml"),
               $want_mymeta,
               'MYMETA YAML data (BUILD_REQUIRES wins)';
 }
@@ -454,11 +469,10 @@ note "CPAN::Meta bug using the module version instead of the meta spec version";
         ok -e "MYMETA.yml";
         ok -e "MYMETA.json";
 
-        require CPAN::Meta;
-        my $meta_yml = CPAN::Meta->load_file("MYMETA.yml");
+        my $meta_yml = Parse::CPAN::Meta->load_file("MYMETA.yml");
         is $meta_yml->{'meta-spec'}{version}, 1.4, "MYMETA.yml correctly downgraded to 1.4";
 
-        my $meta_json = CPAN::Meta->load_file("MYMETA.json");
+        my $meta_json = Parse::CPAN::Meta->load_file("MYMETA.json");
         cmp_ok $meta_json->{'meta-spec'}{version}, ">=", 2, "MYMETA.json at 2 or better";
     };
 

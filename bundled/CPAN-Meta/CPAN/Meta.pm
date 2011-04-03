@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package CPAN::Meta;
 BEGIN {
-  $CPAN::Meta::VERSION = '2.110580';
+  $CPAN::Meta::VERSION = '2.110930';
 }
 # ABSTRACT: the distribution metadata for a CPAN dist
 
@@ -223,7 +223,6 @@ sub save {
 }
 
 
-# XXX Do we need this if we always upconvert? -- dagolden, 2010-04-14
 sub meta_spec_version {
   my ($self) = @_;
   return $self->meta_spec->{version};
@@ -313,7 +312,7 @@ sub as_string {
   my $version = $options->{version} || '2';
 
   my $struct;
-  if ( $self->version ne $version ) {
+  if ( $self->meta_spec_version ne $version ) {
     my $cmc = CPAN::Meta::Converter->new( $self->as_struct );
     $struct = $cmc->convert( version => $version );
   }
@@ -354,7 +353,7 @@ CPAN::Meta - the distribution metadata for a CPAN dist
 
 =head1 VERSION
 
-version 2.110580
+version 2.110930
 
 =head1 SYNOPSIS
 
