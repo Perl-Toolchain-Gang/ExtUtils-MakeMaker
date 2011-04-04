@@ -486,8 +486,8 @@ note "A bad license string"; {
         LICENSE   => 'death and retribution',
     );
 
-    my $meta = $mm->mymeta;
     in_dir {
+        my $meta = $mm->mymeta;
         $mm->write_mymeta($meta);
 
         my $meta_yml = Parse::CPAN::Meta->load_file("MYMETA.yml");
