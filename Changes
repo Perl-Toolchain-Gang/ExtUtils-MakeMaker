@@ -1,4 +1,4 @@
-6.57_10
+6.57_10  Sun, 03 Apr 2011 19:36:38 +1000
     Bug Fixes
     * Relaxed strictures on prerequisite versions.  Invalid versions now
       issue a warning and are set to 0 rather than dying. [github #7]
