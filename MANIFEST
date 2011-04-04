@@ -121,6 +121,7 @@ t/MakeMaker_Parameters.t
 t/maketext_filter.t
 t/META_for_testing.json
 t/META_for_testing.yml
+t/META_for_testing_tricky_version.yml
 t/metafile_data.t
 t/metafile_file.t
 t/min_perl_version.t
