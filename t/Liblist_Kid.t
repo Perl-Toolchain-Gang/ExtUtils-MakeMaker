@@ -132,7 +132,7 @@ sub test_kid_win32 {
     is_deeply( [ _ext( 'test' ) ], [ 'test.meep', '', 'test.meep', '' ], '$Config{lib_ext} changes the lib extension to be searched for' );
     delete $Config{lib_ext};
 
-    $Config{cc} = 'gcc';
+    $Config{cc} = 'C:/MinGW/bin/gcc.exe';
 
     is_deeply( [ _ext( 'test' ) ],                    [ 'test.lib',      '', 'test.lib',      '' ], '[gcc] searching for straight lib names remains unchanged' );
     is_deeply( [ _ext( '-l__test' ) ],                [ 'lib__test.lib', '', 'lib__test.lib', '' ], '[gcc] lib-prefixed library files are found first when -l is in use' );
@@ -140,7 +140,7 @@ sub test_kid_win32 {
     is_deeply( [ _ext( '-llibtest' ) ],               [ 'test.lib',      '', 'test.lib',      '' ], '[gcc] if -l is used and the lib name is already prefixed a second search without the lib is done' );
     is_deeply( [ _ext( ':nosearch -lunreal_test' ) ], [ '-lunreal_test', '', '-lunreal_test', '' ], '[gcc] lib names with -l after a :nosearch remain as they are' );
 
-    $Config{cc} = 'cl';
+    $Config{cc} = 'c:/Programme/Microsoft Visual Studio 9.0/VC/bin/cl.exe';
 
     is_deeply( [ _ext( 'test' ) ], [ 'test.lib', '', 'test.lib', '' ], '[vc] searching for straight lib names remains unchanged' );
     is_deeply( [ _ext( ':nosearch -Lunreal_test' ) ], [ '-libpath:unreal_test', '', '-libpath:unreal_test', '' ], '[vc] lib dirs with -L after a :nosearch are prefixed with -libpath:' );

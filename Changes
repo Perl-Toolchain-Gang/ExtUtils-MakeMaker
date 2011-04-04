@@ -2,6 +2,10 @@
     VMS
     * Fix prereq.t to work around "local %ENV = %ENV" bug
 
+    Win32
+    * Liblist::Kid can now recognize long compiler paths
+      (Christian Walde) [github #11]
+
 
 6.57_10  Sun, 03 Apr 2011 19:36:38 +1000
     Bug Fixes
