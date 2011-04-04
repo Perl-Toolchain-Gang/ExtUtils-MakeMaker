@@ -158,7 +158,12 @@ BIN_WARN
         # Strip off all the whitespace at the end, we'll put our own in.
         $make =~ s{\s+\z}{\n};
 
-        my @perls = qw( perl5.8.9 );
+        my @perls = qw(
+            perl5.6.2
+            perl5.8.9
+            perl5.10.1
+            perl5.12.3
+        );
 
         for my $perl ( @perls ) {
             $make .= sprintf <<'END', $perl;
