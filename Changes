@@ -1,3 +1,8 @@
+6.57_11
+    VMS
+    * Fix prereq.t to work around "local %ENV = %ENV" bug
+
+
 6.57_10  Sun, 03 Apr 2011 19:36:38 +1000
     Bug Fixes
     * Relaxed strictures on prerequisite versions.  Invalid versions now
