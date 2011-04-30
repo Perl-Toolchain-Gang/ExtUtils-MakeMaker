@@ -759,6 +759,9 @@ MAKE_FRAG
         $self->{META_ADD}   || {},
         $self->{META_MERGE} || {},
     );
+    
+    _fix_metadata_before_conversion( \%metadata );
+
     my $meta       = CPAN::Meta->create( \%metadata, {lazy_validation => 1} );
 
     my @write_metayml = $self->echo(
@@ -781,6 +784,47 @@ metafile : create_distdir
 MAKE_FRAG
 
 }
+
+=begin private
+
+=head3 _fix_metadata_before_conversion
+
+    _fix_metadata_before_conversion( \%metadata );
+
+Fixes errors in the metadata before it's handed off to CPAN::Meta for
+conversion. This hopefully results in something that can be used further
+on, no guarantee is made though.
+
+=end private
+
+=cut
+
+sub _fix_metadata_before_conversion {
+    my ( $metadata ) = @_;
+
+    # just delete all invalid versions
+    $metadata->{version} = '' if $metadata->{version} and !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
+
+    my $validator = CPAN::Meta::Validator->new( $metadata );
+    return if $validator->is_valid;
+
+    # fix non-camelcase custom resource keys (only other trick we know)
+    for my $error ( $validator->errors ) {
+        my ( $key ) = ( $error =~ /Custom resource '(.*)' must be in CamelCase./ );
+        next if !$key;
+
+        ( my $new_key = $key ) =~ s/[^_a-zA-Z]//g;    # first try to remove all non-alphabetic chars
+
+        $new_key = ucfirst $new_key if !$validator->custom_1( $new_key );    # if that doesn't work, uppercase first one
+
+        $metadata->{resources}{$new_key} = $metadata->{resources}{$key} if $validator->custom_1( $new_key );    # copy to new key if that worked
+
+        delete $metadata->{resources}{$key};                                                                    # and delete old one in any case
+    }
+
+    return;
+}
+
 
 =begin private
 
@@ -1196,12 +1240,16 @@ sub write_mymeta {
 
     return unless _has_cpan_meta();
 
+    _fix_metadata_before_conversion( $mymeta );
+    
+    # this can still blow up
+    # not sure if i should just eval this and skip file creation if it
+    # blows up
     my $meta_obj = CPAN::Meta->new( $mymeta, { lazy_validation => 1 } );
     $meta_obj->save( 'MYMETA.json' );
     $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );
     return 1;
 }
-
 
 =head3 realclean (o)
 
