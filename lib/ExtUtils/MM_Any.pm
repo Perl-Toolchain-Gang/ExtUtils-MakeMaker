@@ -816,9 +816,14 @@ on, no guarantee is made though.
 sub _fix_metadata_before_conversion {
     my ( $metadata ) = @_;
 
+    my $bad_version = $metadata->{version} &&
+                      !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
+
     # just delete all invalid versions
-    $metadata->{version} = '' if $metadata->{version} and
-                                 !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
+    if( $bad_version ) {
+        warn "Can't parse version '$metadata->{version}'\n";
+        $metadata->{version} = '';
+    }
 
     my $validator = CPAN::Meta::Validator->new( $metadata );
     return if $validator->is_valid;
