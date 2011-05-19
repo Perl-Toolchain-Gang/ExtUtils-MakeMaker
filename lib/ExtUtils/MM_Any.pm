@@ -817,7 +817,8 @@ sub _fix_metadata_before_conversion {
     my ( $metadata ) = @_;
 
     # just delete all invalid versions
-    $metadata->{version} = '' if $metadata->{version} and !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
+    $metadata->{version} = '' if $metadata->{version} and
+                                 !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
 
     my $validator = CPAN::Meta::Validator->new( $metadata );
     return if $validator->is_valid;
@@ -827,13 +828,18 @@ sub _fix_metadata_before_conversion {
         my ( $key ) = ( $error =~ /Custom resource '(.*)' must be in CamelCase./ );
         next if !$key;
 
-        ( my $new_key = $key ) =~ s/[^_a-zA-Z]//g;    # first try to remove all non-alphabetic chars
+        # first try to remove all non-alphabetic chars
+        ( my $new_key = $key ) =~ s/[^_a-zA-Z]//g;
 
-        $new_key = ucfirst $new_key if !$validator->custom_1( $new_key );    # if that doesn't work, uppercase first one
+        # if that doesn't work, uppercase first one
+        $new_key = ucfirst $new_key if !$validator->custom_1( $new_key );
 
-        $metadata->{resources}{$new_key} = $metadata->{resources}{$key} if $validator->custom_1( $new_key );    # copy to new key if that worked
+        # copy to new key if that worked
+        $metadata->{resources}{$new_key} = $metadata->{resources}{$key}
+          if $validator->custom_1( $new_key );
 
-        delete $metadata->{resources}{$key};                                                                    # and delete old one in any case
+        # and delete old one in any case
+        delete $metadata->{resources}{$key};
     }
 
     return;
