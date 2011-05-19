@@ -765,14 +765,19 @@ MAKE_FRAG
     # paper over validation issues, but still complain, necessary because
     # there's no guarantee that the above will fix ALL errors
     my $meta = eval { CPAN::Meta->create( \%metadata, { lazy_validation => 1 } ) };
-    warn $@ if $@ and $@ !~ /encountered CODE.*, but JSON can only represent references to arrays or hashes/;
-    $meta = bless \%metadata, 'CPAN::Meta' if !$meta;                                                # just use the original metadata straight if the conversion failed
-    $meta = bless \%metadata, 'CPAN::Meta' if !eval { $meta->as_string( { version => "1.4" } ) };    # also if it can't be stringified
-    $meta = bless \%metadata, 'CPAN::Meta' if !eval { $meta->as_string };
+    warn $@ if $@ and 
+               $@ !~ /encountered CODE.*, but JSON can only represent references to arrays or hashes/;
 
-    # these as_string() subs can still die, no idea how to fix that
-    # gracefully, unless we can also accept that no output is
-    # generated from this function
+    # use the original metadata straight if the conversion failed
+    # or if it can't be stringified.
+    if( !$meta                                                  ||
+        !eval { $meta->as_string( { version => "1.4" } ) }      ||
+        !eval { $meta->as_string }
+    )
+    {
+        $meta = bless \%metadata, 'CPAN::Meta';
+    }
+
     my @write_metayml = $self->echo(
       $meta->as_string({version => "1.4"}), 'META_new.yml'
     );
