@@ -1491,7 +1491,7 @@ sub init_INST {
     # perl has been built and installed. Setting INST_LIB allows
     # you to build directly into, say $Config{privlibexp}.
     unless ($self->{INST_LIB}){
-	if ($self->{PERL_CORE}) {
+        if ($self->{PERL_CORE}) {
             if (defined $Cross::platform) {
                 $self->{INST_LIB} = $self->{INST_ARCHLIB} = 
                   $self->catdir($self->{PERL_LIB},"..","xlib",
@@ -1500,9 +1500,9 @@ sub init_INST {
             else {
                 $self->{INST_LIB} = $self->{INST_ARCHLIB} = $self->{PERL_LIB};
             }
-	} else {
-	    $self->{INST_LIB} = $self->catdir($Curdir,"blib","lib");
-	}
+        } else {
+            $self->{INST_LIB} = $self->catdir($Curdir,"blib","lib");
+        }
     }
 
     my @parentdir = split(/::/, $self->{PARENT_NAME});
