@@ -1,4 +1,10 @@
 6.57_11
+    Bug Fixes
+    * Changed CPAN::Meta to accept version objects. [github #16]
+    * Massage bad versions and warn the user about them. [github #15]
+    * Protect against CPAN::Meta dying during metafile validation
+      and generation.
+
     VMS
     * Fix prereq.t to work around "local %ENV = %ENV" bug
 
