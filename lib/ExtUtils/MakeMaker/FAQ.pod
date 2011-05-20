@@ -1,6 +1,6 @@
 package ExtUtils::MakeMaker::FAQ;
 
-our $VERSION = '6.57_10';
+our $VERSION = '6.57_11';
 
 1;
 __END__

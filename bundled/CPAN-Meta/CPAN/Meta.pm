@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package CPAN::Meta;
 BEGIN {
-  $CPAN::Meta::VERSION = '2.110930_001';
+  $CPAN::Meta::VERSION = eval '2.110930_001';
 }
 # ABSTRACT: the distribution metadata for a CPAN dist
 

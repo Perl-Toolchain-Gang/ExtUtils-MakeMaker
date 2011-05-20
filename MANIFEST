@@ -119,6 +119,7 @@ t/Liblist_Kid.t
 t/make.t
 t/MakeMaker_Parameters.t
 t/maketext_filter.t
+t/meta_convert.t
 t/META_for_testing.json
 t/META_for_testing.yml
 t/META_for_testing_tricky_version.yml

@@ -1,4 +1,4 @@
-6.57_11
+6.57_11  Thu May 19 17:26:31 PDT 2011
     Bug Fixes
     * Changed CPAN::Meta to accept version objects. [github #16]
     * Massage bad versions and warn the user about them. [github #15]
