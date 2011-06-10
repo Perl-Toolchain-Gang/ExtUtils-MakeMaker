@@ -2869,7 +2869,7 @@ generated Makefile along with your report.
 
 For more up-to-date information, see L<http://www.makemaker.org>.
 
-Repository available at L<http://github.com/schwern/extutils-makemaker>.
+Repository available at L<https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker>.
 
 =head1 LICENSE
 
