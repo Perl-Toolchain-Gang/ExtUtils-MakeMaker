@@ -11,7 +11,7 @@ use 5.006;
 
 use strict;
 use warnings;
-our $VERSION = '6.57_11';
+our $VERSION = '6.58';
 
 use ExtUtils::MakeMaker::Config;
 use Cwd 'cwd';
