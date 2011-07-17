@@ -2,6 +2,10 @@ Next
     Doc Fixes
     * Corrected the repository location [chorny]
 
+    Bug Fixes
+    * Forgot to load CPAN::Meta::Validator, can't rely on CPAN::Meta
+      loading it. [rt.cpan.org 69465]
+
 
 6.58  Wed Jul  6 14:17:06 PDT 2011
     No changes since 6.57_11

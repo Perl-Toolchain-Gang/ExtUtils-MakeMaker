@@ -816,6 +816,8 @@ on, no guarantee is made though.
 sub _fix_metadata_before_conversion {
     my ( $metadata ) = @_;
 
+    require CPAN::Meta::Validator;
+
     my $bad_version = $metadata->{version} &&
                       !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
 
