@@ -1293,7 +1293,7 @@ sub realclean {
     # Special exception for the perl core where INST_* is not in blib.
     # This cleans up the files built from the ext/ directory (all XS).
     if( $self->{PERL_CORE} ) {
-	push @dirs, qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
+        push @dirs, qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
         push @files, values %{$self->{PM}};
     }
 
