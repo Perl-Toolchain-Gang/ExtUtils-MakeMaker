@@ -730,8 +730,8 @@ CMD
 
 sub _has_cpan_meta {
     return eval {
-      $INC{'CPAN/Meta.pm'} or require CPAN::Meta;
-      CPAN::Meta->VERSION(2.110350);
+      require CPAN::Meta;
+      CPAN::Meta->VERSION(2.112150);
       1;
     };
 }
@@ -816,7 +816,10 @@ on, no guarantee is made though.
 sub _fix_metadata_before_conversion {
     my ( $metadata ) = @_;
 
-    require CPAN::Meta::Validator;
+    # we should never be called unless this already passed but
+    # prefer to be defensive in case somebody else calls this
+
+    return unless _has_cpan_meta;
 
     my $bad_version = $metadata->{version} &&
                       !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
