@@ -361,7 +361,7 @@ sub _win32_default_search_paths {
     my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
     push @libpath, "$Config{installarchlib}/CORE";    # add "$Config{installarchlib}/CORE" to default search path
 
-    if ( $VC and exists $ENV{LIB} and $ENV{LIB} ) {
+    if ( $VC and $ENV{LIB} ) {
         push @libpath, split /;/, $ENV{LIB};
     }
 
