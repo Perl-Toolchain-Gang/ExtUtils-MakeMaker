@@ -258,9 +258,10 @@ sub _win32_ext {
     # TODO: make this use MM_Win32.pm's compiler detection
     my %libs_seen;
     my @extralibs;
-    my $cc         = $Config{cc} || '';
-    my $VC         = $cc =~ /\bcl\b/i;
-    my $GC         = $cc =~ /\bgcc\b/i;
+    my $cc = $Config{cc} || '';
+    my $VC = $cc =~ /\bcl\b/i;
+    my $GC = $cc =~ /\bgcc\b/i;
+
     my $libext     = _win32_lib_extensions();
     my @searchpath = ( '' );                               # from "-L/path" entries in $potential_libs
     my @libpath    = _win32_default_search_paths( $VC );
@@ -361,9 +362,7 @@ sub _win32_default_search_paths {
     my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
     push @libpath, "$Config{installarchlib}/CORE";    # add "$Config{installarchlib}/CORE" to default search path
 
-    if ( $VC and $ENV{LIB} ) {
-        push @libpath, split /;/, $ENV{LIB};
-    }
+    push @libpath, split /;/, $ENV{LIB} if $VC and $ENV{LIB};
 
     return @libpath;
 }
