@@ -49,7 +49,8 @@ sub run {
 sub conf_reset {
     delete $Config{$_} for keys %Config;
     delete $ENV{LIB};
-    
+    delete $ENV{LIBRARY_PATH};
+
     return;
 }
 
@@ -140,6 +141,10 @@ sub test_kid_win32 {
     is_deeply( [ _ext( '-llibtest' ) ],               [ 'test.lib',      '', 'test.lib',      '' ], '[gcc] if -l is used and the lib name is already prefixed a second search without the lib is done' );
     is_deeply( [ _ext( ':nosearch -lunreal_test' ) ], [ '-lunreal_test', '', '-lunreal_test', '' ], '[gcc] lib names with -l after a :nosearch remain as they are' );
 
+    $ENV{LIBRARY_PATH} = 'libpath';
+    is_deeply( [ _ext( 'lp_test' ) ], [ 'libpath\lp_test.lib', '', 'libpath\lp_test.lib', '' ], '[gcc] $ENV{LIBRARY_PATH} adds extra search paths' );
+    delete $ENV{LIBRARY_PATH};
+
     $Config{cc} = 'c:/Programme/Microsoft Visual Studio 9.0/VC/bin/cl.exe';
 
     is_deeply( [ _ext( 'test' ) ], [ 'test.lib', '', 'test.lib', '' ], '[vc] searching for straight lib names remains unchanged' );
@@ -151,4 +156,3 @@ sub test_kid_win32 {
 
     return;
 }
-

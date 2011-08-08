@@ -1,3 +1,8 @@
+
+    Win32
+    * Liblist::Kid now checks the ActiveState MinGW library path environment
+      variable [MITHALDU]
+
 6.59  Fri Aug  5 12:09:00 BST
     No changes since 6.58_01
 
