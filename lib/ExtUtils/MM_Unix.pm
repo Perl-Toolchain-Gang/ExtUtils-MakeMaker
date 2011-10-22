@@ -2890,10 +2890,12 @@ sub ppd {
     $abstract =~ s/\n/\\n/sg;
     $abstract =~ s/</&lt;/g;
     $abstract =~ s/>/&gt;/g;
+    $abstract =~ s/\$/\$\$/g;
 
     my $author = join(', ',@{$self->{AUTHOR} || []});
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
+    $author =~ s/\$/\$\$/g;
 
     my $ppd_xml = sprintf <<'PPD_HTML', $self->{VERSION}, $abstract, $author;
 <SOFTPKG NAME="$(DISTNAME)" VERSION="%s">
