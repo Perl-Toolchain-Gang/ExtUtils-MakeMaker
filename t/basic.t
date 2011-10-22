@@ -83,7 +83,7 @@ close PPD;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0.01">}m, 
                                                            '  <SOFTPKG>' );
 like( $ppd_html,
-      qr{^\s*<ABSTRACT>Try "our" hot dog's \$andwiche\$</ABSTRACT>}m,         
+      qr{^\s*<ABSTRACT>Try "our" hot dog's and \$andwiche\$</ABSTRACT>}m,
                                                            '  <ABSTRACT>');
 like( $ppd_html, 
       qr{^\s*<AUTHOR>Michael G Schwern &lt;schwern\@pobox.com&gt;</AUTHOR>}m,
