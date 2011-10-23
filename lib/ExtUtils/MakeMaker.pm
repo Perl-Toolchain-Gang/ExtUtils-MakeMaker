@@ -613,6 +613,7 @@ END
         $self->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
+    $self->init_tools();
     $self->init_others();
     $self->init_platform();
     $self->init_PERM();

@@ -141,21 +141,13 @@ sub init_DIRFILESEP {
                                                        : '\\';
 }
 
-=item B<init_others>
+=item init_tools
 
-Override some of the Unix specific commands with portable
-ExtUtils::Command ones.
-
-Also provide defaults for LD and AR in case the %Config values aren't
-set.
-
-LDLOADLIBS's default is changed to $Config{libs}.
-
-Adjustments are made for Borland's quirks needing -L to come first.
+Override some of the slower, portable commands with Windows specific ones.
 
 =cut
 
-sub init_others {
+sub init_tools {
     my ($self) = @_;
 
     $self->{NOOP}     ||= 'rem';
@@ -165,13 +157,32 @@ sub init_others {
       "\$(PERLRUN) $self->{PERL_SRC}/win32/bin/pl2bat.pl" : 
       'pl2bat.bat';
 
+    $self->SUPER::init_tools;
+
+    # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
+    delete $self->{SHELL};
+
+    return;
+}
+
+
+=item init_others
+
+Override the default link and compile tools.
+
+LDLOADLIBS's default is changed to $Config{libs}.
+
+Adjustments are made for Borland's quirks needing -L to come first.
+
+=cut
+
+sub init_others {
+    my $self = shift;
+
     $self->{LD}     ||= 'link';
     $self->{AR}     ||= 'lib';
 
     $self->SUPER::init_others;
-
-    # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
-    delete $self->{SHELL};
 
     $self->{LDLOADLIBS} ||= $Config{libs};
     # -Lfoo must come first for Borland, so we put it in LDDLFLAGS
@@ -187,7 +198,7 @@ sub init_others {
         $self->{LDDLFLAGS} .= " $libpath";
     }
 
-    return 1;
+    return;
 }
 
 
@@ -485,7 +496,8 @@ sub oneliner {
 
 
 sub quote_literal {
-    my($self, $text) = @_;
+    my($self, $text, $opts) = @_;
+    $opts->{allow_variables} = 1 unless defined $opts->{allow_variables};
 
     # See: http://www.autohotkey.net/~deleyd/parameters/parameters.htm#CPP
 
@@ -508,7 +520,8 @@ sub quote_literal {
         $text =~ s/}/}}/g;
     }
 
-    $text = $self->escape_dollarsigns($text);
+    $text = $opts->{allow_variables}
+      ? $self->escape_dollarsigns($text) : $self->escape_all_dollarsigns($text);
 
     return $text;
 }
