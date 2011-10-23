@@ -18,7 +18,7 @@ our @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
 
-our $VERSION = '6.61_01';
+our $VERSION = '6.62';
 $VERSION = eval $VERSION;
 
 # Emulate something resembling CVS $Revision$

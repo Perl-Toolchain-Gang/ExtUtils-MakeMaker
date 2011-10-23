@@ -1,3 +1,7 @@
+6.62  Sun Oct 23 16:43:36 PDT 2011
+    No changes from 6.61_01
+
+
 6.61_01  Sat Sep 24 22:16:13 PDT 2011
     Win32
     * Liblist::Kid now checks the ActiveState MinGW library path environment
