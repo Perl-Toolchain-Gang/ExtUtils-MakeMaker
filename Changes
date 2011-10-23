@@ -15,10 +15,14 @@
     * escape_dollarsigns() to escape dollar signs but allow variables
     * escape_all_dollarsigns() to escape all dollar signs
 
-
     Improvements
     * The PPD VERSION is now derived from the VERSION variable in the Makefile
       rather than hard coded.
+
+    Bundled Modules
+    * Updated CPAN::Meta to 2.112621
+    * Updated CPAN::Meta::YAML to 0.004
+    * Updated JSON::PP to 2.27200
 
 
 6.62  Sun Oct 23 16:43:36 PDT 2011
