@@ -233,8 +233,8 @@ my $mymeta_yml = "$distdir/MYMETA.yml";
 my $meta_json = "$distdir/META.json";
 my $mymeta_json = "$distdir/MYMETA.json";
 
-SKIP: {
-    skip "CPAN::Meta required", 104 unless eval { require CPAN::Meta };
+note "META file validity"; {
+    require CPAN::Meta;
 
     ok( !-f 'META.yml',  'META.yml not written to source dir' );
     ok( -f $meta_yml,    'META.yml written to dist dir' );
