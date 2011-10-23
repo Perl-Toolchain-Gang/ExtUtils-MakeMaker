@@ -73,7 +73,6 @@ my $make = make_run();
 
 END { unlink 'MANIFEST'; }
 
-
 my $ppd_out = run("$make ppd");
 is( $?, 0,                      '  exited normally' ) || diag $ppd_out;
 ok( open(PPD, 'Big-Dummy.ppd'), '  .ppd file generated' );
@@ -280,7 +279,7 @@ SKIP: {
       };
       $is->( name => "Big-Dummy" );
       $is->( version => "0.01" );
-      $is->( abstract => q{Try "our" hot dog's} );
+      $is->( abstract => q{Try "our" hot dog's and $andwiche$} );
       $is_list->( licenses => [q{unknown}] );
       $is_list->( authors => [ q{Michael G Schwern <schwern@pobox.com>} ] );
       $is_map->( prereqs => {

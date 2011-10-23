@@ -2890,12 +2890,10 @@ sub ppd {
     $abstract =~ s/\n/\\n/sg;
     $abstract =~ s/</&lt;/g;
     $abstract =~ s/>/&gt;/g;
-    $abstract =~ s/\$/\$\$/g;
 
     my $author = join(', ',@{$self->{AUTHOR} || []});
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
-    $author =~ s/\$/\$\$/g;
 
     my $ppd_xml = sprintf <<'PPD_HTML', $self->{VERSION}, $abstract, $author;
 <SOFTPKG NAME="$(DISTNAME)" VERSION="%s">
@@ -3153,9 +3151,10 @@ sub oneliner {
 sub quote_literal {
     my($self, $text) = @_;
 
-    # I think all we have to quote is single quotes and I think
-    # this is a safe way to do it.
+    # Quote single quotes
     $text =~ s{'}{'\\''}g;
+
+    $text = $self->escape_dollarsigns($text);
 
     return "'$text'";
 }

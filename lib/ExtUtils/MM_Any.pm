@@ -341,6 +341,26 @@ For example, on Unix this would escape any single-quotes in $text and
 put single-quotes around the whole thing.
 
 
+=head3 escape_dollarsigns
+
+    my $escaped_text = $MM->escape_dollarsigns($text);
+
+Escapes stray C<$> so they are not interpreted as make variables.
+
+It lets by C<$(...)>.
+
+=cut
+
+sub escape_dollarsigns {
+    my($self, $text) = @_;
+
+    # Escape dollar signs which are not starting a variable
+    $text =~ s{\$ (?!\() }{\$\$}gx;
+
+    return $text;
+}
+
+
 =head3 escape_newlines  I<Abstract>
 
     my $escaped_text = $MM->escape_newlines($text);

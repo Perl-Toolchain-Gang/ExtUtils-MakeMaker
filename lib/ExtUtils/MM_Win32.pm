@@ -508,6 +508,8 @@ sub quote_literal {
         $text =~ s/}/}}/g;
     }
 
+    $text = $self->escape_dollarsigns($text);
+
     return $text;
 }
 

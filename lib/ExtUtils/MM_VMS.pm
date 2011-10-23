@@ -1776,6 +1776,8 @@ sub quote_literal {
     # I believe this is all we should need.
     $text =~ s{"}{""}g;
 
+    $text = $self->escape_dollarsigns($text);
+
     return qq{"$text"};
 }
 
