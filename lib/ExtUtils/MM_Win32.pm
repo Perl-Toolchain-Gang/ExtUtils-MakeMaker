@@ -496,7 +496,8 @@ sub oneliner {
 
 
 sub quote_literal {
-    my($self, $text) = @_;
+    my($self, $text, $opts) = @_;
+    $opts->{allow_variables} = 1 unless defined $opts->{allow_variables};
 
     # See: http://www.autohotkey.net/~deleyd/parameters/parameters.htm#CPP
 
@@ -519,7 +520,8 @@ sub quote_literal {
         $text =~ s/}/}}/g;
     }
 
-    $text = $self->escape_dollarsigns($text);
+    $text = $opts->{allow_variables}
+      ? $self->escape_dollarsigns($text) : $self->escape_all_dollarsigns($text);
 
     return $text;
 }

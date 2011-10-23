@@ -1,8 +1,27 @@
-6.61_01  Sat Sep 24 22:16:13 PDT 2011
+6.61_02
     Bug Fixes
-    * Stray $ in the ABSTRACT or other locations are now escaped.
-      [rt.cpan.org 71847]
+    * Stray $ in the PPD and meta files (for example, from the ABSTRACT)
+      are now escaped.  [rt.cpan.org 71847]
 
+    Possibly incompatible changes
+    * echo() now escapes all dollar signs by default
+
+    New Features
+    * echo() has an option to allow make variable expansion.
+    * echo() is now passed a hash of options (old style $appending flag
+      still works for compatibility).
+    * quote_literal() now escapes dollar signs, but allows make variables.
+    * quote_literal() has an option to escape make variables.
+    * escape_dollarsigns() to escape dollar signs but allow variables
+    * escape_all_dollarsigns() to escape all dollar signs
+
+
+    Improvements
+    * The PPD VERSION is now derived from the VERSION variable in the Makefile
+      rather than hard coded.
+
+
+6.61_01  Sat Sep 24 22:16:13 PDT 2011
     Win32
     * Liblist::Kid now checks the ActiveState MinGW library path environment
       variable [MITHALDU]

@@ -14,12 +14,11 @@ use MakeMaker::Test::Utils;
 use File::Temp;
 use Cwd 'abs_path';
 
-my $Is_VMS   = $^O eq 'VMS';
-my $Is_Win32 = $^O eq 'MSWin32';
-
 use Test::More;
 
-# Setup
+
+#--------------------- Setup
+
 my $cwd  = abs_path;
 my $perl = which_perl;
 my $make = make_run();
@@ -27,10 +26,11 @@ my $mm = bless { NAME => "Foo", MAKE => $Config{make} }, "MM";
 $mm->init_tools;  # need ECHO
 
 
-# Testing functions
+#------------------- Testing functions
+
 sub test_for_echo {
-    my($args, $want, $name) = @_;
-    my $output_file = $args->[1];
+    my($calls, $want, $name) = @_;
+    my $output_file = $calls->[0][1];
 
     note "Testing $name";
 
@@ -38,15 +38,21 @@ sub test_for_echo {
     chdir $dir;
     note "Temp dir: $dir";
 
+    # Write a Makefile to test the output of echo
     {
         open my $makefh, ">", "Makefile" or croak "Can't open Makefile: $!";
+        print $makefh "FOO=42\n";       # a variable to test with
         print $makefh "ECHO=$mm->{ECHO}\n\n";
         print $makefh "all:\n";
-        print $makefh map { "\t".$_ } $mm->echo(@$args);
+        for my $args (@$calls) {
+            print $makefh map { "\t$_\n" } $mm->echo(@$args);
+        }
     }
 
+    # Run the Makefile
     ok run($make), "make: $name";
 
+    # Check it made the file in question
     ok -e $output_file, "$output_file exists";
     open my $fh, "<", $output_file or croak "Can't open $output_file: $!";
     is join("", <$fh>), $want, "contents";
@@ -55,10 +61,46 @@ sub test_for_echo {
 }
 
 
-# Tests begin
+#---------------- Tests begin
+
 test_for_echo(
-    ["Foo", "bar.txt"], "Foo\n", "simple echo"
+    [["Foo", "bar.txt"]],
+    "Foo\n",
+    "simple echo"
 );
 
+test_for_echo(
+    [["Foo\nBar\nBaz Biff\n", "something.txt"]],
+    "Foo\nBar\nBaz Biff\n",
+    "multiline echo"
+);
+
+test_for_echo(
+    [['$something$', "something.txt"]],
+    '$something$'."\n",
+    "dollar signs escaped"
+);
+
+test_for_echo(
+    [['$(something)', "something.txt"]],
+    '$(something)'."\n",
+    "variables escaped"
+);
+
+test_for_echo(
+    [['Answer: $(FOO)', "bar.txt", { allow_variables => 1 }]],
+    "Answer: 42\n",
+    "allow_variables"
+);
+
+test_for_echo(
+    [
+        ["Foo", "bar.txt"],
+        ["Bar", "bar.txt", { append => 1 }],
+        ["Baz", "bar.txt", 1],
+    ],
+    "Foo\nBar\nBaz\n",
+    "append"
+);
 
 done_testing;

@@ -2892,8 +2892,13 @@ sub ppd {
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 
-    my $ppd_xml = sprintf <<'PPD_HTML', $self->{VERSION}, $abstract, $author;
-<SOFTPKG NAME="$(DISTNAME)" VERSION="%s">
+    my $ppd_file = '$(DISTNAME).ppd';
+
+    my @ppd_cmds = $self->echo(<<'PPD_HTML', $ppd_file, { append => 0, allow_variables => 1 });
+<SOFTPKG NAME="$(DISTNAME)" VERSION="$(VERSION)">
+PPD_HTML
+
+    my $ppd_xml = sprintf <<'PPD_HTML', $abstract, $author;
     <ABSTRACT>%s</ABSTRACT>
     <AUTHOR>%s</AUTHOR>
 PPD_HTML
@@ -2955,7 +2960,7 @@ PPD_OUT
 </SOFTPKG>
 PPD_XML
 
-    my @ppd_cmds = $self->echo($ppd_xml, '$(DISTNAME).ppd');
+    push @ppd_cmds, $self->echo($ppd_xml, $ppd_file, { append => 1 });
 
     return sprintf <<'PPD_OUT', join "\n\t", @ppd_cmds;
 # Creates a PPD (Perl Package Description) for a binary distribution.
@@ -3146,12 +3151,14 @@ sub oneliner {
 =cut
 
 sub quote_literal {
-    my($self, $text) = @_;
+    my($self, $text, $opts) = @_;
+    $opts->{allow_variables} = 1 unless defined $opts->{allow_variables};
 
     # Quote single quotes
     $text =~ s{'}{'\\''}g;
 
-    $text = $self->escape_dollarsigns($text);
+    $text = $opts->{allow_variables}
+      ? $self->escape_dollarsigns($text) : $self->escape_all_dollarsigns($text);
 
     return "'$text'";
 }

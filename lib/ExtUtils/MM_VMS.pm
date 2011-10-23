@@ -1789,12 +1789,14 @@ sub echo {
 =cut
 
 sub quote_literal {
-    my($self, $text) = @_;
+    my($self, $text, $opts) = @_;
+    $opts->{allow_variables} = 1 unless defined $opts->{allow_variables};
 
     # I believe this is all we should need.
     $text =~ s{"}{""}g;
 
-    $text = $self->escape_dollarsigns($text);
+    $text = $opts->{allow_variables}
+      ? $self->escape_dollarsigns($text) : $self->escape_all_dollarsigns($text);
 
     return qq{"$text"};
 }

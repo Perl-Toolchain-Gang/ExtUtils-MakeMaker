@@ -82,7 +82,7 @@ close PPD;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0.01">}m, 
                                                            '  <SOFTPKG>' );
 like( $ppd_html,
-      qr{^\s*<ABSTRACT>Try "our" hot dog's and \$andwiche\$</ABSTRACT>}m,
+      qr{^\s*<ABSTRACT>Try "our" hot dog's, \$andwiche\$ and \$\(ub\)\$!</ABSTRACT>}m,
                                                            '  <ABSTRACT>');
 like( $ppd_html, 
       qr{^\s*<AUTHOR>Michael G Schwern &lt;schwern\@pobox.com&gt;</AUTHOR>}m,
@@ -279,7 +279,7 @@ note "META file validity"; {
       };
       $is->( name => "Big-Dummy" );
       $is->( version => "0.01" );
-      $is->( abstract => q{Try "our" hot dog's and $andwiche$} );
+      $is->( abstract => q{Try "our" hot dog's, $andwiche$ and $(ub)$!} );
       $is_list->( licenses => [q{unknown}] );
       $is_list->( authors => [ q{Michael G Schwern <schwern@pobox.com>} ] );
       $is_map->( prereqs => {
