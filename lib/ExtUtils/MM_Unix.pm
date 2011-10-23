@@ -3151,9 +3151,10 @@ sub oneliner {
 sub quote_literal {
     my($self, $text) = @_;
 
-    # I think all we have to quote is single quotes and I think
-    # this is a safe way to do it.
+    # Quote single quotes
     $text =~ s{'}{'\\''}g;
+
+    $text = $self->escape_dollarsigns($text);
 
     return "'$text'";
 }
