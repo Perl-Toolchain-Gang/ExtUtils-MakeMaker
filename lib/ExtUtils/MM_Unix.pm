@@ -1739,17 +1739,14 @@ EOP
                $self->{NAME} eq "ExtUtils::MakeMaker";
 }
 
-=item init_others
+=item init_tools
 
-Initializes EXTRALIBS, BSLOADLIBS, LDLOADLIBS, LIBS, LD_RUN_PATH, LD,
-OBJECT, BOOTDEP, PERLMAINCC, LDFROM, LINKTYPE, SHELL, NOOP,
-FIRST_MAKEFILE, MAKEFILE_OLD, NOECHO, RM_F, RM_RF, TEST_F,
-TOUCH, CP, MV, CHMOD, UMASK_NULL, ECHO, ECHO_N
+Initializes tools to use their common (and faster) Unix commands.
 
 =cut
 
-sub init_others {	# --- Initialize Other Attributes
-    my($self) = shift;
+sub init_tools {
+    my $self = shift;
 
     $self->{ECHO}       ||= 'echo';
     $self->{ECHO_N}     ||= 'echo -n';
@@ -1765,13 +1762,13 @@ sub init_others {	# --- Initialize Other Attributes
 
     $self->{LD}         ||= 'ld';
 
-    $self->SUPER::init_others(@_);
+    return $self->SUPER::init_tools(@_);
 
-    # After SUPER::init_others so $Config{shell} has a
+    # After SUPER::init_tools so $Config{shell} has a
     # chance to get set.
     $self->{SHELL}      ||= '/bin/sh';
 
-    return 1;
+    return;
 }
 
 

@@ -1913,15 +1913,14 @@ sub init_VERSION {
 }
 
 
-=head3 init_others
+=head3 init_tools
 
-    $MM->init_others();
+    $MM->init_tools();
 
-Initializes the macro definitions used by tools_other() and places them
-in the $MM object.
-
-If there is no description, its the same as the parameter to
-WriteMakefile() documented in ExtUtils::MakeMaker.
+Initializes the simple macro definitions used by tools_other() and
+places them in the $MM object.  These use conservative cross platform
+versions and should be overridden with platform specific versions for
+performance.
 
 Defines at least these macros.
 
@@ -1929,11 +1928,6 @@ Defines at least these macros.
 
   NOOP              Do nothing
   NOECHO            Tell make not to display the command itself
-
-  MAKEFILE
-  FIRST_MAKEFILE
-  MAKEFILE_OLD
-  MAKE_APERL_FILE   File used by MAKE_APERL
 
   SHELL             Program used to run shell commands
 
@@ -1953,7 +1947,7 @@ Defines at least these macros.
 
 =cut
 
-sub init_others {
+sub init_tools {
     my $self = shift;
 
     $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
@@ -1986,6 +1980,18 @@ CODE
     $self->{UNINST}     ||= 0;
     $self->{VERBINST}   ||= 0;
 
+    $self->{SHELL}              ||= $Config{sh};
+
+    # UMASK_NULL is not used by MakeMaker but some CPAN modules
+    # make use of it.
+    $self->{UMASK_NULL}         ||= "umask 0";
+
+    # Not the greatest default, but its something.
+    $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
+
+    $self->{NOOP}               ||= '$(TRUE)';
+    $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
+
     $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE} || 'Makefile';
     $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE};
     $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
@@ -1999,17 +2005,24 @@ CODE
     $self->{MACROSTART}         ||= '';
     $self->{MACROEND}           ||= '';
 
-    $self->{SHELL}              ||= $Config{sh};
+    return;
+}
 
-    # UMASK_NULL is not used by MakeMaker but some CPAN modules
-    # make use of it.
-    $self->{UMASK_NULL}         ||= "umask 0";
 
-    # Not the greatest default, but its something.
-    $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
+=head3 init_others
 
-    $self->{NOOP}               ||= '$(TRUE)';
-    $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
+    $MM->init_others();
+
+Initializes the macro definitions having to do with compiling and
+linking used by tools_other() and places them in the $MM object.
+
+If there is no description, its the same as the parameter to
+WriteMakefile() documented in ExtUtils::MakeMaker.
+
+=cut
+
+sub init_others {
+    my $self = shift;
 
     $self->{LD_RUN_PATH} = "";
 
@@ -2050,7 +2063,7 @@ CODE
                         : ($Config{usedl} ? 'dynamic' : 'static');
     }
 
-    return 1;
+    return;
 }
 
 
