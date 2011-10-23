@@ -1,4 +1,8 @@
 6.61_01  Sat Sep 24 22:16:13 PDT 2011
+    Bug Fixes
+    * Stray $ in the ABSTRACT or other locations are now escaped.
+      [rt.cpan.org 71847]
+
     Win32
     * Liblist::Kid now checks the ActiveState MinGW library path environment
       variable [MITHALDU]
