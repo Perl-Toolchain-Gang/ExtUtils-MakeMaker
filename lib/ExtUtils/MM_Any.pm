@@ -215,6 +215,10 @@ If $file is not given, output goes to STDOUT.
 If $appending is true the $file will be appended to rather than
 overwritten.
 
+Example of use:
+
+    my $make = map "\t$_\n", $MM->echo($text, $file);
+
 =cut
 
 sub echo {
