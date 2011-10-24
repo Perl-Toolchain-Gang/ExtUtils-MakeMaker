@@ -1,4 +1,4 @@
-6.63_01
+6.63_01  Sun Oct 23 16:57:24 PDT 2011
     Bug Fixes
     * Stray $ in the PPD and meta files (for example, from the ABSTRACT)
       are now escaped.  [rt.cpan.org 71847]
