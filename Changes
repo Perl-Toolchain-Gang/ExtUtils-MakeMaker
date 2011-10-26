@@ -2,6 +2,11 @@
     Test Fixes
     * Inform BSDPAN (on FreeBSD) to not register modules installed while
       testing. [rt.cpan.org 70232]
+
+    Misc
+    * my::bundle::copy_bundles() will only load File::Copy::Recursive if
+      it needs it, allowing vendors packaging MakeMaker to just delete
+      bundled/*
     
 
 6.63_01  Sun Oct 23 16:57:24 PDT 2011

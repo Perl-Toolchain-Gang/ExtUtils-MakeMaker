@@ -57,8 +57,6 @@ sub import {
 sub copy_bundles {
     my($src, $dest) = @_;
 
-    require File::Copy::Recursive;
-
     rmtree $dest;
     mkpath $dest;
 
@@ -68,6 +66,9 @@ sub copy_bundles {
 
         next unless $should_use->($dist);
 
+        # Don't require it unless we need it, allowing vendors to just delete
+        # the contents of bundle/
+        require File::Copy::Recursive;
         File::Copy::Recursive::rcopy_glob("$src/$dist/*", $dest) or
           die "Can't copy $src/$dist/* to $dest";
     }
