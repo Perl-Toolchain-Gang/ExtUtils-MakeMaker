@@ -7,6 +7,12 @@
     * my::bundle::copy_bundles() will only load File::Copy::Recursive if
       it needs it, allowing vendors packaging MakeMaker to just delete
       bundled/*
+    * Bundling can be overridden by setting the BUILDING_AS_PACKAGE
+      environment variable.  This makes life easier for vendor packagers.
+
+    Docs
+    * README.packaging explains how to package MakeMaker
+    * bundled/README explains what the bundled directory is about.
     
 
 6.63_01  Sun Oct 23 16:57:24 PDT 2011

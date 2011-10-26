@@ -3,6 +3,8 @@ package my::bundles;
 use strict;
 use warnings;
 
+use File::Path;
+
 
 =head1 NAME
 
@@ -28,10 +30,7 @@ inc/ as a flattened module directory that MakeMaker can install.
 
 =cut
 
-require lib;
 my $bundle_dir = "bundled";
-
-use File::Path;
 
 my %special_dist = (
     "Scalar-List-Utils" => sub {
@@ -47,15 +46,22 @@ my %special_dist = (
 );
 
 
-sub import {
+sub add_bundles_to_inc {
     opendir my $dh, $bundle_dir or die "Can't open bundles directory: $!";
     my @bundles = map { "$bundle_dir/$_" } grep !/^\./, readdir $dh;
+
+    require lib;
     lib->import(@bundles);
+
+    return;
 }
 
 
 sub copy_bundles {
     my($src, $dest) = @_;
+
+    # So we can use them to copy them.
+    add_bundles_to_inc();
 
     rmtree $dest;
     mkpath $dest;

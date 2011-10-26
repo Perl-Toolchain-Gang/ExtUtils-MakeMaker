@@ -18,6 +18,8 @@ use lib qw(lib);    # build ourself with ourself
 use File::Spec;
 use ExtUtils::MakeMaker 6.50;
 
+my $BUILDING_AS_PACKAGE = $ENV{BUILDING_AS_PACKAGE};
+
 BEGIN {
     die "You have File::Spec version $File::Spec::VERSION\n" . "ExtUtils::MakeMaker requires File::Spec >= 0.8 to build at all.\n"
       if $File::Spec::VERSION < 0.8;
@@ -46,19 +48,42 @@ CHANGE_WARN
 # Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
 # when a test had -T.  This made it too long.  So we need a Test::Harness
 # > 2.00 on VMS for t/testlib.t
-my %prereq = ();
-$prereq{'Test::Harness'} = 2.00 if $^O eq 'VMS';
+my %Extra_Prereqs = ();
+$Extra_Prereqs{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 
 check_environment();
 
-my::bundles::copy_bundles("bundled", "inc");
+# Special case for MakeMaker being built as a vendor package
+if( $BUILDING_AS_PACKAGE ) {
+    # Some of these are lower than what we bundle.  That's ok, we
+    # bundle the latest because we might as well, but we don't want to
+    # burden vendors with having to update everything.
+    %Extra_Prereqs = (
+        'CPAN::Meta'            => '2.112580',
+        'CPAN::Meta::YAML'      => '0.002',
+        'ExtUtils::Command'     => '1.16',
+        'ExtUtils::Install'     => '1.52',
+        'ExtUtils::Manifest'    => '1.58',
+        'File::Temp'            => '0.22',
+        'JSON::PP'              => '2.27103',
+        'Parse::CPAN::Meta'     => '1.4400',
+        'Scalar::Util'          => '1.13',
+        'version'               => '0.82',
+        'Version::Requirements' => '0.101020',
+    );
+
+    $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
+}
+else {
+    my::bundles::copy_bundles("bundled", "inc");
+}
 
 my $MM = WriteMakefile(
     NAME         => $PACKAGE,
     VERSION_FROM => "lib/$PACKAGE_FILE.pm",    # finds $VERSION
 
     PREREQ_PM => {
-        %prereq,
+        %Extra_Prereqs,
         'File::Spec'     => 0.8,               # splitpath(), rel2abs()
         'Pod::Man'       => 0,                 # manifypods needs Pod::Man
         'File::Basename' => 0,

@@ -1,0 +1,5 @@
+This directory contains CPAN modules which ExtUtils-MakeMaker depends on.
+They are bundled with ExtUtils-MakeMaker to avoid dependency loops.
+
+Vendor packages will want to disable this bundling.  See README.packaging in the top
+level directory for details.
