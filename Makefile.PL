@@ -45,13 +45,9 @@ are upgrading from a version older than $LAST_API_CHANGE.
 CHANGE_WARN
 }
 
-# Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
-# when a test had -T.  This made it too long.  So we need a Test::Harness
-# > 2.00 on VMS for t/testlib.t
-my %Extra_Prereqs = ();
-$Extra_Prereqs{'Test::Harness'} = 2.00 if $^O eq 'VMS';
-
 check_environment();
+
+my %Extra_Prereqs = ();
 
 # Special case for MakeMaker being built as a vendor package
 if( $BUILDING_AS_PACKAGE ) {
@@ -77,6 +73,11 @@ if( $BUILDING_AS_PACKAGE ) {
 else {
     my::bundles::copy_bundles("bundled", "inc");
 }
+
+# Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
+# when a test had -T.  This made it too long.  So we need a Test::Harness
+# > 2.00 on VMS for t/testlib.t
+$Extra_Prereqs{'Test::Harness'} = 2.00 if $^O eq 'VMS';
 
 my $MM = WriteMakefile(
     NAME         => $PACKAGE,
