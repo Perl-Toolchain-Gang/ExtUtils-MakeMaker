@@ -43,7 +43,7 @@ sub test_for_echo {
         open my $makefh, ">", "Makefile" or croak "Can't open Makefile: $!";
         print $makefh "FOO=42\n";       # a variable to test with
         print $makefh "ECHO=$mm->{ECHO}\n\n";
-        print $makefh "all:\n";
+        print $makefh "all :\n";
         for my $args (@$calls) {
             print $makefh map { "\t$_\n" } $mm->echo(@$args);
         }
