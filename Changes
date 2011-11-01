@@ -16,6 +16,8 @@
       bundled/*
     * Bundling can be overridden by setting the BUILDING_AS_PACKAGE
       environment variable.  This makes life easier for vendor packagers.
+    * Stripped the Windows newlines off Parse::CPAN::Meta to avoid
+      confusing old versions of Module::Signature.
 
     Docs
     * README.packaging explains how to package MakeMaker
