@@ -48,7 +48,7 @@ my %special_dist = (
 
 sub add_bundles_to_inc {
     opendir my $dh, $bundle_dir or die "Can't open bundles directory: $!";
-    my @bundles = map { "$bundle_dir/$_" } grep !/^\./, readdir $dh;
+    my @bundles = grep { -d $_ } map { "$bundle_dir/$_" } grep !/^\./, readdir $dh;
 
     require lib;
     lib->import(@bundles);
@@ -67,7 +67,7 @@ sub copy_bundles {
     mkpath $dest;
 
     opendir my $bundle_dh, $src or die $!;
-    for my $dist (grep !/^\./, readdir $bundle_dh) {
+    for my $dist (grep !/^\./, grep { -d $_ } readdir $bundle_dh) {
         my $should_use = $special_dist{$dist} || \&should_use_dist;
 
         next unless $should_use->($dist);
