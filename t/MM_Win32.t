@@ -104,13 +104,20 @@ delete $ENV{PATHEXT} unless $had_pathext;
         'catfile() eq File::Spec->catfile()' );
 }
 
-# init_others(): check if all keys are created and set?
-# qw( TOUCH CHMOD CP RM_F RM_RF MV NOOP TEST_F LD AR LDLOADLIBS DEV_NUL )
-{
+# init_tools(): check if all keys are created and set?
+note "init_tools creates expected keys"; {
+    my $mm_w32 = bless( { BASEEXT => 'Foo', MAKE => $Config{make} }, 'MM' );
+    $mm_w32->init_tools();
+    my @keys = qw( TOUCH CHMOD CP RM_F RM_RF MV NOOP NOECHO SHELL ECHO ECHO_N TEST_F DEV_NULL );
+    for my $key ( @keys ) {
+        ok( $mm_w32->{ $key }, "init_tools: $key" );
+    }
+}
+
+note "init_others creates expected keys"; {
     my $mm_w32 = bless( { BASEEXT => 'Foo', MAKE => $Config{make} }, 'MM' );
     $mm_w32->init_others();
-    my @keys = qw( TOUCH CHMOD CP RM_F RM_RF MV NOOP 
-                   TEST_F LD AR LDLOADLIBS DEV_NULL );
+    my @keys = qw( LD AR LDLOADLIBS );
     for my $key ( @keys ) {
         ok( $mm_w32->{ $key }, "init_others: $key" );
     }
