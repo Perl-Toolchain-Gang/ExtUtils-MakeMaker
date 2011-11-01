@@ -2,6 +2,13 @@
     Test Fixes
     * Inform BSDPAN (on FreeBSD) to not register modules installed while
       testing. [rt.cpan.org 70232]
+    * Fix t/echo.t test on Win32. [rt.cpan.org 72097]
+    * Fix t/echo.t test on VMS. (Craig A. Berry)
+    * Fix t/Win32.t to handle the change to init_others(). [rt.cpan.org 72096]
+
+    Bug Fixes
+    * Fix VMS's echo() for the interface changes. (Craig A. Berry)
+    * Fix VMS's dollar sign escaping. (Craig A. Berry)
 
     Misc
     * my::bundle::copy_bundles() will only load File::Copy::Recursive if
