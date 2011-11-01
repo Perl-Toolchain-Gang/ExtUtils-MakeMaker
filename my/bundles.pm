@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use File::Path;
+use File::Spec;
 
 
 =head1 NAME
@@ -67,7 +68,7 @@ sub copy_bundles {
     mkpath $dest;
 
     opendir my $bundle_dh, $src or die $!;
-    for my $dist (grep !/^\./, grep { -d $_ } readdir $bundle_dh) {
+    for my $dist (grep !/^\./, grep { -d File::Spec->catdir($src, $_) } readdir $bundle_dh) {
         my $should_use = $special_dist{$dist} || \&should_use_dist;
 
         next unless $should_use->($dist);
