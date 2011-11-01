@@ -9,11 +9,11 @@ use strict;
 use Test::More;
 
 BEGIN {
-	if ($^O =~ /MSWin32/i) {
-		plan tests => 61;
-	} else {
-		plan skip_all => 'This is not Win32';
-	}
+    if ($^O =~ /MSWin32/i) {
+        plan tests => 61;
+    } else {
+        plan skip_all => 'This is not Win32';
+    }
 }
 
 use Config;
@@ -185,7 +185,7 @@ delete $ENV{PATHEXT} unless $had_pathext;
 {
     my $path = 'c:\\Program Files/SomeApp\\Progje.exe';
     is( $MM->canonpath( $path ), File::Spec->canonpath( $path ),
-	    'canonpath() eq File::Spec->canonpath' );
+        'canonpath() eq File::Spec->canonpath' );
 }
 
 # perl_script()
@@ -235,28 +235,28 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
     SKIP: {
         skip("Not using 'nmake'", 2) unless $Config{make} eq 'nmake';
         ok(   $MM->is_make_type('nmake'), '->is_make_type(nmake) true'  );
-	ok( ! $MM->is_make_type('dmake'), '->is_make_type(dmake) false' );
+        ok( ! $MM->is_make_type('dmake'), '->is_make_type(dmake) false' );
     }
 
     # Check for literal nmake
     SKIP: {
         skip("Not using /nmake/", 2) unless $Config{make} =~ /nmake/;
         ok(   $MM->is_make_type('nmake'), '->is_make_type(nmake) true'  );
-	ok( ! $MM->is_make_type('dmake'), '->is_make_type(dmake) false' );
+        ok( ! $MM->is_make_type('dmake'), '->is_make_type(dmake) false' );
     }
 
     # Check for literal dmake
     SKIP: {
         skip("Not using 'dmake'", 2) unless $Config{make} eq 'dmake';
         ok(   $MM->is_make_type('dmake'), '->is_make_type(dmake) true'  );
-	ok( ! $MM->is_make_type('nmake'), '->is_make_type(nmake) false' );
+        ok( ! $MM->is_make_type('nmake'), '->is_make_type(nmake) false' );
     }
 
     # Check for literal dmake
     SKIP: {
         skip("Not using /dmake/", 2) unless $Config{make} =~ /dmake/;
         ok(   $MM->is_make_type('dmake'), '->is_make_type(dmake) true'  );
-	ok( ! $MM->is_make_type('nmake'), '->is_make_type(nmake) false' );
+        ok( ! $MM->is_make_type('nmake'), '->is_make_type(nmake) false' );
     }
 
 }
@@ -275,107 +275,106 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 
 # _identify_compiler_environment()
 {
-	sub _run_cc_id {
-		my ( $config ) = @_;
+    sub _run_cc_id {
+        my ( $config ) = @_;
 
-		$config->{cc} ||= '';
+        $config->{cc} ||= '';
 
-		my @cc_env = ExtUtils::MM_Win32::_identify_compiler_environment( $config );
+        my @cc_env = ExtUtils::MM_Win32::_identify_compiler_environment( $config );
 
-		my %cc_env = ( BORLAND => $cc_env[0], GCC => $cc_env[1], DLLTOOL => $cc_env[2] );
+        my %cc_env = ( BORLAND => $cc_env[0], GCC => $cc_env[1], DLLTOOL => $cc_env[2] );
 
-		return \%cc_env;
-	}
+        return \%cc_env;
+    }
 
-	sub _check_cc_id_value {
-		my ( $test ) = @_;
+    sub _check_cc_id_value {
+        my ( $test ) = @_;
 
-		my $res = _run_cc_id( $test->{config} );
+        my $res = _run_cc_id( $test->{config} );
 
-		fail( "unknown key '$test->{key}'" ) if !exists $res->{$test->{key}};
-		my $val = $res->{$test->{key}};
+        fail( "unknown key '$test->{key}'" ) if !exists $res->{$test->{key}};
+        my $val = $res->{$test->{key}};
 
-		is( $val, $test->{expect}, $test->{desc} );
+        is( $val, $test->{expect}, $test->{desc} );
 
-		return;
-	}
+        return;
+    }
 
-	my @tests = (
-		{
-			config => {},
-			key => 'DLLTOOL', expect => 'dlltool',
-			desc => 'empty dlltool defaults to "dlltool"',
-		},
-		{
-			config => { dlltool => 'test' },
-			key => 'DLLTOOL', expect => 'test',
-			desc => 'dlltool value is taken over verbatim from %Config, if set',
-		},
-		{
-			config => {},
-			key => 'GCC', expect => 0,
-			desc => 'empty cc is not recognized as gcc',
-		},
-		{
-			config => { cc => 'gcc' },
-			key => 'GCC', expect => 1,
-			desc => 'plain "gcc" is recognized',
-		},
-		{
-			config => { cc => 'C:/MinGW/bin/gcc.exe' },
-			key => 'GCC', expect => 1,
-			desc => 'fully qualified "gcc" is recognized',
-		},
-		{
-			config => { cc => 'C:/MinGW/bin/gcc-1.exe' },
-			key => 'GCC', expect => 1,
-			desc => 'dash-extended gcc is recognized',
-		},
-		{
-			config => { cc => 'C:/MinGW/bin/gcc_1.exe' },
-			key => 'GCC', expect => 0,
-			desc => 'underscore-extended gcc is not recognized',
-		},
-		{
-			config => {},
-			key => 'BORLAND', expect => 0,
-			desc => 'empty cc is not recognized as borland',
-		},
-		{
-			config => { cc => 'bcc' },
-			key => 'BORLAND', expect => 1,
-			desc => 'plain "bcc" is recognized',
-		},
-		{
-			config => { cc => 'C:/Borland/bin/bcc.exe' },
-			key => 'BORLAND', expect => 0,
-			desc => 'fully qualified borland cc is not recognized',
-		},
-		{
-			config => { cc => 'bcc-1.exe' },
-			key => 'BORLAND', expect => 1,
-			desc => 'dash-extended borland cc is recognized',
-		},
-		{
-			config => { cc => 'bcc_1.exe' },
-			key => 'BORLAND', expect => 1,
-			desc => 'underscore-extended borland cc is recognized',
-		},
-	);
+    my @tests = (
+        {
+            config => {},
+            key => 'DLLTOOL', expect => 'dlltool',
+            desc => 'empty dlltool defaults to "dlltool"',
+        },
+        {
+            config => { dlltool => 'test' },
+            key => 'DLLTOOL', expect => 'test',
+            desc => 'dlltool value is taken over verbatim from %Config, if set',
+        },
+        {
+            config => {},
+            key => 'GCC', expect => 0,
+            desc => 'empty cc is not recognized as gcc',
+        },
+        {
+            config => { cc => 'gcc' },
+            key => 'GCC', expect => 1,
+            desc => 'plain "gcc" is recognized',
+        },
+        {
+            config => { cc => 'C:/MinGW/bin/gcc.exe' },
+            key => 'GCC', expect => 1,
+            desc => 'fully qualified "gcc" is recognized',
+        },
+        {
+            config => { cc => 'C:/MinGW/bin/gcc-1.exe' },
+            key => 'GCC', expect => 1,
+            desc => 'dash-extended gcc is recognized',
+        },
+        {
+            config => { cc => 'C:/MinGW/bin/gcc_1.exe' },
+            key => 'GCC', expect => 0,
+            desc => 'underscore-extended gcc is not recognized',
+        },
+        {
+            config => {},
+            key => 'BORLAND', expect => 0,
+            desc => 'empty cc is not recognized as borland',
+        },
+        {
+            config => { cc => 'bcc' },
+            key => 'BORLAND', expect => 1,
+            desc => 'plain "bcc" is recognized',
+        },
+        {
+            config => { cc => 'C:/Borland/bin/bcc.exe' },
+            key => 'BORLAND', expect => 0,
+            desc => 'fully qualified borland cc is not recognized',
+        },
+        {
+            config => { cc => 'bcc-1.exe' },
+            key => 'BORLAND', expect => 1,
+            desc => 'dash-extended borland cc is recognized',
+        },
+        {
+            config => { cc => 'bcc_1.exe' },
+            key => 'BORLAND', expect => 1,
+            desc => 'underscore-extended borland cc is recognized',
+        },
+    );
 
-	_check_cc_id_value($_) for @tests;
-
+    _check_cc_id_value($_) for @tests;
 }
 
 package FakeOut;
 
 sub TIEHANDLE {
-	bless(\(my $scalar), $_[0]);
+    bless(\(my $scalar), $_[0]);
 }
 
 sub PRINT {
-	my $self = shift;
-	$$self .= shift;
+    my $self = shift;
+    $$self .= shift;
 }
 
 __END__
