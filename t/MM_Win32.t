@@ -9,9 +9,7 @@ use strict;
 use Test::More;
 
 BEGIN {
-    if ($^O =~ /MSWin32/i) {
-        plan tests => 61;
-    } else {
+    if ($^O !~ /MSWin32/i) {
         plan skip_all => 'This is not Win32';
     }
 }
@@ -108,7 +106,7 @@ delete $ENV{PATHEXT} unless $had_pathext;
 note "init_tools creates expected keys"; {
     my $mm_w32 = bless( { BASEEXT => 'Foo', MAKE => $Config{make} }, 'MM' );
     $mm_w32->init_tools();
-    my @keys = qw( TOUCH CHMOD CP RM_F RM_RF MV NOOP NOECHO SHELL ECHO ECHO_N TEST_F DEV_NULL );
+    my @keys = qw( TOUCH CHMOD CP RM_F RM_RF MV NOOP NOECHO ECHO ECHO_N TEST_F DEV_NULL );
     for my $key ( @keys ) {
         ok( $mm_w32->{ $key }, "init_tools: $key" );
     }
@@ -373,6 +371,10 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
     _check_cc_id_value($_) for @tests;
 }
 
+
+done_testing;
+
+
 package FakeOut;
 
 sub TIEHANDLE {
@@ -383,26 +385,3 @@ sub PRINT {
     my $self = shift;
     $$self .= shift;
 }
-
-__END__
-
-=head1 NAME
-
-MM_Win32.t - Tests for ExtUtils::MM_Win32
-
-=head1 TODO
-
- - Methods to still be checked:
- # static_lib() should look into that
- # dynamic_bs() should look into that
- # dynamic_lib() should look into that
- # xs_o() should look into that
- # top_targets() should look into that
- # dist_ci() should look into that
- # dist_core() should look into that
-
-=head1 AUTHOR
-
-20011228 Abe Timmerman <abe@ztreet.demon.nl>
-
-=cut
