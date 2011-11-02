@@ -1,4 +1,4 @@
-6.63_02
+6.63_02  Tue Nov  1 17:02:40 PDT 2011
     Test Fixes
     * Inform BSDPAN (on FreeBSD) to not register modules installed while
       testing. [rt.cpan.org 70232]
