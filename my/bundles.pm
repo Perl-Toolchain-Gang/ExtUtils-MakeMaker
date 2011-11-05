@@ -34,7 +34,7 @@ inc/ as a flattened module directory that MakeMaker can install.
 my $bundle_dir = "bundled";
 
 my %special_dist = (
-    "Scalar-List-Utils" => sub {
+    "scalar-list-utils" => sub {
         # Special case for Scalar::Util, never override the XS version with a
         # pure Perl version.  Just check that it's there.
         my $installed = find_installed("Scalar/Util.pm");
@@ -50,6 +50,9 @@ my %special_dist = (
 sub add_bundles_to_inc {
     opendir my $dh, $bundle_dir or die "Can't open bundles directory: $!";
     my @bundles = grep { -d $_ } map { "$bundle_dir/$_" } grep !/^\./, readdir $dh;
+    if ($^O eq 'VMS') {
+        for my $bundle (@bundles) { $bundle =~ s/\.DIR$//i; }
+    }
 
     require lib;
     lib->import(@bundles);
@@ -69,7 +72,8 @@ sub copy_bundles {
 
     opendir my $bundle_dh, $src or die $!;
     for my $dist (grep !/^\./, grep { -d File::Spec->catdir($src, $_) } readdir $bundle_dh) {
-        my $should_use = $special_dist{$dist} || \&should_use_dist;
+        $dist =~ s/.DIR$//i if $^O eq 'VMS';
+        my $should_use = $special_dist{lc($dist)} || \&should_use_dist;
 
         next unless $should_use->($dist);
 
