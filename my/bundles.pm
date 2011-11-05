@@ -98,7 +98,7 @@ sub should_use_dist {
 
     # Shut up "isn't numeric" warning on X.Y_Z versions.
     my $installed_version = $installed ? MM->parse_version( $installed ) : 0;
-    my $inc_version       = MM->parse_version( "$bundle_dir/$dist/$pm_file" );
+    my $inc_version       = MM->parse_version( File::Spec->catfile($bundle_dir, $dist, $pm_file) );
 
     $installed_version = cleanup_version($installed_version);
     $inc_version       = cleanup_version($inc_version);
