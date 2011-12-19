@@ -1,3 +1,9 @@
+6.63_03
+    Doc Fixes
+    * Clarified NAME. [rt.cpan.org 73361]
+    * SYNOPSIS is a bit more useful.
+
+
 6.63_02  Tue Nov  1 17:02:40 PDT 2011
     Test Fixes
     * Inform BSDPAN (on FreeBSD) to not register modules installed while
