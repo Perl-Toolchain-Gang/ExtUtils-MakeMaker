@@ -5,6 +5,8 @@
 use strict;
 use warnings;
 
+use lib 't/lib';
+
 use Test::More;
 
 note "The 0.01 / Gconvert bug"; {
