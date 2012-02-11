@@ -1,3 +1,7 @@
+    Misc
+    * Change 'Note' to 'Warning' when libraries aren't found since people
+      often fail to realise that this is the cause of a build failure.
+
 6.63_03
     Test Fixes
     * Added an early test to check for a common 5.6 bug where 0.01 is
