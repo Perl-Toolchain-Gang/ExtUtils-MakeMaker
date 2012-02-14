@@ -1811,7 +1811,7 @@ sub init_INSTALL_from_PREFIX {
         my($s, $t, $d, $style) = @{$layout}{qw(s t d style)};
         my $r = '$('.$type2prefix{$t}.')';
 
-        print STDERR "Prefixing $var\n" if $Verbose >= 2;
+        warn "Prefixing $var\n" if $Verbose >= 2;
 
         my $installvar = "install$var";
         my $Installvar = uc $installvar;
@@ -1820,7 +1820,7 @@ sub init_INSTALL_from_PREFIX {
         $d = "$style/$d" if $style;
         $self->prefixify($installvar, $s, $r, $d);
 
-        print STDERR "  $Installvar == $self->{$Installvar}\n" 
+        warn "  $Installvar == $self->{$Installvar}\n" 
           if $Verbose >= 2;
     }
 
@@ -2383,7 +2383,7 @@ sub arch_check {
 
         my $arch = (grep length, $self->splitdir($pthinks))[-1];
 
-        print STDOUT <<END unless $self->{UNINSTALLED_PERL};
+        print <<END unless $self->{UNINSTALLED_PERL};
 Your perl and your Config.pm seem to have different ideas about the 
 architecture they are running on.
 Perl thinks: [$arch]

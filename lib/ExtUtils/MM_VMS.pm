@@ -134,13 +134,13 @@ sub guess_name {
                 last;
             }
         }
-        print STDOUT "Warning (non-fatal): Couldn't find package name in ${defpm}.pm;\n\t",
+        print "Warning (non-fatal): Couldn't find package name in ${defpm}.pm;\n\t",
                      "defaulting package name to $defname\n"
             if eof($pm);
         close $pm;
     }
     else {
-        print STDOUT "Warning (non-fatal): Couldn't find ${defpm}.pm;\n\t",
+        print "Warning (non-fatal): Couldn't find ${defpm}.pm;\n\t",
                      "defaulting package name to $defname\n";
     }
     $defname =~ s#[\d.\-_]+$##;
@@ -244,7 +244,7 @@ sub find_perl {
             return "MCR $vmsfile";
         }
     }
-    print STDOUT "Unable to find a perl $ver (by these names: @$names, in these dirs: @$dirs)\n";
+    print "Unable to find a perl $ver (by these names: @$names, in these dirs: @$dirs)\n";
     0; # false and not empty
 }
 
@@ -697,7 +697,7 @@ sub cflags {
     my($name,$sys,@m);
 
     ( $name = $self->{NAME} . "_cflags" ) =~ s/:/_/g ;
-    print STDOUT "Unix shell script ".$Config{"$self->{'BASEEXT'}_cflags"}.
+    print "Unix shell script ".$Config{"$self->{'BASEEXT'}_cflags"}.
          " required to modify CC command for $self->{'BASEEXT'}\n"
     if ($Config{$name});
 
@@ -1513,7 +1513,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     push @optlibs, grep { !/PerlShr/i } split ' ', +($self->ext())[2];
     if ($libperl) {
 	unless (-f $libperl || -f ($libperl = $self->catfile($Config{'installarchlib'},'CORE',$libperl))) {
-	    print STDOUT "Warning: $libperl not found\n";
+	    print "Warning: $libperl not found\n";
 	    undef $libperl;
 	}
     }
@@ -1522,7 +1522,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	    $libperl = $self->catfile($self->{PERL_SRC},"libperl$self->{LIB_EXT}");
 	} elsif (-f ($libperl = $self->catfile($Config{'installarchlib'},'CORE',"libperl$self->{LIB_EXT}")) ) {
 	} else {
-	    print STDOUT "Warning: $libperl not found
+	    print "Warning: $libperl not found
     If you're going to build a static perl binary, make sure perl is installed
     otherwise ignore this warning\n";
 	}
@@ -1651,23 +1651,23 @@ sub prefixify {
                $Config{lc $var} || $Config{lc $var_no_install};
 
     if( !$path ) {
-        print STDERR "  no Config found for $var.\n" if $Verbose >= 2;
+        warn "  no Config found for $var.\n" if $Verbose >= 2;
         $path = $self->_prefixify_default($rprefix, $default);
     }
     elsif( !$self->{ARGS}{PREFIX} || !$self->file_name_is_absolute($path) ) {
         # do nothing if there's no prefix or if its relative
     }
     elsif( $sprefix eq $rprefix ) {
-        print STDERR "  no new prefix.\n" if $Verbose >= 2;
+        warn "  no new prefix.\n" if $Verbose >= 2;
     }
     else {
 
-        print STDERR "  prefixify $var => $path\n"     if $Verbose >= 2;
-        print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
+        warn "  prefixify $var => $path\n"     if $Verbose >= 2;
+        warn "    from $sprefix to $rprefix\n" if $Verbose >= 2;
 
         my($path_vol, $path_dirs) = $self->splitpath( $path );
         if( $path_vol eq $Config{vms_prefix}.':' ) {
-            print STDERR "  $Config{vms_prefix}: seen\n" if $Verbose >= 2;
+            warn "  $Config{vms_prefix}: seen\n" if $Verbose >= 2;
 
             $path_dirs =~ s{^\[}{\[.} unless $path_dirs =~ m{^\[\.};
             $path = $self->_catprefix($rprefix, $path_dirs);
@@ -1685,14 +1685,14 @@ sub prefixify {
 sub _prefixify_default {
     my($self, $rprefix, $default) = @_;
 
-    print STDERR "  cannot prefix, using default.\n" if $Verbose >= 2;
+    warn "  cannot prefix, using default.\n" if $Verbose >= 2;
 
     if( !$default ) {
-        print STDERR "No default!\n" if $Verbose >= 1;
+        warn "No default!\n" if $Verbose >= 1;
         return;
     }
     if( !$rprefix ) {
-        print STDERR "No replacement prefix!\n" if $Verbose >= 1;
+        warn "No replacement prefix!\n" if $Verbose >= 1;
         return '';
     }
 

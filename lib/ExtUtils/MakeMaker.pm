@@ -431,7 +431,7 @@ sub new {
         $self->_PRINT_PREREQ;
    }
 
-    print STDOUT "MakeMaker (v$VERSION)\n" if $Verbose;
+    print "MakeMaker (v$VERSION)\n" if $Verbose;
     if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}){
         check_manifest();
     }
@@ -795,18 +795,18 @@ END
 
 
 sub check_manifest {
-    print STDOUT "Checking if your kit is complete...\n";
+    print "Checking if your kit is complete...\n";
     require ExtUtils::Manifest;
     # avoid warning
     $ExtUtils::Manifest::Quiet = $ExtUtils::Manifest::Quiet = 1;
     my(@missed) = ExtUtils::Manifest::manicheck();
     if (@missed) {
-        print STDOUT "Warning: the following files are missing in your kit:\n";
+        print "Warning: the following files are missing in your kit:\n";
         print "\t", join "\n\t", @missed;
-        print STDOUT "\n";
-        print STDOUT "Please inform the author.\n";
+        print "\n";
+        print "Please inform the author.\n";
     } else {
-        print STDOUT "Looks good\n";
+        print "Looks good\n";
     }
 }
 
@@ -834,9 +834,9 @@ sub parse_args{
     if (defined $self->{potential_libs}){
         my($msg)="'potential_libs' => '$self->{potential_libs}' should be";
         if ($self->{potential_libs}){
-            print STDOUT "$msg changed to:\n\t'LIBS' => ['$self->{potential_libs}']\n";
+            print "$msg changed to:\n\t'LIBS' => ['$self->{potential_libs}']\n";
         } else {
-            print STDOUT "$msg deleted.\n";
+            print "$msg deleted.\n";
         }
         $self->{LIBS} = [$self->{potential_libs}];
         delete $self->{potential_libs};
@@ -844,14 +844,14 @@ sub parse_args{
     # catch old-style 'ARMAYBE' and inform user how to 'upgrade'
     if (defined $self->{ARMAYBE}){
         my($armaybe) = $self->{ARMAYBE};
-        print STDOUT "ARMAYBE => '$armaybe' should be changed to:\n",
+        print "ARMAYBE => '$armaybe' should be changed to:\n",
                         "\t'dynamic_lib' => {ARMAYBE => '$armaybe'}\n";
         my(%dl) = %{$self->{dynamic_lib} || {}};
         $self->{dynamic_lib} = { %dl, ARMAYBE => $armaybe};
         delete $self->{ARMAYBE};
     }
     if (defined $self->{LDTARGET}){
-        print STDOUT "LDTARGET should be changed to LDFROM\n";
+        print "LDTARGET should be changed to LDFROM\n";
         $self->{LDFROM} = $self->{LDTARGET};
         delete $self->{LDTARGET};
     }
@@ -873,8 +873,8 @@ sub parse_args{
 
     foreach my $mmkey (sort keys %$self){
         next if $mmkey eq 'ARGS';
-        print STDOUT "  $mmkey => ", neatvalue($self->{$mmkey}), "\n" if $Verbose;
-        print STDOUT "'$mmkey' is not a known MakeMaker parameter name.\n"
+        print "  $mmkey => ", neatvalue($self->{$mmkey}), "\n" if $Verbose;
+        print "'$mmkey' is not a known MakeMaker parameter name.\n"
             unless exists $Recognized_Att_Keys{$mmkey};
     }
     $| = 1 if $Verbose;
@@ -915,7 +915,7 @@ sub _run_hintfile {
     my($hint_file) = shift;
 
     local($@, $!);
-    print STDERR "Processing hints file $hint_file\n";
+    warn "Processing hints file $hint_file\n";
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into @INC
@@ -923,7 +923,7 @@ sub _run_hintfile {
     my $ret = do $hint_file;
     if( !defined $ret ) {
         my $error = $@ || $!;
-        print STDERR $error;
+        warn $error;
     }
 }
 
@@ -993,20 +993,20 @@ sub skipcheck {
     my($self) = shift;
     my($section) = @_;
     if ($section eq 'dynamic') {
-        print STDOUT "Warning (non-fatal): Target 'dynamic' depends on targets ",
+        print "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}{dynamic_bs} && $Verbose;
-        print STDOUT "Warning (non-fatal): Target 'dynamic' depends on targets ",
+        print "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_lib'\n"
             if $self->{SKIPHASH}{dynamic_lib} && $Verbose;
     }
     if ($section eq 'dynamic_lib') {
-        print STDOUT "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on ",
+        print "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on ",
         "targets in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}{dynamic_bs} && $Verbose;
     }
     if ($section eq 'static') {
-        print STDOUT "Warning (non-fatal): Target 'static' depends on targets ",
+        print "Warning (non-fatal): Target 'static' depends on targets ",
         "in skipped section 'static_lib'\n"
             if $self->{SKIPHASH}{static_lib} && $Verbose;
     }
@@ -1018,7 +1018,7 @@ sub flush {
     my $self = shift;
 
     my $finalname = $self->{MAKEFILE};
-    print STDOUT "Writing $finalname for $self->{NAME}\n";
+    print "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
     open(my $fh,">", "MakeMaker.tmp")
@@ -1037,8 +1037,8 @@ sub flush {
 
     unless ($self->{NO_MYMETA}) {
         # Write MYMETA.yml to communicate metadata up to the CPAN clients
-        if ( $self->write_mymeta( $self->mymeta ) ) {;
-            print STDOUT "Writing MYMETA.yml and MYMETA.json\n";
+        if ( $self->write_mymeta( $self->mymeta ) ) {
+            print "Writing MYMETA.yml and MYMETA.json\n";
         }
 
     }
