@@ -507,34 +507,6 @@ CODE
     return;
 }
 
-
-=item init_others (override)
-
-Provide VMS-specific forms of various compile and link commands
-
-=cut
-
-sub init_others {
-    my $self = shift;
-
-    # Must come first as we're modifying and deriving from the defaults.
-    $self->SUPER::init_others;
-
-    if ($self->{OBJECT} =~ /\s/) {
-        $self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
-        $self->{OBJECT} = $self->wraplist(
-            map $self->fixpath($_,0), split /,?\s+/, $self->{OBJECT}
-        );
-    }
-
-    $self->{LDFROM} = $self->wraplist(
-        map $self->fixpath($_,0), split /,?\s+/, $self->{LDFROM}
-    );
-
-    return;
-}
-
-
 =item init_platform (override)
 
 Add PERL_VMS, MM_VMS_REVISION and MM_VMS_VERSION.
@@ -628,12 +600,30 @@ sub constants {
     # Fixup files for MMS macros
     # XXX is this list complete?
     for my $macro (qw/
-                   FULLEXT VERSION_FROM OBJECT LDFROM
+                   FULLEXT VERSION_FROM
 	      /	) {
         next unless defined $self->{$macro};
         $self->{$macro} = $self->fixpath($self->{$macro},0);
     }
 
+
+    for my $macro (qw/
+                   OBJECT LDFROM
+	      /	) {
+        next unless defined $self->{$macro};
+
+        # Must expand macros before splitting on unescaped whitespace.
+        $self->{$macro} = $self->eliminate_macros($self->{$macro});
+        if ($self->{$macro} =~ /(?<!\^)\s/) {
+            $self->{$macro} =~ s/(\\)?\n+\s+/ /g;
+            $self->{$macro} = $self->wraplist(
+                map $self->fixpath($_,0), split /,?(?<!\^)\s+/, $self->{$macro}
+            );
+        }
+        else {
+            $self->{$macro} = $self->fixpath($self->{$macro},0);
+        }
+    }
 
     for my $macro (qw/ XS MAN1PODS MAN3PODS PM /) {
         # Where is the space coming from? --jhi
