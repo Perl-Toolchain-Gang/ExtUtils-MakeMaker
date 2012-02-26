@@ -1168,6 +1168,14 @@ It splits the task of generating the Makefile into several subroutines
 that can be individually overridden.  Each subroutine returns the text
 it wishes to have written to the Makefile.
 
+As there are various Make programs with incompatible syntax, which
+use operating system shells, again with incompatible syntax, it is
+important to know which flavour of Make a Makefile has been written
+for. On POSIX systems, this will likely be GNU Make; on Microsoft
+Windows, it will be either Microsoft NMake or DMake. Note that GNU
+Make is not supported on Windows. See the section on the L</"MAKE">
+parameter for details.
+
 MakeMaker is object oriented. Each directory below the current
 directory that contains a Makefile.PL is treated as a separate
 object. This makes it possible to write an unlimited number of
@@ -1938,9 +1946,17 @@ MakeMaker also honors the MAKE environment variable.  This parameter
 takes precedent.
 
 Currently the only significant values are 'dmake' and 'nmake' for Windows
-users.
+users, instructing MakeMaker to generate a Makefile in the flavour of
+DMake ("Dennis Vadura's Make") or Microsoft NMake respectively.
 
-Defaults to $Config{make}.
+Defaults to $Config{make}, which may go looking for a Make program
+in your environment.
+
+How are you supposed to know what flavour of Make a Makefile has
+been generated for if you didn't specify a value explicitly? Search
+the generated Makefile for the definition of the MAKE variable,
+which is used to recursively invoke the Make utility. That will tell
+you what Make you're supposed to invoke the Makefile with.
 
 =item MAKEAPERL
 
