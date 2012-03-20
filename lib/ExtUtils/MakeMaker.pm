@@ -1170,11 +1170,15 @@ it wishes to have written to the Makefile.
 
 As there are various Make programs with incompatible syntax, which
 use operating system shells, again with incompatible syntax, it is
-important to know which flavour of Make a Makefile has been written
-for. On POSIX systems, this will likely be GNU Make; on Microsoft
-Windows, it will be either Microsoft NMake or DMake. Note that GNU
-Make is not supported on Windows. See the section on the L</"MAKE">
-parameter for details.
+important for users of this module to know I<which flavour of Make
+a Makefile has been written for so they'll use the correct one and
+won't have to face the possibly bewildering errors resulting from
+using the wrong one.
+
+On POSIX systems, that program will likely be GNU Make; on Microsoft
+Windows, it will be either Microsoft NMake or DMake. Note that this
+module does not support generating Makefiles for GNU Make on Windows.
+See the section on the L</"MAKE"> parameter for details.
 
 MakeMaker is object oriented. Each directory below the current
 directory that contains a Makefile.PL is treated as a separate
