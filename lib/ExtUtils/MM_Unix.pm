@@ -2645,6 +2645,7 @@ sub parse_version {
             $result = $1;
         }
         elsif ( m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* =}x ) {
+            do { s/BEGIN\s*{(.*)}/$1/ }; # do{} will keep $1, $2 from the regex above
             my $eval = qq{
                 package ExtUtils::MakeMaker::_version;
                 no strict;

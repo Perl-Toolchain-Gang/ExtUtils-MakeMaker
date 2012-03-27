@@ -25,6 +25,7 @@ my %versions = (q[$VERSION = '1.00']            => '1.00',
                 q[local $FOO::VERSION = '1.30'] => 'undef',
                 q[if( $Foo::VERSION >= 3.00 ) {]=> 'undef',
                 q[our $VERSION = '1.23';]       => '1.23',
+                q[BEGIN { our $VERSION = '1.23' }]       => '1.23',
 
                 '$Something::VERSION == 1.0'    => 'undef',
                 '$Something::VERSION <= 1.0'    => 'undef',
