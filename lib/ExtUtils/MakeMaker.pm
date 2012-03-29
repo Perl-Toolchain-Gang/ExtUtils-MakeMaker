@@ -1170,7 +1170,7 @@ it wishes to have written to the Makefile.
 
 As there are various Make programs with incompatible syntax, which
 use operating system shells, again with incompatible syntax, it is
-important for users of this module to know I<which flavour of Make
+important for users of this module to know which flavour of Make
 a Makefile has been written for so they'll use the correct one and
 won't have to face the possibly bewildering errors resulting from
 using the wrong one.
