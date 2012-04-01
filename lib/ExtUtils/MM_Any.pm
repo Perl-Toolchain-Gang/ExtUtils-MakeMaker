@@ -999,7 +999,7 @@ sub metafile_data {
         };
     }
 
-    %meta = $self->_add_requirements_to_meta( %meta );
+    %meta = $self->_add_requirements_to_meta( 0, %meta );
 
     while( my($key, $val) = each %$meta_add ) {
         $meta{$key} = $val;
@@ -1018,23 +1018,48 @@ sub metafile_data {
 =cut
 
 sub _add_requirements_to_meta {
-    my ( $self, %meta ) = @_;
+    my ( $self, $v2, %meta ) = @_;
 
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
+    if ($v2) {
+        if( $self->{ARGS}{BUILD_REQUIRES} ) {
+            $meta{prereqs}{build}{requires} = _normalize_prereqs($self->{BUILD_REQUIRES});
+        } else {
+            $meta{prereqs}{build}{requires} = {
+                'ExtUtils::MakeMaker'       => 0,
+            };
+        }
 
-    if( $self->{ARGS}{BUILD_REQUIRES} ) {
-        $meta{build_requires} = _normalize_prereqs($self->{BUILD_REQUIRES});
+        if( $self->{ARGS}{TEST_REQUIRES} ) {
+            $meta{prereqs}{test}{requires} = _normalize_prereqs($self->{TEST_REQUIRES});
+        }
+
+        $meta{prereqs}{runtime}{requires} = _normalize_prereqs($self->{PREREQ_PM})
+            if defined $self->{PREREQ_PM};
+        $meta{prereqs}{runtime}{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
+            if $self->{MIN_PERL_VERSION};
     } else {
-        $meta{build_requires} = {
-            'ExtUtils::MakeMaker'       => 0,
-        };
-    }
+        if( $self->{ARGS}{BUILD_REQUIRES} ) {
+            $meta{build_requires} = _normalize_prereqs($self->{BUILD_REQUIRES});
+        } else {
+            $meta{build_requires} = {
+                'ExtUtils::MakeMaker'       => 0,
+            };
+        }
 
-    $meta{requires} = _normalize_prereqs($self->{PREREQ_PM})
-        if defined $self->{PREREQ_PM};
-    $meta{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
-        if $self->{MIN_PERL_VERSION};
+        if( $self->{ARGS}{TEST_REQUIRES} ) {
+            $meta{build_requires} = {
+              %{ $meta{build_requires} },
+              %{ _normalize_prereqs($self->{TEST_REQUIRES}) },
+            };
+        }
+
+        $meta{requires} = _normalize_prereqs($self->{PREREQ_PM})
+            if defined $self->{PREREQ_PM};
+        $meta{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
+            if $self->{MIN_PERL_VERSION};
+    }
 
     return %meta;
 }
@@ -1262,6 +1287,7 @@ sub mymeta {
     my $file = shift || ''; # for testing
 
     my $mymeta = $self->_mymeta_from_meta($file);
+    my $v2 = 1;
 
     unless ( $mymeta ) {
         my @metadata = $self->metafile_data(
@@ -1269,11 +1295,12 @@ sub mymeta {
             $self->{META_MERGE} || {},
         );
         $mymeta = {@metadata};
+        $v2 = 0;
     }
 
     # Overwrite the non-configure dependency hashes
 
-    $mymeta = { $self->_add_requirements_to_meta( %$mymeta ) };
+    $mymeta = { $self->_add_requirements_to_meta( $v2, %$mymeta ) };
 
     $mymeta->{dynamic_config} = 0;
 
@@ -1291,12 +1318,12 @@ sub _mymeta_from_meta {
     for my $file ( $metafile, "META.json", "META.yml" ) {
       next unless -e $file;
       eval {
-          $meta = CPAN::Meta->load_file($file)->as_struct( {version => "1.4"} );
+          $meta = CPAN::Meta->load_file($file)->as_struct( { version => 2 } );
       };
       last if $meta;
     }
     return undef unless $meta;
-    
+
     # META.yml before 6.25_01 cannot be trusted.  META.yml lived in the source directory.
     # There was a good chance the author accidentally uploaded a stale META.yml if they
     # rolled their own tarball rather than using "make dist".

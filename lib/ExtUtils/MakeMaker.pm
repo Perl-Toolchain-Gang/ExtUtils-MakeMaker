@@ -94,6 +94,7 @@ my %Special_Sigs = (
  PREREQ_PM          => 'HASH',
  BUILD_REQUIRES     => 'HASH',
  CONFIGURE_REQUIRES => 'HASH',
+ TEST_REQUIRES      => 'HASH',
  SKIP               => 'ARRAY',
  TYPEMAPS           => 'ARRAY',
  XS                 => 'HASH',
@@ -274,12 +275,13 @@ sub full_setup {
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
     LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET
     META_ADD META_MERGE MIN_PERL_VERSION BUILD_REQUIRES CONFIGURE_REQUIRES
-    MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NO_MYMETA NORECURS NO_VC OBJECT
-    OPTIMIZE PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
+    MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NO_MYMETA
+    NORECURS NO_VC OBJECT OPTIMIZE PERL_MALLOC_OK PERL PERLMAINCC PERLRUN
+    PERLRUNINST PERL_CORE
     PERL_SRC PERM_DIR PERM_RW PERM_RWX
     PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE PPM_INSTALL_EXEC
     PPM_INSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
-    SIGN SKIP TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
+    SIGN SKIP TEST_REQUIRES TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
     XS_VERSION clean depend dist dynamic_lib linkext macro realclean
     tool_autosplit
 
@@ -416,7 +418,7 @@ sub new {
     bless $self, "MM";
 
     # Cleanup all the module requirement bits
-    for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES)) {
+    for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
         $self->{$key}      ||= {};
         $self->clean_versions( $key );
     }
@@ -780,7 +782,11 @@ END
         if ($key eq 'PREREQ_PM') {
             # CPAN.pm takes prereqs from this field in 'Makefile'
             # and does not know about BUILD_REQUIRES
-            $v = neatvalue({ %{ $att->{PREREQ_PM} || {} }, %{ $att->{BUILD_REQUIRES} || {} } });
+            $v = neatvalue({
+                %{ $att->{PREREQ_PM} || {} },
+                %{ $att->{BUILD_REQUIRES} || {} },
+                %{ $att->{TEST_REQUIRES} || {} },
+            });
         } else {
             $v = neatvalue($att->{$key});
         }
@@ -2371,6 +2377,16 @@ Arrayref. E.g. [qw(name1 name2)] skip (do not write) sections of the
 Makefile. Caution! Do not use the SKIP attribute for the negligible
 speedup. It may seriously damage the resulting Makefile. Only use it
 if you really need it.
+
+=item TEST_REQUIRES
+
+A hash of modules that are needed to test your module but not run or
+build it.
+
+This will go into the C<test_requires> field of your CPAN Meta file.
+(F<META.yml> or F<META.json>).
+
+The format is the same as PREREQ_PM.
 
 =item TYPEMAPS
 
