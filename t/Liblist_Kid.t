@@ -3,14 +3,7 @@
 use strict;
 use warnings;
 
-# This makes sure the test is run from the same place, with the same @INC,
-# no matter whether it's started via prove or via Komodo IDE.
-
-BEGIN {
-    use Cwd;
-    chdir 't' if -d 't';
-    use lib getcwd() . '/lib', getcwd() . '/../lib';
-}
+use lib 't/lib';
 
 # Liblist wants to be an object which has File::Spec capabilities, so we
 # mock one.
