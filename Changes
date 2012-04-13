@@ -4,7 +4,8 @@
       for testing.  [github 29] (Ricardo Signes)
 
     Bug Fixes
-    * Update bundled modules: ExtUtils::Install to 1.54
+    * Update bundled modules: ExtUtils::Install to 1.54, ExtUtils::Manifest
+      to 1.60.
 
     Misc
     * Change 'Note' to 'Warning' when libraries aren't found since people
