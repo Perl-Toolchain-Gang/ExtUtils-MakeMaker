@@ -1162,7 +1162,10 @@ ExtUtils::MakeMaker - Create a module Makefile
 
   use ExtUtils::MakeMaker;
 
-  WriteMakefile( ATTRIBUTE => VALUE [, ...] );
+  WriteMakefile(
+      NAME              => "Foo::Bar",
+      VERSION_FROM      => "lib/Foo/Bar.pm",
+  );
 
 =head1 DESCRIPTION
 
@@ -2019,9 +2022,18 @@ name of the library (see SDBM_File)
 
 =item NAME
 
-Perl module name for this extension (DBD::Oracle). This will default
-to the directory name but should be explicitly defined in the
-Makefile.PL.
+The package representing the distribution. For example, C<Test::More>
+or C<ExtUtils::MakeMaker>. It will be used to derive information about
+the distribution such as the L<DISTNAME>, installation locations
+within the Perl library and where XS files will be looked for by
+default (see L<XS>).
+
+C<NAME> I<must> be a valid Perl package name and it I<must> have an
+associated C<.pm> file. For example, C<Foo::Bar> is a valid C<NAME>
+and there must exist F<Foo/Bar.pm>.  Any XS code should be in
+F<Bar.xs> unless stated otherwise.
+
+Your distribution B<must> have a C<NAME>.
 
 =item NEEDS_LINKING
 
