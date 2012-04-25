@@ -186,14 +186,22 @@ BIN_WARN
 
         my @perls = qw(
             perl5.6.2
+            perl5.8.1
             perl5.8.9
             perl5.10.0
             perl5.10.1
+            perl5.12.3
             perl5.12.4
             perl5.14.1
+            perl5.14.2
         );
 
         for my $perl ( @perls ) {
+            if( !`which $perl` ) {
+                print STDERR "Missing $perl";
+                next;
+            }
+
             $make .= sprintf <<'END', $perl;
 	cd $(DISTVNAME) && $(MAKE) clean && %s Makefile.PL && $(MAKE) test $(PASTHRU)
 END
