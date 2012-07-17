@@ -51,9 +51,10 @@ sub conf_reset {
 # separation of OS-specific files.
 
 sub move_to_os_test_data_dir {
-    my %os_test_dirs = ( MSWin32 => 'liblist/win32', );
-    chdir $os_test_dirs{$^O} if $os_test_dirs{$^O};
+    my %os_test_dirs = ( MSWin32 => 't/liblist/win32', );
+    return if !$os_test_dirs{$^O};
 
+    chdir $os_test_dirs{$^O} or die "Could not change to liblist test dir '$os_test_dirs{$^O}': $!";
     return;
 }
 
