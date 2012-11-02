@@ -185,15 +185,24 @@ BIN_WARN
         $make =~ s{\s+\z}{\n};
 
         my @perls = qw(
+            perl5.6.1
             perl5.6.2
             perl5.8.1
+            perl5.8.5
+            perl5.8.8
             perl5.8.9
+            perl5.10
             perl5.10.0
             perl5.10.1
+            perl5.12
             perl5.12.3
             perl5.12.4
+            perl5.14.0
             perl5.14.1
             perl5.14.2
+            perl5.16.0
+            perl5.16.1
+            perl5.16.2
         );
 
         for my $perl ( @perls ) {
