@@ -6,6 +6,8 @@
     Bug Fixes
     * Update bundled modules: ExtUtils::Install to 1.54, ExtUtils::Manifest
       to 1.60.
+    * Update CPAN::Meta::YAML to 0.08 for compatibility with older versions
+      of Scalar::Util.
 
     Misc
     * Change 'Note' to 'Warning' when libraries aren't found since people
