@@ -1,3 +1,9 @@
+6.63_04
+    Test Fixes
+    * Eliminated the problematic PASTHRU test on Windows.  A better test
+      will come after stable. [github 41] (Michael G Schwern)
+
+
 6.63_03  Thu Nov  1 19:52:30 PDT 2012
     New Features
     * Added TEST_REQUIRES keyword to specify prerequisites only needed
