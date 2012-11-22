@@ -1,7 +1,13 @@
-6.63_04
+6.63_04  Thu Nov 22 13:18:06 PST 2012
     Test Fixes
-    * Eliminated the problematic PASTHRU test on Windows.  A better test
-      will come after stable. [github 41] (Michael G Schwern)
+    * Eliminated the problematic and not very useful PASTHRU test
+      on Windows.  A better test will come after stable. [github 41]
+      (Michael G Schwern)
+    * Avoid a new regex warning in 5.17.x in t/MM_OS2.t. (Craig A. Berry)
+
+    VMS Fixes
+    * Better ignore files due to non-case-preserving filesystems.
+      (Craig A. Berry)
 
 
 6.63_03  Thu Nov  1 19:52:30 PDT 2012

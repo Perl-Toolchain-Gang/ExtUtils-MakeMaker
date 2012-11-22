@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);
-$VERSION = '6.63_03';
+$VERSION = '6.63_04';
 $VERSION = eval $VERSION;
 
 require ExtUtils::MM_Any;
