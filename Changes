@@ -1,3 +1,9 @@
+6.64
+    Build Fixes
+    * Update the home page in the meta file.  makemaker.org has been
+      unmaintained for a while.
+
+
 6.63_04  Thu Nov 22 13:18:06 PST 2012
     Test Fixes
     * Eliminated the problematic and not very useful PASTHRU test
