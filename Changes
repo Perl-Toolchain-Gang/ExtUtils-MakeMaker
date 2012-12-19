@@ -1,3 +1,9 @@
+6.65_01
+    Doc Fixes
+    * Numerous typo fixes. (Ben Bullock)
+      [github #33] [github #34] [github #35]
+
+
 6.64  Sun Dec 16 18:27:40 PST 2012
     Build Fixes
     * Update the home page in the meta file.  makemaker.org has been
