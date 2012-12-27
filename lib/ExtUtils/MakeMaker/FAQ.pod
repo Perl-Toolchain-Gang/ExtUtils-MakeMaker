@@ -47,6 +47,9 @@ reason, do it the long way.
 Module::Build, as of 0.28, supports two ways to install to the same
 location as MakeMaker.
 
+We highly recommend the install_base method, its the simplest and most
+closely approximates the expected behavior of an installation prefix.
+
 1) Use INSTALL_BASE / C<--install_base>
 
 MakeMaker (as of 6.31) and Module::Build (as of 0.28) both can install
@@ -58,6 +61,9 @@ C<--install_base> in MB to the same location.
     perl Makefile.PL INSTALL_BASE=/whatever
     perl Build.PL    --install_base /whatever
 
+This works most like other language's behavior when you specify a
+prefix.  We recommend this method.
+
 2) Use PREFIX / C<--prefix>
 
 Module::Build 0.28 added support for C<--prefix> which works like
@@ -66,6 +72,10 @@ MakeMaker's PREFIX.
     perl Makefile.PL PREFIX=/whatever
     perl Build.PL    --prefix /whatever
 
+We highly discourage this method.  It should only be used if you know
+what you're doing and specifically need the PREFIX behavior.  The
+PREFIX algorithm is complicated and focused on matching the system
+installation.
 
 =item How do I keep from installing man pages?
 
