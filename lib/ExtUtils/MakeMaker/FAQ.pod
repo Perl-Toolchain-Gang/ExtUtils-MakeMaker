@@ -129,6 +129,22 @@ installation structure matching INSTALL_BASE and using that instead.
 
 =back
 
+=head2 Common errors and problems
+
+=over 4
+
+=item "No rule to make target `/usr/lib/perl5/CORE/config.h', needed by `Makefile'"
+
+Just what it says, you're missing that file.  MakeMaker uses it to
+determine if perl has been rebuilt since the Makefile was made.  It's
+a bit of a bug that it halts installation.
+
+Some operating systems don't ship the CORE directory with their base
+perl install.  To solve the problem, you likely need to install a perl
+development package such as perl-devel (CentOS, Fedora and other
+Redhat systems) or perl (Ubuntu and other Debian systems).
+
+=back
 
 =head2 Philosophy and History
 
