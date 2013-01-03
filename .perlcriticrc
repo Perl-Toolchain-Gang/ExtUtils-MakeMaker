@@ -47,9 +47,6 @@ pager           = $PAGER
 # common functions by default.
 [-Modules::ProhibitAutomaticExportation]
 
-# Git doesn't have these.  And they're rarely practical anyway.
-[-Miscellanea::RequireRcsKeywords]
-
 # I cannot be arsed to add text to every POD link just in case somebody
 # uses an old formatter
 [-Documentation::RequirePodLinksIncludeText]
