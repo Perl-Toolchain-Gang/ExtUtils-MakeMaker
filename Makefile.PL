@@ -220,4 +220,16 @@ END
 
         return $make;
     }
+
+
+    sub postamble {
+        my $self = shift;
+
+        return <<'END';
+critic : .perlcriticrc
+	find lib -name '*.pm' -print0 | xargs -0 perlcritic
+
+END
+
+    }
 }
