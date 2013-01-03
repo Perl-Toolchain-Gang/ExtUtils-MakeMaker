@@ -1332,7 +1332,7 @@ sub _mymeta_from_meta {
       };
       last if $meta;
     }
-    return undef unless $meta;
+    return unless $meta;
 
     # META.yml before 6.25_01 cannot be trusted.  META.yml lived in the source directory.
     # There was a good chance the author accidentally uploaded a stale META.yml if they
@@ -1341,7 +1341,7 @@ sub _mymeta_from_meta {
         $meta->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
         my $eummv = do { local $^W = 0; $1+0; };
         if ($eummv < 6.2501) {
-            return undef;
+            return;
         }
     }
 

@@ -16,7 +16,7 @@ use ExtUtils::MakeMaker qw($Verbose neatvalue);
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);
 $VERSION = '6.64';
-$VERSION = eval $VERSION;
+$VERSION = eval $VERSION;  ## no critic [BuiltinFunctions::ProhibitStringyEval]
 
 require ExtUtils::MM_Any;
 our @ISA = qw(ExtUtils::MM_Any);
@@ -1193,7 +1193,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     else {
         warn "Can't find $cmd in PATH, $file unchanged"
             if $Verbose;
-        return undef;
+        return;
     }
     return $shb
 }

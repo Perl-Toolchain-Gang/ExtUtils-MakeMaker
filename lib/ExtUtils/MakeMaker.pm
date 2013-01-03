@@ -19,7 +19,7 @@ my @Prepend_parent;
 my %Recognized_Att_Keys;
 
 our $VERSION = '6.64';
-$VERSION = eval $VERSION;
+$VERSION = eval $VERSION;  ## no critic [BuiltinFunctions::ProhibitStringyEval]
 
 # Emulate something resembling CVS $Revision$
 (our $Revision = $VERSION) =~ s{_}{};
