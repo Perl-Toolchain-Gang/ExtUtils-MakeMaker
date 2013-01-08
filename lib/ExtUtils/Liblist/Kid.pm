@@ -422,7 +422,8 @@ sub _win32_try_attach_extension {
 sub _win32_lib_extensions {
     my %extensions;
     $extensions{ $Config{'lib_ext'} } = 1 if $Config{'lib_ext'};
-    $extensions{".lib"} = 1;
+    $extensions{".dll.a"} = 1 if $extensions{".a"};
+    $extensions{".lib"}   = 1;
     return [ keys %extensions ];
 }
 

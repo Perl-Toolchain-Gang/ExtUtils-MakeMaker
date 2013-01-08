@@ -127,6 +127,10 @@ sub test_kid_win32 {
     is_deeply( [ _ext( 'test' ) ], [ 'test.meep', '', 'test.meep', '' ], '$Config{lib_ext} changes the lib extension to be searched for' );
     delete $Config{lib_ext};
 
+    $Config{lib_ext} = '.a';
+    is_deeply( [ _ext( 'imp' ) ], [ 'imp.dll.a', '', 'imp.dll.a', '' ], '$Config{lib_ext} == ".a" will find *.dll.a too' );
+    delete $Config{lib_ext};
+
     $Config{cc} = 'C:/MinGW/bin/gcc.exe';
 
     is_deeply( [ _ext( 'test' ) ],                    [ 'test.lib',      '', 'test.lib',      '' ], '[gcc] searching for straight lib names remains unchanged' );
