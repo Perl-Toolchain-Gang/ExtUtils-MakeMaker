@@ -1196,7 +1196,7 @@ Makefiles with a single invocation of WriteMakefile().
 
 =head2 How To Write A Makefile.PL
 
-See ExtUtils::MakeMaker::Tutorial.
+See L<ExtUtils::MakeMaker::Tutorial>.
 
 The long answer is the rest of the manpage :-)
 
