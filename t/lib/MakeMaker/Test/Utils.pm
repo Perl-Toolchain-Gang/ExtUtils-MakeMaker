@@ -14,7 +14,7 @@ our $Is_FreeBSD = $^O eq 'freebsd';
 our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
                  make make_run run make_macro calibrate_mtime
                  setup_mm_test_root
-                 have_compiler slurp
+                 have_compiler have_cplusplus slurp
                  $Is_VMS $Is_MacOS
                  run_ok
                 );
@@ -388,6 +388,36 @@ sub have_compiler {
     };
 
     return $have_compiler;
+}
+
+=item have_cplusplus
+
+  $have_compiler = have_cplusplus;
+
+Returns true if there is a C++ compiler available for XS builds.
+
+=cut
+
+sub have_cplusplus {
+    my $have_cplusplus = 0;
+
+    # ExtUtils::CBuilder prints its compilation lines to the screen.
+    # Shut it up.
+    use TieOut;
+    local *STDOUT = *STDOUT;
+    local *STDERR = *STDERR;
+
+    tie *STDOUT, 'TieOut';
+    tie *STDERR, 'TieOut';
+
+    eval {
+	require ExtUtils::CBuilder;
+	my $cb = ExtUtils::CBuilder->new;
+
+	$have_cplusplus = $cb->have_cplusplus;
+    };
+
+    return $have_cplusplus;
 }
 
 =item slurp

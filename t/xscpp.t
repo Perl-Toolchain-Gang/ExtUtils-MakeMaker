@@ -15,12 +15,12 @@ use File::Spec;
 use File::Path;
 
 my $Skipped = 0;
-if( have_compiler() ) {
+if( have_cplusplus() ) {
     plan tests => 5;
 }
 else {
     $Skipped = 1;
-    plan skip_all => "ExtUtils::CBuilder not installed or couldn't find a compiler";
+    plan skip_all => "ExtUtils::CBuilder not installed or couldn't find a C++ compiler";
 }
 
 my $Is_VMS = $^O eq 'VMS';
