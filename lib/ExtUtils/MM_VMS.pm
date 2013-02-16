@@ -905,8 +905,8 @@ sub xs_c {
     my($self) = @_;
     return '' unless $self->needs_linking();
     '
-.xs.c :
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET)
+.xs$(XSTARGET_EXT) :
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET_NAME)$(XSTARGET_EXT)
 ';
 }
 
@@ -921,8 +921,8 @@ sub xs_o {	# many makes are too dumb to use xs_c then c_o
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT) :
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET_NAME).c
-	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).c
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET_NAME)$(XSTARGET_EXT)
+	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME)$(XSTARGET_EXT)
 ';
 }
 

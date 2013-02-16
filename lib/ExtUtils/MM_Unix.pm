@@ -3592,7 +3592,8 @@ sub writedoc {
 
 =item xs_c (o)
 
-Defines the suffix rules to compile XS files to C.
+Defines the suffix rules to compile XS files to C (or to C++
+if XSTARGET_EXT set to ".cpp").
 
 =cut
 

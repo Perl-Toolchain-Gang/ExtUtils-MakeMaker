@@ -2523,6 +2523,11 @@ May be set to an empty string, which is identical to C<-prototypes>, or
 C<-noprototypes>. See the xsubpp documentation for details. MakeMaker
 defaults to the empty string.
 
+=item XSTARGET_EXT
+
+Suffix for files produced from .xs files. It is .c by default. But can be
+set to .cpp if you xs code contains C++.
+
 =item XS_VERSION
 
 Your version number for the .xs file of this package.  This defaults
