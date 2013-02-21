@@ -2624,6 +2624,36 @@ sub _all_prereqs {
     return { %{$self->{PREREQ_PM}}, %{$self->{BUILD_REQUIRES}} };
 }
 
+=begin private
+
+=head3 _perl_header_files
+
+  my $perl_headers= $self->_perl_headers;
+
+returns a sorted list of header files as found in PERL_SRC or $archlibexp/CORE.
+
+Used by perldepend() in MM_Unix and MM_VMS.
+
+=end private
+
+=cut
+
+sub _perl_header_files {
+    my $self = shift;
+
+    my $header_dir = $self->{PERL_SRC} || $self->catdir($Config{archlibexp}, 'CORE');
+    opendir my $dh, $header_dir
+        or die "Failed to opendir '$header_dir' to find header files: $!";
+
+    # we need to use a temporary here as the sort in scalar context would have undefined results.
+    my @perl_headers= sort grep { /\.h\z/ } readdir($dh);
+
+    closedir $dh;
+
+    return @perl_headers;
+}
+
+
 
 =head1 AUTHOR
 

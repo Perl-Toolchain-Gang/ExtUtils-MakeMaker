@@ -1288,23 +1288,22 @@ sub perldepend {
     my($self) = @_;
     my(@m);
 
-    push @m, '
-$(OBJECT) : $(PERL_INC)EXTERN.h, $(PERL_INC)INTERN.h, $(PERL_INC)XSUB.h
-$(OBJECT) : $(PERL_INC)av.h, $(PERL_INC)config.h
-$(OBJECT) : $(PERL_INC)cop.h, $(PERL_INC)cv.h, $(PERL_INC)embed.h
-$(OBJECT) : $(PERL_INC)embedvar.h, $(PERL_INC)form.h
-$(OBJECT) : $(PERL_INC)gv.h, $(PERL_INC)handy.h, $(PERL_INC)hv.h
-$(OBJECT) : $(PERL_INC)intrpvar.h, $(PERL_INC)iperlsys.h, $(PERL_INC)keywords.h
-$(OBJECT) : $(PERL_INC)mg.h, $(PERL_INC)nostdio.h, $(PERL_INC)op.h
-$(OBJECT) : $(PERL_INC)opcode.h, $(PERL_INC)patchlevel.h
-$(OBJECT) : $(PERL_INC)perl.h, $(PERL_INC)perlio.h
-$(OBJECT) : $(PERL_INC)perlsdio.h, $(PERL_INC)perlvars.h
-$(OBJECT) : $(PERL_INC)perly.h, $(PERL_INC)pp.h, $(PERL_INC)pp_proto.h
-$(OBJECT) : $(PERL_INC)proto.h, $(PERL_INC)regcomp.h, $(PERL_INC)regexp.h
-$(OBJECT) : $(PERL_INC)regnodes.h, $(PERL_INC)scope.h, $(PERL_INC)sv.h
-$(OBJECT) : $(PERL_INC)thread.h, $(PERL_INC)util.h, $(PERL_INC)vmsish.h
-
-' if $self->{OBJECT}; 
+    if ( $self->{OBJECT} ) {
+        # This block is structured so as to try hard to keep lines under 80 chars
+        # I do not know if that is required or not, but that is how the code this
+        # replaced looked, and since I can't test directly, seemed a reasonable
+        # property to preserve in this refactoring.
+        my @lines;
+        foreach my $file ( $self->_perl_header_files() ) {
+            my $cat = ", \$(PERL_INC)$file";
+            if (!@lines or length($lines[-1] . $cat) > 79) {
+                push @lines, "\$(OBJECT) : \$(PERL_INC)$file";
+            } else {
+                $lines[-1] .= $cat;
+            }
+        }
+        push @m, join("\n", "", @lines, "", ""); # "" are to add blank lines in appropriate places
+    }
 
     if ($self->{PERL_SRC}) {
 	my(@macros);
