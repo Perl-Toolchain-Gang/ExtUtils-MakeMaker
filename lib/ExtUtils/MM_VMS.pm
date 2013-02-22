@@ -1288,21 +1288,13 @@ sub perldepend {
     my($self) = @_;
     my(@m);
 
-    if ( $self->{OBJECT} ) {
-        # This block is structured so as to try hard to keep lines under 80 chars
-        # I do not know if that is required or not, but that is how the code this
-        # replaced looked, and since I can't test directly, seemed a reasonable
-        # property to preserve in this refactoring.
-        my @lines;
-        foreach my $file ( $self->_perl_header_files() ) {
-            my $cat = ", \$(PERL_INC)$file";
-            if (!@lines or length($lines[-1] . $cat) > 79) {
-                push @lines, "\$(OBJECT) : \$(PERL_INC)$file";
-            } else {
-                $lines[-1] .= $cat;
-            }
-        }
-        push @m, join("\n", "", @lines, "", ""); # "" are to add blank lines in appropriate places
+# This is the same as what's done in MM_Unix except we don't put  '/' between
+# the directory and the filename as the directory already has delimiters.
+    if ($self->{OBJECT}) {
+        my $fmt= '        $(PERL_INC)%s            ';
+        push @m, qq{PERL_HDRS = \\\n}
+               . join("\\\n", map { sprintf $fmt, $_ } $self->_perl_header_files())
+               . qq{\n\n\$(OBJECT) : \$(PERL_HDRS)\n};
     }
 
     if ($self->{PERL_SRC}) {
