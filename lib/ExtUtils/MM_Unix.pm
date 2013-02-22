@@ -2755,10 +2755,9 @@ MAKE_FRAG
     return join "", @m unless $self->needs_linking;
 
     if ($self->{OBJECT}) {
-        my $fmt= '        $(PERL_INC)/%s            '; # preserve the old indentation and formating
-        push @m, qq{PERL_HDRS = \\\n}
-               . join("\\\n", map { sprintf $fmt, $_ } $self->_perl_header_files())
-               . qq{\n\n\$(OBJECT) : \$(PERL_HDRS)\n};
+        # Need to add an object file dependency on the perl headers.
+        # this is very important for XS modules in perl.git development.
+        push @m, $self->_perl_header_files_fragment("/"); # Directory separator between $(PERL_INC)/header.h
     }
 
     push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};

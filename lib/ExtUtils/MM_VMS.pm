@@ -1288,13 +1288,11 @@ sub perldepend {
     my($self) = @_;
     my(@m);
 
-# This is the same as what's done in MM_Unix except we don't put  '/' between
-# the directory and the filename as the directory already has delimiters.
     if ($self->{OBJECT}) {
-        my $fmt= '        $(PERL_INC)%s            ';
-        push @m, qq{PERL_HDRS = \\\n}
-               . join("\\\n", map { sprintf $fmt, $_ } $self->_perl_header_files())
-               . qq{\n\n\$(OBJECT) : \$(PERL_HDRS)\n};
+        # Need to add an object file dependency on the perl headers.
+        # this is very important for XS modules in perl.git development.
+
+        push @m, $self->_perl_header_files_fragment(""); # empty separator on VMS as its in the $(PERL_INC)
     }
 
     if ($self->{PERL_SRC}) {
