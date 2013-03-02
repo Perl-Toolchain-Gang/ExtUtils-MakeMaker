@@ -212,10 +212,10 @@ ExtUtils::Mksymlists - write linker options files for dynamic extension
 =head1 SYNOPSIS
 
     use ExtUtils::Mksymlists;
-    Mksymlists({ NAME     => $name ,
+    Mksymlists(  NAME     => $name ,
                  DL_VARS  => [ $var1, $var2, $var3 ],
                  DL_FUNCS => { $pkg1 => [ $func1, $func2 ],
-                               $pkg2 => [ $func3 ] });
+                               $pkg2 => [ $func3 ] );
 
 =head1 DESCRIPTION
 
@@ -281,9 +281,9 @@ generation of the bootstrap function for the package. To still create
 the bootstrap name you have to specify the package name in the
 DL_FUNCS hash:
 
-    Mksymlists({ NAME     => $name ,
+    Mksymlists(  NAME     => $name ,
 		 FUNCLIST => [ $func1, $func2 ],
-                 DL_FUNCS => { $pkg => [] } });
+                 DL_FUNCS => { $pkg => [] } );
 
 
 =item IMPORTS
