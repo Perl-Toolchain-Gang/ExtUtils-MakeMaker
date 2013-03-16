@@ -381,10 +381,10 @@ sub have_compiler {
     tie *STDERR, 'TieOut';
 
     eval {
-	require ExtUtils::CBuilder;
-	my $cb = ExtUtils::CBuilder->new;
+        require ExtUtils::CBuilder;
+        my $cb = ExtUtils::CBuilder->new;
 
-	$have_compiler = $cb->have_compiler;
+        $have_compiler = $cb->have_compiler;
     };
 
     return $have_compiler;
@@ -411,10 +411,10 @@ sub have_cplusplus {
     tie *STDERR, 'TieOut';
 
     eval {
-	require ExtUtils::CBuilder;
-	my $cb = ExtUtils::CBuilder->new;
+        require ExtUtils::CBuilder;
+        my $cb = ExtUtils::CBuilder->new;
 
-	$have_cplusplus = $cb->have_cplusplus;
+        $have_cplusplus = $cb->have_cplusplus;
     };
 
     return $have_cplusplus;
