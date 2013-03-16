@@ -2624,6 +2624,66 @@ sub _all_prereqs {
     return { %{$self->{PREREQ_PM}}, %{$self->{BUILD_REQUIRES}} };
 }
 
+=begin private
+
+=head3 _perl_header_files
+
+  my $perl_header_files= $self->_perl_header_files;
+
+returns a sorted list of header files as found in PERL_SRC or $archlibexp/CORE.
+
+Used by perldepend() in MM_Unix and MM_VMS via _perl_header_files_fragment()
+
+=end private
+
+=cut
+
+sub _perl_header_files {
+    my $self = shift;
+
+    my $header_dir = $self->{PERL_SRC} || $self->catdir($Config{archlibexp}, 'CORE');
+    opendir my $dh, $header_dir
+        or die "Failed to opendir '$header_dir' to find header files: $!";
+
+    # we need to use a temporary here as the sort in scalar context would have undefined results.
+    my @perl_headers= sort grep { /\.h\z/ } readdir($dh);
+
+    closedir $dh;
+
+    return @perl_headers;
+}
+
+=begin private
+
+=head3 _perl_header_files_fragment ($o, $separator)
+
+  my $perl_header_files_fragment= $self->_perl_header_files_fragment("/");
+
+return a Makefile fragment which holds the list of perl header files which
+XS code depends on $(PERL_INC), and sets up the dependency for the $(OBJECT) file.
+
+The $separator argument defaults to "". MM_VMS will set it to "" and MM_UNIX to "/"
+in perldepend(). This reason child subclasses need to control this is that in
+VMS the $(PERL_INC) directory will already have delimiters in it, but in
+UNIX $(PERL_INC) will need a slash between it an the filename. Hypothetically
+win32 could use "\\" (but it doesn't need to).
+
+=end private
+
+=cut
+
+sub _perl_header_files_fragment {
+    my ($self, $separator)= @_;
+    $separator ||= "";
+    return join("\\\n",
+                "PERL_HDRS = ",
+                map {
+                    sprintf( "        \$(PERL_INC)%s%s            ", $separator, $_ )
+                } $self->_perl_header_files()
+           ) . "\n\n"
+           . "\$(OBJECT) : \$(PERL_HDRS)\n";
+}
+
 
 =head1 AUTHOR
 
