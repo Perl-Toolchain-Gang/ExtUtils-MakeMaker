@@ -106,14 +106,20 @@ sub _write_os2 {
     print $def "EXPORTS\n  ";
     print $def join("\n  ",@{$data->{DL_VARS}}, "\n") if @{$data->{DL_VARS}};
     print $def join("\n  ",@{$data->{FUNCLIST}}, "\n") if @{$data->{FUNCLIST}};
-    if (%{$data->{IMPORTS}}) {
+    _print_imports($def, $data);
+    close $def;
+}
+
+sub _print_imports {
+    my ($def, $data)= @_;
+    my $imports= $data->{IMPORTS}
+        or return;
+    if ( keys %$imports ) {
         print $def "IMPORTS\n";
-        my ($name, $exp);
-        while (($name, $exp)= each %{$data->{IMPORTS}}) {
-            print $def "  $name=$exp\n";
+        foreach my $name (sort keys %$imports) {
+            print $def "  $name=$imports->{$name}\n";
         }
     }
-    close $def;
 }
 
 sub _write_win32 {
@@ -150,13 +156,7 @@ sub _write_win32 {
         }
     }
     print $def join("\n  ",@syms, "\n") if @syms;
-    if (%{$data->{IMPORTS}}) {
-        print $def "IMPORTS\n";
-        my ($name, $exp);
-        while (($name, $exp)= each %{$data->{IMPORTS}}) {
-            print $def "  $name=$exp\n";
-        }
-    }
+    _print_imports($def, $data);
     close $def;
 }
 
