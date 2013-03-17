@@ -27,7 +27,7 @@ sub Mksymlists {
         unless ( ($spec{DL_FUNCS} and keys %{$spec{DL_FUNCS}}) or
                  @{$spec{FUNCLIST}});
     if (defined $spec{DL_FUNCS}) {
-        foreach my $package (keys %{$spec{DL_FUNCS}}) {
+        foreach my $package (sort keys %{$spec{DL_FUNCS}}) {
             my($packprefix,$bootseen);
             ($packprefix = $package) =~ s/\W/_/g;
             foreach my $sym (@{$spec{DL_FUNCS}->{$package}}) {
