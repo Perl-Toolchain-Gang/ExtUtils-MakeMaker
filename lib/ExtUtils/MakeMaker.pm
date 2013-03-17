@@ -2525,8 +2525,8 @@ defaults to the empty string.
 
 =item XSTARGET_EXT
 
-Suffix for files produced from .xs files. It is .c by default. But can be
-set to .cpp if you xs code contains C++.
+Suffix for files produced from F<.xs> files. It is F<.c> by default. But can be
+set to F<.cpp> if you xs code contains C++.
 
 =item XS_VERSION
 
