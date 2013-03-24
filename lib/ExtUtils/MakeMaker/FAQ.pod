@@ -445,10 +445,11 @@ This tip has been brought to you by Nick Ing-Simmons and Stas Bekman.
 
 =item How can I build my xs files as C++
 
-Traditionally, language of source files determined by suffix (eg. F<.c> - C,
-F<.cpp> or F<.cc> is C++), so you need to say to MakeMaker that it should make
-files with appropriate suffix from you F<.xs> files. It can be done by using
-C<XSTARGET_EXT> option. Something like:
+Traditionally the language of source files is determined by suffix 
+(e.g. F<.c>- C, F<.cpp> or F<.cc> is C++),
+so you need to tell MakeMaker that it should make files with an appropriate
+suffix from your F<.xs> files. It can be done by using
+C<XSTARGET_EXT> option. For example:
 
   Makefile.PL:
   --------
@@ -463,13 +464,13 @@ C<XSTARGET_EXT> option. Something like:
       # ... other attrs ...
   );
 
-B<CAUTION>: If you already have F<.c> files generated before switch suffix,
-you need to remove these files manually, or MakeMaker detects they and add
-to build. That will lead to strange link errors.
+B<CAUTION>: If you have already generated F<.c> files before switching
+the suffix, you need to remove these files manually, otherwise MakeMaker will
+detect them and add to build. That will lead to strange errors from linker.
 
-B<CAUTION>: You probably want to disable file/line numbers info placed in
-generated file because C<xsubpp> knows nothing about generated file suffix
-and uses F<.c> unconditionally. To do this, add C<-nolinenumbers> to
+B<CAUTION>: You will probably need to disable file/line numbers info placed in
+the generated file because C<xsubpp> knows nothing about the generated file
+suffix and uses F<.c> unconditionally. To do this, add C<-nolinenumbers> to
 C<XSOPT> option.
 
 =back
