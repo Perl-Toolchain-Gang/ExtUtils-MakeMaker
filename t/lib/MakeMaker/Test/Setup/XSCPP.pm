@@ -34,6 +34,7 @@ WriteMakefile(
     NAME          => 'XSCPP::Test',
     VERSION_FROM  => 'lib/XSCPP/Test.pm',
     XSTARGET_EXT  => '.cpp',
+    LIBS          => ['-lstdc++'],
 );
 END
 
