@@ -371,18 +371,9 @@ Returns true if there is a compiler available for XS builds.
 sub have_compiler {
     my $have_compiler = 0;
 
-    # ExtUtils::CBuilder prints its compilation lines to the screen.
-    # Shut it up.
-    use TieOut;
-    local *STDOUT = *STDOUT;
-    local *STDERR = *STDERR;
-
-    tie *STDOUT, 'TieOut';
-    tie *STDERR, 'TieOut';
-
     eval {
         require ExtUtils::CBuilder;
-        my $cb = ExtUtils::CBuilder->new;
+        my $cb = ExtUtils::CBuilder->new(quiet=>1);
 
         $have_compiler = $cb->have_compiler;
     };
@@ -401,18 +392,9 @@ Returns true if there is a C++ compiler available for XS builds.
 sub have_cplusplus {
     my $have_cplusplus = 0;
 
-    # ExtUtils::CBuilder prints its compilation lines to the screen.
-    # Shut it up.
-    use TieOut;
-    local *STDOUT = *STDOUT;
-    local *STDERR = *STDERR;
-
-    tie *STDOUT, 'TieOut';
-    tie *STDERR, 'TieOut';
-
     eval {
         require ExtUtils::CBuilder;
-        my $cb = ExtUtils::CBuilder->new;
+        my $cb = ExtUtils::CBuilder->new(quiet=>1);
 
         $have_cplusplus = $cb->have_cplusplus;
     };
