@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+
+use Fatal qw(open close);
+use Getopt::Long;
+use File::Find::Rule;
+use POSIX qw(strftime);
+
+GetOptions(
+    "alpha"       => \(my $Alpha),
+    "version=s"   => \(my $Version),
+    "isodate"     => \(my $Use_ISO_Date),
+);
+
+
+sub inc_version {
+    my $version = shift;
+
+    use Version::Next qw(next_version);
+
+    $version =~
+      /^ \d{4} \d{2} \d{2} $/x ? set_isodate_version()
+                               : next_version($version);
+}
+
+sub set_isodate_version {
+    return strftime("%Y%m%d", gmtime);
+}
+
+sub increment_version {
+    my($old_version) = @_;
+    
+    my($version, $alpha) = split /_/, $old_version;
+    $alpha ||= '00';
+
+    if ( $Alpha ) {
+        $new_version = $version;
+        $new_version = inc_version($new_version) unless $alpha + 0;
+
+        # Keep the same format as the original alpha number.
+        # Must be done before incrementing else leading 0s will be lost.
+        my $format = "%0".length($alpha)."d";
+
+        $alpha++;
+        $new_version .= sprintf "_".$format, $alpha;
+    }
+    else {
+        $new_version = inc_version($version);
+    }
+    
+    return $new_version;
+}
+
+my @dirs = grep { -d $_ } qw(lib bin);
+my @files = @ARGV ? @ARGV : File::Find::Rule->file->in(@dirs);
+foreach my $file (@files) {
+    open my($old), $file;
+    open my($new), "> $file.new";
+
+    my $saw_version = 0;
+    while(<$old>) {
+        unless( $saw_version ) {
+            s{((?:our)?\s*\$VERSION\b.*=.*?)([\d._]+)}{
+                $saw_version = 1;
+                my $old_version = $2;
+
+                my $new_version = defined $Version 
+                                    ? $Version 
+                                    : increment_version($old_version);
+
+                print "Changed version of $file from $old_version to $new_version\n";
+
+                $1 . $new_version;
+            }e;
+        }
+
+        print $new $_;
+    }
+
+    close $old;
+    close $new;
+
+    rename "$file.new", $file;
+}
