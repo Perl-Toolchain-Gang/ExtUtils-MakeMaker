@@ -38,16 +38,10 @@ WriteMakefile(
 END
 
              'XSCPP-Test/Test.xs'              => <<'END',
-#ifdef __cplusplus
 extern "C" {
-#endif
-
 #include "EXTERN.h"
 #include "perl.h"
-
-#ifdef __cplusplus
 }
-#endif
 
 #include "XSUB.h"
 
