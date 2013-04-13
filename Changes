@@ -1,3 +1,9 @@
+6.65_02
+    Test Fixes
+    * t/xs.t is now running tests against the XS build.
+      (Michael G Schwern) (Leon Timmermans)
+
+
 6.65_01 Tue Mar 19 00:06:17 CET 2013
     New Features
     * Improvements perlcritic support. (M. Schwern)
