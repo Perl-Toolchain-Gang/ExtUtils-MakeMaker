@@ -1,4 +1,4 @@
-6.65_02
+6.65_02 Sun Apr 14 10:56:41 BST 2013
     Test Fixes
     * t/xs.t is now running tests against the XS build.
       (Michael G Schwern) (Leon Timmermans)
