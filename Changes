@@ -1,3 +1,9 @@
+6.65_03
+    Test Fixes
+    * Use File::Temp in parse_* tests to resolve race conditions
+      on 64bit Windows
+      (bingos)
+
 6.65_02 Sun Apr 14 10:56:41 BST 2013
     Test Fixes
     * t/xs.t is now running tests against the XS build.
