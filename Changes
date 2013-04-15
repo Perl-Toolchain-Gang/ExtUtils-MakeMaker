@@ -1,4 +1,4 @@
-6.65_03
+6.65_03 Mon Apr 15 13:44:24 BST 2013
     Test Fixes
     * Use File::Temp in parse_* tests to resolve race conditions
       on 64bit Windows
