@@ -1,4 +1,8 @@
 6.67_01
+    Doc Fixes
+    * Change references to makemaker.org in the docs
+      (Reported as RT#83246 by dolmen)
+
     VOS Fixes
     * 'core' files are keep files (*.kp) on vos, adjust the
       'clean' target to account for this (Paul Green)

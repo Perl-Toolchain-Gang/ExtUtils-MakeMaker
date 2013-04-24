@@ -116,7 +116,7 @@ Currently maintained by Michael G Schwern C<schwern@pobox.com>.
 
 Send patches and ideas to C<makemaker@perl.org>.
 
-See http://www.makemaker.org.
+See https://metacpan.org/release/ExtUtils-MakeMaker.
 
 =cut
 
