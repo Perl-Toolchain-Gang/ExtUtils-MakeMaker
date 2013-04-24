@@ -1,3 +1,8 @@
+6.67_01
+    VOS Fixes
+    * 'core' files are keep files (*.kp) on vos, adjust the
+      'clean' target to account for this (Paul Green)
+
 6.66 Fri Apr 19 17:53:13 BST 2013
     No changes from 6.65_03
 

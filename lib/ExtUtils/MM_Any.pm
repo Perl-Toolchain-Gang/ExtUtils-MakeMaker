@@ -531,10 +531,10 @@ clean :: clean_subdirs
 #     push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
 #                    $(INST_BIN) $(INST_SCRIPT)
 #                    $(INST_MAN1DIR) $(INST_MAN3DIR)
-#                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
+#                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR)
 #                    $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
 #                 );
-                  
+
 
     if( $attribs{FILES} ) {
         # Use @dirs because we don't know what's in here.
@@ -543,7 +543,7 @@ clean :: clean_subdirs
                         split /\s+/, $attribs{FILES}   ;
     }
 
-    push(@files, qw[$(MAKE_APERL_FILE) 
+    push(@files, qw[$(MAKE_APERL_FILE)
                     MYMETA.json MYMETA.yml perlmain.c tmon.out mon.out so_locations
                     blibdirs.ts pm_to_blib pm_to_blib.ts
                     *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
@@ -556,7 +556,13 @@ clean :: clean_subdirs
     push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
 
     # core files
-    push(@files, qw[core core.*perl.*.? *perl.core]);
+    if ($^O eq 'vos') {
+        push(@files, qw[perl*.kp]);
+    }
+    else {
+        push(@files, qw[core core.*perl.*.? *perl.core]);
+    }
+
     push(@files, map { "core." . "[0-9]"x$_ } (1..5));
 
     # OS specific things to clean up.  Use @dirs since we don't know
