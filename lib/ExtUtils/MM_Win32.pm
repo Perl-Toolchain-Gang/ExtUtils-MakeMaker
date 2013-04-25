@@ -251,7 +251,7 @@ sub constants {
     #
     # This has to come here before all the constants and not in
     # platform_constants which is after constants.
-    my $size = $self->{MAXLINELENGTH} || 64 * 1024;
+    my $size = $self->{MAXLINELENGTH} || 800000;
     my $prefix = qq{
 # Get dmake to read long commands like PM_TO_BLIB
 MAXLINELENGTH = $size

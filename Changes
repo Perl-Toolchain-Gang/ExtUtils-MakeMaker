@@ -7,6 +7,10 @@
     * 'core' files are keep files (*.kp) on vos, adjust the
       'clean' target to account for this (Paul Green)
 
+    Win32 Fixes
+    * Increase dmake MAXLINELENGTH to 800000 (RT#77215) as
+      per kmx's recommendations (kmx)
+
 6.66 Fri Apr 19 17:53:13 BST 2013
     No changes from 6.65_03
 
