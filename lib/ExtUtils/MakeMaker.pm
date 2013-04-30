@@ -1127,7 +1127,7 @@ sub clean_versions {
     for my $module (keys %$reqs) {
         my $version = $reqs->{$module};
 
-        if( !defined $version or $version !~ /^[\d_\.]+$/ ) {
+        if( !defined $version or $version !~ /^v?[\d_\.]+$/ ) {
             carp "Unparsable version '$version' for prerequisite $module";
             $reqs->{$module} = 0;
         }

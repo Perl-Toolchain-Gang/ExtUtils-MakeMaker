@@ -1,3 +1,7 @@
+6.67_02
+    Bug Fixes
+    * Allow v-prefixed version strings once more (bingos)
+
 6.67_01 Thu Apr 25 21:03:58 BST 2013
     Doc Fixes
     * Change references to makemaker.org in the docs
