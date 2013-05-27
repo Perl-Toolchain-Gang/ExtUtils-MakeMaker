@@ -631,7 +631,7 @@ Because depending on a directory to just ensure it exists doesn't work
 too well (the modified time changes too often) dir_target() creates a
 .exists file in the created directory.  It is this you should depend on.
 For portability purposes you should use the $(DIRFILESEP) macro rather
-than a '/' to seperate the directory from the file.
+than a '/' to separate the directory from the file.
 
     yourdirectory$(DIRFILESEP).exists
 
@@ -689,7 +689,7 @@ MAKE_FRAG
 =head3 dist_test
 
 Defines a target that produces the distribution in the
-scratchdirectory, and runs 'perl Makefile.PL; make ;make test' in that
+scratch directory, and runs 'perl Makefile.PL; make ;make test' in that
 subdirectory.
 
 =cut
@@ -1983,7 +1983,7 @@ sub init_VERSION {
 
     # Graham Barr and Paul Marquess had some ideas how to ensure
     # version compatibility between the *.pm file and the
-    # corresponding *.xs file. The bottomline was, that we need an
+    # corresponding *.xs file. The bottom line was, that we need an
     # XS_VERSION macro that defaults to VERSION:
     $self->{XS_VERSION} ||= $self->{VERSION};
 
@@ -2200,7 +2200,7 @@ sub tools_other {
   $MM->init_DIRFILESEP;
   my $dirfilesep = $MM->{DIRFILESEP};
 
-Initializes the DIRFILESEP macro which is the seperator between the
+Initializes the DIRFILESEP macro which is the separator between the
 directory and filename in a filepath.  ie. / on Unix, \ on Win32 and
 nothing on VMS.
 
@@ -2212,8 +2212,8 @@ For example:
 Something of a hack but it prevents a lot of code duplication between
 MM_* variants.
 
-Do not use this as a seperator between directories.  Some operating
-systems use different seperators between subdirectories as between
+Do not use this as a separator between directories.  Some operating
+systems use different separators between subdirectories as between
 directories and filenames (for example:  VOLUME:[dir1.dir2]file on VMS).
 
 =head3 init_linker  I<Abstract>
@@ -2242,7 +2242,7 @@ Some OSes do not need these in which case leave it blank.
 
 Initialize any macros which are for platform specific use only.
 
-A typical one is the version number of your OS specific mocule.
+A typical one is the version number of your OS specific module.
 (ie. MM_Unix_VERSION or MM_VMS_VERSION).
 
 =cut
@@ -2315,7 +2315,7 @@ sub POD2MAN_macro {
     my $self = shift;
 
 # Need the trailing '--' so perl stops gobbling arguments and - happens
-# to be an alternative end of line seperator on VMS so we quote it
+# to be an alternative end of line separator on VMS so we quote it
     return <<'END_OF_DEF';
 POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
