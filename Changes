@@ -1,6 +1,8 @@
-6.67_02
+6.67_02 Sun Jun  2 18:27:45 BST 2013
     Bug Fixes
     * Allow v-prefixed version strings once more (bingos)
+    * Typos fixed (David Steinbrunner)
+    * Resolve test failure with latest CPAN::Meta
 
 6.67_01 Thu Apr 25 21:03:58 BST 2013
     Doc Fixes
