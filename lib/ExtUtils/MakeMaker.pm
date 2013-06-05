@@ -2029,6 +2029,22 @@ own.  META_MERGE will merge its value with the default.
 Unless you want to override the defaults, prefer META_MERGE so as to
 get the advantage of any future defaults.
 
+By default CPAN Meta specification C<1.4> is used. In order to use
+CPAN Meta specification C<2.0>, indicate with C<meta-spec> the version
+you want to use.
+
+  META_MERGE        => {
+
+    "meta-spec" => { version => 2 },
+
+    repository => {
+      type => 'git',
+      url => 'git://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker.git',
+      web => 'https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker',
+    },
+
+  },
+
 =item MIN_PERL_VERSION
 
 The minimum required version of Perl for this distribution.

@@ -1,3 +1,7 @@
+6.67_03
+    Doc Fixes
+    * Document how to specify meta-spec in META_MERGE (bingos)
+
 6.67_02 Sun Jun  2 18:27:45 BST 2013
     Bug Fixes
     * Allow v-prefixed version strings once more (bingos)
