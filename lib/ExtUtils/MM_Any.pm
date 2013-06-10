@@ -1005,7 +1005,13 @@ sub metafile_data {
         };
     }
 
-    %meta = $self->_add_requirements_to_meta_v1_4( %meta );
+    {
+      my $vers = _metaspec_version( $meta_add, $meta_merge );
+      my $method = $vers =~ m!^2!
+               ? '_add_requirements_to_meta_v2'
+               : '_add_requirements_to_meta_v1_4';
+      %meta = $self->$method( %meta );
+    }
 
     while( my($key, $val) = each %$meta_add ) {
         $meta{$key} = $val;
@@ -1022,6 +1028,17 @@ sub metafile_data {
 =begin private
 
 =cut
+
+sub _metaspec_version {
+  my ( $meta_add, $meta_merge ) = @_;
+  return $meta_add->{'meta-spec'}->{version}
+    if defined $meta_add->{'meta-spec'}
+       and defined $meta_add->{'meta-spec'}->{version};
+  return $meta_merge->{'meta-spec'}->{version}
+    if defined $meta_merge->{'meta-spec'}
+       and  defined $meta_merge->{'meta-spec'}->{version};
+  return '1.4';
+}
 
 sub _add_requirements_to_meta_v1_4 {
     my ( $self, %meta ) = @_;

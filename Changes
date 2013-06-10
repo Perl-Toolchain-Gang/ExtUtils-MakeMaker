@@ -1,3 +1,8 @@
+6.67_04
+    Bug fixes
+    * Address RT#85406, where specifying 'meta-spec' in
+      META_[ADD|MERGE] would remove all prereqs (bingos)
+
 6.67_03 Wed Jun  5 22:03:28 BST 2013
     Doc Fixes
     * Document how to specify meta-spec in META_MERGE (bingos)
