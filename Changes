@@ -1,4 +1,4 @@
-6.67_04
+6.67_04 Mon Jun 10 20:18:25 BST 2013
     Bug fixes
     * Address RT#85406, where specifying 'meta-spec' in
       META_[ADD|MERGE] would remove all prereqs (bingos)
