@@ -2486,6 +2486,8 @@ but these will fail:
     local $VERSION      = '1.02';
     local $FOO::VERSION = '1.30';
 
+(Putting C<my> or C<local> on the preceding line will work o.k.)
+
 "Version strings" are incompatible and should not be used.
 
     # Bad
@@ -2499,8 +2501,6 @@ as $VERSION is declared.
 
     # All on one line
     use version; our $VERSION = qv(1.2.3);
-
-(Putting C<my> or C<local> on the preceding line will work o.k.)
 
 The file named in VERSION_FROM is not added as a dependency to
 Makefile. This is not really correct, but it would be a major pain
