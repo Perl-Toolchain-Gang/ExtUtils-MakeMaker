@@ -1,3 +1,8 @@
+6.69_01 Thu Jun 20 12:49:45 BST 2013
+    Win32 Fixes:
+    * resolve regression on Win32 introduced in 6.67_01
+      (bingos)
+
 6.68 Fri Jun 14 23:26:11 BST 2013
     No changes from 6.67_05
 
