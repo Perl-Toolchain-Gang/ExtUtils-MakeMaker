@@ -1,9 +1,7 @@
 use strict;
 use warnings;
-package Version::Requirements;
-BEGIN {
-  $Version::Requirements::VERSION = '0.101020';
-}
+package CPAN::Meta::Requirements;
+our $VERSION = '2.120351'; # VERSION
 # ABSTRACT: a set of version requirements for a CPAN dist
 
 
@@ -109,7 +107,7 @@ sub __modify_entry_for {
   Carp::confess("can't add new requirements to finalized requirements")
     if $fin and not $old;
 
-  my $new = ($old || 'Version::Requirements::_Range::Range')
+  my $new = ($old || 'CPAN::Meta::Requirements::_Range::Range')
           ->$method($version);
 
   Carp::confess("can't modify finalized requirements")
@@ -183,10 +181,7 @@ sub from_string_hash {
 
 {
   package
-    Version::Requirements::_Range::Exact;
-BEGIN {
-  $Version::Requirements::_Range::Exact::VERSION = '0.101020';
-}
+    CPAN::Meta::Requirements::_Range::Exact;
   sub _new     { bless { version => $_[1] } => $_[0] }
 
   sub _accepts { return $_[0]{version} == $_[1] }
@@ -230,10 +225,7 @@ BEGIN {
 
 {
   package
-    Version::Requirements::_Range::Range;
-BEGIN {
-  $Version::Requirements::_Range::Range::VERSION = '0.101020';
-}
+    CPAN::Meta::Requirements::_Range::Range;
 
   sub _self { ref($_[0]) ? $_[0] : (bless { } => $_[0]) }
 
@@ -301,7 +293,7 @@ BEGIN {
     Carp::confess("illegal requirements: exact specification outside of range")
       unless $self->_accepts($version);
 
-    return Version::Requirements::_Range::Exact->_new($version);
+    return CPAN::Meta::Requirements::_Range::Exact->_new($version);
   }
 
   sub _simplify {
@@ -312,7 +304,7 @@ BEGIN {
         Carp::confess("illegal requirements: excluded all values")
           if grep { $_ == $self->{minimum} } @{ $self->{exclusions} || [] };
 
-        return Version::Requirements::_Range::Exact->_new($self->{minimum})
+        return CPAN::Meta::Requirements::_Range::Exact->_new($self->{minimum})
       }
 
       Carp::confess("illegal requirements: minimum exceeds maximum")
@@ -388,17 +380,17 @@ __END__
 
 =head1 NAME
 
-Version::Requirements - a set of version requirements for a CPAN dist
+CPAN::Meta::Requirements - a set of version requirements for a CPAN dist
 
 =head1 VERSION
 
-version 0.101020
+version 2.120351
 
 =head1 SYNOPSIS
 
-  use Version::Requirements;
+  use CPAN::Meta::Requirements;
 
-  my $build_requires = Version::Requirements->new;
+  my $build_requires = CPAN::Meta::Requirements->new;
 
   $build_requires->add_minimum('Library::Foo' => 1.208);
 
@@ -410,10 +402,10 @@ version 0.101020
 
 =head1 DESCRIPTION
 
-A Version::Requirements object models a set of version constraints like those
-specified in the F<META.yml> or F<META.json> files in CPAN distributions.  It
-can be built up by adding more and more constraints, and it will reduce them to
-the simplest representation.
+A CPAN::Meta::Requirements object models a set of version constraints like
+those specified in the F<META.yml> or F<META.json> files in CPAN distributions.
+It can be built up by adding more and more constraints, and it will reduce them
+to the simplest representation.
 
 Logically impossible constraints will be identified immediately by thrown
 exceptions.
@@ -422,9 +414,9 @@ exceptions.
 
 =head2 new
 
-  my $req = Version::Requirements->new;
+  my $req = CPAN::Meta::Requirements->new;
 
-This returns a new Version::Requirements object.  It ignores any arguments
+This returns a new CPAN::Meta::Requirements object.  It ignores any arguments
 given.
 
 =head2 add_minimum
@@ -481,7 +473,7 @@ This method returns the requirements object.
 
   $req->add_requirements( $another_req_object );
 
-This method adds all the requirements in the given Version::Requirements object
+This method adds all the requirements in the given CPAN::Meta::Requirements object
 to the requirements object on which it was called.  If there are any conflicts,
 an exception is thrown.
 
@@ -548,9 +540,9 @@ strings in the F<META.yml> specification.
 
 For example after the following program:
 
-  my $req = Version::Requirements->new;
+  my $req = CPAN::Meta::Requirements->new;
 
-  $req->add_minimum('Version::Requirements' => 0.102);
+  $req->add_minimum('CPAN::Meta::Requirements' => 0.102);
 
   $req->add_minimum('Library::Foo' => 1.208);
 
@@ -567,7 +559,7 @@ For example after the following program:
 C<$hashref> would contain:
 
   {
-    'Version::Requirements' => '0.102',
+    'CPAN::Meta::Requirements' => '0.102',
     'Library::Foo' => '>= 1.208, <= 2.206',
     'Module::Bar'  => '>= v1.2.3, != v1.2.8',
     'Xyzzy'        => '== 6.01',
@@ -575,19 +567,29 @@ C<$hashref> would contain:
 
 =head2 from_string_hash
 
-  my $req = Version::Requirements->from_string_hash( \%hash );
+  my $req = CPAN::Meta::Requirements->from_string_hash( \%hash );
 
-This is an alternate constructor for a Version::Requirements object.  It takes
+This is an alternate constructor for a CPAN::Meta::Requirements object.  It takes
 a hash of module names and version requirement strings and returns a new
-Version::Requirements object.
+CPAN::Meta::Requirements object.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-  Ricardo Signes <rjbs@cpan.org>
+=over 4
+
+=item *
+
+David Golden <dagolden@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Ricardo Signes.
+This software is copyright (c) 2010 by David Golden and Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

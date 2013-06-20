@@ -55,17 +55,17 @@ if( $BUILDING_AS_PACKAGE ) {
     # bundle the latest because we might as well, but we don't want to
     # burden vendors with having to update everything.
     %Extra_Prereqs = (
-        'CPAN::Meta'            => '2.112580',
-        'CPAN::Meta::YAML'      => '0.002',
-        'ExtUtils::Command'     => '1.16',
-        'ExtUtils::Install'     => '1.52',
-        'ExtUtils::Manifest'    => '1.58',
-        'File::Temp'            => '0.22',
-        'JSON::PP'              => '2.27103',
-        'Parse::CPAN::Meta'     => '1.4400',
-        'Scalar::Util'          => '1.13',
-        'version'               => '0.82',
-        'Version::Requirements' => '0.101020',
+        'CPAN::Meta'               => '2.113640',
+        'CPAN::Meta::YAML'         => '0.002',
+        'ExtUtils::Command'        => '1.16',
+        'ExtUtils::Install'        => '1.52',
+        'ExtUtils::Manifest'       => '1.58',
+        'File::Temp'               => '0.22',
+        'JSON::PP'                 => '2.27103',
+        'Parse::CPAN::Meta'        => '1.4400',
+        'Scalar::Util'             => '1.13',
+        'version'                  => '0.82',
+        'CPAN::Meta::Requirements' => '2.121',
     );
 
     $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
