@@ -44,6 +44,7 @@ my %versions = (q[$VERSION = '1.00']            => '1.00',
 if( $Has_Version ) {
     $versions{q[use version; $VERSION = qv("1.2.3");]} = qv("1.2.3");
     $versions{q[$VERSION = qv("1.2.3")]}               = qv("1.2.3");
+    $versions{q[$VERSION = v1.2.3]} = 'v1.2.3';
 }
 
 if( $] >= 5.011001 ) {
