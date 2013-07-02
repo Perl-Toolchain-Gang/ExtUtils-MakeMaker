@@ -1987,6 +1987,11 @@ sub init_VERSION {
     if (defined $self->{VERSION}) {
         $self->{VERSION} =~ s/^\s+//;
         $self->{VERSION} =~ s/\s+$//;
+        if ( $self->{VERSION} !~ /^v?[\d_\.]+$/ ) {
+          require version;
+          my $normal = eval { version->parse( $self->{VERSION} ) };
+          $self->{VERSION} = $normal if defined $normal;
+        }
     }
     else {
         $self->{VERSION} = '';
