@@ -1,3 +1,11 @@
+6.69_02 Tue Jul  2 13:12:51 BST 2013
+    Bug Fixes:
+    * [RT#86609] VERSION_FROM now handles v-strings correctly.
+    * VERSION also now handles v-strings correctly.
+
+    Misc:
+    * Updated bundled CPAN::Meta and removed Version::Requirements
+
 6.69_01 Thu Jun 20 12:49:45 BST 2013
     Win32 Fixes:
     * resolve regression on Win32 introduced in 6.67_01
