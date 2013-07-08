@@ -1,3 +1,7 @@
+6.69_03
+    Misc:
+    * Install into site when 5.12 or above
+
 6.69_02 Tue Jul  2 13:12:51 BST 2013
     Bug Fixes:
     * [RT#86609] VERSION_FROM now handles v-strings correctly.
