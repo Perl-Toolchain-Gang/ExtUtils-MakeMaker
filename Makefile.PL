@@ -112,7 +112,7 @@ my $MM = WriteMakefile(
 
     CONFIGURE_REQUIRES => {},                  # We don't need ourself to install ourself.
     BUILD_REQUIRES     => { 'Data::Dumper' => 0, },
-    INSTALLDIRS        => 'perl',
+    INSTALLDIRS        => ( $] < 5.012 ? 'perl' : 'site' ),
     LICENSE            => 'perl',
     ABSTRACT_FROM      => "lib/$PACKAGE_FILE.pm",
     AUTHOR             => 'Michael G Schwern <schwern@pobox.com>',
