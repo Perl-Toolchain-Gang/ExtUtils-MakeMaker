@@ -1,4 +1,12 @@
-6.69_03
+6.69_03 Tue Jul  9 22:39:54 BST 2013
+    Bug Fixes:
+    * RT#61419 Avoid invisible interactive question when
+      rebuilding Makefile (Slaven Rezic)
+    * VERSION also now really handles v-strings correctly.
+
+    Cygwin Fixes:
+    * RT#54703 - Don't hardcode /cygdrive (Jerry Hedden)
+
     Misc:
     * Install into site when 5.12 or above
 
