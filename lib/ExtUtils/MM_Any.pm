@@ -1983,15 +1983,14 @@ sub init_VERSION {
         }
     }
 
-    # strip blanks
     if (defined $self->{VERSION}) {
-        $self->{VERSION} =~ s/^\s+//;
-        $self->{VERSION} =~ s/\s+$//;
-        if ( $self->{VERSION} !~ /^v?[\d_\.]+$/ ) {
+        if ( $self->{VERSION} !~ /^\s*v?[\d_\.]+\s*$/ ) {
           require version;
           my $normal = eval { version->parse( $self->{VERSION} ) };
           $self->{VERSION} = $normal if defined $normal;
         }
+        $self->{VERSION} =~ s/^\s+//;
+        $self->{VERSION} =~ s/\s+$//;
     }
     else {
         $self->{VERSION} = '';
