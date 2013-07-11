@@ -11,6 +11,7 @@ use File::Temp qw[tempfile];
 
 my $Has_Version = eval 'require version; "version"->import; 1';
 
+# "undef" - means we expect "undef", undef - eval should be never called for this string
 my %versions = (q[$VERSION = '1.00']            => '1.00',
                 q[*VERSION = \'1.01']           => '1.01',
                 q[($VERSION) = q$Revision: 32208 $ =~ /(\d+)/g;] => 32208,
@@ -82,7 +83,17 @@ for my $code ( sort keys %versions ) {
     (my $label = $code) =~ s/\n/\\n/g;
     my $warnings = "";
     local $SIG{__WARN__} = sub { $warnings .= "@_\n"; };
-    is( parse_version_string($code), $expect, $label );
+	if (defined $expect) {
+		is( parse_version_string($code), $expect, $label );
+	} else {
+		my $is_called = 0;
+		no warnings 'redefine';
+		local *MM::get_version = sub {
+			$is_called = 1;
+		};
+		ok !$is_called;
+		is( parse_version_string($code), 'undef', $label );
+	}
     is($warnings, '', "$label does not cause warnings");
 }
 

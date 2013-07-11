@@ -2646,28 +2646,7 @@ sub parse_version {
             $result = $1;
         }
         elsif ( m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* =}x ) {
-            my $eval = qq{
-                package ExtUtils::MakeMaker::_version;
-                no strict;
-                BEGIN { eval {
-                    # Ensure any version() routine which might have leaked
-                    # into this package has been deleted.  Interferes with
-                    # version->import()
-                    undef *version;
-                    require version;
-                    "version"->import;
-                } }
-
-                local $1$2;
-                \$$2=undef;
-                do {
-                    $_
-                };
-                \$$2;
-            };
-            local $^W = 0;
-            $result = eval($eval);  ## no critic
-            warn "Could not eval '$eval' in $parsefile: $@" if $@;
+			$result = $self->get_version($parsefile, $1, $2);
         }
         else {
           next;
@@ -2683,6 +2662,34 @@ sub parse_version {
     }
     $result = "undef" unless defined $result;
     return $result;
+}
+
+sub get_version
+{
+	my ($self, $parsefile, $sigil, $name) = @_;
+	my $eval = qq{
+		package ExtUtils::MakeMaker::_version;
+		no strict;
+		BEGIN { eval {
+			# Ensure any version() routine which might have leaked
+			# into this package has been deleted.  Interferes with
+			# version->import()
+			undef *version;
+			require version;
+			"version"->import;
+		} }
+
+		local $sigil$name;
+		\$$name=undef;
+		do {
+			$_
+		};
+		\$$name;
+	};
+	local $^W = 0;
+	my $result = eval($eval);  ## no critic
+	warn "Could not eval '$eval' in $parsefile: $@" if $@;
+	$result;
 }
 
 
