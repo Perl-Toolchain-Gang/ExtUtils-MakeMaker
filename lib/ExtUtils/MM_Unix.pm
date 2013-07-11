@@ -2645,7 +2645,7 @@ sub parse_version {
             local $^W = 0;
             $result = $1;
         }
-        elsif ( m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* =}x ) {
+        elsif ( m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* [^!><=]=[^!><=]}x ) {
 			$result = $self->get_version($parsefile, $1, $2);
         }
         else {
