@@ -88,7 +88,7 @@ for my $code ( sort keys %versions ) {
 		is( parse_version_string($code), $expect, $label );
 	} else {
 		my $is_called = 0;
-		no warnings 'redefine';
+		no warnings qw[redefine once];
 		local *MM::get_version = sub {
 			$is_called = 1;
 		};
