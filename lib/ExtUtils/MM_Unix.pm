@@ -1897,7 +1897,7 @@ sub init_PERL {
     # XXX This logic is flawed.  If "miniperl" is anywhere in the path
     # it will get confused.  It should be fixed to work only on the filename.
     # Define 'FULLPERL' to be a non-miniperl (used in test: target)
-    ($self->{FULLPERL} = $self->{PERL}) =~ s/miniperl/$perl_name/i
+    ($self->{FULLPERL} = $self->{PERL}) =~ s/\Q$miniperl\E$/$perl_name$Config{exe_ext}/i
 	unless $self->{FULLPERL};
 
     # Little hack to get around VMS's find_perl putting "MCR" in front
