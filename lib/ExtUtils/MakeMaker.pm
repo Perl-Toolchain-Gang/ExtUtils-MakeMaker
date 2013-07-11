@@ -2037,10 +2037,14 @@ you want to use.
 
     "meta-spec" => { version => 2 },
 
-    repository => {
-      type => 'git',
-      url => 'git://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker.git',
-      web => 'https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker',
+    resources => {
+
+      repository => {
+          type => 'git',
+          url => 'git://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker.git',
+          web => 'https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker',
+      },
+
     },
 
   },
