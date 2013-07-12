@@ -2345,6 +2345,9 @@ will C<die> instead of simply informing the user of the missing dependencies.
 It is I<extremely> rare to have to use C<PREREQ_FATAL>. Its use by module
 authors is I<strongly discouraged> and should never be used lightly.
 
+For dependencies that are required in order to run C<Makefile.PL>,
+see C<CONFIGURE_REQUIRES>.
+
 Module installation tools have ways of resolving unmet dependencies but
 to do that they need a F<Makefile>.  Using C<PREREQ_FATAL> breaks this.
 That's bad.
