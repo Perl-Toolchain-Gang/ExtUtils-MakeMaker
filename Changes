@@ -1,12 +1,12 @@
+    Doc Fixes:
+    * Fix META_MERGE example
+
 6.69_05 Thu Jul 11 22:10:10 BST 2013
     Bug Fixes:
     * Resolve RT#9452 regression with
       parse_version() (Victor Efimov)
     * RT#28632 use LD and OPTIMIZE in recursive Makefile.PL
       invocations (Niko Tyni)
-
-    Doc Fixes:
-    * Fix META_MERGE example.
 
 6.69_04 Wed Jul 10 11:48:22 BST 2013
     Cygwin Fixes:
