@@ -5,6 +5,9 @@
     * RT#28632 use LD and OPTIMIZE in recursive Makefile.PL
       invocations (Niko Tyni)
 
+    Doc Fixes:
+    * Fix META_MERGE example.
+
 6.69_04 Wed Jul 10 11:48:22 BST 2013
     Cygwin Fixes:
     * Revert RT#54703 and apply patch from RT#69401 to
