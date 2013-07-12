@@ -1237,6 +1237,11 @@ C<TEST_VERBOSE> variable to true.
 
   make test TEST_VERBOSE=1
 
+If you want to run particular test files, set the C<TEST_FILES> variable.
+It is possible to use globbing with this mechanism.
+
+  make test TEST_FILES='t/foobar.t t/dagobah*.t'
+
 =head2 make testdb
 
 A useful variation of the above is the target C<testdb>. It runs the

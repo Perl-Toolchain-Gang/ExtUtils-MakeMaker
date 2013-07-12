@@ -6,6 +6,7 @@
     Doc Fixes:
     * Fix META_MERGE example
     * RT#31053 Mention configure_requires in PREREQ_FATAL documentation
+    * RT#14680 Document TEST_FILES usage with 'make test'
 
 6.69_05 Thu Jul 11 22:10:10 BST 2013
     Bug Fixes:
