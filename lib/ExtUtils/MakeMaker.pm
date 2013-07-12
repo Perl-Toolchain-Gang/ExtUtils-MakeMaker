@@ -2735,6 +2735,11 @@ does a realclean first and then the distcheck. Note that this is not
 needed to build a new distribution as long as you are sure that the
 MANIFEST file is ok.
 
+=item    make veryclean
+
+does a realclean first and then removes backup files such as C<*~>,
+C<*.bak>, C<*.old> and C<*.orig>
+
 =item    make manifest
 
 rewrites the MANIFEST file, adding all remaining files found (See
