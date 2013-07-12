@@ -1,4 +1,4 @@
-6.69_06
+6.69_06 Fri Jul 12 14:49:32 BST 2013
     Bug Fixes:
     * RT#64163 clean_subdirs infinite loop if subdir already gone
     * RT#79348 doesn't support miniperl in installation paths
