@@ -1,3 +1,7 @@
+6.69_07
+    Bug Fixes:
+    * RT#66113 strip control characters from ABSTRACT
+
 6.69_06 Fri Jul 12 14:49:32 BST 2013
     Bug Fixes:
     * RT#64163 clean_subdirs infinite loop if subdir already gone
