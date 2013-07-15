@@ -1598,6 +1598,13 @@ sub init_ABSTRACT {
             carp "WARNING: Setting ABSTRACT via file ".
                  "'$self->{ABSTRACT_FROM}' failed\n";
     }
+
+    if ($self->{ABSTRACT} && $self->{ABSTRACT} =~ m![[:cntrl:]]+!) {
+            warn "WARNING: ABSTRACT contains control character(s),".
+                 " they will be removed\n";
+            $self->{ABSTRACT} =~ s![[:cntrl:]]+!!g;
+            return;
+    }
 }
 
 =head3 init_INST
