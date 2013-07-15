@@ -11,7 +11,7 @@ use File::Spec;
 # So the tests can chdir around and not break @INC.
 # We use getcwd() because otherwise rel2abs will blow up under taint
 # mode pre-5.8.  We detaint is so @INC won't be tainted.  This is
-# no worse, and probably better, than just shoving an untainted, 
+# no worse, and probably better, than just shoving an untainted,
 # relative "blib/lib" onto @INC.
 my $cwd;
 BEGIN {

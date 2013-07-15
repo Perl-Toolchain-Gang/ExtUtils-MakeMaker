@@ -37,7 +37,7 @@ Test::Builder::Module - Base class for test modules
       my $tb = $CLASS->builder;
       return $tb->ok(@_);
   }
-  
+
   1;
 
 
@@ -64,8 +64,8 @@ same basic way as Test::More's, setting the plan and controling
 exporting of functions and variables.  This allows your module to set
 the plan independent of Test::More.
 
-All arguments passed to import() are passed onto 
-C<< Your::Module->builder->plan() >> with the exception of 
+All arguments passed to import() are passed onto
+C<< Your::Module->builder->plan() >> with the exception of
 C<import =>[qw(things to import)]>.
 
     use Your::Module import => [qw(this that)], tests => 23;
@@ -134,7 +134,7 @@ sub _strip_imports {
 import_extra() is called by import().  It provides an opportunity for you
 to add behaviors to your module based on its import list.
 
-Any extra arguments which shouldn't be passed on to plan() should be 
+Any extra arguments which shouldn't be passed on to plan() should be
 stripped off by this method.
 
 See Test::More for an example of its use.

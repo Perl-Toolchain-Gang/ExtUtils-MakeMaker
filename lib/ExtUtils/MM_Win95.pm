@@ -62,7 +62,7 @@ sub xs_cpp {
 	';
 }
 
-=item xs_o 
+=item xs_o
 
 The && problem.
 
