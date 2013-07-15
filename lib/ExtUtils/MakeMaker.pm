@@ -1525,7 +1525,11 @@ recommends it (or you know what you're doing).
 =head2 Using Attributes and Parameters
 
 The following attributes may be specified as arguments to WriteMakefile()
-or as NAME=VALUE pairs on the command line.
+or as NAME=VALUE pairs on the command line. Attributes that became
+available with later versions of MakeMaker are indicated.
+
+In order to maintain portability of attributes with older versions of
+MakeMaker you may want to use L<App::EUMM::Upgrade> with your C<Makefile.PL>.
 
 =over 2
 
@@ -1557,6 +1561,8 @@ builds a PPD package that references a binary of the C<Agent> package,
 located in the C<x86> directory relative to the PPD itself.
 
 =item BUILD_REQUIRES
+
+Available in version 6.5503 and above.
 
 A hash of modules that are needed to build your module but not run it.
 
@@ -1604,6 +1610,8 @@ hash may contain further attributes, e.g. {LIBS =E<gt> ...}, that have to
 be determined by some evaluation method.
 
 =item CONFIGURE_REQUIRES
+
+Available in version 6.52 and above.
 
 A hash of modules that are required to run Makefile.PL itself, but not
 to run your distribution.
@@ -1941,6 +1949,8 @@ MakeMaker will turn it into an array with one element.
 
 =item LICENSE
 
+Available in version 6.31 and above.
+
 The licensing terms of your distribution.  Generally it's "perl" for the
 same license as Perl itself.
 
@@ -2024,6 +2034,8 @@ may hold a name for that binary. Defaults to perl
 
 =item META_MERGE
 
+Available in version 6.46 and above.
+
 A hashref of items to add to the CPAN Meta file (F<META.yml> or
 F<META.json>).
 
@@ -2055,6 +2067,8 @@ you want to use.
   },
 
 =item MIN_PERL_VERSION
+
+Available in version 6.48 and above.
 
 The minimum required version of Perl for this distribution.
 
