@@ -1,4 +1,7 @@
 6.69_07
+    New features:
+    * RT#4550 report the file created after make dist
+
     Bug Fixes:
     * RT#66113 strip control characters from ABSTRACT
 
