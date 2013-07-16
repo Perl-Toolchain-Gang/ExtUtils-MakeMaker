@@ -443,7 +443,7 @@ MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS}})."
     push @m, q{
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
-};
+} if -e File::Spec->catfile( $self->{PERL_INC}, 'config.h' );
 
 
     push @m, qq{
