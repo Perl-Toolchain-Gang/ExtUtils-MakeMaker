@@ -1,4 +1,12 @@
 language: perl
+branches:
+  only:
+    - master
+notifications:
+  on_sucess: change
+  on_failure: always
+  irc: "irc.perl.org#toolchain"
+  email: false
 perl:
   - "5.18"
   - "5.16"
@@ -6,5 +14,5 @@ perl:
   - "5.12"
   - "5.10"
 script:
-  - make test
+  - perl Makefile.PL && make test
   - make disttest
