@@ -1,3 +1,8 @@
+6.69_09 Sun Jul 21 09:22:40 BST 2013
+    Bug Fixes:
+    * RT#86976 Fix version parsing bug introduced in 6.69_05
+      Part Deux :)
+
 6.69_08 Wed Jul 17 00:36:28 BST 2013
     Bug Fixes:
     * RT#86976 Fix version parsing bug introduced in 6.69_05
