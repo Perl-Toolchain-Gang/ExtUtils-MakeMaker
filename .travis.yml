@@ -1,7 +1,4 @@
 language: perl
-branches:
-  only:
-    - master
 notifications:
   on_success: change
   on_failure: always
