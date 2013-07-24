@@ -1,3 +1,7 @@
+6.73_01 Wed Jul 24 23:49:56 BST 2013
+    Bug Fixes:
+    * Robustified parse_version()
+
 6.72 Wed Jul 24 18:38:19 BST 2013
     No changes from 6.71_01
 
