@@ -1,3 +1,7 @@
+6.73_02 Fri Jul 26 13:32:43 BST 2013
+    Misc:
+    * Updated bundled Parse::CPAN::Meta
+
 6.73_01 Wed Jul 24 23:49:56 BST 2013
     Bug Fixes:
     * Robustified parse_version()
