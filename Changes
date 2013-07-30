@@ -1,3 +1,8 @@
+6.73_03 Tue Jul 30 22:09:52 BST 2013
+    Bug Fixes:
+    * Fix clean_subdirs target that was generating
+      warning on BSD
+
 6.73_02 Fri Jul 26 13:32:43 BST 2013
     Misc:
     * Updated bundled Parse::CPAN::Meta
