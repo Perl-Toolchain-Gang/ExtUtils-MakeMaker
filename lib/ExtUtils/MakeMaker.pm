@@ -2284,7 +2284,7 @@ is there for backwards compatibility (and it's somewhat DWIM).
 
 Hashref of .pm files and *.pl files to be installed.  e.g.
 
-  {'name_of_file.pm' => '$(INST_LIBDIR)/install_as.pm'}
+  {'name_of_file.pm' => '$(INST_LIB)/install_as.pm'}
 
 By default this will include *.pm and *.pl and the files found in
 the PMLIBDIRS directories.  Defining PM in the
