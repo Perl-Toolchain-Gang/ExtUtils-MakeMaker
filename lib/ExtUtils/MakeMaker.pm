@@ -9,7 +9,6 @@ require Exporter;
 use ExtUtils::MakeMaker::Config;
 use Carp;
 use File::Path;
-use Text::ParseWords qw/shellwords/;
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
@@ -587,7 +586,8 @@ END
         my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
         parse_args($self,@fm) if @fm;
     } else {
-        parse_args($self, shellwords($ENV{PERL_MM_OPT} || ''),@ARGV);
+        require Text::ParseWords;
+        parse_args($self, Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),@ARGV);
     }
 
 

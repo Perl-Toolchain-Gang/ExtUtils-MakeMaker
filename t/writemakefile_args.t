@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 39;
+use Test::More tests => 40;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -238,5 +238,16 @@ VERIFY
     };
     is( $warnings, '' );
     is_deeply( $mm->{AUTHOR},  ["test1","test2"] );
+
+    # PERL_MM_OPT
+    {
+      local $ENV{PERL_MM_OPT} = 'CCFLAGS="-Wl,-rpath -Wl,/foo/bar/lib"';
+      $mm = WriteMakefile(
+          NAME            => 'Big::Dummy',
+          VERSION    => '1.00',
+      );
+
+      is( $mm->{CCFLAGS}, "-Wl,-rpath -Wl,/foo/bar/lib", 'parse_args() splits like shell' );
+    }
 
 }
