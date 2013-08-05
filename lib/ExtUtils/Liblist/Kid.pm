@@ -422,11 +422,11 @@ sub _win32_try_attach_extension {
 }
 
 sub _win32_lib_extensions {
-    my %extensions;
-    $extensions{ $Config{'lib_ext'} } = 1 if $Config{'lib_ext'};
-    $extensions{".dll.a"} = 1 if $extensions{".a"};
-    $extensions{".lib"}   = 1;
-    return [ keys %extensions ];
+    my @extensions;
+    push @extensions, $Config{'lib_ext'} if $Config{'lib_ext'};
+    push @extensions, '.dll.a' if grep { m!^\.a$! } @extensions;
+    push @extensions, '.lib';
+    return \@extensions;
 }
 
 sub _debug {
