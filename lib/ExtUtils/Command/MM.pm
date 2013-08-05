@@ -14,6 +14,10 @@ our $VERSION = '6.73_05';
 
 my $Is_VMS = $^O eq 'VMS';
 
+eval "require Time::HiRes";
+*mtime = $@ ?
+ sub { [             stat($_[0])]->[9] } :
+ sub { [Time::HiRes::stat($_[0])]->[9] } ;
 
 =head1 NAME
 
@@ -131,8 +135,8 @@ sub pod2man {
         my ($pod, $man) = splice(@ARGV, 0, 2);
 
         next if ((-e $man) &&
-                 (-M $man < -M $pod) &&
-                 (-M $man < -M "Makefile"));
+                 (mtime($man) > mtime($pod)) &&
+                 (mtime($man) > mtime("Makefile")));
 
         print "Manifying $man\n";
 
