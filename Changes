@@ -1,3 +1,7 @@
+6.73_06 Tue Aug  6 00:50:08 BST 2013
+    New features:
+    * RT#70201 replace -M with Time::HiRes::stat
+
     Bug Fixes:
     * Split PERL_MM_OPT like a shell would, instead of split ' '
 
