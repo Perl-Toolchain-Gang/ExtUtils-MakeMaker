@@ -1,6 +1,9 @@
     Bug Fixes:
     * Split PERL_MM_OPT like a shell would, instead of split ' '
 
+    Win32 Fixes:
+    * Correct an oversight with Liblist Kid fix
+
 6.73_05 Mon Aug  5 17:44:00 BST 2013
     Win32 fixes:
     * Fix hash randomisation problems with Liblist Kid

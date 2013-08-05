@@ -2922,8 +2922,10 @@ If no $default is provided an empty string will be used instead.
 =item PERL_MM_OPT
 
 Command line options used by C<MakeMaker-E<gt>new()>, and thus by
-C<WriteMakefile()>.  The string is split on whitespace, and the result
+C<WriteMakefile()>.  The string is split as the shell would, and the result
 is processed before any actual command line arguments are processed.
+
+  PERL_MM_OPT='CCFLAGS="-Wl,-rpath -Wl,/foo/bar/lib" LIBS="-lwibble -lwobble"'
 
 =item PERL_MM_USE_DEFAULT
 

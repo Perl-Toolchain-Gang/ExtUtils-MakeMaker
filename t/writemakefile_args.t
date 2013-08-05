@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 40;
+use Test::More tests => 43;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -241,13 +241,36 @@ VERIFY
 
     # PERL_MM_OPT
     {
-      local $ENV{PERL_MM_OPT} = 'CCFLAGS="-Wl,-rpath -Wl,/foo/bar/lib"';
+      local $ENV{PERL_MM_OPT} = 'CCFLAGS="-Wl,-rpath -Wl,/foo/bar/lib" LIBS="-lwibble -lwobble"';
       $mm = WriteMakefile(
           NAME            => 'Big::Dummy',
           VERSION    => '1.00',
       );
 
       is( $mm->{CCFLAGS}, "-Wl,-rpath -Wl,/foo/bar/lib", 'parse_args() splits like shell' );
+      is_deeply( $mm->{LIBS}, ['-lwibble -lwobble'], 'parse_args() splits like shell' );
+    }
+
+    # PERL_MM_OPT
+    {
+      local $ENV{PERL_MM_OPT} = 'INSTALL_BASE=/how/we/have/not/broken/local/lib';
+      $mm = WriteMakefile(
+          NAME            => 'Big::Dummy',
+          VERSION    => '1.00',
+      );
+
+      is( $mm->{INSTALL_BASE}, "/how/we/have/not/broken/local/lib", 'parse_args() splits like shell' );
+    }
+
+    # PERL_MM_OPT
+    {
+      local $ENV{PERL_MM_OPT} = 'INSTALL_BASE="/Users/miyagawa/tmp/car1 foo/foo bar"';
+      $mm = WriteMakefile(
+          NAME            => 'Big::Dummy',
+          VERSION    => '1.00',
+      );
+
+      is( $mm->{INSTALL_BASE}, "/Users/miyagawa/tmp/car1 foo/foo bar", 'parse_args() splits like shell' );
     }
 
 }
