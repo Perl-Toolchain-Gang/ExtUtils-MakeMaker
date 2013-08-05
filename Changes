@@ -1,3 +1,7 @@
+6.73_05 Mon Aug  5 17:44:00 BST 2013
+    Win32 fixes:
+    * Fix hash randomisation problems with Liblist Kid
+
 6.73_04 Thu Aug  1 22:34:31 BST 2013
     Doc fixes:
     * Corrected example for PM => {}
