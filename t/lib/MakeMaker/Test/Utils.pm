@@ -10,6 +10,7 @@ our @ISA = qw(Exporter);
 our $Is_VMS     = $^O eq 'VMS';
 our $Is_MacOS   = $^O eq 'MacOS';
 our $Is_FreeBSD = $^O eq 'freebsd';
+our $Is_Win32   = $^O eq 'MSWin32';
 
 our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
                  make make_run run make_macro calibrate_mtime
@@ -37,6 +38,9 @@ our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
 
     # Inform the BSDPAN hacks not to register modules installed for testing.
     $default_env_keys{PORTOBJFORMAT} = 1 if $Is_FreeBSD;
+
+    # https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/65
+    $default_env_keys{ACTIVEPERL_CONFIG_SILENT} = 1 if $Is_Win32;
 
     # Remember the ENV values because on VMS %ENV is global
     # to the user, not the process.
