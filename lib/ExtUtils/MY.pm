@@ -3,7 +3,7 @@ package ExtUtils::MY;
 use strict;
 require ExtUtils::MM;
 
-our $VERSION = '6.73_06';
+our $VERSION = '6.73_07';
 our @ISA = qw(ExtUtils::MM);
 
 {

@@ -1,3 +1,8 @@
+6.73_07 Wed Aug  7 16:07:04 BST 2013
+    Bug Fixes:
+    * Set ACTIVEPERL_CONFIG_SILENT=1 during tests to make
+      ActivePerl less vocal about things
+
 6.73_06 Tue Aug  6 00:50:08 BST 2013
     New features:
     * RT#70201 replace -M with Time::HiRes::stat
