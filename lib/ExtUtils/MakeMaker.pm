@@ -587,7 +587,6 @@ END
         parse_args($self,@fm) if @fm;
     }
     else {
-        require Text::ParseWords;
         parse_args($self, _shellwords($ENV{PERL_MM_OPT} || ''),@ARGV);
     }
 
