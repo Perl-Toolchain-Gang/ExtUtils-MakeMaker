@@ -585,9 +585,10 @@ END
         }
         my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
         parse_args($self,@fm) if @fm;
-    } else {
+    }
+    else {
         require Text::ParseWords;
-        parse_args($self, Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),@ARGV);
+        parse_args($self, _shellwords($ENV{PERL_MM_OPT} || ''),@ARGV);
     }
 
 
@@ -800,6 +801,83 @@ END
     return @result;
 }
 
+# _shellwords and _parseline borrowed from Text::ParseWords
+sub _shellwords {
+    my (@lines) = @_;
+    my @allwords;
+
+    foreach my $line (@lines) {
+      $line =~ s/^\s+//;
+      my @words = _parse_line('\s+', 0, $line);
+      pop @words if (@words and !defined $words[-1]);
+      return() unless (@words || !length($line));
+      push(@allwords, @words);
+    }
+    return(@allwords);
+}
+
+sub _parse_line {
+    my($delimiter, $keep, $line) = @_;
+    my($word, @pieces);
+
+    no warnings 'uninitialized';  # we will be testing undef strings
+
+    while (length($line)) {
+        # This pattern is optimised to be stack conservative on older perls.
+        # Do not refactor without being careful and testing it on very long strings.
+        # See Perl bug #42980 for an example of a stack busting input.
+        $line =~ s/^
+                    (?:
+                        # double quoted string
+                        (")                             # $quote
+                        ((?>[^\\"]*(?:\\.[^\\"]*)*))"   # $quoted
+        | # --OR--
+                        # singe quoted string
+                        (')                             # $quote
+                        ((?>[^\\']*(?:\\.[^\\']*)*))'   # $quoted
+                    |   # --OR--
+                        # unquoted string
+            (                               # $unquoted
+                            (?:\\.|[^\\"'])*?
+                        )
+                        # followed by
+            (                               # $delim
+                            \Z(?!\n)                    # EOL
+                        |   # --OR--
+                            (?-x:$delimiter)            # delimiter
+                        |   # --OR--
+                            (?!^)(?=["'])               # a quote
+                        )
+        )//xs or return;    # extended layout
+        my ($quote, $quoted, $unquoted, $delim) = (($1 ? ($1,$2) : ($3,$4)), $5, $6);
+
+
+  return() unless( defined($quote) || length($unquoted) || length($delim));
+
+        if ($keep) {
+      $quoted = "$quote$quoted$quote";
+  }
+        else {
+      $unquoted =~ s/\\(.)/$1/sg;
+      if (defined $quote) {
+    $quoted =~ s/\\(.)/$1/sg if ($quote eq '"');
+    #$quoted =~ s/\\([\\'])/$1/g if ( $PERL_SINGLE_QUOTE && $quote eq "'");
+            }
+  }
+        $word .= substr($line, 0, 0); # leave results tainted
+        $word .= defined $quote ? $quoted : $unquoted;
+
+        if (length($delim)) {
+            push(@pieces, $word);
+            push(@pieces, $delim) if ($keep eq 'delimiters');
+            undef $word;
+        }
+        if (!length($line)) {
+            push(@pieces, $word);
+  }
+    }
+    return(@pieces);
+}
 
 sub check_manifest {
     print "Checking if your kit is complete...\n";
