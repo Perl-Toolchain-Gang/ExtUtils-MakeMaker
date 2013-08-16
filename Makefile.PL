@@ -47,6 +47,7 @@ CHANGE_WARN
 
 check_environment();
 
+my %Extra_Params  = ();
 my %Extra_Prereqs = ();
 
 # Special case for MakeMaker being built as a vendor package
@@ -71,7 +72,16 @@ if( $BUILDING_AS_PACKAGE ) {
     $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
 }
 else {
-    my::bundles::copy_bundles("bundled", "inc");
+   eval {
+      require ExtUtils::Manifest;
+      require ExtUtils::Command;
+      require ExtUtils::Install;
+   };
+   if ( $@ ) {
+     $Extra_Params{PERL} = "$^X -Iinc";
+   }
+
+   my::bundles::copy_bundles("bundled", "inc");
 }
 
 # Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
@@ -120,6 +130,8 @@ my $MM = WriteMakefile(
     realclean              => {
         FILES   => "inc"
     },
+
+    %Extra_Params,
 
     $^O =~ /win/i
     ? (
