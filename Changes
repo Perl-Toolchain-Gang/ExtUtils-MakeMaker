@@ -1,3 +1,8 @@
+6.73_10 Fri Aug 16 16:40:09 BST 2013
+    Bug Fixes:
+    * RT#87839 resolve bootstrap problems when required prereqs
+      are missing
+
 6.73_09 Fri Aug  9 19:58:32 BST 2013
     Bug Fixes:
     * Bundle code from Text::ParseWords to handle splitting
