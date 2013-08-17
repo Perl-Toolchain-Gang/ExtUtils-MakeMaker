@@ -583,6 +583,7 @@ sub init_dist {
 
     ($self->{DISTNAME} = $self->{NAME}) =~ s{::}{-}g unless $self->{DISTNAME};
     $self->{DISTVNAME} ||= $self->{DISTNAME}.'-'.$self->{VERSION};
+    $self->{SUFFIX} = '.' . $self->{SUFFIX} unless $self->{SUFFIX} =~ m!^\.!;
 
 }
 
