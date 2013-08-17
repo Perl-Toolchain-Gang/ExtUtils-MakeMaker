@@ -1,3 +1,7 @@
+6.73_11 Sat Aug 17 22:51:14 BST 2013
+    Bug Fixes:
+    * RT#87911 prepend SUFFIX with a '.' if one isn't supplied
+
 6.73_10 Fri Aug 16 16:40:09 BST 2013
     Bug Fixes:
     * RT#87839 resolve bootstrap problems when required prereqs

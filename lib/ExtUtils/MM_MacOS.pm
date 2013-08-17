@@ -2,7 +2,7 @@ package ExtUtils::MM_MacOS;
 
 use strict;
 
-our $VERSION = '6.73_10';
+our $VERSION = '6.73_11';
 
 sub new {
     die <<'UNSUPPORTED';
