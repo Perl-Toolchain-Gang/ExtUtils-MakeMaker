@@ -1,3 +1,10 @@
+6.73_12 Fri Aug 23 10:49:13 BST 2013
+    Bug Fixes:
+    * Preserve runtime requires when PREREQ_PM argument is empty or undef
+      (miyagawa)
+    * RT#88037 regen run of Makefile.PL will use same -MCross arg as
+      initial .PL run (bulk88)
+
 6.73_11 Sat Aug 17 22:51:14 BST 2013
     Bug Fixes:
     * RT#87911 prepend SUFFIX with a '.' if one isn't supplied
