@@ -2524,8 +2524,12 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 
     my $newer_than_target = $Is{VMS} ? '$(MMS$SOURCE_LIST)' : '$?';
     my $mpl_args = join " ", map qq["$_"], @ARGV;
-
-    $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
+    my $cross = '';
+    if (defined $::Cross::platform) {
+        # Inherited from win32/buildext.pl
+        $cross = "-MCross=$::Cross::platform ";
+    }
+    $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $cross, $mpl_args;
 # We take a very conservative approach here, but it's worth it.
 # We move Makefile to Makefile.old here to avoid gnu make looping.
 $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
@@ -2534,7 +2538,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	-$(NOECHO) $(RM_F) $(MAKEFILE_OLD)
 	-$(NOECHO) $(MV)   $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
 	- $(MAKE) $(USEMAKEFILE) $(MAKEFILE_OLD) clean $(DEV_NULL)
-	$(PERLRUN) Makefile.PL %s
+	$(PERLRUN) %sMakefile.PL %s
 	$(NOECHO) $(ECHO) "==> Your Makefile has been rebuilt. <=="
 	$(NOECHO) $(ECHO) "==> Please rerun the $(MAKE) command.  <=="
 	$(FALSE)
