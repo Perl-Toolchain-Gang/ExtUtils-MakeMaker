@@ -1087,7 +1087,7 @@ sub _add_requirements_to_meta_v2 {
     }
 
     $meta{prereqs}{runtime}{requires} = _normalize_prereqs($self->{PREREQ_PM})
-        if defined $self->{PREREQ_PM};
+        if $self->{ARGS}{PREREQ_PM};
     $meta{prereqs}{runtime}{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
         if $self->{MIN_PERL_VERSION};
 
