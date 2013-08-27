@@ -1228,6 +1228,23 @@ pure_vendor_install ::
 	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
 
+];
+
+    push @m, q[
+# Ditto
+doc_perl_install ::
+	$(NOECHO) $(NOOP)
+
+# And again
+doc_site_install ::
+	$(NOECHO) $(NOOP)
+
+doc_vendor_install ::
+	$(NOECHO) $(NOOP)
+
+] if $self->{NO_PERLLOCAL};
+
+    push @m, q[
 # Ditto
 doc_perl_install ::
 	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{DESTINSTALLARCHLIB}, 'perllocal.pod').q["
@@ -1254,7 +1271,7 @@ doc_vendor_install ::
 	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 
-];
+] unless $self->{NO_PERLLOCAL};
 
     push @m, q[
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs
