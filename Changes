@@ -1,7 +1,9 @@
 6.75_01
     New features:
     * Added NO_PERLLOCAL option to allow suppression of writing
-      installs to perllocal.pod.
+      installs to perllocal.pod
+    * Added NO_PACKLIST option to allow suppression of writing
+      packlist files for installations
 
     Doc Fixes:
     * RT#87350 Document DLEXT parameter (sisyphus)
