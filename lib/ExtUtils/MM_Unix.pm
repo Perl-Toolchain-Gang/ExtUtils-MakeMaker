@@ -2095,6 +2095,21 @@ pure_vendor_install :: all
 		$(INST_MAN1DIR) $(DESTINSTALLVENDORMAN1DIR) \
 		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR)
 
+};
+
+    push @m, q{
+doc_perl_install :: all
+	$(NOECHO) $(NOOP)
+
+doc_site_install :: all
+	$(NOECHO) $(NOOP)
+
+doc_vendor_install :: all
+	$(NOECHO) $(NOOP)
+
+} if $self->{NO_PERLLOCAL};
+
+    push @m, q{
 doc_perl_install :: all
 	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
 	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
@@ -2128,7 +2143,7 @@ doc_vendor_install :: all
 		EXE_FILES "$(EXE_FILES)" \
 		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
 
-};
+} unless $self->{NO_PERLLOCAL};
 
     push @m, q{
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs

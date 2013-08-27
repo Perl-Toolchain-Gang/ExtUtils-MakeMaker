@@ -1,4 +1,8 @@
 6.75_01
+    New features:
+    * Added NO_PERLLOCAL option to allow suppression of writing
+      installs to perllocal.pod.
+
     Doc Fixes:
     * RT#87350 Document DLEXT parameter (sisyphus)
 
