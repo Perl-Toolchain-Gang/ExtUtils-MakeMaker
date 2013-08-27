@@ -1743,6 +1743,18 @@ For example, version 1.04 of Foo::Bar becomes Foo-Bar-1.04.
 On some OS's where . has special meaning VERSION_SYM may be used in
 place of VERSION.
 
+=item DLEXT
+
+Specifies the extension of the module's loadable object. For example:
+
+  DLEXT => 'unusual_ext', # Default value is $Config{so}
+
+NOTE: When using this option to alter the extension of a module's
+loadable object, it is also necessary that the module's pm file
+specifies the same change:
+
+  local $DynaLoader::dl_dlext = 'unusual_ext';
+
 =item DL_FUNCS
 
 Hashref of symbol names for routines to be made available as universal

@@ -1,3 +1,7 @@
+6.75_01
+    Doc Fixes:
+    * RT#87350 Document DLEXT parameter (sisyphus)
+
 6.74 Tue Aug 27 12:43:05 BST 2013
     No changes from 6.73_12
 
