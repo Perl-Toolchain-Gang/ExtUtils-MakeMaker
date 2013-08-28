@@ -5,6 +5,9 @@
     * Added NO_PACKLIST option to allow suppression of writing
       packlist files for installations
 
+    Bug Fixes:
+    * RT#32894 deal with legitimate linker flags correctly
+
     Doc Fixes:
     * RT#87350 Document DLEXT parameter (sisyphus)
 

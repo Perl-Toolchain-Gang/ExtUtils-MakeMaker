@@ -85,6 +85,12 @@ sub _unix_os2_ext {
             next;
         }
 
+        if ( $thislib =~ m!^-Wl,! ) {
+            push( @extralibs,  $thislib );
+            push( @ldloadlibs, $thislib );
+            next;
+        }
+
         # Handle possible library arguments.
         unless ( $thislib =~ s/^-l// ) {
             warn "Unrecognized argument in LIBS ignored: '$thislib'\n";
