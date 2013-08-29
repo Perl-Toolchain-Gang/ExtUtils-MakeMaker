@@ -197,7 +197,7 @@ sub prompt ($;$) {  ## no critic
     else {
         $ans = <STDIN>;
         if( defined $ans ) {
-            chomp $ans;
+            $ans =~ s{\015?\012$}{};
         }
         else { # user hit ctrl-D
             print "\n";
