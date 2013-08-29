@@ -7,6 +7,7 @@
 
     Bug Fixes:
     * RT#32894 deal with legitimate linker flags correctly
+    * RT#88222 check that Time::HiRes has 'stat' before using it
 
     Doc Fixes:
     * RT#87350 Document DLEXT parameter (sisyphus)
