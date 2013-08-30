@@ -247,7 +247,7 @@ VERIFY
           VERSION    => '1.00',
       );
 
-      is( $mm->{CCFLAGS}, "-Wl,-rpath -Wl,/foo/bar/lib", 'parse_args() splits like shell' );
+      like( $mm->{CCFLAGS}, qr{-Wl,-rpath -Wl,/foo/bar/lib}, 'parse_args() splits like shell' );
       is_deeply( $mm->{LIBS}, ['-lwibble -lwobble'], 'parse_args() splits like shell' );
     }
 
