@@ -770,7 +770,7 @@ sub manifypods_target {
     my $dependencies  = '';
 
     # populate manXpods & dependencies:
-    foreach my $name (keys %{$self->{MAN1PODS}}, keys %{$self->{MAN3PODS}}) {
+    foreach my $name (sort keys %{$self->{MAN1PODS}}, sort keys %{$self->{MAN3PODS}}) {
         $dependencies .= " \\\n\t$name";
     }
 
@@ -781,7 +781,7 @@ END
     my @man_cmds;
     foreach my $section (qw(1 3)) {
         my $pods = $self->{"MAN${section}PODS"};
-        push @man_cmds, $self->split_command(<<CMD, %$pods);
+        push @man_cmds, $self->split_command(<<CMD, map {($_,$pods->{$_})} sort keys %$pods);
 	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)
 CMD
     }

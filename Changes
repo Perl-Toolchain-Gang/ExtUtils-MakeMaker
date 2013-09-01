@@ -2,6 +2,8 @@
     Bug fixes:
     * RT#49043 binmode STDIN breaks prompt() on MSWin32
     * RT#14505 Handle -Wl,-rpath correctly
+    * RT#17041 Sort manification and copying events for perceptive
+      cleanliness
 
 6.75_01 Thu Aug 29 15:06:27 BST 2013
     New features:
