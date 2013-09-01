@@ -1,4 +1,4 @@
-6.75_02
+6.75_02 Sun Sep  1 21:50:48 BST 2013
     Bug fixes:
     * RT#49043 binmode STDIN breaks prompt() on MSWin32
     * RT#14505 Handle -Wl,-rpath correctly
