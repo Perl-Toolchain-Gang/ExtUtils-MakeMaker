@@ -3379,7 +3379,10 @@ sub test {
 
     my($self, %attribs) = @_;
     my $tests = $attribs{TESTS} || '';
-    if (!$tests && -d 't') {
+    if (!$tests && -d 't' && defined $attribs{RECURSIVE_TEST_FILES}) {
+        $tests = $self->find_tests_recursive;
+    }
+    elsif (!$tests && -d 't') {
         $tests = $self->find_tests;
     }
     # note: 'test.pl' name is also hardcoded in init_dirscan()

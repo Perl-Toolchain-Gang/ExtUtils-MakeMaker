@@ -2735,7 +2735,15 @@ Anything put here will be passed to MY::postamble() if you have one.
 
 =item test
 
+Specify the targets for testing.
+
   {TESTS => 't/*.t'}
+
+C<RECURSIVE_TEST_FILES> can be used to include all directories
+recursively under C<t> that contain C<.t> files. It will be ignored if
+you provide your own C<TESTS> attribute, defaults to false.
+
+  {RECURSIVE_TEST_FILES=>1}
 
 =item tool_autosplit
 
