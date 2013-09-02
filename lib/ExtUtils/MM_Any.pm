@@ -2510,6 +2510,44 @@ sub find_tests {
     return -d 't' ? 't/*.t' : '';
 }
 
+=head3 find_tests_recursive
+
+  my $tests = $mm->find_tests_recursive;
+
+Returns a string suitable for feeding to the shell to return all
+tests in t/ but recursively.
+
+=cut
+
+sub find_tests_recursive {
+    my($self) = shift;
+    return '' unless -d 't';
+
+    require File::Find;
+
+    my %testfiles;
+
+    my $wanted = sub {
+        return unless m!\.t$!;
+        my ($volume,$directories,$file) =
+            File::Spec->splitpath( $File::Find::name  );
+        my @dirs = File::Spec->splitdir( $directories );
+        for ( @dirs ) {
+          next if $_ eq 't';
+          unless ( $_ ) {
+            $_ = '*.t';
+            next;
+          }
+          $_ = '*';
+        }
+        my $testfile = join '/', @dirs;
+        $testfiles{ $testfile } = 1;
+    };
+
+    File::Find::find( $wanted, 't' );
+
+    return join ' ', sort keys %testfiles;
+}
 
 =head3 extra_clean_files
 
