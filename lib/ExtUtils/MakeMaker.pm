@@ -1101,6 +1101,13 @@ sub skipcheck {
 sub flush {
     my $self = shift;
 
+    # This needs a bit more work for more wacky OSen
+    my $type = 'GNU-style';
+    if ( $self->os_flavor_is('Win32') ) {
+      $type = $self->make . '-style';
+    }
+    print "Generating a $type Makefile\n";
+
     my $finalname = $self->{MAKEFILE};
     print "Writing $finalname for $self->{NAME}\n";
 

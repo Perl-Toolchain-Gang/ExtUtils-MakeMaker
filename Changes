@@ -1,6 +1,7 @@
 6.75_03
     New features:
     * Added RECURSIVE_TEST_FILES attribute to 'test'
+    * Report the type of Makefile being generated
 
     Bug fixes:
     * RT#17041 more sortification of hashes to Makefile
