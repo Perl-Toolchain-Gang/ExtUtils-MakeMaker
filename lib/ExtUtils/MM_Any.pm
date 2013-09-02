@@ -519,7 +519,7 @@ sub clean {
 clean :: clean_subdirs
 ');
 
-    my @files = values %{$self->{XS}}; # .c files from *.xs files
+    my @files = sort values %{$self->{XS}}; # .c files from *.xs files
     my @dirs  = qw(blib);
 
     # Normally these are all under blib but they might have been
@@ -570,8 +570,8 @@ clean :: clean_subdirs
     push @dirs, $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
-    { my(%f) = map { ($_ => 1) } @files; @files = keys %f; }
-    { my(%d) = map { ($_ => 1) } @dirs;  @dirs  = keys %d; }
+    { my(%f) = map { ($_ => 1) } @files; @files = sort keys %f; }
+    { my(%d) = map { ($_ => 1) } @dirs;  @dirs  = sort keys %d; }
 
     push @m, map "\t$_\n", $self->split_command('- $(RM_F)',  @files);
     push @m, map "\t$_\n", $self->split_command('- $(RM_RF)', @dirs);

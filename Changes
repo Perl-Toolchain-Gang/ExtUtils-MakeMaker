@@ -2,6 +2,9 @@
     New features:
     * Added RECURSIVE_TEST_FILES attribute to 'test'
 
+    Bug fixes:
+    * RT#17041 more sortification of hashes to Makefile
+
 6.75_02 Sun Sep  1 21:50:48 BST 2013
     Bug fixes:
     * RT#49043 binmode STDIN breaks prompt() on MSWin32
