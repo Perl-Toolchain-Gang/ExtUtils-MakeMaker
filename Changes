@@ -1,3 +1,7 @@
+6.75_04 Thu Sep  5 12:07:59 BST 2013
+    Bug fixes:
+    * Sanitise make on MSWin32 when reporting Makefile type
+
 6.75_03 Tue Sep  3 00:24:23 BST 2013
     New features:
     * Added RECURSIVE_TEST_FILES attribute to 'test'
