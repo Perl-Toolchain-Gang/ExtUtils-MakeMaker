@@ -593,6 +593,9 @@ END
 
     $self->{NAME} ||= $self->guess_name;
 
+    warn "Warning: NAME must be a package name\n"
+      unless $self->{NAME} =~ m!^[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*$!;
+
     ($self->{NAME_SYM} = $self->{NAME}) =~ s/\W+/_/g;
 
     $self->init_MAKE;
