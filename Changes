@@ -1,6 +1,7 @@
 6.77_01
     Bug fixes:
     * RT#7248 warn if NAME is not valid package name
+    * Perl#36539 reverse search order for finding perl
 
 6.76 Fri Sep  6 13:32:42 BST 2013
 
