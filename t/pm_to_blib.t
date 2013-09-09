@@ -5,12 +5,22 @@
 use strict;
 use lib 't/lib';
 
-use Test::More 'no_plan';
+use Config;
+use Test::More;
 
 use ExtUtils::MakeMaker;
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
+
+my $Skipped = 0;
+if( $Config{'usecrosscompile'} ) {
+    $Skipped = 1;
+    plan skip_all => "no toolchain installed when cross-compiling";
+}
+else {
+    plan 'no_plan';
+}
 
 
 my $perl     = which_perl();
@@ -26,8 +36,10 @@ my $make     = make_run();
 
     ok( setup_recurs(), 'setup' );
     END {
-        ok( chdir File::Spec->updir );
-        ok( teardown_recurs(), 'teardown' );
+        unless ( $Skipped ) {
+            ok( chdir File::Spec->updir );
+            ok( teardown_recurs(), 'teardown' );
+        }
     }
 
     ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||

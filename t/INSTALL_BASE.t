@@ -10,9 +10,18 @@ use strict;
 use File::Path;
 use Config;
 
-use Test::More tests => 20;
+use Test::More;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
+
+my $Skipped = 0;
+if( $Config{'usecrosscompile'} ) {
+    $Skipped = 1;
+    plan skip_all => "no toolchain installed when cross-compiling";
+}
+else {
+    plan tests => 20;
+}
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -23,8 +32,10 @@ perl_lib;
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok( chdir File::Spec->updir );
-    ok( teardown_recurs(), 'teardown' );
+    unless ( $Skipped ) {
+        ok( chdir File::Spec->updir );
+        ok( teardown_recurs(), 'teardown' );
+    }
 }
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy") || diag("chdir failed; $!");

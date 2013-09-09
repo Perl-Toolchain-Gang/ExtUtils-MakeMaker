@@ -16,6 +16,8 @@ use Cwd 'abs_path';
 
 use Test::More;
 
+plan skip_all => "no toolchain installed when cross-compiling"
+    if $Config{'usecrosscompile'};
 
 #--------------------- Setup
 
