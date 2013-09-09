@@ -8,7 +8,8 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 20;
+use Config;
+use Test::More;
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -16,6 +17,15 @@ use MakeMaker::Test::Setup::SAS;
 use File::Path;
 
 use ExtUtils::MakeMaker;
+
+my $Skipped = 0;
+if( $Config{'usecrosscompile'} ) {
+    $Skipped = 1;
+    plan skip_all => "no toolchain installed when cross-compiling";
+}
+else {
+    plan tests => 20;
+}
 
 # avoid environment variables interfering with our make runs
 delete @ENV{qw(LIB MAKEFLAGS)};
@@ -30,8 +40,10 @@ perl_lib();
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok( chdir(File::Spec->updir), 'leaving dir' );
-    ok( teardown_recurs(), 'teardown' );
+    unless ( $Skipped ) {
+        ok( chdir(File::Spec->updir), 'leaving dir' );
+        ok( teardown_recurs(), 'teardown' );
+    }
 }
 
 ok( chdir $MakeMaker::Test::Setup::SAS::dirname, "entering dir $MakeMaker::Test::Setup::SAS::dirname" ) ||
@@ -82,7 +94,7 @@ note "argument verification via CONFIGURE"; {
 note "generated files verification"; {
     unlink $makefile;
     my @mpl_out = run(qq{$perl Makefile.PL});
-    END { unlink $makefile, makefile_backup() }
+    END { unlink $makefile, makefile_backup() unless $Skipped }
 
     cmp_ok( $?, '==', 0, 'Makefile.PL exiting normally' ) || diag(@mpl_out);
     ok( -e $makefile, 'Makefile present' );
@@ -92,7 +104,7 @@ note "generated files verification"; {
 note "ppd output"; {
     my $ppd_file = 'Multiple-Authors.ppd';
     my @make_out = run(qq{$make ppd});
-    END { unlink $ppd_file }
+    END { unlink $ppd_file unless $Skipped }
 
     cmp_ok( $?, '==', 0,    'Make ppd exiting normally' ) || diag(@make_out);
 
@@ -111,7 +123,7 @@ note "META.yml output"; {
     my $meta_yml = "$distdir/META.yml";
     my $meta_json = "$distdir/META.json";
     my @make_out    = run(qq{$make metafile});
-    END { rmtree $distdir }
+    END { rmtree $distdir unless $Skipped }
 
     cmp_ok( $?, '==', 0, 'Make metafile exiting normally' ) || diag(@make_out);
 

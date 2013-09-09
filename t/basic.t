@@ -11,12 +11,21 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 171;
+use Test::More;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
 use File::Spec;
 use File::Path;
+
+my $Skipped = 0;
+if( $Config{'usecrosscompile'} ) {
+    $Skipped = 1;
+    plan skip_all => "no toolchain installed when cross-compiling";
+}
+else {
+    plan tests => 171;
+}
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
@@ -31,8 +40,10 @@ $| = 1;
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok chdir File::Spec->updir or die;
-    ok teardown_recurs, "teardown";
+    unless ( $Skipped ) {
+        ok chdir File::Spec->updir or die;
+        ok teardown_recurs, "teardown";
+    }
 }
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||

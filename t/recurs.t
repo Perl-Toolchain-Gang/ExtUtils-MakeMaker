@@ -9,9 +9,18 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 26;
+use Test::More;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::Recurs;
+
+my $Skipped = 0;
+if( $Config{'usecrosscompile'} ) {
+    $Skipped = 1;
+    plan skip_all => "no toolchain installed when cross-compiling";
+}
+else {
+    plan tests => 26;
+}
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
@@ -30,8 +39,10 @@ $| = 1;
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok( chdir File::Spec->updir );
-    ok( teardown_recurs(), 'teardown' );
+    unless ( $Skipped ) {
+        ok( chdir File::Spec->updir );
+        ok( teardown_recurs(), 'teardown' );
+    }
 }
 
 ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||

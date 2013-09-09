@@ -6,12 +6,16 @@
 use strict;
 use lib 't/lib';
 
+use Config;
 use Test::More;
 
 # In a BEGIN block so the END tests aren't registered.
 BEGIN {
     plan skip_all => "miniperl test only necessary for the perl core"
       if !$ENV{PERL_CORE};
+
+    plan skip_all => "no toolchain installed when cross-compiling"
+      if $Config{'usecrosscompile'};
 
     plan "no_plan";
 }
@@ -42,8 +46,10 @@ my $make     = make_run();
 
     ok( setup_recurs(), 'setup' );
     END {
-        ok( chdir File::Spec->updir );
-        ok( teardown_recurs(), 'teardown' );
+        unless ( $Skipped ) {
+            ok( chdir File::Spec->updir );
+            ok( teardown_recurs(), 'teardown' );
+        }
     }
 
     ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||

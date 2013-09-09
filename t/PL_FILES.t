@@ -6,11 +6,21 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 9;
+use Config;
+use Test::More;
 
 use File::Spec;
 use MakeMaker::Test::Setup::PL_FILES;
 use MakeMaker::Test::Utils;
+
+my $Skipped = 0;
+if( $Config{'usecrosscompile'} ) {
+    $Skipped = 1;
+    plan skip_all => "no toolchain installed when cross-compiling";
+}
+else {
+    plan tests => 9;
+}
 
 my $perl = which_perl();
 my $make = make_run();
@@ -19,8 +29,10 @@ perl_lib();
 setup;
 
 END {
-    ok( chdir File::Spec->updir );
-    ok( teardown );
+    unless ( $Skipped ) {
+        ok( chdir File::Spec->updir );
+        ok( teardown );
+    }
 }
 
 ok chdir('PL_FILES-Module');
