@@ -99,6 +99,7 @@ my $MM = WriteMakefile(
         'Pod::Man'       => 0,                 # manifypods needs Pod::Man
         'File::Basename' => 0,
         DirHandle        => 0,
+        perl             => '5.006',
     },
 
     MIN_PERL_VERSION => '5.006',

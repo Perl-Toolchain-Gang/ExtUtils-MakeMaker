@@ -481,10 +481,18 @@ END
     foreach my $prereq (sort keys %$prereqs) {
         my $required_version = $prereqs->{$prereq};
 
-        my $installed_file = MM->_installed_file_for_module($prereq);
         my $pr_version = 0;
-        $pr_version = MM->parse_version($installed_file) if $installed_file;
-        $pr_version = 0 if $pr_version eq 'undef';
+        my $installed_file;
+
+        if ( $prereq eq 'perl' ) {
+          $installed_file = $prereq;
+          $pr_version = $];
+        }
+        else {
+          $installed_file = MM->_installed_file_for_module($prereq);
+          $pr_version = MM->parse_version($installed_file) if $installed_file;
+          $pr_version = 0 if $pr_version eq 'undef';
+        }
 
         # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
