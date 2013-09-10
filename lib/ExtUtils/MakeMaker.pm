@@ -485,6 +485,12 @@ END
         my $installed_file;
 
         if ( $prereq eq 'perl' ) {
+          if ( defined $required_version && $required_version =~ /^v?[\d_\.]+$/
+               || $required_version !~ /^v?[\d_\.]+$/ ) {
+            require version;
+            my $normal = eval { version->parse( $required_version ) };
+            $required_version = $normal if defined $normal;
+          }
           $installed_file = $prereq;
           $pr_version = $];
         }
