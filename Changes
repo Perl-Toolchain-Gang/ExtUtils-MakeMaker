@@ -3,6 +3,7 @@
     * RT#7248 warn if NAME is not valid package name
     * Perl#36539 reverse search order for finding perl
     * parse_version() should work with taint mode now
+    * RT#69590 enable tests to be run in parallel
 
 6.76 Fri Sep  6 13:32:42 BST 2013
 

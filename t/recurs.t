@@ -10,6 +10,8 @@ use strict;
 use Config;
 
 use Test::More tests => 26;
+use File::Temp qw[tempdir];
+
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::Recurs;
 
@@ -20,7 +22,8 @@ delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
-chdir('t');
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+chdir $tmpdir;
 
 perl_lib;
 

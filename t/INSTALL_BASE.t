@@ -18,7 +18,10 @@ my $Is_VMS = $^O eq 'VMS';
 
 my $perl = which_perl();
 
-chdir 't';
+use File::Temp qw[tempdir];
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+chdir $tmpdir;
+
 perl_lib;
 
 ok( setup_recurs(), 'setup' );

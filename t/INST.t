@@ -18,7 +18,9 @@ use File::Spec;
 use TieOut;
 use Config;
 
-chdir 't';
+use File::Temp qw[tempdir];
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+chdir $tmpdir;
 
 perl_lib;
 
