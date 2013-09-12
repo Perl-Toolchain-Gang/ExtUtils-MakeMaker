@@ -1,6 +1,7 @@
 6.77_02
     Bug fixes:
     * Support 'perl' as a PREREQ_PM target
+    * RT#77029 Support linefeeds in abstract parsing
 
 6.77_01 Tue Sep 10 15:20:42 BST 2013
     Bug fixes:

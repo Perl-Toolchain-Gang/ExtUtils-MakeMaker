@@ -2640,9 +2640,15 @@ sub parse_abstract {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if !$inpod;
         chop;
-        next unless /^($package(?:\.pm)? \s+ -+ \s+)(.*)/x;
-        $result = $2;
-        last;
+        if ( /^($package(?:\.pm)? \s+ -+ \s+)(.*)/x ) {
+          $result = $2;
+          next;
+        }
+        next unless $result;
+        if ( $result && ( /^\s*$/ || /^\=/ ) ) {
+          last;
+        }
+        $result = join ' ', $result, $_;
     }
     close $fh;
 
