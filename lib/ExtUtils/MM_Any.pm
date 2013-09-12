@@ -1,7 +1,7 @@
 package ExtUtils::MM_Any;
 
 use strict;
-our $VERSION = '6.77_01';
+our $VERSION = '6.77_02';
 
 use Carp;
 use File::Spec;

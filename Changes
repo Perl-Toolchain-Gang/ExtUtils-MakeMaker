@@ -1,7 +1,8 @@
-6.77_02
+6.77_02 Thu Sep 12 21:21:12 BST 2013
     Bug fixes:
     * Support 'perl' as a PREREQ_PM target
     * RT#77029 Support linefeeds in abstract parsing
+    * Skip some tests when cross-compiling core
 
 6.77_01 Tue Sep 10 15:20:42 BST 2013
     Bug fixes:
