@@ -10,7 +10,10 @@ use strict;
 use File::Path;
 use Config;
 
-use Test::More tests => 20;
+use Test::More
+    $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "no toolchain installed when cross-compiling")
+    : (tests => 20);
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 

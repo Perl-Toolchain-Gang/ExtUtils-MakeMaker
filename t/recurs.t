@@ -9,7 +9,10 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 26;
+use Test::More
+    $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "no toolchain installed when cross-compiling")
+    : (tests => 26);
 use File::Temp qw[tempdir];
 
 use MakeMaker::Test::Utils;
