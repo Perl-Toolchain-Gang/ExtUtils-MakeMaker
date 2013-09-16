@@ -1,3 +1,7 @@
+6.77_03 Mon Sep 16 12:20:25 BST 2013
+    VMS fixes:
+    * CCFLAGS may have appendages not from PERL_MM_OPT
+
 6.77_02 Thu Sep 12 21:21:12 BST 2013
     Bug fixes:
     * Support 'perl' as a PREREQ_PM target
