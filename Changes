@@ -1,3 +1,8 @@
+6.77_04 Wed Sep 18 19:23:38 BST 2013
+    Bug fixes:
+    * Fixed PERL_SRC for core tests after parallelisation
+      enhancements were made in 6.77_01
+
 6.77_03 Mon Sep 16 12:20:25 BST 2013
     VMS fixes:
     * CCFLAGS may have appendages not from PERL_MM_OPT
