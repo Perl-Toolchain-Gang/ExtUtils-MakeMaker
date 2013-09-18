@@ -6,16 +6,18 @@
 use strict;
 use lib 't/lib';
 
-use Config;
 use Test::More;
+use IPC::Cmd qw(can_run);
+use MakeMaker::Test::Utils;
+use MakeMaker::Test::Setup::BFD;
 
 # In a BEGIN block so the END tests aren't registered.
 BEGIN {
     plan skip_all => "miniperl test only necessary for the perl core"
       if !$ENV{PERL_CORE};
 
-    plan skip_all => "no toolchain installed when cross-compiling"
-      if $ENV{PERL_CORE} && $Config{'usecrosscompile'};
+    plan skip_all => "make not available"
+      unless can_run(make());
 
     plan "no_plan";
 }
@@ -28,9 +30,6 @@ BEGIN {
 use MakeMaker::Test::NoXS;
 
 use ExtUtils::MakeMaker;
-
-use MakeMaker::Test::Utils;
-use MakeMaker::Test::Setup::BFD;
 
 
 my $perl     = which_perl();
