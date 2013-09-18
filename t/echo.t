@@ -13,11 +13,12 @@ use ExtUtils::MM;
 use MakeMaker::Test::Utils;
 use File::Temp;
 use Cwd 'abs_path';
+use IPC::Cmd 'can_run';
 
 use Test::More;
 
-plan skip_all => "no toolchain installed when cross-compiling"
-    if $ENV{PERL_CORE} && $Config{'usecrosscompile'};
+plan skip_all => "make not available"
+    unless can_run(make());
 
 #--------------------- Setup
 
