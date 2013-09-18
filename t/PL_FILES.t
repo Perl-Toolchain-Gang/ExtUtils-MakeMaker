@@ -5,16 +5,16 @@ BEGIN {
 }
 
 use strict;
-use Config;
-use Test::More
-    $ENV{PERL_CORE} && $Config{'usecrosscompile'}
-    ? (skip_all => "no toolchain installed when cross-compiling")
-    : (tests => 9);
 
 use File::Spec;
 use File::Temp qw[tempdir];
 use MakeMaker::Test::Setup::PL_FILES;
 use MakeMaker::Test::Utils;
+use IPC::Cmd qw(can_run);
+use Test::More
+    can_run(make())
+    ? (tests => 9)
+    : (skip_all => "make not available");
 
 my $perl = which_perl();
 my $make = make_run();

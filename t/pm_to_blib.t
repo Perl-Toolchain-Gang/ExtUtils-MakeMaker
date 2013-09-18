@@ -5,17 +5,17 @@
 use strict;
 use lib 't/lib';
 
-use Config;
-use Test::More
-    $ENV{PERL_CORE} && $Config{'usecrosscompile'}
-    ? (skip_all => "no toolchain installed when cross-compiling")
-    : 'no_plan';
 use File::Temp qw[tempdir];
 
 use ExtUtils::MakeMaker;
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
+use IPC::Cmd qw(can_run);
+use Test::More
+    can_run(make())
+    ? 'no_plan'
+    : (skip_all => "make not available");
 
 
 my $perl     = which_perl();

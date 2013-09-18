@@ -14,12 +14,13 @@ map { s/ //g } @INSTDIRS if $^O eq 'MSWin32'; # FIXME when MM_Win32 can handle t
 my $CLEANUP = 1;
 $CLEANUP &&= 1; # so always 1 or numerically 0
 
-use Test::More;
-plan $ENV{PERL_CORE} && $Config{'usecrosscompile'}
-    ? (skip_all => "no toolchain installed when cross-compiling")
-    : (tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP));
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
+use IPC::Cmd qw(can_run);
+use Test::More;
+plan can_run(make())
+    ? (tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP))
+    : (skip_all => "make not available");
 
 my $Is_VMS = $^O eq 'VMS';
 

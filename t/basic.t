@@ -11,12 +11,13 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More
-    $ENV{PERL_CORE} && $Config{'usecrosscompile'}
-    ? (skip_all => "no toolchain installed when cross-compiling")
-    : (tests => 171);
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
+use IPC::Cmd qw(can_run);
+use Test::More
+    can_run(make())
+    ? (tests => 171)
+    : (skip_all => "make not available");
 use File::Find;
 use File::Spec;
 use File::Path;
