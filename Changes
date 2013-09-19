@@ -1,3 +1,7 @@
+6.77_05 Thu Sep 19 14:09:00 BST 2013
+    Bug fixes:
+    * Fix 3 more tests to work in parallel. Now works with HARNESS_OPTIONS=j64
+
 6.77_04 Wed Sep 18 19:23:38 BST 2013
     Bug fixes:
     * Fixed PERL_SRC for core tests after parallelisation
