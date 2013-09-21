@@ -1,3 +1,7 @@
+6.77_07 Sat Sep 21 09:44:19 BST 2013
+    Bug fixes:
+    * do not set default switches in Test::Harness; not even -w
+
 6.77_06 Thu Sep 19 15:36:59 BST 2013
     Dist fixes:
     * Previous tarball was corrupted
