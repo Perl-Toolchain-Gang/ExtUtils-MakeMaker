@@ -1,3 +1,7 @@
+6.78 Mon Sep 23 13:44:39 BST 2013
+
+    No changes from 6.77_08
+
 6.77_08 Sun Sep 22 18:43:23 BST 2013
     New feature:
     * Made UNINST an attribute, so removing shadowed modules
