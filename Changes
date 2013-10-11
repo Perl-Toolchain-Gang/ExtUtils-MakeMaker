@@ -1,3 +1,7 @@
+6.79_03 Fri Oct 11 13:56:53 BST 2013
+    Bug fixes:
+    * don't copy .bs portably :)
+
 6.79_02 Fri Oct 11 12:58:01 BST 2013
     Bug fixes:
     * RT#28992 don't copy .bs files if they are empty
