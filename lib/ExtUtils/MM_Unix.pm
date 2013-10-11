@@ -959,8 +959,7 @@ MAKE
     push @m, <<'MAKE';
 	$(CHMOD) $(PERM_RWX) $@
 	$(NOECHO) $(RM_RF) $(BOOTSTRAP)
-	- $(TEST_S) $(BOOTSTRAP) && $(CP) $(BOOTSTRAP) $(INST_BOOT) && \
-	$(CHMOD) $(PERM_RW) $(INST_BOOT)
+	- $(CP_NONEMPTY) $(BOOTSTRAP) $(INST_BOOT) $(PERM_RW)
 MAKE
 
     return join('',@m);

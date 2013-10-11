@@ -2047,6 +2047,7 @@ Defines at least these macros.
   TEST_F            Test for a file's existence
   TEST_S            Test the size of a file
   CP                Copy a file
+  CP_NONEMPTY       Copy a file if it is not empty
   MV                Move a file
   CHMOD             Change permissions on a file
   FALSE             Exit with non-zero
@@ -2069,6 +2070,7 @@ sub init_tools {
     $self->{RM_RF}    ||= $self->oneliner('rm_rf', ["-MExtUtils::Command"]);
     $self->{TEST_F}   ||= $self->oneliner('test_f', ["-MExtUtils::Command"]);
     $self->{TEST_S}   ||= $self->oneliner('test_s', ["-MExtUtils::Command::MM"]);
+    $self->{CP_NONEMPTY} ||= $self->oneliner('cp_nonempty', ["-MExtUtils::Command::MM"]);
     $self->{FALSE}    ||= $self->oneliner('exit 1');
     $self->{TRUE}     ||= $self->oneliner('exit 0');
 
