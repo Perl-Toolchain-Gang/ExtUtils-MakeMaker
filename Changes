@@ -1,3 +1,7 @@
+6.79_04 Fri Oct 11 18:57:51 BST 2013
+    Bug fixes:
+    * Add CP_NONEMPTY to the list of tools in Makefile
+
 6.79_03 Fri Oct 11 13:56:53 BST 2013
     Bug fixes:
     * don't copy .bs portably :)
