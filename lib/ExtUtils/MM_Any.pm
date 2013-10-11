@@ -532,7 +532,7 @@ clean :: clean_subdirs
 #                    $(INST_BIN) $(INST_SCRIPT)
 #                    $(INST_MAN1DIR) $(INST_MAN3DIR)
 #                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR)
-#                    $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
+#                    $(INST_STATIC) $(INST_DYNAMIC)
 #                 );
 
 
@@ -727,7 +727,7 @@ sub dynamic {
 
     my($self) = shift;
     '
-dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
+dynamic :: $(FIRST_MAKEFILE) $(BOOTSTRAP) $(INST_DYNAMIC)
 	$(NOECHO) $(NOOP)
 ';
 }
