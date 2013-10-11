@@ -2218,6 +2218,7 @@ sub tools_other {
                       USEMAKEFILE
                       PM_FILTER
                       FIXIN
+                      CP_NONEMPTY
                     } )
     {
         next unless defined $self->{$tool};
