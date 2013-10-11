@@ -1761,6 +1761,7 @@ sub init_tools {
     $self->{RM_RF}      ||= "rm -rf";
     $self->{TOUCH}      ||= "touch";
     $self->{TEST_F}     ||= "test -f";
+    $self->{TEST_S}     ||= "test -s";
     $self->{CP}         ||= "cp";
     $self->{MV}         ||= "mv";
     $self->{CHMOD}      ||= "chmod";

@@ -9,7 +9,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT  = qw(test_harness pod2man perllocal_install uninstall
-                  warn_if_old_packlist);
+                  warn_if_old_packlist test_s);
 our $VERSION = '6.79_01';
 
 my $Is_VMS = $^O eq 'VMS';
@@ -270,6 +270,19 @@ Sorry for the inconvenience.
 
 WARNING
 
+}
+
+=item B<test_s>
+
+   perl "-MExtUtils::Command::MM" -e test_s <file>
+
+Tests if a file exists and is not empty (size > 0).
+I<Exits> with 0 if it does, 1 if it does not.
+
+=cut
+
+sub test_s {
+  exit(-s $ARGV[0] ? 0 : 1);
 }
 
 =back
