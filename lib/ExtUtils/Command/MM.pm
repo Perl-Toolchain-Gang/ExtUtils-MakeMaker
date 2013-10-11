@@ -9,7 +9,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT  = qw(test_harness pod2man perllocal_install uninstall
-                  warn_if_old_packlist test_s);
+                  warn_if_old_packlist test_s cp_nonempty);
 our $VERSION = '6.79_02';
 
 my $Is_VMS = $^O eq 'VMS';
@@ -285,8 +285,30 @@ sub test_s {
   exit(-s $ARGV[0] ? 0 : 1);
 }
 
+=item B<cp_nonempty>
+
+  perl "-MExtUtils::Command::MM" -e cp_nonempty <srcfile> <dstfile> <perm>
+
+Tests if the source file exists and is not empty (size > 0). If it is not empty
+it copies it to the given destination with the given permissions.
+
 =back
 
 =cut
+
+sub cp_nonempty {
+  my @args = @ARGV;
+  return 0 unless -s $args[0];
+  require ExtUtils::Command;
+  {
+    local @ARGV = @args[0,1];
+    ExtUtils::Command::cp(@ARGV);
+  }
+  {
+    local @ARGV = @args[2,1];
+    ExtUtils::Command::chmod(@ARGV);
+  }
+}
+
 
 1;
