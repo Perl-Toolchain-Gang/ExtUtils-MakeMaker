@@ -1,3 +1,7 @@
+6.80 Tue Oct 15 16:04:50 BST 2013
+
+    No changes from 6.79_04
+
 6.79_04 Fri Oct 11 18:57:51 BST 2013
     Bug fixes:
     * Add CP_NONEMPTY to the list of tools in Makefile
