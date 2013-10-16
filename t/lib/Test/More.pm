@@ -17,10 +17,10 @@ sub _carp {
     return warn @_, " at $file line $line\n";
 }
 
-our $VERSION = '0.88';
+our $VERSION = '0.99';
 $VERSION = eval $VERSION;    ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
-use Test::Builder::Module;
+use Test::Builder::Module 0.99;
 our @ISA    = qw(Test::Builder::Module);
 our @EXPORT = qw(ok use_ok require_ok
   is isnt like unlike is_deeply
@@ -33,6 +33,7 @@ our @EXPORT = qw(ok use_ok require_ok
   done_testing
   can_ok isa_ok new_ok
   diag note explain
+  subtest
   BAIL_OUT
 );
 
@@ -48,7 +49,6 @@ Test::More - yet another framework for writing test scripts
   # or
   use Test::More;   # see done_testing()
 
-  BEGIN { use_ok( 'Some::Module' ); }
   require_ok( 'Some::Module' );
 
   # Various ways to say "ok"
@@ -243,7 +243,6 @@ exponential".
 All test functions take a name argument.  It's optional, but highly
 suggested that you use it.
 
-
 =head2 I'm ok, you're not ok.
 
 The basic purpose of this module is to print out either "ok #" or "not
@@ -269,7 +268,7 @@ For example:
     ok( $exp{9} == 81,                   'simple exponential' );
     ok( Film->can('db_Main'),            'set_db()' );
     ok( $p->tests == 4,                  'saw tests' );
-    ok( !grep !defined $_, @items,       'items populated' );
+    ok( !grep(!defined $_, @items),      'all items defined' );
 
 (Mnemonic:  "This is ok.")
 
@@ -316,6 +315,11 @@ are similar to these:
 
     ok( ultimate_answer() eq 42,        "Meaning of Life" );
     ok( $foo ne '',     "Got some foo" );
+
+C<undef> will only ever match C<undef>.  So you can test a value
+against C<undef> like this:
+
+    is($not_defined, undef, "undefined as expected");
 
 (Mnemonic:  "This is that."  "This isn't that.")
 
@@ -392,7 +396,7 @@ So this:
 
 is similar to:
 
-    ok( $got =~ /expected/, 'this is like that');
+    ok( $got =~ m/expected/, 'this is like that');
 
 (Mnemonic "This is like that".)
 
@@ -435,8 +439,9 @@ sub unlike ($$;$) {
 
   cmp_ok( $got, $op, $expected, $test_name );
 
-Halfway between ok() and is() lies cmp_ok().  This allows you to
-compare two arguments using any binary perl operator.
+Halfway between C<ok()> and C<is()> lies C<cmp_ok()>.  This allows you
+to compare two arguments using any binary perl operator.  The test
+passes if the comparison is true and fails otherwise.
 
     # ok( $got eq $expected );
     cmp_ok( $got, 'eq', $expected, 'this eq that' );
@@ -462,7 +467,7 @@ is()'s use of C<eq> will interfere:
 
     cmp_ok( $big_hairy_number, '==', $another_big_hairy_number );
 
-It's especially useful when comparing greater-than or smaller-than
+It's especially useful when comparing greater-than or smaller-than 
 relation between values:
 
     cmp_ok( $some_value, '<=', $upper_limit );
@@ -488,9 +493,9 @@ Checks to make sure the $module or $object can do these @methods
 
 is almost exactly like saying:
 
-    ok( Foo->can('this') &&
-        Foo->can('that') &&
-        Foo->can('whatever')
+    ok( Foo->can('this') && 
+        Foo->can('that') && 
+        Foo->can('whatever') 
       );
 
 only without all the typing and with a better interface.  Handy for
@@ -572,57 +577,80 @@ you'd like them to be more specific, you can supply an $object_name
 =cut
 
 sub isa_ok ($$;$) {
-    my( $object, $class, $obj_name ) = @_;
+    my( $thing, $class, $thing_name ) = @_;
     my $tb = Test::More->builder;
 
-    my $diag;
+    my $whatami;
+    if( !defined $thing ) {
+        $whatami = 'undef';
+    }
+    elsif( ref $thing ) {
+        $whatami = 'reference';
 
-    if( !defined $object ) {
-        $obj_name = 'The thing' unless defined $obj_name;
-        $diag = "$obj_name isn't defined";
+        local($@,$!);
+        require Scalar::Util;
+        if( Scalar::Util::blessed($thing) ) {
+            $whatami = 'object';
+        }
     }
     else {
-        my $whatami = ref $object ? 'object' : 'class';
-        # We can't use UNIVERSAL::isa because we want to honor isa() overrides
-        my( $rslt, $error ) = $tb->_try( sub { $object->isa($class) } );
-        if($error) {
-            if( $error =~ /^Can't call method "isa" on unblessed reference/ ) {
-                # Its an unblessed reference
-                $obj_name = 'The reference' unless defined $obj_name;
-                if( !UNIVERSAL::isa( $object, $class ) ) {
-                    my $ref = ref $object;
-                    $diag = "$obj_name isn't a '$class' it's a '$ref'";
-                }
-            }
-            elsif( $error =~ /Can't call method "isa" without a package/ ) {
-                # It's something that can't even be a class
-                $diag = "$obj_name isn't a class or reference";
-            }
-            else {
-                die <<WHOA;
+        $whatami = 'class';
+    }
+
+    # We can't use UNIVERSAL::isa because we want to honor isa() overrides
+    my( $rslt, $error ) = $tb->_try( sub { $thing->isa($class) } );
+
+    if($error) {
+        die <<WHOA unless $error =~ /^Can't (locate|call) method "isa"/;
 WHOA! I tried to call ->isa on your $whatami and got some weird error.
 Here's the error.
 $error
 WHOA
-            }
-        }
-        else {
-            $obj_name = "The $whatami" unless defined $obj_name;
-            if( !$rslt ) {
-                my $ref = ref $object;
-                $diag = "$obj_name isn't a '$class' it's a '$ref'";
-            }
-        }
     }
 
-    my $name = "$obj_name isa $class";
-    my $ok;
-    if($diag) {
-        $ok = $tb->ok( 0, $name );
-        $tb->diag("    $diag\n");
+    # Special case for isa_ok( [], "ARRAY" ) and like
+    if( $whatami eq 'reference' ) {
+        $rslt = UNIVERSAL::isa($thing, $class);
+    }
+
+    my($diag, $name);
+    if( defined $thing_name ) {
+        $name = "'$thing_name' isa '$class'";
+        $diag = defined $thing ? "'$thing_name' isn't a '$class'" : "'$thing_name' isn't defined";
+    }
+    elsif( $whatami eq 'object' ) {
+        my $my_class = ref $thing;
+        $thing_name = qq[An object of class '$my_class'];
+        $name = "$thing_name isa '$class'";
+        $diag = "The object of class '$my_class' isn't a '$class'";
+    }
+    elsif( $whatami eq 'reference' ) {
+        my $type = ref $thing;
+        $thing_name = qq[A reference of type '$type'];
+        $name = "$thing_name isa '$class'";
+        $diag = "The reference of type '$type' isn't a '$class'";
+    }
+    elsif( $whatami eq 'undef' ) {
+        $thing_name = 'undef';
+        $name = "$thing_name isa '$class'";
+        $diag = "$thing_name isn't defined";
+    }
+    elsif( $whatami eq 'class' ) {
+        $thing_name = qq[The class (or class-like) '$thing'];
+        $name = "$thing_name isa '$class'";
+        $diag = "$thing_name isn't a '$class'";
     }
     else {
+        die;
+    }
+
+    my $ok;
+    if($rslt) {
         $ok = $tb->ok( 1, $name );
+    }
+    else {
+        $ok = $tb->ok( 0, $name );
+        $tb->diag("    $diag\n");
     }
 
     return $ok;
@@ -656,7 +684,6 @@ sub new_ok {
     my( $class, $args, $object_name ) = @_;
 
     $args ||= [];
-    $object_name = "The object" unless defined $object_name;
 
     my $obj;
     my( $success, $error ) = $tb->_try( sub { $obj = $class->new(@$args); 1 } );
@@ -665,11 +692,82 @@ sub new_ok {
         isa_ok $obj, $class, $object_name;
     }
     else {
-        $tb->ok( 0, "new() died" );
+        $class = 'undef' if !defined $class;
+        $tb->ok( 0, "$class->new() died" );
         $tb->diag("    Error was:  $error");
     }
 
     return $obj;
+}
+
+=item B<subtest>
+
+    subtest $name => \&code;
+
+subtest() runs the &code as its own little test with its own plan and
+its own result.  The main test counts this as a single test using the
+result of the whole subtest to determine if its ok or not ok.
+
+For example...
+
+  use Test::More tests => 3;
+ 
+  pass("First test");
+
+  subtest 'An example subtest' => sub {
+      plan tests => 2;
+
+      pass("This is a subtest");
+      pass("So is this");
+  };
+
+  pass("Third test");
+
+This would produce.
+
+  1..3
+  ok 1 - First test
+      # Subtest: An example subtest
+      1..2
+      ok 1 - This is a subtest
+      ok 2 - So is this
+  ok 2 - An example subtest
+  ok 3 - Third test
+
+A subtest may call "skip_all".  No tests will be run, but the subtest is
+considered a skip.
+
+  subtest 'skippy' => sub {
+      plan skip_all => 'cuz I said so';
+      pass('this test will never be run');
+  };
+
+Returns true if the subtest passed, false otherwise.
+
+Due to how subtests work, you may omit a plan if you desire.  This adds an
+implicit C<done_testing()> to the end of your subtest.  The following two
+subtests are equivalent:
+
+  subtest 'subtest with implicit done_testing()', sub {
+      ok 1, 'subtests with an implicit done testing should work';
+      ok 1, '... and support more than one test';
+      ok 1, '... no matter how many tests are run';
+  };
+
+  subtest 'subtest with explicit done_testing()', sub {
+      ok 1, 'subtests with an explicit done testing should work';
+      ok 1, '... and support more than one test';
+      ok 1, '... no matter how many tests are run';
+      done_testing();
+  };
+
+=cut
+
+sub subtest {
+    my ($name, $subtests) = @_;
+
+    my $tb = Test::More->builder;
+    return $tb->subtest(@_);
 }
 
 =item B<pass>
@@ -706,21 +804,101 @@ sub fail (;$) {
 
 =head2 Module tests
 
-You usually want to test if the module you're testing loads ok, rather
-than just vomiting if its load fails.  For such purposes we have
-C<use_ok> and C<require_ok>.
+Sometimes you want to test if a module, or a list of modules, can
+successfully load.  For example, you'll often want a first test which
+simply loads all the modules in the distribution to make sure they
+work before going on to do more complicated testing.
+
+For such purposes we have C<use_ok> and C<require_ok>.
 
 =over 4
+
+=item B<require_ok>
+
+   require_ok($module);
+   require_ok($file);
+
+Tries to C<require> the given $module or $file.  If it loads
+successfully, the test will pass.  Otherwise it fails and displays the
+load error.
+
+C<require_ok> will guess whether the input is a module name or a
+filename.
+
+No exception will be thrown if the load fails.
+
+    # require Some::Module
+    require_ok "Some::Module";
+
+    # require "Some/File.pl";
+    require_ok "Some/File.pl";
+
+    # stop testing if any of your modules will not load
+    for my $module (@module) {
+        require_ok $module or BAIL_OUT "Can't load $module";
+    }
+
+=cut
+
+sub require_ok ($) {
+    my($module) = shift;
+    my $tb = Test::More->builder;
+
+    my $pack = caller;
+
+    # Try to determine if we've been given a module name or file.
+    # Module names must be barewords, files not.
+    $module = qq['$module'] unless _is_module_name($module);
+
+    my $code = <<REQUIRE;
+package $pack;
+require $module;
+1;
+REQUIRE
+
+    my( $eval_result, $eval_error ) = _eval($code);
+    my $ok = $tb->ok( $eval_result, "require $module;" );
+
+    unless($ok) {
+        chomp $eval_error;
+        $tb->diag(<<DIAGNOSTIC);
+    Tried to require '$module'.
+    Error:  $eval_error
+DIAGNOSTIC
+
+    }
+
+    return $ok;
+}
+
+sub _is_module_name {
+    my $module = shift;
+
+    # Module names start with a letter.
+    # End with an alphanumeric.
+    # The rest is an alphanumeric or ::
+    $module =~ s/\b::\b//g;
+
+    return $module =~ /^[a-zA-Z]\w*$/ ? 1 : 0;
+}
+
 
 =item B<use_ok>
 
    BEGIN { use_ok($module); }
    BEGIN { use_ok($module, @imports); }
 
-These simply use the given $module and test to make sure the load
-happened ok.  It's recommended that you run use_ok() inside a BEGIN
-block so its functions are exported at compile-time and prototypes are
-properly honored.
+Like C<require_ok>, but it will C<use> the $module in question and
+only loads modules, not files.
+
+If you just want to test a module can be loaded, use C<require_ok>.
+
+If you just want to load a module in a test, we recommend simply using
+C<use> directly.  It will cause the test to stop.
+
+It's recommended that you run use_ok() inside a BEGIN block so its
+functions are exported at compile-time and prototypes are properly
+honored.
 
 If @imports are given, they are passed through to the use.  So this:
 
@@ -749,6 +927,10 @@ because the notion of "compile-time" is relative.  Instead, you want:
   BEGIN { use_ok('Some::Module') }
   BEGIN { ...some code that depends on the use... }
 
+If you want the equivalent of C<use Foo ()>, use a module but not
+import anything, use C<require_ok>.
+
+  BEGIN { require_ok "Foo" }
 
 =cut
 
@@ -758,6 +940,7 @@ sub use_ok ($;@) {
     my $tb = Test::More->builder;
 
     my( $pack, $filename, $line ) = caller;
+    $filename =~ y/\n\r/_/; # so it doesn't run off the "#line $line $f" line
 
     my $code;
     if( @imports == 1 and $imports[0] =~ /^\d+(?:\.\d+)?$/ ) {
@@ -765,6 +948,8 @@ sub use_ok ($;@) {
         # for it to work with non-Exporter based modules.
         $code = <<USE;
 package $pack;
+
+#line $line $filename
 use $module $imports[0];
 1;
 USE
@@ -772,6 +957,8 @@ USE
     else {
         $code = <<USE;
 package $pack;
+
+#line $line $filename
 use $module \@{\$args[0]};
 1;
 USE
@@ -812,56 +999,6 @@ sub _eval {
     return( $eval_result, $eval_error );
 }
 
-=item B<require_ok>
-
-   require_ok($module);
-   require_ok($file);
-
-Like use_ok(), except it requires the $module or $file.
-
-=cut
-
-sub require_ok ($) {
-    my($module) = shift;
-    my $tb = Test::More->builder;
-
-    my $pack = caller;
-
-    # Try to deterine if we've been given a module name or file.
-    # Module names must be barewords, files not.
-    $module = qq['$module'] unless _is_module_name($module);
-
-    my $code = <<REQUIRE;
-package $pack;
-require $module;
-1;
-REQUIRE
-
-    my( $eval_result, $eval_error ) = _eval($code);
-    my $ok = $tb->ok( $eval_result, "require $module;" );
-
-    unless($ok) {
-        chomp $eval_error;
-        $tb->diag(<<DIAGNOSTIC);
-    Tried to require '$module'.
-    Error:  $eval_error
-DIAGNOSTIC
-
-    }
-
-    return $ok;
-}
-
-sub _is_module_name {
-    my $module = shift;
-
-    # Module names start with a letter.
-    # End with an alphanumeric.
-    # The rest is an alphanumeric or ::
-    $module =~ s/\b::\b//g;
-
-    return $module =~ /^[a-zA-Z]\w*$/ ? 1 : 0;
-}
 
 =back
 
@@ -912,7 +1049,7 @@ sub is_deeply {
     unless( @_ == 2 or @_ == 3 ) {
         my $msg = <<'WARNING';
 is_deeply() takes two or three args, you gave %d.
-This usually means you passed an array or hash instead
+This usually means you passed an array or hash instead 
 of a reference to it
 WARNING
         chop $msg;    # clip off newline so carp() will put in line/file
@@ -996,7 +1133,7 @@ sub _type {
 
     return '' if !ref $thing;
 
-    for my $type (qw(ARRAY HASH REF SCALAR GLOB CODE Regexp)) {
+    for my $type (qw(Regexp ARRAY HASH REF SCALAR GLOB CODE)) {
         return $type if UNIVERSAL::isa( $thing, $type );
     }
 
@@ -1041,7 +1178,7 @@ You might remember C<ok() or diag()> with the mnemonic C<open() or
 die()>.
 
 B<NOTE> The exact formatting of the diagnostic output is still
-changing, but it is guaranteed that whatever you throw at it it won't
+changing, but it is guaranteed that whatever you throw at it won't
 interfere with the test.
 
 =item B<note>
@@ -1095,7 +1232,7 @@ sub explain {
 
 Sometimes running a test under certain conditions will cause the
 test script to die.  A certain function or method isn't implemented
-(such as fork() on MacOS), some resource isn't available (like a
+(such as fork() on MacOS), some resource isn't available (like a 
 net connection) or a module isn't available.  In these cases it's
 necessary to skip tests, or declare that they are supposed to fail
 but will work in the future (a todo test).
@@ -1213,9 +1350,6 @@ and you'll know immediately when they're fixed.
 Once a todo test starts succeeding, simply move it outside the block.
 When the block is empty, delete it.
 
-B<NOTE>: TODO tests require a Test::Harness upgrade else it will
-treat it as a normal failure.  See L<CAVEATS and NOTES>).
-
 
 =item B<todo_skip>
 
@@ -1280,7 +1414,7 @@ but want to put tests in your testing script (always a good idea).
     BAIL_OUT($reason);
 
 Indicates to the harness that things are going so badly all testing
-should terminate.  This includes the running any additional test scripts.
+should terminate.  This includes the running of any additional test scripts.
 
 This is typically used when testing cannot continue such as a critical
 module failing to compile or a necessary external utility not being
@@ -1314,7 +1448,7 @@ These functions are usually used inside an ok().
 
     ok( eq_array(\@got, \@expected) );
 
-C<is_deeply()> can do that better and with diagnostics.
+C<is_deeply()> can do that better and with diagnostics.  
 
     is_deeply( \@got, \@expected );
 
@@ -1353,6 +1487,8 @@ sub _eq_array {
         my $e1 = $_ > $#$a1 ? $DNE : $a1->[$_];
         my $e2 = $_ > $#$a2 ? $DNE : $a2->[$_];
 
+        next if _equal_nonrefs($e1, $e2);
+
         push @Data_Stack, { type => 'ARRAY', idx => $_, vals => [ $e1, $e2 ] };
         $ok = _deep_check( $e1, $e2 );
         pop @Data_Stack if $ok;
@@ -1361,6 +1497,21 @@ sub _eq_array {
     }
 
     return $ok;
+}
+
+sub _equal_nonrefs {
+    my( $e1, $e2 ) = @_;
+
+    return if ref $e1 or ref $e2;
+
+    if ( defined $e1 ) {
+        return 1 if defined $e2 and $e1 eq $e2;
+    }
+    else {
+        return 1 if !defined $e2;
+    }
+
+    return;
 }
 
 sub _deep_check {
@@ -1375,9 +1526,6 @@ sub _deep_check {
     local %Refs_Seen = %Refs_Seen;
 
     {
-        # Quiet uninitialized value warnings when comparing undefs.
-        no warnings 'uninitialized';
-
         $tb->_unoverload_str( \$e1, \$e2 );
 
         # Either they're both references or both not.
@@ -1388,7 +1536,7 @@ sub _deep_check {
             $ok = 0;
         }
         elsif( !defined $e1 and !defined $e2 ) {
-            # Shortcut if they're both defined.
+            # Shortcut if they're both undefined.
             $ok = 1;
         }
         elsif( _dne($e1) xor _dne($e2) ) {
@@ -1484,6 +1632,8 @@ sub _eq_hash {
     foreach my $k ( keys %$bigger ) {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
+
+        next if _equal_nonrefs($e1, $e2);
 
         push @Data_Stack, { type => 'HASH', idx => $k, vals => [ $e1, $e2 ] };
         $ok = _deep_check( $e1, $e2 );
@@ -1592,13 +1742,68 @@ If you fail more than 254 tests, it will be reported as 254.
 B<NOTE>  This behavior may go away in future versions.
 
 
+=head1 COMPATIBILITY
+
+Test::More works with Perls as old as 5.8.1.
+
+Thread support is not very reliable before 5.10.1, but that's
+because threads are not very reliable before 5.10.1.
+
+Although Test::More has been a core module in versions of Perl since 5.6.2, Test::More has evolved since then, and not all of the features you're used to will be present in the shipped version of Test::More. If you are writing a module, don't forget to indicate in your package metadata the minimum version of Test::More that you require. For instance, if you want to use C<done_testing()> but want your test script to run on Perl 5.10.0, you will need to explicitly require Test::More > 0.88.
+
+Key feature milestones include:
+
+=over 4
+
+=item subtests
+
+Subtests were released in Test::More 0.94, which came with Perl 5.12.0. Subtests did not implicitly call C<done_testing()> until 0.96; the first Perl with that fix was Perl 5.14.0 with 0.98.
+
+=item C<done_testing()>
+
+This was released in Test::More 0.88 and first shipped with Perl in 5.10.1 as part of Test::More 0.92. 
+
+=item C<cmp_ok()>
+
+Although C<cmp_ok()> was introduced in 0.40, 0.86 fixed an important bug to make it safe for overloaded objects; the fixed first shipped with Perl in 5.10.1 as part of Test::More 0.92.
+
+=item C<new_ok()> C<note()> and C<explain()>
+
+These were was released in Test::More 0.82, and first shipped with Perl in 5.10.1 as part of Test::More 0.92. 
+
+=back
+
+There is a full version history in the Changes file, and the Test::More versions included as core can be found using L<Module::CoreList>:
+
+    $ corelist -a Test::More
+
+
 =head1 CAVEATS and NOTES
 
 =over 4
 
-=item Backwards compatibility
+=item utf8 / "Wide character in print"
 
-Test::More works with Perls as old as 5.6.0.
+If you use utf8 or other non-ASCII characters with Test::More you
+might get a "Wide character in print" warning.  Using C<binmode
+STDOUT, ":utf8"> will not fix it.  Test::Builder (which powers
+Test::More) duplicates STDOUT and STDERR.  So any changes to them,
+including changing their output disciplines, will not be seem by
+Test::More.
+
+One work around is to apply encodings to STDOUT and STDERR as early
+as possible and before Test::More (or any other Test module) loads.
+
+    use open ':std', ':encoding(utf8)';
+    use Test::More;
+
+A more direct work around is to change the filehandles used by
+Test::Builder.
+
+    my $builder = Test::More->builder;
+    binmode $builder->output,         ":encoding(utf8)";
+    binmode $builder->failure_output, ":encoding(utf8)";
+    binmode $builder->todo_output,    ":encoding(utf8)";
 
 
 =item Overloaded objects
@@ -1630,17 +1835,6 @@ This may cause problems:
     use threads;
 
 5.8.1 and above are supported.  Anything below that has too many bugs.
-
-
-=item Test::Harness upgrade
-
-no_plan, todo and done_testing() depend on new Test::Harness features
-and fixes.  If you're going to distribute tests that use no_plan or
-todo your end-users will have to upgrade Test::Harness to the latest
-one on CPAN.  If you avoid no_plan and TODO tests, the stock
-Test::Harness will work fine.
-
-Installing Test::More should also upgrade Test::Harness.
 
 =back
 

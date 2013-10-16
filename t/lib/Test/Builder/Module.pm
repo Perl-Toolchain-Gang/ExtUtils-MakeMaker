@@ -2,22 +2,14 @@ package Test::Builder::Module;
 
 use strict;
 
-use Test::Builder;
+use Test::Builder 0.99;
 
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.88';
+our $VERSION = '0.99';
 $VERSION = eval $VERSION;      ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
-# 5.004's Exporter doesn't have export_to_level.
-my $_export_to_level = sub {
-    my $pkg   = shift;
-    my $level = shift;
-    (undef) = shift;    # redundant arg
-    my $callpkg = caller($level);
-    $pkg->export( $callpkg, @_ );
-};
 
 =head1 NAME
 
@@ -37,7 +29,7 @@ Test::Builder::Module - Base class for test modules
       my $tb = $CLASS->builder;
       return $tb->ok(@_);
   }
-
+  
   1;
 
 
@@ -60,13 +52,13 @@ for you.
 =head3 import
 
 Test::Builder::Module provides an import() method which acts in the
-same basic way as Test::More's, setting the plan and controling
+same basic way as Test::More's, setting the plan and controlling
 exporting of functions and variables.  This allows your module to set
 the plan independent of Test::More.
 
-All arguments passed to import() are passed onto
-C<< Your::Module->builder->plan() >> with the exception of
-C<import =>[qw(things to import)]>.
+All arguments passed to import() are passed onto 
+C<< Your::Module->builder->plan() >> with the exception of 
+C<< import =>[qw(things to import)] >>.
 
     use Your::Module import => [qw(this that)], tests => 23;
 
@@ -98,7 +90,7 @@ sub import {
 
     $test->plan(@_);
 
-    $class->$_export_to_level( 1, $class, @imports );
+    $class->export_to_level( 1, $class, @imports );
 }
 
 sub _strip_imports {
@@ -134,7 +126,7 @@ sub _strip_imports {
 import_extra() is called by import().  It provides an opportunity for you
 to add behaviors to your module based on its import list.
 
-Any extra arguments which shouldn't be passed on to plan() should be
+Any extra arguments which shouldn't be passed on to plan() should be 
 stripped off by this method.
 
 See Test::More for an example of its use.
