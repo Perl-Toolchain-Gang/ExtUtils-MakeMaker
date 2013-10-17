@@ -1,3 +1,10 @@
+6.81_03
+    Doc Fixes:
+    * Clarify heir-apparent in FAQ
+
+    Misc:
+    * Changed GNU-Style to Unix-Style
+
 6.81_02 Thu Oct 17 12:20:59 BST 2013
     Misc:
     * Updated bundled JSON::PP
