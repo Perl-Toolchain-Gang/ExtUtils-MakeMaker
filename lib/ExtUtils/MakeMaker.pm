@@ -1119,7 +1119,7 @@ sub flush {
     my $self = shift;
 
     # This needs a bit more work for more wacky OSen
-    my $type = 'GNU-style';
+    my $type = 'Unix-style';
     if ( $self->os_flavor_is('Win32') ) {
       my $make = $self->make;
       $make = +( File::Spec->splitpath( $make ) )[-1];
