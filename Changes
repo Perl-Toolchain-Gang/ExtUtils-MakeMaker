@@ -1,3 +1,7 @@
+6.81_02 Thu Oct 17 12:20:59 BST 2013
+    Misc:
+    * Updated bundled JSON::PP
+
 6.81_01 Wed Oct 16 08:59:03 BST 2013
     Misc:
     * Updated bundled Test-Simple
