@@ -1126,9 +1126,12 @@ sub flush {
       $make =~ s!\.exe$!!i;
       $type = $make . '-style';
     }
-    print "Generating a $type Makefile\n";
+    elsif ( $Is_VMS ) {
+        $type = $Config{make} . '-style';
+    }
 
     my $finalname = $self->{MAKEFILE};
+    print "Generating a $type $finalname\n";
     print "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
