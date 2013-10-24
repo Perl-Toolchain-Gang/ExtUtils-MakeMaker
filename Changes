@@ -1,9 +1,10 @@
-6.81_03
+6.81_03 Thu Oct 24 20:50:15 BST 2013
     Doc Fixes:
     * Clarify heir-apparent in FAQ
 
     Misc:
     * Changed GNU-Style to Unix-Style
+    * VMS will now report 'make' style
 
 6.81_02 Thu Oct 17 12:20:59 BST 2013
     Misc:
