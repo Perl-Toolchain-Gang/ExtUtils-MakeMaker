@@ -1,4 +1,4 @@
-6.81_05
+6.81_05 Sat Nov  2 21:29:42 GMT 2013
     Misc:
     * Special-case the bundling of version, so
       that XS versions don't get overwritten
