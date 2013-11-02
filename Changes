@@ -1,3 +1,8 @@
+6.81_05
+    Misc:
+    * Special-case the bundling of version, so
+      that XS versions don't get overwritten
+
 6.81_04 Fri Nov  1 19:54:09 GMT 2013
     Doc fixes:
     * Update XSPROTOARG docs for changes in xsubpp
