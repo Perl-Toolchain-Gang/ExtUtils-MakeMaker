@@ -244,4 +244,14 @@ critic : .perlcriticrc
 END
 
     }
+
+    sub special_targets {
+      my $make_frag = shift->SUPER::special_targets(@_);
+      $make_frag .= <<'MAKE_FRAG';
+.NOTPARALLEL: pure_all
+
+MAKE_FRAG
+      return $make_frag;
+    }
+
 }
