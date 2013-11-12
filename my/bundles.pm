@@ -48,6 +48,11 @@ my %special_dist = (
         # Special case for version, never override the XS version with a
         # pure Perl version.  Just check that it's there.
         my $installed = find_installed("version.pm");
+        if ( $] == 5.010000 ) {
+          # Special special case
+          my $installed_version = $installed ? MM->parse_version( $installed ) : 0;
+          return should_use_dist('version') if $installed_version < 0.77;
+        }
         return if $installed;
 
         my $inc_version = MM->parse_version("$bundle_dir/version/version.pm");
