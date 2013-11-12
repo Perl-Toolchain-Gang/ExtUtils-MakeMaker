@@ -1,3 +1,7 @@
+6.83_02 Tue Nov 12 11:11:34 GMT 2013
+    Misc:
+    * Enable bootstrapping to work on v5.10.x again
+
 6.83_01 Tue Nov  5 11:43:50 GMT 2013
     Misc:
     * disable make parallelism for pure_all target
