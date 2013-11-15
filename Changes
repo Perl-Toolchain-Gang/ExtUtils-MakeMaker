@@ -1,3 +1,7 @@
+6.83_03 Fri Nov 15 09:44:26 GMT 2013
+    Bug fixes:
+    * Don't recurse into stale dist dirs
+
 6.83_02 Tue Nov 12 11:11:34 GMT 2013
     Misc:
     * Enable bootstrapping to work on v5.10.x again
