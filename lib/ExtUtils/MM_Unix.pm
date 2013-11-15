@@ -1274,10 +1274,14 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     $Is{VMS} ? $ignore{"$self->{DISTVNAME}.dir"} = 1
             : $ignore{$self->{DISTVNAME}} = 1;
 
+    my $distprefix = $Is{VMS} ? qr/^\Q$self->{DISTNAME}\E-.*\.dir$/i
+                              : qr/^\Q$self->{DISTNAME}-/;
+
     @ignore{map lc, keys %ignore} = values %ignore if $Is{VMS};
 
     foreach my $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
+	next if $name =~ $distprefix;
 	$name = lc($name) if $Is{VMS};
 	next if $name eq $Curdir or $name eq $Updir or $ignore{$name};
 	next unless $self->libscan($name);
