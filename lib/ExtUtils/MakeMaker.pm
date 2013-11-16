@@ -87,6 +87,7 @@ my %Special_Sigs = (
  MAN3PODS           => 'HASH',
  META_ADD           => 'HASH',
  META_MERGE         => 'HASH',
+ OBJECT             => ['ARRAY', ''],
  PL_FILES           => 'HASH',
  PM                 => 'HASH',
  PMLIBDIRS          => 'ARRAY',
@@ -2270,8 +2271,8 @@ Makefile.PL, use it interactively instead.
 =item OBJECT
 
 List of object files, defaults to '$(BASEEXT)$(OBJ_EXT)', but can be a long
-string containing all object files, e.g. "tkpBind.o
-tkpButton.o tkpCanvas.o"
+string or an array containing all object files, e.g. "tkpBind.o
+tkpButton.o tkpCanvas.o" or ["tkpBind.o", "tkpButton.o", "tkpCanvas.o"]
 
 (Where BASEEXT is the last component of NAME, and OBJ_EXT is $Config{obj_ext}.)
 

@@ -2154,6 +2154,7 @@ sub init_others {
     }
 
     if ( $self->{OBJECT} ) {
+        $self->{OBJECT} = join(" ", map { "\"$_\"" } @{$self->{OBJECT}}) if ref $self->{OBJECT};
         $self->{OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
     } else {
         # init_dirscan should have found out, if we have C files
