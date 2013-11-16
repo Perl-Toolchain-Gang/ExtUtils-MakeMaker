@@ -1266,7 +1266,7 @@ Called by init_main.
 
 sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my($self) = @_;
-    my(%dir, %xs, %c, %h, %pl_files, %pm);
+    my(%dir, %xs, %c, %o, %h, %pl_files, %pm);
 
     my %ignore = map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t);
 
@@ -1278,6 +1278,13 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
                               : qr/^\Q$self->{DISTNAME}-/;
 
     @ignore{map lc, keys %ignore} = values %ignore if $Is{VMS};
+
+    if ( defined $self->{XS} and !defined $self->{C} ) {
+	my @c_files = grep { m/\.c(pp|xx)?\z/i } values %{$self->{XS}};
+	my @o_files = grep { m/(?:.(?:o(?:bj)?)|\$\(OBJ_EXT\))\z/i } values %{$self->{XS}};
+	%c = map { $_ => 1 } @c_files;
+	%o = map { $_ => 1 } @o_files;
+    }
 
     foreach my $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
@@ -1323,7 +1330,8 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     $self->{PM}         ||= \%pm;
 
     my @o_files = @{$self->{C}};
-    $self->{O_FILES} = [grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @o_files];
+    %o = (%o, map { $_ => 1 } grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @o_files);
+    $self->{O_FILES} = [sort keys %o];
 }
 
 
