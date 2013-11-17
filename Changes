@@ -1,3 +1,8 @@
+6.83_04 Sun Nov 17 11:41:43 GMT 2013
+    New Features:
+    * OBJECT can now be specified as an array
+    * build C_FILES/O_FILES/OBJECT automatically from XS
+
 6.83_03 Fri Nov 15 09:44:26 GMT 2013
     Bug fixes:
     * Don't recurse into stale dist dirs
