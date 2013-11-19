@@ -3249,6 +3249,54 @@ static :: $(FIRST_MAKEFILE) $(INST_STATIC)
 ';
 }
 
+=item static_lib_pure_cmd
+
+Defines how to run the archive utility
+
+=cut
+
+sub static_lib_pure_cmd
+{
+    my ($self, $src) = @_;
+    my $ar;
+    if (exists $self->{FULL_AR} && -x $self->{FULL_AR}) {
+        # Prefer the absolute pathed ar if available so that PATH
+        # doesn't confuse us.  Perl itself is built with the full_ar.
+        $ar = 'FULL_AR';
+    } else {
+        $ar = 'AR';
+    }
+
+    return sprintf('	$(%s) $(AR_STATIC_ARGS) $@ %s && $(RANLIB) $@', $ar, $src);
+}
+
+=item static_lib_template
+
+Defines how to produce any *.a (or equivalent) files.
+
+=cut
+
+sub static_lib_template
+{
+    my ($self, $target, $deps, $src, $fixtures, $closures) = @_;
+
+    my @m;
+    push(@m, <<"EOINTRO");
+${target}: ${deps}
+	\$(RM_RF) \$@
+EOINTRO
+
+    @$fixtures and push(@m, @$fixtures);
+    push @m, $self->static_lib_pure_cmd($src);
+    push @m, <<'MAKE_FRAG';
+	$(CHMOD) $(PERM_RWX) $@
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)$(DFSEP)extralibs.ld
+MAKE_FRAG
+    @$closures and push(@m, @$closures);
+
+    return @m;
+}
+
 =item static_lib (o)
 
 Defines how to produce the *.a (or equivalent) files.
@@ -3259,37 +3307,22 @@ sub static_lib {
     my($self) = @_;
     return '' unless $self->has_link_code;
 
-    my(@m);
-    push(@m, <<'END');
-
-$(INST_STATIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(RM_RF) $@
-END
-
+    my (@f,@m,@c);
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, <<'MAKE_FRAG') if $self->{MYEXTLIB};
+    push(@f, <<'MAKE_FRAG') if $self->{MYEXTLIB};
 	$(CP) $(MYEXTLIB) $@
 MAKE_FRAG
 
-    my $ar;
-    if (exists $self->{FULL_AR} && -x $self->{FULL_AR}) {
-        # Prefer the absolute pathed ar if available so that PATH
-        # doesn't confuse us.  Perl itself is built with the full_ar.
-        $ar = 'FULL_AR';
-    } else {
-        $ar = 'AR';
-    }
-    push @m, sprintf <<'MAKE_FRAG', $ar;
-	$(%s) $(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@
-	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
+    # Old mechanism - still available:
+    push @c, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)$(DFSEP)ext.libs
 MAKE_FRAG
 
-    # Old mechanism - still available:
-    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
-MAKE_FRAG
+    @m = $self->static_lib_template(
+		'$(INST_STATIC)',
+		'$(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists',
+		'$(OBJECT)', \@f, \@c);
 
     join('', @m);
 }

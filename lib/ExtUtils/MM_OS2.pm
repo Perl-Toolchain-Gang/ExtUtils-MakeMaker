@@ -91,18 +91,20 @@ $self->{BASEEXT}.def: Makefile.PL
     join('',@m);
 }
 
-sub static_lib {
-    my($self) = @_;
-    my $old = $self->ExtUtils::MM_Unix::static_lib();
-    return $old unless $self->{IMPORTS} && %{$self->{IMPORTS}};
+=item static_lib_template
 
-    my @chunks = split /\n{2,}/, $old;
-    shift @chunks unless length $chunks[0]; # Empty lines at the start
-    $chunks[0] .= <<'EOC';
+Defines how to produce any *.lib (or equivalent) files.
 
-	$(AR) $(AR_STATIC_ARGS) $@ tmp_imp/* && $(RANLIB) $@
-EOC
-    return join "\n\n". '', @chunks;
+=cut
+
+sub static_lib_template
+{
+    my ($self, $target, $deps, $src, $fixtures, $closures) = @_;
+
+    my @m = $self->ExtUtils::MM_Unix::static_lib_template($target, $deps, $src, $fixtures, $closures);
+    push @m, q{	$(AR) $(AR_STATIC_ARGS) $@ tmp_imp/* && $(RANLIB) $@};
+
+    return @m;
 }
 
 sub replace_manpage_separator {

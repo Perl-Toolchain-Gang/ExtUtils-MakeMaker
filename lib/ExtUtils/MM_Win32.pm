@@ -280,48 +280,21 @@ MAKE_FRAG
     return $make_frag;
 }
 
+=item static_lib_pure_cmd
 
-=item static_lib
-
-Changes how to run the linker.
-
-The rest is duplicate code from MM_Unix.  Should move the linker code
-to its own method.
+Defines how to run the archive utility
 
 =cut
 
-sub static_lib {
-    my($self) = @_;
-    return '' unless $self->has_link_code;
+sub static_lib_pure_cmd
+{
+    my ($self, $src) = @_;
 
-    my(@m);
-    push(@m, <<'END');
-$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(RM_RF) $@
-END
-
-    # If this extension has its own library (eg SDBM_File)
-    # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push @m, <<'MAKE_FRAG' if $self->{MYEXTLIB};
-	$(CP) $(MYEXTLIB) $@
-MAKE_FRAG
-
-    push @m,
-q{	$(AR) }.($BORLAND ? '$@ $(OBJECT:^"+")'
-			  : ($GCC ? '-ru $@ $(OBJECT)'
-			          : '-out:$@ $(OBJECT)')).q{
-	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
-};
-
-    # Old mechanism - still available:
-    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
-MAKE_FRAG
-
-    join('', @m);
+    $BORLAND and $src =~ s/(\$\(\w+)(\))/$1:^"+"$2/g;
+    return q{	$(AR) }.($BORLAND ? '$@ ' . $src
+			  : ($GCC ? '-ru $@ ' . $src
+			          : '-out:$@ ' . $src));
 }
-
 
 =item dynamic_lib
 
