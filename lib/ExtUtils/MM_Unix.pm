@@ -3335,29 +3335,74 @@ subdirs_static ::
 ';
 }
 
-=item static_lib (o)
-
-Defines how to produce the *.a (or equivalent) files.
-
-=cut
-
 sub static_lib {
     my($self) = @_;
     return '' unless $self->has_link_code;
-
     my(@m);
-    push(@m, <<'END');
+    my @libs;
+    @libs = ([ qw($(OBJECT) $(INST_STATIC) $(INST_ARCHAUTODIR)) ]);
+    push @m, map { $self->xs_make_static_lib(@$_); } @libs;
+    join "\n", @m;
+}
 
-$(INST_STATIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(RM_RF) $@
-END
+=item xs_make_static_lib
 
+Defines the recipes for the C<static_lib> section.
+
+=cut
+
+sub xs_make_static_lib {
+    my ($self, $from, $to, $todir) = @_;
+    my @m = sprintf '%s: %s $(MYEXTLIB) %s$(DFSEP).exists'."\n", $to, $from, $todir;
+    push @m, "\t\$(RM_F) \"\$\@\"\n";
+    push @m, $self->static_lib_fixtures;
+    push @m, $self->static_lib_pure_cmd($from);
+    push @m, "\t\$(CHMOD) \$(PERM_RWX) \$\@\n";
+    push @m, $self->static_lib_closures($todir);
+    join '', @m;
+}
+
+=item static_lib_closures
+
+Records C<$(EXTRALIBS)> in F<extralibs.ld> and F<$(PERL_SRC)/ext.libs>.
+
+=cut
+
+sub static_lib_closures {
+    my ($self, $todir) = @_;
+    my @m = sprintf <<'MAKE_FRAG', $todir;
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > %s$(DFSEP)extralibs.ld
+MAKE_FRAG
+    # Old mechanism - still available:
+    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)$(DFSEP)ext.libs
+MAKE_FRAG
+    @m;
+}
+
+=item static_lib_fixtures
+
+Handles copying C<$(MYEXTLIB)> as starter for final static library that
+then gets added to.
+
+=cut
+
+sub static_lib_fixtures {
+    my ($self) = @_;
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, <<'MAKE_FRAG') if $self->{MYEXTLIB};
-	$(CP) $(MYEXTLIB) "$@"
-MAKE_FRAG
+    return unless $self->{MYEXTLIB};
+    "\t\$(CP) \$(MYEXTLIB) \"\$\@\"\n";
+}
 
+=item static_lib_pure_cmd
+
+Defines how to run the archive utility.
+
+=cut
+
+sub static_lib_pure_cmd {
+    my ($self, $from) = @_;
     my $ar;
     if (exists $self->{FULL_AR} && -x $self->{FULL_AR}) {
         # Prefer the absolute pathed ar if available so that PATH
@@ -3366,18 +3411,10 @@ MAKE_FRAG
     } else {
         $ar = 'AR';
     }
-    push @m, sprintf <<'MAKE_FRAG', $ar;
-	$(%s) $(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@
-	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > "$(INST_ARCHAUTODIR)/extralibs.ld"
+    sprintf <<'MAKE_FRAG', $ar, $from;
+	$(%s) $(AR_STATIC_ARGS) "$@" %s
+	$(RANLIB) "$@"
 MAKE_FRAG
-
-    # Old mechanism - still available:
-    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> "$(PERL_SRC)/ext.libs"
-MAKE_FRAG
-
-    join('', @m);
 }
 
 =item staticmake (o)

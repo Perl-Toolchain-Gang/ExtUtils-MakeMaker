@@ -139,50 +139,18 @@ MAKE_FRAG
 
 }
 
+=item static_lib_pure_cmd
 
-=item static_lib
+Defines how to run the archive utility
 
 =cut
 
-sub static_lib {
-    my($self) = @_;
-
-    return '' unless $self->has_link_code;
-
-    my $m = <<'END';
-$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(RM_RF) $@
-END
-
-    # If this extension has it's own library (eg SDBM_File)
-    # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    $m .= <<'END'  if $self->{MYEXTLIB};
-	$self->{CP} $(MYEXTLIB) $@
-END
-
-    my $ar_arg;
-    if( $BORLAND ) {
-        $ar_arg = '$@ $(OBJECT:^"+")';
-    }
-    elsif( $GCC ) {
-        $ar_arg = '-ru $@ $(OBJECT)';
-    }
-    else {
-        $ar_arg = '-type library -o $@ $(OBJECT)';
-    }
-
-    $m .= sprintf <<'END', $ar_arg;
-	$(AR) %s
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
-	$(CHMOD) 755 $@
-END
-
-    $m .= <<'END' if $self->{PERL_SRC};
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
-
-
-END
-    return $m;
+sub static_lib_pure_cmd {
+    my ($self, $src) = @_;
+    $src =~ s/(\$\(\w+)(\))/$1:^"+"$2/g if $BORLAND;
+    sprintf qq{\t\$(AR) %s\n}, ($BORLAND ? '$@ ' . $src
+                          : ($GCC ? '-ru $@ ' . $src
+                                  : '-type library -o $@ ' . $src));
 }
 
 =item dynamic_lib

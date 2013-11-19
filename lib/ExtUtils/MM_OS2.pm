@@ -91,18 +91,14 @@ $self->{BASEEXT}.def: Makefile.PL
     join('',@m);
 }
 
-sub static_lib {
+sub static_lib_pure_cmd {
     my($self) = @_;
-    my $old = $self->ExtUtils::MM_Unix::static_lib();
+    my $old = $self->SUPER::static_lib_pure_cmd;
     return $old unless $self->{IMPORTS} && %{$self->{IMPORTS}};
-
-    my @chunks = split /\n{2,}/, $old;
-    shift @chunks unless length $chunks[0]; # Empty lines at the start
-    $chunks[0] .= <<'EOC';
-
-	$(AR) $(AR_STATIC_ARGS) $@ tmp_imp/* && $(RANLIB) $@
+    $old . <<'EOC';
+	$(AR) $(AR_STATIC_ARGS) "$@" tmp_imp/*
+	$(RANLIB) "$@"
 EOC
-    return join "\n\n". '', @chunks;
 }
 
 sub replace_manpage_separator {
