@@ -316,7 +316,7 @@ sub full_setup {
 
  special_targets
  c_o xs_c xs_o
- top_targets blibdirs linkext dlsyms dynamic dynamic_bs
+ top_targets blibdirs linkext dlsyms dynamic_bs dynamic
  dynamic_lib static static_lib manifypods processPL
  installbin subdirs
  clean_subdirs clean realclean_subdirs realclean
