@@ -1,4 +1,8 @@
-6.83_05
+6.83_05 Mon Nov 25 22:51:11 GMT 2013
+    New Features:
+    * Added MAGICXS attribute to explicitly enable automagic
+      XS building.
+
     Bug fixes:
     * RT#90780 fix Macro `BOOTSTRAP' redefined warnings
     * Only enable automatic OBJECT generation if MAGICXS is true
