@@ -2085,6 +2085,15 @@ Defaults to "unknown".
 config.sh). Should only be used to force static linking (also see
 linkext below).
 
+=item MAGICXS
+
+When this is set to C<1>, C<C_FILES>, C<O_FILES> and C<OBJECT> will
+be automagically derived from C<XS>.
+
+  * when XS is given, but neither C (C_FILES), values of %XS are sorted
+    into C/O_FILES
+  * when no OBJECT is given, but XS or C, derive OBJECT from O_FILES
+
 =item MAKE
 
 Variant of make you intend to run the generated Makefile with.  This
