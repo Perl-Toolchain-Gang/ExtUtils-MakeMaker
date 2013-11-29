@@ -1,3 +1,7 @@
+6.83_06 Fri Nov 29 21:50:51 GMT 2013
+    Doc fixes:
+    * Correct the documentation for MAGICXS
+
 6.83_05 Mon Nov 25 22:51:11 GMT 2013
     New Features:
     * Added MAGICXS attribute to explicitly enable automagic
