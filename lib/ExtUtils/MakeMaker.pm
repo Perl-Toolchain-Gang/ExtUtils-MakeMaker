@@ -280,8 +280,8 @@ sub full_setup {
     NORECURS NO_VC OBJECT OPTIMIZE PERL_MALLOC_OK PERL PERLMAINCC PERLRUN
     PERLRUNINST PERL_CORE
     PERL_SRC PERM_DIR PERM_RW PERM_RWX MAGICXS
-    PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE PPM_INSTALL_EXEC
-    PPM_INSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
+    PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE PPM_INSTALL_EXEC PPM_UNINSTALL_EXEC
+    PPM_INSTALL_SCRIPT PPM_UNINSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
     SIGN SKIP TEST_REQUIRES TYPEMAPS UNINST VERSION VERSION_FROM XS XSOPT XSPROTOARG
     XS_VERSION clean depend dist dynamic_lib linkext macro realclean
     tool_autosplit
@@ -2480,6 +2480,15 @@ Name of the executable used to run C<PPM_INSTALL_SCRIPT> below. (e.g. perl)
 
 Name of the script that gets executed by the Perl Package Manager after
 the installation of a package.
+
+=item PPM_UNINSTALL_EXEC
+
+Name of the executable used to run C<PPM_UNINSTALL_SCRIPT> below. (e.g. perl)
+
+=item PPM_UNINSTALL_SCRIPT
+
+Name of the script that gets executed by the Perl Package Manager before
+the removal of a package.
 
 =item PREFIX
 

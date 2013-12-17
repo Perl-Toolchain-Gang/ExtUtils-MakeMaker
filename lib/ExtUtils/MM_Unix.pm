@@ -2983,6 +2983,17 @@ PPD_OUT
         }
     }
 
+    if ($self->{PPM_UNINSTALL_SCRIPT}) {
+        if ($self->{PPM_UNINSTALL_EXEC}) {
+            $ppd_xml .= sprintf qq{        <UNINSTALL EXEC="%s">%s</UNINSTALL>\n},
+                  $self->{PPM_UNINSTALL_EXEC}, $self->{PPM_UNINSTALL_SCRIPT};
+        }
+        else {
+            $ppd_xml .= sprintf qq{        <UNINSTALL>%s</UNINSTALL>\n},
+                  $self->{PPM_UNINSTALL_SCRIPT};
+        }
+    }
+
     my ($bin_location) = $self->{BINARY_LOCATION} || '';
     $bin_location =~ s/\\/\\\\/g;
 
