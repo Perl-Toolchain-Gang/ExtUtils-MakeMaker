@@ -1,3 +1,8 @@
+6.85_02 Tue Dec 17 10:13:28 GMT 2013
+    New features:
+    * Added PPM_UNINSTALL_EXEC and PPM_UNINSTALL_SCRIPT options
+      to PPD generation
+
 6.85_01 Mon Dec 16 13:15:43 GMT 2013
     Bug Fixes:
     * harden xsubpp locating loop in MM_Unix
