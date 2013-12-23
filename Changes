@@ -1,3 +1,7 @@
+6.85_03 Mon Dec 23 14:55:37 GMT 2013
+    Bug fixes:
+    * RT#91540 PREREQ_FATAL not recognised on command line
+
 6.85_02 Tue Dec 17 10:13:28 GMT 2013
     New features:
     * Added PPM_UNINSTALL_EXEC and PPM_UNINSTALL_SCRIPT options
