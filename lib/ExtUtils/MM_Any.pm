@@ -995,17 +995,6 @@ sub metafile_data {
     # The author key is required and it takes a list.
     $meta{author}   = defined $self->{AUTHOR}    ? $self->{AUTHOR} : [];
 
-    # Check the original args so we can tell between the user setting it
-    # to an empty hash and it just being initialized.
-    if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
-        $meta{configure_requires}
-            = _normalize_prereqs($self->{CONFIGURE_REQUIRES});
-    } else {
-        $meta{configure_requires} = {
-            'ExtUtils::MakeMaker'       => 0,
-        };
-    }
-
     {
       my $vers = _metaspec_version( $meta_add, $meta_merge );
       my $method = $vers =~ m!^2!
@@ -1046,6 +1035,15 @@ sub _add_requirements_to_meta_v1_4 {
 
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
+    if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
+        $meta{configure_requires}
+            = _normalize_prereqs($self->{CONFIGURE_REQUIRES});
+    } else {
+        $meta{configure_requires} = {
+            'ExtUtils::MakeMaker'       => 0,
+        };
+    }
+
     if( $self->{ARGS}{BUILD_REQUIRES} ) {
         $meta{build_requires} = _normalize_prereqs($self->{BUILD_REQUIRES});
     } else {
@@ -1074,6 +1072,15 @@ sub _add_requirements_to_meta_v2 {
 
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
+    if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
+        $meta{prereqs}{configure}{requires}
+            = _normalize_prereqs($self->{CONFIGURE_REQUIRES});
+    } else {
+        $meta{prereqs}{configure}{requires} = {
+            'ExtUtils::MakeMaker'       => 0,
+        };
+    }
+
     if( $self->{ARGS}{BUILD_REQUIRES} ) {
         $meta{prereqs}{build}{requires} = _normalize_prereqs($self->{BUILD_REQUIRES});
     } else {

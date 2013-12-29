@@ -417,6 +417,7 @@ my $new_mm = sub {
             },
             configure => {
                 requires => {
+                    'ExtUtils::MakeMaker'   => 0,
                 },
             },
             build    => {
