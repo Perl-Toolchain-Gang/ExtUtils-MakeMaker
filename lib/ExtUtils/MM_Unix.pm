@@ -1594,6 +1594,8 @@ sub init_main {
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
+    # We require DynaLoader to make sure that mod2fname is loaded
+    eval { require DynaLoader };
     if (defined &DynaLoader::mod2fname) {
         $modfname = &DynaLoader::mod2fname(\@modparts);
     }
