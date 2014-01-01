@@ -1,3 +1,10 @@
+6.85_07 Wed Jan  1 18:55:22 GMT 2014
+    Bug fixes:
+    * Expanded test coverage for metafiles
+
+    Doc fixes:
+    * Documentation expanded to mention JSON metafiles
+
 6.85_06 Mon Dec 30 23:14:37 GMT 2013
     Bug fixes:
     * Explicitly require dynaloader before using mod2fname
