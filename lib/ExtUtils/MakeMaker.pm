@@ -1686,10 +1686,9 @@ Available in version 6.5503 and above.
 
 A hash of modules that are needed to build your module but not run it.
 
-This will go into the C<build_requires> field of your CPAN Meta file.
-(F<META.yml> or F<META.json>).
+This will go into the C<build_requires> field of your F<META.yml> and the C<build> of the C<prereqs> field of your F<META.json>.
 
-Defaults to C<<< { "ExtUtils::MakeMaker" => 0 } >>>
+Defaults to C<<< { "ExtUtils::MakeMaker" => 0 } >>> if this attribute is not specified.
 
 The format is the same as PREREQ_PM.
 
@@ -1738,10 +1737,9 @@ Available in version 6.52 and above.
 A hash of modules that are required to run Makefile.PL itself, but not
 to run your distribution.
 
-This will go into the C<configure_requires> field of your CPAN Meta file
-(F<META.yml> or F<META.json>)
+This will go into the C<configure_requires> field of your F<META.yml> and the C<configure> of the C<prereqs> field of your F<META.json>.
 
-Defaults to C<<< { "ExtUtils::MakeMaker" => 0 } >>>
+Defaults to C<<< { "ExtUtils::MakeMaker" => 0 } >>> if this attribute is not specified.
 
 The format is the same as PREREQ_PM.
 
@@ -2543,8 +2541,7 @@ A hash of modules that are needed to run your module.  The keys are
 the module names ie. Test::More, and the minimum version is the
 value. If the required version number is 0 any version will do.
 
-This will go into the C<requires> field of your CPAN Meta file
-(F<META.yml> or F<META.json>).
+This will go into the C<requires> field of your F<META.yml> and the C<runtime> of the C<prereqs> field of your F<META.json>.
 
     PREREQ_PM => {
         # Require Test::More at least 0.47
@@ -2616,8 +2613,7 @@ if you really need it.
 A hash of modules that are needed to test your module but not run or
 build it.
 
-This will go into the C<test_requires> field of your CPAN Meta file.
-(F<META.yml> or F<META.json>).
+This will go into the C<build_requires> field of your F<META.yml> and the C<test> of the C<prereqs> field of your F<META.json>.
 
 The format is the same as PREREQ_PM.
 
