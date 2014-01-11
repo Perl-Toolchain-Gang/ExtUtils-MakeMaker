@@ -2610,6 +2610,8 @@ if you really need it.
 
 =item TEST_REQUIRES
 
+Available in version 6.64 and above.
+
 A hash of modules that are needed to test your module but not run or
 build it.
 
