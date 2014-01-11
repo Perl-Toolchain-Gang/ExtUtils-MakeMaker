@@ -37,6 +37,7 @@ BEGIN {
     $Is{BSD}     = ($^O =~ /^(?:free|net|open)bsd$/ or
                    grep( $^O eq $_, qw(bsdos interix dragonfly) )
                   );
+    $Is{Android} = $Config{cppsymbols} =~ /\b__ANDROID__=1\b/;
 }
 
 BEGIN {
@@ -943,6 +944,8 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
         } elsif ($Config{'lddlflags'} =~ /-R/) {
             $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -R$(PERL_ARCHLIB)/CORE -lperl';
         }
+    } elsif ($Is{Android} && $Config{'useshrplib'} eq 'true') {
+        $libs .= ' -L$(PERL_INC) -lperl';
     }
 
     my $ld_run_path_shell = "";
