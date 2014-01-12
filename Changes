@@ -1,3 +1,7 @@
+6.87_01 Sun Jan 12 10:31:41 GMT 2014
+    Doc fixes:
+    * mention that TEST_REQUIRES is in v6.64 and above
+
 6.86 Sat Jan  4 12:17:53 GMT 2014
 
     No changes from 6.85_07
