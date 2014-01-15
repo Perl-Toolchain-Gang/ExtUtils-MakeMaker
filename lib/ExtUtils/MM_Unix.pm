@@ -33,11 +33,11 @@ BEGIN {
     $Is{Interix} = $^O eq 'interix';
     $Is{SunOS4}  = $^O eq 'sunos';
     $Is{Solaris} = $^O eq 'solaris';
+    $Is{Android} = $^O =~ /android/;
     $Is{SunOS}   = $Is{SunOS4} || $Is{Solaris};
     $Is{BSD}     = ($^O =~ /^(?:free|net|open)bsd$/ or
                    grep( $^O eq $_, qw(bsdos interix dragonfly) )
                   );
-    $Is{Android} = $Config{cppsymbols} =~ /\b__ANDROID__=1\b/;
 }
 
 BEGIN {
@@ -934,7 +934,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
 
     my $libs = '$(LDLOADLIBS)';
 
-    if (($Is{NetBSD} || $Is{Interix}) && $Config{'useshrplib'} eq 'true') {
+    if (($Is{NetBSD} || $Is{Interix} || $Is{Android}) && $Config{'useshrplib'} eq 'true') {
 	# Use nothing on static perl platforms, and to the flags needed
 	# to link against the shared libperl library on shared perl
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
@@ -943,9 +943,11 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
             $libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -Wl,-R$(PERL_ARCHLIB)/CORE -lperl';
         } elsif ($Config{'lddlflags'} =~ /-R/) {
             $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -R$(PERL_ARCHLIB)/CORE -lperl';
+        } elsif ($Is{Android}) {
+            # The Android linker will not recognize symbols from
+            # libperl unless the module explicitly depends on it.
+            $libs .= ' -L$(PERL_INC) -lperl';
         }
-    } elsif ($Is{Android} && $Config{'useshrplib'} eq 'true') {
-        $libs .= ' -L$(PERL_INC) -lperl';
     }
 
     my $ld_run_path_shell = "";
