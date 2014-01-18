@@ -2083,10 +2083,10 @@ MakeMaker will turn it into an array with one element.
 
 Available in version 6.31 and above.
 
-The licensing terms of your distribution.  Generally it's "perl" for the
+The licensing terms of your distribution.  Generally it's "perl_5" for the
 same license as Perl itself.
 
-See L<Module::Build::API> for the list of options.
+See L<CPAN::Meta::Spec> for the list of options.
 
 Defaults to "unknown".
 
