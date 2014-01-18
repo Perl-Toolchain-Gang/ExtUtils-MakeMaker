@@ -1,3 +1,10 @@
+6.87_02 Sat Jan 18 13:00:36 GMT 2014
+    Doc fixes:
+    * Update documentation for LICENSE attribute.
+
+    Bug fixes:
+    * Get rid of unused printf arguments in dir_target
+
 6.87_01 Sun Jan 12 10:31:41 GMT 2014
     Doc fixes:
     * mention that TEST_REQUIRES is in v6.64 and above
