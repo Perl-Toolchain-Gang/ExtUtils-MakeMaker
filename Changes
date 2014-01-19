@@ -1,3 +1,7 @@
+6.87_03 Sun Jan 19 17:49:43 GMT 2014
+    Bug fixes:
+    * Get rid of unused printf arguments in dynamic_bs
+
 6.87_02 Sat Jan 18 13:00:36 GMT 2014
     Doc fixes:
     * Update documentation for LICENSE attribute.
