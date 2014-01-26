@@ -10,12 +10,13 @@ use strict;
 use File::Path;
 use Config;
 
-use Test::More
-    $ENV{PERL_CORE} && $Config{'usecrosscompile'}
-    ? (skip_all => "no toolchain installed when cross-compiling")
-    : (tests => 20);
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
+use IPC::Cmd qw(can_run);
+use Test::More
+    can_run(make())
+    ? (tests => 20)
+    : (skip_all => "make not available");
 
 my $Is_VMS = $^O eq 'VMS';
 
