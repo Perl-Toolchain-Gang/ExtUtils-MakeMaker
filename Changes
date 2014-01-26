@@ -1,3 +1,7 @@
+6.87_04 Sun Jan 26 19:29:05 GMT 2014
+    Bug fixes:
+    * On Android, pass PERL_LIB through rel2abs().
+
 6.87_03 Sun Jan 19 17:49:43 GMT 2014
     Bug fixes:
     * Get rid of unused printf arguments in dynamic_bs
