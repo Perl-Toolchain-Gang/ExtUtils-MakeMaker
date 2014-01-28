@@ -1,3 +1,7 @@
+6.87_05 Tue Jan 28 13:54:21 GMT 2014
+    Bug fixes:
+    * Synchronisation with blead to remove old cross-compilation model
+
 6.87_04 Sun Jan 26 19:29:05 GMT 2014
     Bug fixes:
     * On Android, pass PERL_LIB through rel2abs().
