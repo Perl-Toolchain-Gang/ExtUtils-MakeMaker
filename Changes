@@ -1,3 +1,7 @@
+6.88 Fri Jan 31 20:49:13 GMT 2014
+
+    No changes from 6.87_05
+
 6.87_05 Tue Jan 28 13:54:21 GMT 2014
     Bug fixes:
     * Synchronisation with blead to remove old cross-compilation model
