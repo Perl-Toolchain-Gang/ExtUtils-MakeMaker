@@ -28,10 +28,10 @@ sub _unix_os2_ext {
     my ( $self, $potential_libs, $verbose, $give_libs ) = @_;
     $verbose ||= 0;
 
-    if ( $^O =~ 'os2' and $Config{perllibs} ) {
+    if ( $^O =~ /os2|android/ and $Config{perllibs} ) {
 
         # Dynamic libraries are not transitive, so we may need including
-        # the libraries linked against perl.dll again.
+        # the libraries linked against perl.dll/libperl.so again.
 
         $potential_libs .= " " if $potential_libs;
         $potential_libs .= $Config{perllibs};
