@@ -1,3 +1,7 @@
+6.89_01 Mon Feb 17 15:56:39 GMT 2014
+    Bug fixes:
+    * Libraries are not transitive on Android
+
 6.88 Fri Jan 31 20:49:13 GMT 2014
 
     No changes from 6.87_05
