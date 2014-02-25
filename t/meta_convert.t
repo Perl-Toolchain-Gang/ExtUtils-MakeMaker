@@ -41,7 +41,7 @@ note "Filename as version"; {
     );
 
     my $res = $warn_ok->(
-        sub { eval { $mm->metafile_target } },
+        sub { eval { $mm->metafile_target('echo') } },
         qr{Can't parse version 'Recursive.pm'}
     );
     ok $res, 'we know how to deal with bogus versions defined in Makefile.PL';
@@ -55,7 +55,7 @@ note "'undef' version from parse_version"; {
         VERSION  => 'undef',
     );
     my $res = $warn_ok->(
-        sub { eval { $mm->metafile_target } },
+        sub { eval { $mm->metafile_target('echo') } },
         qr{Can't parse version 'undef'}
     );
     ok $res, q|when there's no $VERSION in Module.pm, $self->{VERSION} = 'undef'; via MM_Unix::parse_version and we know how to deal with that|;
@@ -71,7 +71,7 @@ note "x.y.z version"; {
 
     # It would be more useful if the warning got translated to visible characters
     my $res = $warn_ok->(
-        sub { eval { $mm->metafile_target } },
+        sub { eval { $mm->metafile_target('echo') } },
         qr{Can't parse version '\x00\x00\x03'}
     );
     ok $res, q|we know how to deal with our $VERSION = 0.0.3; style versions defined in the module|;
@@ -85,7 +85,7 @@ note ".5 version"; {
         VERSION  => '.5',
     );
     my $res = $warn_ok->(
-        sub { eval { $mm->metafile_target } },
+        sub { eval { $mm->metafile_target('echo') } },
         qr{Can't parse version '.5'}
     );
     ok $res, q|we know how to deal with our $VERSION = '.5'; style versions defined in the module|;
@@ -103,7 +103,7 @@ note "Non-camel case metadata"; {
             },
         },
     );
-    my $res = eval { $mm->metafile_target };
+    my $res = eval { $mm->metafile_target('echo') };
     ok $res, q|we know how to deal with non-camel-cased custom meta resource keys defined in Makefile.PL|;
     like $res, qr/x_Repositoryclone/, "they're camel-cased";
 }
@@ -122,6 +122,6 @@ note "version object in provides"; {
             }
         },
     );
-    my $res = eval { $mm->metafile_target };
+    my $res = eval { $mm->metafile_target('echo') };
     like $res, qr{version: \s* v1.2.3}x;
 }

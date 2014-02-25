@@ -247,6 +247,47 @@ sub echo {
     return @cmds;
 }
 
+=head3 base64
+
+    my @commands = $MM->base64($text);
+    my @commands = $MM->base64($text, $file);
+    my @commands = $MM->base64($text, $file, \%opts);
+
+Generates a set of @commands which print the $text to a $file.
+
+If $file is not given, output goes to STDOUT.
+
+If $opts{append} is true the $file will be appended to rather than
+overwritten.  Default is to overwrite.
+
+Example of use:
+
+    my $make = map "\t$_\n", $MM->base64($text, $file);
+
+=cut
+
+sub base64 {
+    my($self, $text, $file, $opts) = @_;
+
+    # Compatibility with old options
+    if( !ref $opts ) {
+        my $append = $opts;
+        $opts = { append => $append || 0 };
+    }
+    $opts->{allow_variables} = 0 unless defined $opts->{allow_variables};
+
+    my $ql_opts = { allow_variables => $opts->{allow_variables} };
+    my @cmds = map { '$(NOECHO) $(DECODE_BASE64) '.$self->quote_literal($_, $ql_opts) }
+               map { $self->_encode_base64($_,'') }
+               split /\n/, $text;
+    if( $file ) {
+        my $redirect = $opts->{append} ? '>>' : '>';
+        $cmds[0] .= " $redirect $file";
+        $_ .= " >> $file" foreach @cmds[1..$#cmds];
+    }
+
+    return @cmds;
+}
 
 =head3 wraplist
 
@@ -814,6 +855,7 @@ The format follows Module::Build's as closely as possible.
 
 sub metafile_target {
     my $self = shift;
+    my $method = shift;
     return <<'MAKE_FRAG' if $self->{NO_META} or ! _has_cpan_meta();
 metafile :
 	$(NOECHO) $(NOOP)
@@ -842,10 +884,12 @@ MAKE_FRAG
         $meta = bless \%metadata, 'CPAN::Meta';
     }
 
-    my @write_metayml = $self->echo(
+    $method = 'base64' unless $method && $method eq 'echo';
+
+    my @write_metayml = $self->$method(
       $meta->as_string({version => "1.4"}), 'META_new.yml'
     );
-    my @write_metajson = $self->echo(
+    my @write_metajson = $self->$method(
       $meta->as_string(), 'META_new.json'
     );
 
@@ -2047,6 +2091,7 @@ Defines at least these macros.
   TEST_S            Test the size of a file
   CP                Copy a file
   CP_NONEMPTY       Copy a file if it is not empty
+  DECODE_BASE64     Decode Base64 encoded text
   MV                Move a file
   CHMOD             Change permissions on a file
   FALSE             Exit with non-zero
@@ -2070,6 +2115,7 @@ sub init_tools {
     $self->{TEST_F}   ||= $self->oneliner('test_f', ["-MExtUtils::Command"]);
     $self->{TEST_S}   ||= $self->oneliner('test_s', ["-MExtUtils::Command::MM"]);
     $self->{CP_NONEMPTY} ||= $self->oneliner('cp_nonempty', ["-MExtUtils::Command::MM"]);
+    $self->{DECODE_BASE64} ||= $self->oneliner('decode_base64', ["-MExtUtils::Command::MM"]);
     $self->{FALSE}    ||= $self->oneliner('exit 1');
     $self->{TRUE}     ||= $self->oneliner('exit 0');
 
@@ -2222,6 +2268,7 @@ sub tools_other {
                       PM_FILTER
                       FIXIN
                       CP_NONEMPTY
+                      DECODE_BASE64
                     } )
     {
         next unless defined $self->{$tool};
@@ -2765,6 +2812,55 @@ sub _perl_header_files_fragment {
            . "\$(OBJECT) : \$(PERL_HDRS)\n";
 }
 
+=begin private
+
+=head3 _encode_base64($str)
+
+Encode data by calling the encode_base64() function.  The first
+argument is the string to encode.  The second argument is the
+line-ending sequence to use.  It is optional and defaults to "\n".  The
+returned encoded string is broken into lines of no more than 76
+characters each and it will end with $eol unless it is empty.  Pass an
+empty string as second argument if you do not want the encoded string
+to be broken into lines.
+
+=end private
+
+=cut
+
+# Stolen from MIME::Base64::Perl
+sub _encode_base64 {
+    my $self = shift;
+
+    if ($] >= 5.006) {
+        require bytes;
+        if (bytes::length($_[0]) > length($_[0]) ||
+            ($] >= 5.008 && $_[0] =~ /[^\0-\xFF]/))
+        {
+            die("The Base64 encoding is only defined for bytes");
+        }
+    }
+
+    use integer;
+
+    my $eol = $_[1];
+    $eol = "\n" unless defined $eol;
+
+    my $res = pack("u", $_[0]);
+    # Remove first character of each line, remove newlines
+    $res =~ s/^.//mg;
+    $res =~ s/\n//g;
+
+    $res =~ tr|` -_|AA-Za-z0-9+/|;               # `# help emacs
+    # fix padding at the end
+    my $padding = (3 - length($_[0]) % 3) % 3;
+    $res =~ s/.{$padding}$/'=' x $padding/e if $padding;
+    # break encoded string into lines of no more than 76 characters each
+    if (length $eol) {
+        $res =~ s/(.{1,76})/$1$eol/g;
+    }
+    return $res;
+}
 
 =head1 AUTHOR
 
