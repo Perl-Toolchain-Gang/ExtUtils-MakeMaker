@@ -2937,12 +2937,18 @@ sub ppd {
 <SOFTPKG NAME="$(DISTNAME)" VERSION="$(VERSION)">
 PPD_HTML
 
-    my $ppd_xml = sprintf <<'PPD_HTML', $abstract, $author;
+    my $ppd_abstract = sprintf <<'PPD_ABSTRACT', $abstract;
     <ABSTRACT>%s</ABSTRACT>
-    <AUTHOR>%s</AUTHOR>
-PPD_HTML
+PPD_ABSTRACT
 
-    $ppd_xml .= "    <IMPLEMENTATION>\n";
+    my $ppd_author = sprintf <<'PPD_AUTHOR', $author;
+    <AUTHOR>%s</AUTHOR>
+PPD_AUTHOR
+
+    push @ppd_cmds, $self->echo($ppd_abstract, $ppd_file, { append => 1 });
+    push @ppd_cmds, $self->base64($ppd_author, $ppd_file, { append => 1 });
+
+    my $ppd_xml = "    <IMPLEMENTATION>\n";
     if ( $self->{MIN_PERL_VERSION} ) {
         my $min_perl_version = $self->_ppd_version($self->{MIN_PERL_VERSION});
         $ppd_xml .= sprintf <<'PPD_PERLVERS', $min_perl_version;
