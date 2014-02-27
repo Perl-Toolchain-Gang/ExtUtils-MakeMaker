@@ -317,6 +317,11 @@ Takes Base64 encoded string and prints decoded text on C<STDOUT>.
 =cut
 
 sub decode_base64 {
+    eval { require MIME::Base64; };
+    unless ($@) {
+      print STDOUT MIME::Base64::decode_base64(@ARGV), "\n";
+      return 1;
+    }
     local($^W) = 0; # unpack("u",...) gives bogus warning in 5.00[123]
     use integer;
 

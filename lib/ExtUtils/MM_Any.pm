@@ -2832,6 +2832,11 @@ to be broken into lines.
 sub _encode_base64 {
     my $self = shift;
 
+    eval { require MIME::Base64; };
+    unless ($@) {
+      return MIME::Base64::encode_base64(@_);
+    }
+
     if ($] >= 5.006) {
         require bytes;
         if (bytes::length($_[0]) > length($_[0]) ||
