@@ -84,6 +84,13 @@ else {
    my::bundles::copy_bundles("bundled", "inc");
 }
 
+if ( $Extra_Params{PERL} ) {
+  $Extra_Params{PERL} .= ' -Ilib';
+}
+else {
+  $Extra_Params{PERL} = "$^X -Ilib";
+}
+
 # Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
 # when a test had -T.  This made it too long.  So we need a Test::Harness
 # > 2.00 on VMS for t/testlib.t
