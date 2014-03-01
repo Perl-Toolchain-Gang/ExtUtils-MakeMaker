@@ -9,7 +9,7 @@ use File::Basename;
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
-use ExtUtils::MakeMaker qw($Verbose);
+use ExtUtils::MakeMaker qw($Verbose open_for_writing);
 
 use ExtUtils::MakeMaker::Config;
 
@@ -657,7 +657,7 @@ clean :: clean_subdirs
 ');
 
     my @files = sort values %{$self->{XS}}; # .c files from *.xs files
-    my @dirs  = qw(blib);
+    my @dirs  = qw(blib _eumm);
 
     # Normally these are all under blib but they might have been
     # redefined.
@@ -980,22 +980,40 @@ MAKE_FRAG
         $meta = bless \%metadata, 'CPAN::Meta';
     }
 
-    my @write_metayml = $self->echo(
-      $meta->as_string({version => "1.4"}), 'META_new.yml'
-    );
-    my @write_metajson = $self->echo(
-      $meta->as_string(), 'META_new.json'
-    );
+    {
+      mkdir '_eumm';
+      my $metayml = $meta->as_string({version => "1.4"});
+      chomp $metayml;
+      my $metajsn = $meta->as_string();
+      chomp $metajsn;
+      my $fh = open_for_writing('_eumm/genmeta');
+      printf $fh <<'EUMMMETA', 'META_new.yml', $metayml, 'META_new.json', $metajsn;
+use strict;
+use warnings;
+{
+  open my $fh, '>', '%s' or die "Error $!\n";
+  print $fh <<'METAYML';
+%s
+METAYML
+  close $fh
+}
+{
+  open my $fh, '>', '%s' or die "Error $!\n";
+  print $fh <<'METAJSON';
+%s
+METAJSON
+  close $fh
+}
+EUMMMETA
+      close $fh or die "Could not write genmeta: $!\n";
+    }
 
-    my $metayml = join("\n\t", @write_metayml);
-    my $metajson = join("\n\t", @write_metajson);
-    return sprintf <<'MAKE_FRAG', $metayml, $metajson;
+    return sprintf <<'MAKE_FRAG';
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
-	%s
-	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
-	%s
+	$(NOECHO) $(ABSPERL) _eumm/genmeta
+	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 MAKE_FRAG
 

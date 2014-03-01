@@ -11,7 +11,7 @@ use DirHandle;
 
 our %Config_Override;
 
-use ExtUtils::MakeMaker qw($Verbose neatvalue);
+use ExtUtils::MakeMaker qw($Verbose neatvalue open_for_writing);
 
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);
@@ -3062,7 +3062,22 @@ PPD_OUT
 </SOFTPKG>
 PPD_XML
 
-    push @ppd_cmds, $self->echo($ppd_xml, $ppd_file, { append => 1 });
+    {
+      mkdir '_eumm';
+      chomp $ppd_xml;
+      my $fh = open_for_writing('_eumm/genppd');
+      printf $fh <<'EUMMPPD', $ppd_xml;
+use strict;
+use warnings;
+$|=1;
+print STDOUT <<'EOF';
+%s
+EOF
+EUMMPPD
+      close $fh or die "Could not write EUMMppd: $!\n";
+    }
+
+    push @ppd_cmds, '$(NOECHO) $(ABSPERL) _eumm/genppd >> ' . $ppd_file;
 
     return sprintf <<'PPD_OUT', join "\n\t", @ppd_cmds;
 # Creates a PPD (Perl Package Description) for a binary distribution.
