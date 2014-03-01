@@ -9,7 +9,7 @@ use File::Basename;
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
-use ExtUtils::MakeMaker qw($Verbose);
+use ExtUtils::MakeMaker qw($Verbose write_file_via_tmp);
 
 use ExtUtils::MakeMaker::Config;
 
@@ -22,6 +22,7 @@ my $Updir   = __PACKAGE__->updir;
 
 my $METASPEC_URL = 'https://metacpan.org/pod/CPAN::Meta::Spec';
 my $METASPEC_V = 2;
+my $STASHDIR = '_eumm';
 
 =head1 NAME
 
@@ -365,7 +366,15 @@ at build-time.
 
 sub stashmeta {
     my($self, $text, $file) = @_;
-    $self->echo($text, $file, { allow_variables => 0, append => 0 });
+    -d $STASHDIR or die "$STASHDIR: $!" unless mkdir $STASHDIR;
+    my $stashfile = File::Spec->catfile($STASHDIR, $file);
+    write_file_via_tmp($stashfile, [ $text ]);
+    my $qlfile = $self->quote_literal($file);
+    my $qlstashfile = $self->quote_literal($stashfile);
+    (
+	sprintf('-$(NOECHO) $(RM_F) %s', $qlfile),
+	sprintf('-$(NOECHO) $(CP) %s %s', $qlstashfile, $qlfile),
+    );
 }
 
 
@@ -687,7 +696,7 @@ clean :: clean_subdirs
 ');
 
     my @files = sort values %{$self->{XS}}; # .c files from *.xs files
-    my @dirs  = qw(blib);
+    my @dirs  = qw(blib _eumm);
 
     # Normally these are all under blib but they might have been
     # redefined.
