@@ -1,3 +1,7 @@
+6.92 Thu Mar 13 16:18:32 GMT 2014
+
+    No changes from 6.91_01
+
 6.91_01 Thu Mar  6 13:48:22 GMT 2014
     Test fixes:
     * Make meta tests more robust to changes in CPAN::Meta
