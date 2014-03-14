@@ -36,7 +36,7 @@ our $Filename = __FILE__;   # referenced outside MakeMaker
 our @ISA = qw(Exporter);
 our @EXPORT    = qw(&WriteMakefile $Verbose &prompt);
 our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
-                    &WriteEmptyMakefile &open_for_writing);
+                    &WriteEmptyMakefile &open_for_writing &write_file_via_tmp);
 
 # These will go away once the last of the Win32 & VMS specific code is
 # purged.
@@ -1175,52 +1175,44 @@ sub open_for_writing {
 sub flush {
     my $self = shift;
 
-    # This needs a bit more work for more wacky OSen
-    my $type = 'Unix-style';
-    if ( $self->os_flavor_is('Win32') ) {
-      my $make = $self->make;
-      $make = +( File::Spec->splitpath( $make ) )[-1];
-      $make =~ s!\.exe$!!i;
-      $type = $make . '-style';
-    }
-    elsif ( $Is_VMS ) {
-        $type = $Config{make} . '-style';
-    }
-
     my $finalname = $self->{MAKEFILE};
-    print "Generating a $type $finalname\n";
+    printf "Generating a %s %s\n", $self->make_type, $finalname;
     print "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
-    my $fh = open_for_writing("MakeMaker.tmp");
 
-    for my $chunk (@{$self->{RESULT}}) {
+    write_file_via_tmp($finalname, $self->{RESULT});
+
+    # Write MYMETA.yml to communicate metadata up to the CPAN clients
+    print "Writing MYMETA.yml and MYMETA.json\n"
+      if !$self->{NO_MYMETA} and $self->write_mymeta( $self->mymeta );
+
+    # save memory
+    if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
+        my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
+        delete $self->{$_} for grep !$keep{$_}, keys %$self;
+    }
+
+    system("$Config::Config{eunicefix} $finalname")
+      if $Config::Config{eunicefix} ne ":";
+
+    return;
+}
+
+sub write_file_via_tmp {
+    my ($finalname, $contents) = @_;
+    my $fh = open_for_writing("MakeMaker.tmp");
+    die "write_file_via_tmp: 2nd arg must be ref" unless ref $contents;
+    for my $chunk (@$contents) {
         my $to_write = $chunk;
         utf8::encode $to_write if !$CAN_DECODE && $] > 5.008;
         print $fh "$to_write\n" or die "Can't write to MakeMaker.tmp: $!";
     }
-
-    close $fh
-        or die "Can't write to MakeMaker.tmp: $!";
+    close $fh or die "Can't write to MakeMaker.tmp: $!";
     _rename("MakeMaker.tmp", $finalname) or
       warn "rename MakeMaker.tmp => $finalname: $!";
-    chmod 0644, $finalname unless $Is_VMS;
-
-    unless ($self->{NO_MYMETA}) {
-        # Write MYMETA.yml to communicate metadata up to the CPAN clients
-        if ( $self->write_mymeta( $self->mymeta ) ) {
-            print "Writing MYMETA.yml and MYMETA.json\n";
-        }
-
-    }
-    my %keep = map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE);
-    if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
-        foreach (keys %$self) { # safe memory
-            delete $self->{$_} unless $keep{$_};
-        }
-    }
-
-    system("$Config::Config{eunicefix} $finalname") unless $Config::Config{eunicefix} eq ":";
+    chmod 0644, $finalname if !$Is_VMS;
+    return;
 }
 
 # This is a rename for OS's where the target must be unlinked first.
