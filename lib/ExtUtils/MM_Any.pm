@@ -681,7 +681,7 @@ clean :: clean_subdirs
     }
 
     push(@files, qw[$(MAKE_APERL_FILE)
-                    MYMETA.json MYMETA.yml perlmain.c tmon.out mon.out so_locations
+                    MYMETA.json MYMETA.yml Makefile.pm perlmain.c tmon.out mon.out so_locations
                     blibdirs.ts pm_to_blib pm_to_blib.ts
                     *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
                     $(BOOTSTRAP) $(BASEEXT).bso

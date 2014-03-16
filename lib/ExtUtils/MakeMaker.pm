@@ -814,10 +814,9 @@ sub WriteEmptyMakefile {
     if (-f $old) {
         _unlink($old) or warn "unlink $old: $!";
     }
-    if ( -f $new ) {
-        _rename($new, $old) or warn "rename $new => $old: $!"
-    }
-    open my $mfh, '>', $new or die "open $new for write: $!";
+    _rename($new, $old) if -f $new;
+    my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
+    open my $mfh, ">$utf8", $new or die "open $new for write: $!";
     print $mfh <<'EOP';
 all :
 
@@ -1219,6 +1218,10 @@ sub flush {
 
     $self->_write_file_via_tmp($finalname, $self->{RESULT});
 
+    push @{$self->{RESULT_PM}}, "1;";
+
+    $self->_write_file_via_tmp("$finalname.pm", $self->{RESULT_PM});
+
     # Write MYMETA.yml to communicate metadata up to the CPAN clients
     print "Writing MYMETA.yml and MYMETA.json\n"
       if !$self->{NO_MYMETA} and $self->write_mymeta( $self->mymeta );
@@ -1252,14 +1255,13 @@ sub _make_type {
 sub _write_file_via_tmp {
     my ($self, $finalname, $contents) = @_;
     my $fh = open_for_writing("MakeMaker.tmp");
-    for my $chunk (@{$self->{RESULT}}) {
+    for my $chunk (@$contents) {
         my $to_write = $chunk;
         utf8::encode $to_write if !$CAN_DECODE && $] > 5.008;
         print $fh "$to_write\n" or die "Can't write to MakeMaker.tmp: $!";
     }
     close $fh or die "Can't write to MakeMaker.tmp: $!";
-    _rename("MakeMaker.tmp", $finalname) or
-      warn "rename MakeMaker.tmp => $finalname: $!";
+    _rename("MakeMaker.tmp", $finalname);
     chmod 0644, $finalname if !$Is_VMS;
     return;
 }
@@ -1269,7 +1271,7 @@ sub _rename {
     my($src, $dest) = @_;
     chmod 0666, $dest;
     unlink $dest;
-    return rename $src, $dest;
+    rename $src, $dest or warn "rename $src => $dest: $!"
 }
 
 # This is an unlink for OS's where the target must be writable first.
