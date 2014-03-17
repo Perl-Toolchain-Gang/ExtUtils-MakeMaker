@@ -993,23 +993,17 @@ MAKE_FRAG
         $meta = bless \%metadata, 'CPAN::Meta';
     }
 
-    my @write_metayml = $self->echo(
-      $meta->as_string({version => "1.4"}), 'META_new.yml'
-    );
-    my @write_metajson = $self->echo(
-      $meta->as_string(), 'META_new.json'
-    );
+    my ($ymlpm, $jsonpm) = map $self->_new_makepm("metafile_target"), 1..2;
+    push @{$self->{RESULT_PM}}, join "",
+      $self->echopm( $ymlpm, $meta->as_string( { version => "1.4" } ) ),
+      $self->echopm( $jsonpm, $meta->as_string );
 
-    my $metayml = join("\n\t", @write_metayml);
-    my $metajson = join("\n\t", @write_metajson);
-    return sprintf <<'MAKE_FRAG', $metayml, $metajson;
+    return sprintf <<'MAKE_FRAG', $self->pmrun($ymlpm), $self->pmrun($jsonpm);
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
-	%s
-	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
+	%s > $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
-	%s
-	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
+	%s > $(DISTVNAME)/META.json
 MAKE_FRAG
 
 }
