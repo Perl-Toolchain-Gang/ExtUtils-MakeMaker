@@ -760,11 +760,15 @@ NOOP_FRAG
     my $clean = "clean_subdirs :\n";
 
     for my $dir (@{$self->{DIR}}) {
-        my $subclean = $self->oneliner(sprintf <<'CODE', $dir);
-exit 0 unless chdir '%s';  system '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
+        my $makepm = $self->_new_makepm("clean_subdirs_target");
+        my $pm_run = $self->pmrun($makepm);
+        my $subclean = $self->pm($makepm, sprintf <<"CODE", $dir, $self->{MAKE}, $self->{FIRST_MAKEFILE});
+    exit 0 unless chdir '%s';
+    system '%s clean' if -f '%s';
 CODE
 
-        $clean .= "\t$subclean\n";
+        $clean .= "\t$pm_run\n";
+        push @{$self->{RESULT_PM}}, $subclean;
     }
 
     return $clean;
