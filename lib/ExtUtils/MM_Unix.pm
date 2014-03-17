@@ -723,15 +723,19 @@ depends on $(DIST_DEFAULT).
 sub dist_target {
     my($self) = shift;
 
-    my $date_check = $self->oneliner(<<'CODE', ['-l']);
-print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
-    if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(FIRST_MAKEFILE)';
+    my $makepm = $self->_new_makepm("dist_target");
+
+    push @{$self->{RESULT_PM}}, $self->pm($makepm, <<'CODE', ($self->{VERSION_FROM})x 3, $self->{FIRST_MAKEFILE});
+    print 'Warning: Makefile possibly out of date with %s'
+      if -e '%s' and -M '%s' < -M '%s';
 CODE
 
+    my $date_check = $self->pmrun($makepm);
     return sprintf <<'MAKE_FRAG', $date_check;
 dist : $(DIST_DEFAULT) $(FIRST_MAKEFILE)
 	$(NOECHO) %s
 MAKE_FRAG
+
 }
 
 =item B<tardist_target>
