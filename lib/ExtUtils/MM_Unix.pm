@@ -2983,13 +2983,11 @@ sub ppd {
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 
-    my $ppd_file = '$(DISTNAME).ppd';
-
-    my @ppd_cmds = $self->echo(<<'PPD_HTML', $ppd_file, { append => 0, allow_variables => 1 });
-<SOFTPKG NAME="$(DISTNAME)" VERSION="$(VERSION)">
+    my $ppd_xml = (<<"PPD_HTML");
+<SOFTPKG NAME="%s" VERSION="%s">
 PPD_HTML
 
-    my $ppd_xml = sprintf <<'PPD_HTML', $abstract, $author;
+    $ppd_xml .= sprintf <<"PPD_HTML", $abstract, $author;
     <ABSTRACT>%s</ABSTRACT>
     <AUTHOR>%s</AUTHOR>
 PPD_HTML
@@ -3062,12 +3060,14 @@ PPD_OUT
 </SOFTPKG>
 PPD_XML
 
-    push @ppd_cmds, $self->echo($ppd_xml, $ppd_file, { append => 1 });
+    my $makepm = $self->_new_makepm("ppd");
+    push @{$self->{RESULT_PM}}, $self->echopm( $makepm, $ppd_xml);
 
-    return sprintf <<'PPD_OUT', join "\n\t", @ppd_cmds;
+    my $pmrun = $self->pmrun($makepm);
+    return sprintf <<'PPD_OUT', $pmrun;
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	%s
+	%s -- $(DISTNAME) $(VERSION) > $(DISTNAME).ppd
 PPD_OUT
 
 }
