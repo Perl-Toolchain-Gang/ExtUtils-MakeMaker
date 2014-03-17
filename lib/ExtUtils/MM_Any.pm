@@ -1660,9 +1660,12 @@ distdir.
 sub distsignature_target {
     my $self = shift;
 
-    my $add_sign = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
-eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }
-    or print "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
+    my $makepm = $self->_new_makepm("distsignature_target");
+
+    push @{$self->{RESULT_PM}}, $self->pm( $makepm, <<'CODE');
+    use ExtUtils::Manifest 'maniadd';
+    eval { maniadd( { 'SIGNATURE' => 'Public-key signature (added by MakeMaker)' } ) }
+      or print "Could not add SIGNATURE to MANIFEST: $@\n"
 CODE
 
     my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s');
@@ -1670,7 +1673,7 @@ CODE
     # cpansign -s complains if SIGNATURE is in the MANIFEST yet does not
     # exist
     my $touch_sig        = $self->cd('$(DISTVNAME)' => '$(TOUCH) SIGNATURE');
-    my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $add_sign );
+    my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $self->pmrun($makepm, '..') );
 
     return sprintf <<'MAKE', $add_sign_to_dist, $touch_sig, $sign_dist
 distsignature : distmeta
