@@ -1615,15 +1615,16 @@ NOOP_FRAG
     my $rclean = "realclean_subdirs :\n";
 
     foreach my $dir (@{$self->{DIR}}) {
-        foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
-            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
-chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
+        foreach my $makefile ($self->{MAKEFILE_OLD}, $self->{FIRST_MAKEFILE}) {
+            my $makepm = $self->_new_makepm("realclean_subdirs_target");
+            my $pm_run = $self->pmrun($makepm);
+            my $subrclean = $self->pm($makepm, sprintf <<'CODE', $dir, $self->{MAKE}, $self->{USEMAKEFILE}, ($makefile) x 2);
+    chdir '%s';
+    system '%s %s %s realclean' if -f '%s';
 CODE
 
-            $rclean .= sprintf <<'RCLEAN', $subrclean;
-	- %s
-RCLEAN
-
+            $rclean .= "	- $pm_run\n";
+            push @{$self->{RESULT_PM}}, $subrclean;
         }
     }
 
