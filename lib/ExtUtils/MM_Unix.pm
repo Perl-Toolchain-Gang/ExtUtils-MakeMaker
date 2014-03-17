@@ -2904,23 +2904,23 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 sub pm_to_blib {
     my $self = shift;
-    my($autodir) = $self->catdir('$(INST_LIB)','auto');
-    my $r = q{
-pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
-};
+    my($autodir) = $self->catdir($self->{INST_LIB},'auto');
+    my $dirs = join ", ", map qq["$_"], map quotemeta, map { ($_, $self->{PM}->{$_}) } sort keys %{$self->{PM}};
+    my $makepm = $self->_new_makepm("pm_to_blib");
 
-    # VMS will swallow '' and PM_FILTER is often empty.  So use q[]
-    my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, '$autodir', q[\$(PM_FILTER)], '\$(PERM_DIR)')
+    push @{$self->{RESULT_PM}}, $self->pm($makepm, sprintf <<"CODE", $dirs, $autodir, $self->{PM_FILTER}||'', $self->{PERM_DIR});
+    use ExtUtils::Install;
+    pm_to_blib({%s}, '%s', '%s', '%s')
 CODE
 
-    my @cmds = $self->split_command($pm_to_blib,
-                  map { ($_, $self->{PM}->{$_}) } sort keys %{$self->{PM}});
+    my $pm_run = $self->pmrun($makepm);
+    return sprintf <<'MAKE', $pm_run;
+pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
+	$(NOECHO) %s
+	$(NOECHO) $(TOUCH) pm_to_blib
 
-    $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
-    $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
+MAKE
 
-    return $r;
 }
 
 =item post_constants (o)

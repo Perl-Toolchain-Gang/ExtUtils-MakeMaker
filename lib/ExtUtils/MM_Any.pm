@@ -1775,7 +1775,7 @@ sub init_INST {
     }
 
     my @parentdir = split(/::/, $self->{PARENT_NAME});
-    $self->{INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     @parentdir);
+    $self->{INST_LIBDIR}      = $self->catdir($self->{INST_LIB}, @parentdir);
     $self->{INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', @parentdir);
     $self->{INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto',
                                               '$(FULLEXT)');
