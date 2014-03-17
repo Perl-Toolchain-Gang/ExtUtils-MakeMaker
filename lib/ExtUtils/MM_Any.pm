@@ -2541,14 +2541,17 @@ pm_to_blib soon.
 sub tool_autosplit {
     my($self, %attribs) = @_;
 
-    my $maxlen = $attribs{MAXLEN} ? '$$AutoSplit::Maxlen=$attribs{MAXLEN};'
+    my $maxlen = $attribs{MAXLEN} ? '$AutoSplit::Maxlen=$attribs{MAXLEN};'
                                   : '';
-
-    my $asplit = $self->oneliner(sprintf <<'PERL_CODE', $maxlen);
-use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)
+    my $makepm = $self->_new_makepm("tool_autosplit");
+    push @{$self->{RESULT_PM}}, $self->pm($makepm, sprintf <<'PERL_CODE', $maxlen);
+    use AutoSplit;
+    %s
+    autosplit($ARGV[0], $ARGV[1], 0, 1, 1);
 PERL_CODE
 
-    return sprintf <<'MAKE_FRAG', $asplit;
+    my $pmrun = $self->pmrun($makepm);
+    my $make = sprintf <<'MAKE_FRAG', $pmrun;
 # Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
 AUTOSPLITFILE = %s
 
