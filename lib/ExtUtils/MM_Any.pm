@@ -384,6 +384,19 @@ sub echo {
     return @cmds;
 }
 
+sub echopm {
+    my ($self, $sub, $text) = @_;
+
+    my $echopm = sprintf <<'ECHOPM', quotemeta $text;
+    binmode STDOUT;
+    my $text = "%s";
+    $text = sprintf $text, @ARGV if @ARGV;
+    print $text;
+ECHOPM
+
+    return $self->pm($sub, $echopm);
+}
+
 
 =head3 wraplist
 
@@ -2883,5 +2896,26 @@ ExtUtils::MM_Win32.
 
 
 =cut
+
+sub pmrun {
+    my ($self, $makepm, $lib) = @_;
+    my $cmd = '$(PERLRUN)';
+    $cmd .= " -I$lib" if $lib;
+    return "$cmd -MMakefile -e $makepm";
+}
+
+sub _new_makepm {
+    my ( $self, $name ) = @_;
+    my $id = $#{$self->{MAKEPM}} + 1;
+    my $makepm = sprintf "m%05d_$name", $id;
+    push @{$self->{MAKEPM}}, $makepm;
+    return $makepm;
+}
+
+sub pm {
+    my ($self, $sub, $code) = @_;
+    my $pm = sprintf "sub %s {\n%s}\n", $sub, $code;
+    return $pm;
+}
 
 1;
