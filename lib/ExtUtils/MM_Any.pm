@@ -1420,20 +1420,18 @@ in the distdir.
 sub distmeta_target {
     my $self = shift;
 
-    my @add_meta = (
-      $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']),
-exit unless -e q{META.yml};
-eval { maniadd({q{META.yml} => q{Module YAML meta-data (added by MakeMaker)}}) }
-    or print "Could not add META.yml to MANIFEST: $${'@'}\n"
-CODE
-      $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd'])
-exit unless -f q{META.json};
-eval { maniadd({q{META.json} => q{Module JSON meta-data (added by MakeMaker)}}) }
-    or print "Could not add META.json to MANIFEST: $${'@'}\n"
-CODE
-    );
+    my ($yamlpm, $jsonpm) = map $self->_new_makepm("distmeta_target"), 1..2;
+    my @files = ({sub => $yamlpm, ext=>'yml', name=>'YAML'}, {sub => $jsonpm, ext=>'json', name=>'JSON'});
 
-    my @add_meta_to_distdir = map { $self->cd('$(DISTVNAME)', $_) } @add_meta;
+    my @add_meta = map $self->pm( $_->{sub}, sprintf <<'CODE', @{$_}{qw( ext ext name ext)} ), @files;
+    use ExtUtils::Manifest 'maniadd';
+    exit unless -f 'META.%s';
+    eval { maniadd( { 'META.%s' => 'Module %s meta-data (added by MakeMaker)' } ) }
+      or print "Could not add META.%s to MANIFEST: $@\n";
+CODE
+    push @{$self->{RESULT_PM}}, join "\n\n", @add_meta;
+
+    my @add_meta_to_distdir = map { $self->cd('$(DISTVNAME)', $_) } map $self->pmrun($_, '..'), $yamlpm, $jsonpm;
 
     return sprintf <<'MAKE', @add_meta_to_distdir;
 distmeta : create_distdir metafile
