@@ -3,7 +3,7 @@ package ExtUtils::Mkbootstrap;
 # There's just too much Dynaloader incest here to turn on strict vars.
 use strict 'refs';
 
-our $VERSION = '6.92';
+our $VERSION = '6.93_01';
 
 require Exporter;
 our @ISA = ('Exporter');
