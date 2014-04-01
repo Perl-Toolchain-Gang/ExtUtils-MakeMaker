@@ -47,6 +47,7 @@ CHANGE_WARN
 
 check_environment();
 
+my %Extra_Params  = ();
 my %Extra_Prereqs = ();
 
 # Special case for MakeMaker being built as a vendor package
@@ -55,23 +56,32 @@ if( $BUILDING_AS_PACKAGE ) {
     # bundle the latest because we might as well, but we don't want to
     # burden vendors with having to update everything.
     %Extra_Prereqs = (
-        'CPAN::Meta'            => '2.112580',
-        'CPAN::Meta::YAML'      => '0.002',
-        'ExtUtils::Command'     => '1.16',
-        'ExtUtils::Install'     => '1.52',
-        'ExtUtils::Manifest'    => '1.58',
-        'File::Temp'            => '0.22',
-        'JSON::PP'              => '2.27103',
-        'Parse::CPAN::Meta'     => '1.4400',
-        'Scalar::Util'          => '1.13',
-        'version'               => '0.82',
-        'Version::Requirements' => '0.101020',
+        'CPAN::Meta'               => '2.113640',
+        'CPAN::Meta::YAML'         => '0.002',
+        'ExtUtils::Command'        => '1.16',
+        'ExtUtils::Install'        => '1.52',
+        'ExtUtils::Manifest'       => '1.58',
+        'File::Temp'               => '0.22',
+        'JSON::PP'                 => '2.27103',
+        'Parse::CPAN::Meta'        => '1.4400',
+        'Scalar::Util'             => '1.13',
+        'version'                  => '0.82',
+        'CPAN::Meta::Requirements' => '2.121',
     );
 
     $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
 }
 else {
-    my::bundles::copy_bundles("bundled", "inc");
+   eval {
+      require ExtUtils::Manifest;
+      require ExtUtils::Command;
+      require ExtUtils::Install;
+   };
+   if ( $@ ) {
+     $Extra_Params{PERL} = "$^X -Iinc";
+   }
+
+   my::bundles::copy_bundles("bundled", "inc");
 }
 
 # Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
@@ -103,7 +113,7 @@ my $MM = WriteMakefile(
         },
         resources => {
             license     => 'http://dev.perl.org/licenses/',
-            homepage    => 'http://makemaker.org',
+            homepage    => 'https://metacpan.org/release/ExtUtils-MakeMaker',
             bugtracker  => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
             repository  => 'http://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker',
             MailingList => 'makemaker@perl.org',
@@ -112,7 +122,7 @@ my $MM = WriteMakefile(
 
     CONFIGURE_REQUIRES => {},                  # We don't need ourself to install ourself.
     BUILD_REQUIRES     => { 'Data::Dumper' => 0, },
-    INSTALLDIRS        => 'perl',
+    INSTALLDIRS        => ( $] < 5.012 ? 'perl' : 'site' ),
     LICENSE            => 'perl',
     ABSTRACT_FROM      => "lib/$PACKAGE_FILE.pm",
     AUTHOR             => 'Michael G Schwern <schwern@pobox.com>',
@@ -120,6 +130,8 @@ my $MM = WriteMakefile(
     realclean              => {
         FILES   => "inc"
     },
+
+    %Extra_Params,
 
     $^O =~ /win/i
     ? (
@@ -185,15 +197,32 @@ BIN_WARN
         $make =~ s{\s+\z}{\n};
 
         my @perls = qw(
+            perl5.6.1
             perl5.6.2
+            perl5.8.1
+            perl5.8.5
+            perl5.8.8
             perl5.8.9
+            perl5.10
             perl5.10.0
             perl5.10.1
+            perl5.12
+            perl5.12.3
             perl5.12.4
+            perl5.14.0
             perl5.14.1
+            perl5.14.2
+            perl5.16.0
+            perl5.16.1
+            perl5.16.2
         );
 
         for my $perl ( @perls ) {
+            if( !`which $perl` ) {
+                print STDERR "Missing $perl";
+                next;
+            }
+
             $make .= sprintf <<'END', $perl;
 	cd $(DISTVNAME) && $(MAKE) clean && %s Makefile.PL && $(MAKE) test $(PASTHRU)
 END
@@ -203,4 +232,26 @@ END
 
         return $make;
     }
+
+
+    sub postamble {
+        my $self = shift;
+
+        return <<'END';
+critic : .perlcriticrc
+	find lib -name '*.pm' -print0 | xargs -0 perlcritic
+
+END
+
+    }
+
+    sub special_targets {
+      my $make_frag = shift->SUPER::special_targets(@_);
+      $make_frag .= <<'MAKE_FRAG';
+.NOTPARALLEL: pure_all
+
+MAKE_FRAG
+      return $make_frag;
+    }
+
 }

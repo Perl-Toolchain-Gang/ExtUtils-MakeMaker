@@ -3,14 +3,7 @@
 use strict;
 use warnings;
 
-# This makes sure the test is run from the same place, with the same @INC,
-# no matter whether it's started via prove or via Komodo IDE.
-
-BEGIN {
-    use Cwd;
-    chdir 't' if -d 't';
-    use lib getcwd() . '/lib', getcwd() . '/../lib';
-}
+use lib 't/lib';
 
 # Liblist wants to be an object which has File::Spec capabilities, so we
 # mock one.
@@ -58,9 +51,10 @@ sub conf_reset {
 # separation of OS-specific files.
 
 sub move_to_os_test_data_dir {
-    my %os_test_dirs = ( MSWin32 => 'liblist/win32', );
-    chdir $os_test_dirs{$^O} if $os_test_dirs{$^O};
+    my %os_test_dirs = ( MSWin32 => 't/liblist/win32', );
+    return if !$os_test_dirs{$^O};
 
+    chdir $os_test_dirs{$^O} or die "Could not change to liblist test dir '$os_test_dirs{$^O}': $!";
     return;
 }
 
@@ -131,6 +125,10 @@ sub test_kid_win32 {
 
     $Config{lib_ext} = '.meep';
     is_deeply( [ _ext( 'test' ) ], [ 'test.meep', '', 'test.meep', '' ], '$Config{lib_ext} changes the lib extension to be searched for' );
+    delete $Config{lib_ext};
+
+    $Config{lib_ext} = '.a';
+    is_deeply( [ _ext( 'imp' ) ], [ 'imp.dll.a', '', 'imp.dll.a', '' ], '$Config{lib_ext} == ".a" will find *.dll.a too' );
     delete $Config{lib_ext};
 
     $Config{cc} = 'C:/MinGW/bin/gcc.exe';

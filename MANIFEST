@@ -1,3 +1,4 @@
+.perlcriticrc
 bin/instmodsh
 bundled/CPAN-Meta-YAML/CPAN/Meta/YAML.pm
 bundled/CPAN-Meta/CPAN/Meta.pm
@@ -5,6 +6,7 @@ bundled/CPAN-Meta/CPAN/Meta/Converter.pm
 bundled/CPAN-Meta/CPAN/Meta/Feature.pm
 bundled/CPAN-Meta/CPAN/Meta/History.pm
 bundled/CPAN-Meta/CPAN/Meta/Prereqs.pm
+bundled/CPAN-Meta/CPAN/Meta/Requirements.pm
 bundled/CPAN-Meta/CPAN/Meta/Spec.pm
 bundled/CPAN-Meta/CPAN/Meta/Validator.pm
 bundled/ExtUtils-Command/ExtUtils/Command.pm
@@ -24,7 +26,6 @@ bundled/Scalar-List-Utils/List/Util.pm
 bundled/Scalar-List-Utils/List/Util/PP.pm
 bundled/Scalar-List-Utils/Scalar/Util.pm
 bundled/Scalar-List-Utils/Scalar/Util/PP.pm
-bundled/Version-Requirements/Version/Requirements.pm
 bundled/version/version.pm
 bundled/version/version.pod
 bundled/version/version/Internals.pod
@@ -60,7 +61,7 @@ lib/ExtUtils/MM_Win95.pm
 lib/ExtUtils/MY.pm
 lib/ExtUtils/testlib.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
 my/bundles.pm
 NOTES
@@ -68,6 +69,7 @@ PATCHING
 README
 README.packaging
 t/00compile.t
+t/01perl_bugs.t
 t/arch_check.t
 t/backwards.t
 t/basic.t
@@ -106,6 +108,7 @@ t/liblist/win32/__test.lib
 't/liblist/win32/di r/dir_test.lib'
 t/liblist/win32/dir/dir_test.lib
 t/liblist/win32/double.lib
+t/liblist/win32/imp.dll.a
 t/liblist/win32/lib/CORE/c_test.lib
 t/liblist/win32/lib/CORE/double.lib
 t/liblist/win32/lib__test.lib
