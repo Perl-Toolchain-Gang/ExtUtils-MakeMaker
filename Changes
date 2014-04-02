@@ -1,3 +1,7 @@
+6.95_01 Wed Apr  2 21:49:22 BST 2014
+    Bug fixes:
+    * Make MIN_PERL_VERSION handle v-strings properly
+
 6.94 Tue Mar 25 19:26:31 GMT 2014
 
     No changes from 6.93_01
