@@ -441,9 +441,16 @@ sub new {
 
     check_hints($self);
 
+    if ( defined $self->{MIN_PERL_VERSION}
+          && $self->{MIN_PERL_VERSION} !~ /^v?[\d_\.]+$/ ) {
+      require version;
+      my $normal = eval { version->parse( $self->{MIN_PERL_VERSION} ) };
+      $self->{MIN_PERL_VERSION} = $normal if defined $normal;
+    }
+
     # Translate X.Y.Z to X.00Y00Z
     if( defined $self->{MIN_PERL_VERSION} ) {
-        $self->{MIN_PERL_VERSION} =~ s{ ^ (\d+) \. (\d+) \. (\d+) $ }
+        $self->{MIN_PERL_VERSION} =~ s{ ^v? (\d+) \. (\d+) \. (\d+) $ }
                                       {sprintf "%d.%03d%03d", $1, $2, $3}ex;
     }
 
