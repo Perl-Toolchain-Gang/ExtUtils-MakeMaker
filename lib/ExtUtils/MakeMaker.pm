@@ -444,8 +444,14 @@ sub new {
     if ( defined $self->{MIN_PERL_VERSION}
           && $self->{MIN_PERL_VERSION} !~ /^v?[\d_\.]+$/ ) {
       require version;
-      my $normal = eval { version->parse( $self->{MIN_PERL_VERSION} ) };
-      $self->{MIN_PERL_VERSION} = $normal if defined $normal;
+      my $normal = eval {
+        local $SIG{__WARN__} = sub {
+            # simulate "use warnings FATAL => 'all'" for vintage perls
+            die @_;
+        };
+        version->parse( $self->{MIN_PERL_VERSION} )
+      };
+      $self->{MIN_PERL_VERSION} = $normal if defined $normal && !$@;
     }
 
     # Translate X.Y.Z to X.00Y00Z
