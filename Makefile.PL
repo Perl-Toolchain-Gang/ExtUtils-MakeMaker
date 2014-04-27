@@ -20,11 +20,6 @@ use ExtUtils::MakeMaker 6.50;
 
 my $BUILDING_AS_PACKAGE = $ENV{BUILDING_AS_PACKAGE};
 
-BEGIN {
-    die "You have File::Spec version $File::Spec::VERSION\n" . "ExtUtils::MakeMaker requires File::Spec >= 0.8 to build at all.\n"
-      if $File::Spec::VERSION < 0.8;
-}
-
 my $PACKAGE = 'ExtUtils::MakeMaker';
 my $version = do { no strict 'refs'; ${ $PACKAGE . '::VERSION' }; };
 $version =~ s/_//;      # for X.Y_Z alpha releases
