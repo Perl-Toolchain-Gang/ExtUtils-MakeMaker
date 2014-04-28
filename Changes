@@ -1,3 +1,7 @@
+6.97_02 Mon Apr 28 11:44:56 BST 2014
+    Dist fixes:
+    * Removed redundant File::Spec check from Makefile.PL
+
 6.97_01 Thu Apr 24 14:23:02 BST 2014
     Bug fixes:
     * Resolve another regression related to not recursing into distdirs
