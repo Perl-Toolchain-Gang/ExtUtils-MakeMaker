@@ -4,8 +4,6 @@ use 5.00503;
 use strict;
 use Carp;
 use File::Copy;
-use File::Compare;
-use File::Basename;
 use File::Path qw(rmtree);
 require Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
