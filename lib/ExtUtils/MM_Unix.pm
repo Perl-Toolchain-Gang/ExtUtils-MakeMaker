@@ -3544,6 +3544,8 @@ sub tool_xsubpp {
             }
         }
     }
+    #escape whitespace on typemap file paths (esp win32)
+    foreach(@tmdeps) {$_ = $self->quote_literal($_)};
     push(@tmdeps, "typemap") if -f "typemap";
     my(@tmargs) = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
