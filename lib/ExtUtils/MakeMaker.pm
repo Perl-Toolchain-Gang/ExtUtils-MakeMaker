@@ -2195,6 +2195,20 @@ own.  META_MERGE will merge its value with the default.
 Unless you want to override the defaults, prefer META_MERGE so as to
 get the advantage of any future defaults.
 
+Where prereqs are concerned, if META_MERGE is used, prerequisites are merged
+with their counterpart C<WriteMakefile()> argument
+(PREREQ_PM is merged into {prereqs}{runtime}{requires},
+BUILD_REQUIRES into C<{prereqs}{build}{requires}>,
+CONFIGURE_REQUIRES into C<{prereqs}{configure}{requires}>,
+and TEST_REQUIRES into C<{prereqs}{test}{requires})>.
+When prereqs are specified with META_ADD, the only prerequisites added to the
+file come from the metadata, not C<WriteMakefile()> arguments.
+
+Note that these configuration options are only used for generating F<META.yml>
+and F<META.json> -- they are NOT used for F<MYMETA.yml> and F<MYMETA.json>.
+Therefore data in these fields should NOT be used for dynamic (user-side)
+configuration.
+
 By default CPAN Meta specification C<1.4> is used. In order to use
 CPAN Meta specification C<2.0>, indicate with C<meta-spec> the version
 you want to use.
