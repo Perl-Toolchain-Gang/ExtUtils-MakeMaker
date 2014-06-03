@@ -1,3 +1,13 @@
+6.99_01 Tue Jun  3 22:17:30 BST 2014
+    Bug fixes:
+    * Disregard some warnings during tests when cross-compiling
+
+    Doc fixes:
+    * Clarified the use and limitations of META_ADD, META_MERGE
+
+    Test fixes:
+    * Sanitise env vars in tests
+
 6.98 Tue Apr 29 21:27:59 BST 2014
 
     No changes from 6.97_02
