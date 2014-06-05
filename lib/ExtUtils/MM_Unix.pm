@@ -2753,7 +2753,7 @@ sub get_version
   $eval = $1 if $eval =~ m{^(.+)}s;
 	local $^W = 0;
 	my $result = eval($eval);  ## no critic
-	warn "Could not eval '$eval' in $parsefile: $@" if $@;
+	#warn "Could not eval '$eval' in $parsefile: $@" if $@;
 	$result;
 }
 
