@@ -1,3 +1,8 @@
+6.99_02 Thu Jun  5 12:15:28 BST 2014
+    Bug fixes:
+    * MM->parse_version will no longer warn if it could
+      not determine the $VERSION due to syntax errors etc.
+
 6.99_01 Tue Jun  3 22:17:30 BST 2014
     Bug fixes:
     * Disregard some warnings during tests when cross-compiling
