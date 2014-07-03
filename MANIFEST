@@ -6,9 +6,9 @@ bundled/CPAN-Meta/CPAN/Meta/Converter.pm
 bundled/CPAN-Meta/CPAN/Meta/Feature.pm
 bundled/CPAN-Meta/CPAN/Meta/History.pm
 bundled/CPAN-Meta/CPAN/Meta/Prereqs.pm
-bundled/CPAN-Meta/CPAN/Meta/Requirements.pm
 bundled/CPAN-Meta/CPAN/Meta/Spec.pm
 bundled/CPAN-Meta/CPAN/Meta/Validator.pm
+bundled/CPAN-Meta-Requirements/CPAN/Meta/Requirements.pm
 bundled/ExtUtils-Command/ExtUtils/Command.pm
 bundled/ExtUtils-Install/ExtUtils/Install.pm
 bundled/ExtUtils-Install/ExtUtils/Installed.pm
