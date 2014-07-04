@@ -3,25 +3,20 @@
  The simple things are always hard."
         -- Some of Murphy's Laws of Combat
 
-This is a short set of guidelines for those patching
+This is a short set of guidelines for those contributing
 ExtUtils::MakeMaker.  Its not an iron-clad set of rules, but just
 things which make life easier when reading and integrating a patch.
-
-Lots of information can be found in makemaker.org.
-
-MakerMaker is being maintained until something else can replace it.
-Bugs will be fixed and compatibility improved, but I would like to
-avoid new features.  If you want to add something to MakeMaker,
-consider instead working on Module::Build, MakeMaker's heir apparent.
-
 
 Reporting bugs
 
 - Often the only information we have for fixing a bug is contained in your
   report.  So...
 
-- Please report your bugs via http://rt.cpan.org or by mailing to
-  makemaker@perl.org.  RT is preferred.
+- Please report your bugs via http://rt.cpan.org or
+  https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues or
+  by mailing to makemaker@perl.org.
+  
+  RT or GitHub are preferred.
 
 - Please report your bug immediately upon encountering it.  Do not wait
   until you have a patch to fix the bug.  Patches are good, but not at
@@ -42,14 +37,14 @@ Reporting bugs
   easier to figure out if its MakeMaker or Perl at fault.
 
 
-Patching details
+Pull Request
 
-- Please use unified diffs.  (diff -u)
+- If you wrote a patch already, please Pull Request on GitHub.
 
-- Patches against the latest development snapshot from makemaker.org are 
-  preferred.  Patches against the latest CPAN version are ok, too.
-
-- Post your patch to makemaker@perl.org.
+- Pull Request against the latest development snapshot from GitHub
+  repository are preferred.
+  
+- Pull Request against the latest CPAN version are ok, too.
 
 
 Code formatting
@@ -104,20 +99,20 @@ Refactoring and Cleanup
 
 Backwards Compatibility
 
-- MakeMaker must be backwards compatible to 5.5.4 (5.005_04).  Avoid any
-  obvious 5.6-isms (threads, warnings.pm, Unicode, our, v1.2.3, attributes
-  open my $fh, lvalue subroutines, qr//, any new core modules, etc...).
+- MakeMaker must be backwards compatible to 5.6.0.
+  Avoid any obvious 5.8-isms. 
 
-- MakeMaker should avoid having module dependencies.  Avoid using modules
-  which didn't come with 5.5.4 and avoid using features from newer 
-  versions.  Sometimes this is unavoidable.
+- MakeMaker should avoid having module dependencies.
+  But if new code need depends the modules absolutely,
+  it will bundle the modules.
+
+  See Makefile.PL of ExtUtils::MakeMaker for detail. 
 
 
 Cross-Platform Compatibility
 
-- With the exception of MacOS Classic, MakeMaker must work on all 
-  architectures Perl works on (see perlport.pod).  This means all Unixen 
-  (including Cygwin and MacOS X), Windows (including Win9x and DOS), and VMS.
+- MakeMaker must work on all architectures Perl works on (see perlport.pod).
+  This means all Unixen (including Cygwin and MacOS X), Windows, and VMS.
 
 - Use the available macros rather than shell commands $(MV), $(CP),
   $(TOUCH), etc...
@@ -154,13 +149,8 @@ Cross-Platform Compatibility
   Unix, Windows and VMS being Very Different.  Note: Cygwin and OS X are 
   Unixen for our purposes.
 
-- If nothing else, at least try it on two different Unixen or Windows
-  machines (ie. Linux and IRIX or WinNT and Win95).
-
-- HP's TestDrive (www.testdrive.compaq.com) and SourceForge's
-  compile farm (www.sourceforge.net) are good sources of testing
-  machines of many different architectures and platforms.  Accounts are 
-  free.
+- If nothing else, at least try it on two different Unixen machines
+  (ie. Linux and OS X).
 
 - If you find yourself writing "do_this if $^O eq 'That'" (ie. checks on
   the OS type) perhaps your code belongs in one of the non-Unix MM_*
@@ -182,6 +172,9 @@ Tests
 - Tests would be nice, but I'm not going to pretend testing MakeMaker
   is easy.  If nothing else, let us know how you tested your patch by
   hand.
+
+- Travis CI (https://travis-ci.org) is good sources of testing
+  machines of many perl versions.  Accounts are free.
 
 
 Documentation

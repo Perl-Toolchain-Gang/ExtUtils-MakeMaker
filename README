@@ -5,7 +5,12 @@ See INSTALL for installation instructions.  Run "perldoc
 ExtUtils::MakeMaker" (while in this source directory before
 installation) for more documentation.
 
-See http://rt.cpan.org for a full list of open problems.
+See http://rt.cpan.org or
+https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues
+for a full list of open problems.
 
-Please report any bugs via http://rt.cpan.org.
-Send questions and discussion to makemaker@perl.org
+Please report your bugs via http://rt.cpan.org or
+https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues or
+by mailing to makemaker@perl.org.
+  
+RT or GitHub are preferred.
