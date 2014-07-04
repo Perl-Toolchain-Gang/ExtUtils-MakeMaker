@@ -1,3 +1,12 @@
+6.99_03 Fri Jul  4 11:02:21 BST 2014
+    Doc Fixes:
+    - PATCHING document has been rewritten as CONTRIBUTING and TODO
+      document has been removed
+
+    Bug Fixes:
+    - Rearranged bundled prereqs so CPAN::Meta::Requirements won't
+      get stomped on if it is installed already, but CPAN::Meta isn't
+
 6.99_02 Thu Jun  5 12:15:28 BST 2014
     Bug fixes:
     * MM->parse_version will no longer warn if it could

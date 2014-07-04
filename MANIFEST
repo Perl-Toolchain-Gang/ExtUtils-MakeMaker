@@ -65,7 +65,7 @@ MANIFEST
 MANIFEST.SKIP
 my/bundles.pm
 NOTES
-PATCHING
+CONTRIBUTING
 README
 README.packaging
 t/00compile.t
@@ -167,4 +167,3 @@ t/VERSION_FROM.t
 t/WriteEmptyMakefile.t
 t/writemakefile_args.t
 t/xs.t
-TODO
