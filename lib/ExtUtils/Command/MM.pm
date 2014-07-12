@@ -130,6 +130,9 @@ sub pod2man {
     # This isn't a valid Pod::Man option and is only accepted for backwards
     # compatibility.
     delete $options{lax};
+    my $count = scalar @ARGV / 2;
+    my $plural = $count == 1 ? 'document' : 'documents';
+    print "Manifying $count pod $plural\n";
 
     do {{  # so 'next' works
         my ($pod, $man) = splice(@ARGV, 0, 2);
@@ -137,8 +140,6 @@ sub pod2man {
         next if ((-e $man) &&
                  (mtime($man) > mtime($pod)) &&
                  (mtime($man) > mtime("Makefile")));
-
-        print "Manifying $man\n";
 
         my $parser = Pod::Man->new(%options);
         $parser->parse_from_file($pod, $man)
