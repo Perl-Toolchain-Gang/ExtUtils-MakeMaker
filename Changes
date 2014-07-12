@@ -1,3 +1,7 @@
+6.99_04 Sat Jul 12 12:43:08 BST 2014
+    Enhancements:
+    - No longer report each file being manified. Only summarise.
+
 6.99_03 Fri Jul  4 11:02:21 BST 2014
     Doc Fixes:
     - PATCHING document has been rewritten as CONTRIBUTING and TODO
