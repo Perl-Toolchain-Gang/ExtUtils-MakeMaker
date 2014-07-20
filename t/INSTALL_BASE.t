@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use File::Path;
 use Config;
-my @INSTDIRS = ('../dummy-install');#, '../dummy install');
+my @INSTDIRS = ('../dummy-install', '../dummy install');
 
 use Test::More;
 plan skip_all => "no toolchain installed when cross-compiling"
