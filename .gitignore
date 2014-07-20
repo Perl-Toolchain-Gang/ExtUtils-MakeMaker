@@ -10,3 +10,4 @@ cover_db/
 MYMETA.*
 ExtUtils-MakeMaker-*
 inc/
+.*.swp
