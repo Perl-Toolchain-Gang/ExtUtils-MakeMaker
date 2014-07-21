@@ -11,10 +11,12 @@ use File::Path;
 use Config;
 my @INSTDIRS = ('../dummy-install', '../dummy  install');
 my $CLEANUP = 1;
+$CLEANUP &&= 1; # so always 1 or numerically 0
 
 use Test::More;
-plan skip_all => "no toolchain installed when cross-compiling"
-    if $ENV{PERL_CORE} && $Config{'usecrosscompile'};
+plan $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "no toolchain installed when cross-compiling")
+    : (tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP));
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
@@ -33,7 +35,6 @@ END {
     ok( chdir File::Spec->updir, 'chdir updir' );
     ok( teardown_recurs(), 'teardown' ) if $CLEANUP;
     map { rmtree $_ } @INSTDIRS if $CLEANUP;
-    done_testing;
 }
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy") || diag("chdir failed; $!");
