@@ -10,6 +10,7 @@ use strict;
 use File::Path;
 use Config;
 my @INSTDIRS = ('../dummy-install', '../dummy install');
+my $CLEANUP = 1;
 
 use Test::More;
 plan skip_all => "no toolchain installed when cross-compiling"
@@ -22,16 +23,16 @@ my $Is_VMS = $^O eq 'VMS';
 my $perl = which_perl();
 
 use File::Temp qw[tempdir];
-my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+my $tmpdir = tempdir( DIR => 't', CLEANUP => $CLEANUP );
 chdir $tmpdir;
 
 perl_lib;
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok( chdir File::Spec->updir );
-    ok( teardown_recurs(), 'teardown' );
-    map { rmtree $_ } @INSTDIRS;
+    ok( chdir File::Spec->updir, 'chdir updir' );
+    ok( teardown_recurs(), 'teardown' ) if $CLEANUP;
+    map { rmtree $_ } @INSTDIRS if $CLEANUP;
     done_testing;
 }
 
@@ -52,7 +53,7 @@ for my $instdir (@INSTDIRS) {
   run("$make");   # this is necessary due to a dmake bug.
   my $install_out = run("$make install");
   is( $?, 0, '  make install exited normally' ) || diag $install_out;
-  like( $install_out, qr/^Installing /m );
+  like( $install_out, qr/^Installing /m, '"Installing" in output' );
 
   ok( -r $instdir,      '  install dir created' );
 
@@ -75,8 +76,10 @@ for my $instdir (@INSTDIRS) {
   open(SAVERR, ">&STDERR") or die $!;
   open(STDERR, ">".File::Spec->devnull) or die $!;
 
-  my $realclean_out = run("$make realclean");
-  is( $?, 0, 'realclean' ) || diag($realclean_out);
+  if ($CLEANUP) {
+      my $realclean_out = run("$make realclean");
+      is( $?, 0, 'realclean' ) || diag($realclean_out);
+  }
 
   open(STDERR, ">&SAVERR") or die $!;
   close SAVERR;
