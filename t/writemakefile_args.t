@@ -272,13 +272,13 @@ VERIFY
 
     # PERL_MM_OPT
     {
-      local $ENV{PERL_MM_OPT} = 'INSTALL_BASE="/Users/miyagawa/tmp/car1 foo/foo bar"';
+      local $ENV{PERL_MM_OPT} = 'INSTALL_BASE="/Users/miyagawa/tmp/car1  foo/foo bar"';
       $mm = WriteMakefile(
           NAME            => 'Big::Dummy',
           VERSION    => '1.00',
       );
 
-      is( $mm->{INSTALL_BASE}, "/Users/miyagawa/tmp/car1 foo/foo bar", 'parse_args() splits like shell' );
+      is( $mm->{INSTALL_BASE}, "/Users/miyagawa/tmp/car1  foo/foo bar", 'parse_args() splits like shell' );
     }
 
 }
