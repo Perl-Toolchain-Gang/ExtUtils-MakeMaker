@@ -1,3 +1,7 @@
+6.99_05 Tue Jul 22 12:32:03 BST 2014
+    Enhancements:
+    - Enable working with (including installing to) directories with spaces in names
+
 6.99_04 Sat Jul 12 12:43:08 BST 2014
     Enhancements:
     - No longer report each file being manified. Only summarise.
