@@ -1160,7 +1160,8 @@ sub flush {
     print "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
-    open(my $fh,">:utf8", "MakeMaker.tmp")
+    my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
+    open(my $fh,">$utf8", "MakeMaker.tmp")
         or die "Unable to open MakeMaker.tmp: $!";
 
     for my $chunk (@{$self->{RESULT}}) {
