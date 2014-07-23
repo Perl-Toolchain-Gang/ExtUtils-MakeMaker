@@ -9,6 +9,7 @@ use File::Path;
 use File::Basename;
 use MakeMaker::Test::Utils;
 use utf8;
+use Config;
 
 my %Files = (
              'Problem-Module/Makefile.PL'   => <<'END',
@@ -17,7 +18,7 @@ use utf8;
 
 WriteMakefile(
     NAME    => 'Problem::Module',
-    AUTHOR              => q{Danijel Tašov},
+    AUTHOR  => q{Danijel Tašov},
 );
 END
 
@@ -31,7 +32,8 @@ sub setup_recurs {
 
         my $dir = dirname($file);
         mkpath $dir;
-        open(FILE, ">:utf8", $file) || die "Can't create $file: $!";
+        my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
+        open(FILE, ">$utf8", $file) || die "Can't create $file: $!";
         print FILE $text;
         close FILE;
 
