@@ -404,6 +404,8 @@ sub constants {
         # pathnames can have sharp signs in them; escape them so
         # make doesn't think it is a comment-start character.
         $self->{$macro} =~ s/#/\\#/g;
+        $self->{$macro} =~ s/( )/\\$1/g
+	  if $ExtUtils::MakeMaker::macro_fsentity{$macro};
 	push @m, "$macro = $self->{$macro}\n";
     }
 
