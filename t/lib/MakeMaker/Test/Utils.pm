@@ -97,7 +97,7 @@ MakeMaker::Test::Utils - Utility routines for testing MakeMaker
 
 =head1 DESCRIPTION
 
-A consolidation of little utility functions used through out the
+A consolidation of little utility functions used throughout the
 MakeMaker test suite.
 
 =head2 Functions
@@ -138,6 +138,7 @@ sub which_perl {
             last if -x $perlpath;
         }
     }
+    $perlpath = qq{"$perlpath"}; # "safe... in a command line" even with spaces
 
     return $perlpath;
 }

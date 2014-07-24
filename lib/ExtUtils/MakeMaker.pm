@@ -252,7 +252,7 @@ sub full_setup {
     $Verbose ||= 0;
 
     my @fs_macros = qw/
-    FULLPERL
+    FULLPERL XSUBPPDIR
 
     INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB INST_MAN1DIR INST_MAN3DIR
     INSTALLDIRS
