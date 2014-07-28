@@ -1,3 +1,7 @@
+6.99_06 Mon Jul 28 15:02:25 BST 2014
+    Enhancements:
+    - Improvements and tests for the spaces-in-stuff handling
+
 6.99_05 Tue Jul 22 12:32:03 BST 2014
     Enhancements:
     - Enable working with (including installing to) directories with spaces in names

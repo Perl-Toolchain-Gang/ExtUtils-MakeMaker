@@ -1,7 +1,7 @@
 package ExtUtils::MM_QNX;
 
 use strict;
-our $VERSION = '6.99_05';
+our $VERSION = '6.99_06';
 
 require ExtUtils::MM_Unix;
 our @ISA = qw(ExtUtils::MM_Unix);
