@@ -278,7 +278,7 @@ VERIFY
           VERSION    => '1.00',
       );
 
-      is( $mm->{INSTALL_BASE}, "/Users/miyagawa/tmp/car1  foo/foo bar", 'parse_args() splits like shell' );
+      is( $mm->{INSTALL_BASE}, "/Users/miyagawa/tmp/car1\\ \\ foo/foo\\ bar", 'parse_args() splits like shell' );
     }
 
 }

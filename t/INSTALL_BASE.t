@@ -40,7 +40,7 @@ END {
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy") || diag("chdir failed; $!");
 
 for my $instdir (@INSTDIRS) {
-  my @mpl_out = run(qq{"$perl" Makefile.PL "INSTALL_BASE=$instdir"});
+  my @mpl_out = run(qq{$perl Makefile.PL "INSTALL_BASE=$instdir"});
 
   cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
     diag(@mpl_out);
