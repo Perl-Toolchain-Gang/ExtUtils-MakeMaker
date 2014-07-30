@@ -1,3 +1,7 @@
+6.99_07 Wed Jul 30 17:36:14 BST 2014
+    Bug fixes:
+    - Resolve 'wide character in print' warnings
+
 6.99_06 Mon Jul 28 15:02:25 BST 2014
     Enhancements:
     - Improvements and tests for the spaces-in-stuff handling

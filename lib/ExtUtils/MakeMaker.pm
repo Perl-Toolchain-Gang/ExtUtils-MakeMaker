@@ -19,7 +19,7 @@ my @Prepend_parent;
 my %Recognized_Att_Keys;
 our %macro_fsentity; # whether a macro is a filesystem name
 
-our $VERSION = '6.99_06';
+our $VERSION = '6.99_07';
 $VERSION = eval $VERSION;  ## no critic [BuiltinFunctions::ProhibitStringyEval]
 
 # Emulate something resembling CVS $Revision$
