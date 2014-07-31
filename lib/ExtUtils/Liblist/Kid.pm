@@ -55,9 +55,9 @@ sub _unix_os2_ext {
     my ( $fullname,   @fullname );
     my ( $pwd )   = cwd();    # from Cwd.pm
     my ( $found ) = 0;
-    my ( $custom_name ) = '';
 
     foreach my $thislib ( split ' ', $potential_libs ) {
+        my ( $custom_name ) = '';
 
         # Handle possible linker path arguments.
         if ( $thislib =~ s/^(-[LR]|-Wl,-R|-Wl,-rpath,)// ) {    # save path flag type
