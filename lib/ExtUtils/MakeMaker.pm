@@ -3156,6 +3156,13 @@ help you setup your distribution.
 
 L<CPAN::Meta> and L<CPAN::Meta::Spec> explain CPAN Meta files in detail.
 
+L<File::ShareDir::Install> makes it easy to install static, sometimes
+also referred to as 'shared' files. L<File::ShareDir> helps accessing
+the shared files after installation.
+
+L<Dist::Zilla> makes it easy for the module author to create MakeMaker-based
+distributions with lots of bells and whistles.
+
 =head1 AUTHORS
 
 Andy Dougherty C<doughera@lafayette.edu>, Andreas KE<ouml>nig
