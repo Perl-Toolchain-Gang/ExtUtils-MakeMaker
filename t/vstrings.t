@@ -1,25 +1,25 @@
 #!/usr/bin/perl -w
 
-# This test tests for support for various forms of vstring versions in PREREQ_PM
+# test support for various forms of vstring versions in PREREQ_PM
 
 # Magic for core
 BEGIN {
-
-    # Always run in t to unify behavor with core
+    # Always run in t to unify behaviour with core
     chdir 't' if -d 't';
 }
 
 # Use things from t/lib/
 use lib './lib';
 use strict;
+use warnings;
 use TieOut;
-use MakeMaker::Test::Utils qw( makefile_name );
+use MakeMaker::Test::Utils qw(makefile_name);
 
 use ExtUtils::MakeMaker;
 use Test::More;
 
 sub capture_make {
-    my ( $package, $version ) = @_ ;
+    my ($package, $version) = @_ ;
 
     my $warnings = '';
     local $SIG{__WARN__} = sub {
@@ -34,7 +34,6 @@ sub capture_make {
     );
 
     return $warnings;
-
 }
 
 sub makefile_content {
@@ -42,32 +41,28 @@ sub makefile_content {
     return <$fh>;
 }
 
-{
+# [ pkg, version, pattern, descrip, invertre ]
+my @DATA = (
+  [ DecimalString => '1.2.3', qr/isn't\s+numeric/, '3-part Decimal String' ],
+  [ VDecimalString => 'v1.2.3', qr/Unparsable\s+version/, '3-part V-Decimal String' ],
+  [ BareVString => v1.2.3, qr/Unparsable\s+version/, '3-part bare V-string' ],
+  [ VDecimalString => 'v1.2', qr/Unparsable\s+version/, '2-part v-decimal string' ],
+  [ BareVString => v1.2, qr/Unparsable\s+version/, '2-part bare v-string' ],
+  [ BrokenString => 'nan', qr/Unparsable\s+version/, 'random string', 1 ],
+);
 
-    ok( my $stdout = tie *STDOUT, 'TieOut' );
-
-    my $out;
-
-    ok( eval { $out=""; $out = capture_make( "Fake::DecimalString" => '1.2.3' ); 1 }, '3-part Decimal String doesn\'t fatal' );
-    unlike ( $out , qr/isn't\s+numeric/i , '"1.2.3" parses as a vstring');
-    note(join q{}, grep { $_ =~ /Fake/i } makefile_content);
-
-    ok( eval { $out=""; $out = capture_make( "Fake::VDecimalString" => 'v1.2.3' ); 1 }, '3-part V-Decimal String doesn\'t fatal' );
-    unlike ( $out, qr/Unparsable\s+version/i , '"v1.2.3" parses as a vstring');
-    note(join q{}, grep { $_ =~ /Fake/i } makefile_content);
-
-    ok( eval { $out=""; $out = capture_make (  "Fake::BareVString" => v1.2.3 ); 1 }, '3-part bare V-string doesn\'t fatal' );
-    unlike( $out, qr/Unparsable\s+version/i, 'v1.2.3 parses as a vstring');
-    note(join q{}, grep { $_ =~ /Fake/i } makefile_content);
-
-    ok( eval { $out=""; $out =  capture_make (  "Fake::VDecimalString" => 'v1.2' ); 1 }, '2-part v-decimal string doesn\'t fatal' );
-    unlike( $out, qr/Unparsable\s+version/i, '"v1.2" parses as a vstring');
-    note(join q{}, grep { $_ =~ /Fake/i } makefile_content);
-
-    ok( eval { $out=""; $out = capture_make (  "Fake::BareVString" => v1.2 ); 1 }, '2-part bare v-string doesn\'t fatal');
-    unlike( $out, qr/Unparsable\s+version/i , 'v1.2 parses as a vstring');
-    note(join q{}, grep { $_ =~ /Fake/i } makefile_content);
-
+ok(my $stdout = tie *STDOUT, 'TieOut');
+my $out;
+for my $tuple (@DATA) {
+  my ($pkg, $version, $pattern, $descrip, $invertre) = @$tuple;
+  eval { $out=""; $out = capture_make("Fake::$pkg" => $version); };
+  is($@, '', "$descrip not fatal");
+  if ($invertre) {
+    like ( $out , qr/$pattern/i , "$descrip parses");
+  } else {
+    unlike ( $out , qr/$pattern/i , "$descrip parses");
+  }
+#  note(join q{}, grep { $_ =~ /Fake/i } makefile_content);
 }
 
 done_testing();

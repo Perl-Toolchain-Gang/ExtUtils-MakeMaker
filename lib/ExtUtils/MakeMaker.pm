@@ -1267,14 +1267,16 @@ sub neatvalue {
 # before CPAN::Meta chokes.
 sub clean_versions {
     my($self, $key) = @_;
-
     my $reqs = $self->{$key};
+    require version;
     for my $module (keys %$reqs) {
-        my $version = $reqs->{$module};
-
-        if( !defined $version or $version !~ /^v?[\d_\.]+$/ ) {
-            carp "Unparsable version '$version' for prerequisite $module";
+        my $version = eval { version->parse($reqs->{$module})->stringify };
+        if( $@ ) {
+            carp "Unparsable version '$reqs->{$module}' for prerequisite $module";
             $reqs->{$module} = 0;
+        } else {
+            $version =~ s/^v//;
+            $reqs->{$module} = $version;
         }
     }
 }

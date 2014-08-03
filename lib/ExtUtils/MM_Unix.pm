@@ -2960,7 +2960,7 @@ PPD_PERLVERS
     foreach my $prereq (sort keys %prereqs) {
         my $name = $prereq;
         $name .= '::' unless $name =~ /::/;
-        my $version = $prereqs{$prereq}+0;  # force numification
+        my $version = $prereqs{$prereq};
 
         my %attrs = ( NAME => $name );
         $attrs{VERSION} = $version if $version;
