@@ -1275,7 +1275,6 @@ sub clean_versions {
             carp "Unparsable version '$reqs->{$module}' for prerequisite $module";
             $reqs->{$module} = 0;
         } else {
-            $version =~ s/^v//;
             $reqs->{$module} = $version;
         }
     }
