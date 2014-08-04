@@ -1277,10 +1277,11 @@ sub clean_versions {
             };
             version->parse($reqs->{$module})->stringify;
         };
-        if( $@ ) {
+        if( $@ || $reqs->{$module} eq '' ) {
             carp "Unparsable version '$reqs->{$module}' for prerequisite $module";
             $reqs->{$module} = 0;
-        } else {
+        }
+        else {
             $reqs->{$module} = $version;
         }
     }
