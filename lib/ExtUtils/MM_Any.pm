@@ -1037,8 +1037,7 @@ sub _add_requirements_to_meta_v1_4 {
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
     if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
-        $meta{configure_requires}
-            = _normalize_prereqs($self->{CONFIGURE_REQUIRES});
+        $meta{configure_requires} = $self->{CONFIGURE_REQUIRES};
     } else {
         $meta{configure_requires} = {
             'ExtUtils::MakeMaker'       => 0,
@@ -1046,7 +1045,7 @@ sub _add_requirements_to_meta_v1_4 {
     }
 
     if( $self->{ARGS}{BUILD_REQUIRES} ) {
-        $meta{build_requires} = _normalize_prereqs($self->{BUILD_REQUIRES});
+        $meta{build_requires} = $self->{BUILD_REQUIRES};
     } else {
         $meta{build_requires} = {
             'ExtUtils::MakeMaker'       => 0,
@@ -1056,11 +1055,11 @@ sub _add_requirements_to_meta_v1_4 {
     if( $self->{ARGS}{TEST_REQUIRES} ) {
         $meta{build_requires} = {
           %{ $meta{build_requires} },
-          %{ _normalize_prereqs($self->{TEST_REQUIRES}) },
+          %{ $self->{TEST_REQUIRES} },
         };
     }
 
-    $meta{requires} = _normalize_prereqs($self->{PREREQ_PM})
+    $meta{requires} = $self->{PREREQ_PM}
         if defined $self->{PREREQ_PM};
     $meta{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
         if $self->{MIN_PERL_VERSION};
@@ -1074,8 +1073,7 @@ sub _add_requirements_to_meta_v2 {
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
     if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
-        $meta{prereqs}{configure}{requires}
-            = _normalize_prereqs($self->{CONFIGURE_REQUIRES});
+        $meta{prereqs}{configure}{requires} = $self->{CONFIGURE_REQUIRES};
     } else {
         $meta{prereqs}{configure}{requires} = {
             'ExtUtils::MakeMaker'       => 0,
@@ -1083,7 +1081,7 @@ sub _add_requirements_to_meta_v2 {
     }
 
     if( $self->{ARGS}{BUILD_REQUIRES} ) {
-        $meta{prereqs}{build}{requires} = _normalize_prereqs($self->{BUILD_REQUIRES});
+        $meta{prereqs}{build}{requires} = $self->{BUILD_REQUIRES};
     } else {
         $meta{prereqs}{build}{requires} = {
             'ExtUtils::MakeMaker'       => 0,
@@ -1091,24 +1089,15 @@ sub _add_requirements_to_meta_v2 {
     }
 
     if( $self->{ARGS}{TEST_REQUIRES} ) {
-        $meta{prereqs}{test}{requires} = _normalize_prereqs($self->{TEST_REQUIRES});
+        $meta{prereqs}{test}{requires} = $self->{TEST_REQUIRES};
     }
 
-    $meta{prereqs}{runtime}{requires} = _normalize_prereqs($self->{PREREQ_PM})
+    $meta{prereqs}{runtime}{requires} = $self->{PREREQ_PM}
         if $self->{ARGS}{PREREQ_PM};
     $meta{prereqs}{runtime}{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
         if $self->{MIN_PERL_VERSION};
 
     return %meta;
-}
-
-sub _normalize_prereqs {
-  my ($hash) = @_;
-  my %prereqs;
-  while ( my ($k,$v) = each %$hash ) {
-    $prereqs{$k} = _normalize_version($v);
-  }
-  return \%prereqs;
 }
 
 # Adapted from Module::Build::Base
