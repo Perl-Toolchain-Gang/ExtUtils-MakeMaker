@@ -1270,7 +1270,13 @@ sub clean_versions {
     my $reqs = $self->{$key};
     require version;
     for my $module (keys %$reqs) {
-        my $version = eval { version->parse($reqs->{$module})->stringify };
+        my $version = eval {
+            local $SIG{__WARN__} = sub {
+              # simulate "use warnings FATAL => 'all'" for vintage perls
+              die @_;
+            };
+            version->parse($reqs->{$module})->stringify;
+        };
         if( $@ ) {
             carp "Unparsable version '$reqs->{$module}' for prerequisite $module";
             $reqs->{$module} = 0;
