@@ -1263,6 +1263,26 @@ sub neatvalue {
     return "{ ".join(', ',@m)." }";
 }
 
+sub _find_magic_vstring {
+    my $value = shift;
+    my $tvalue = '';
+    require B;
+    my $sv = B::svref_2object(\$value);
+    my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
+    while ( $magic ) {
+        if ( $magic->TYPE eq 'V' ) {
+            $tvalue = $magic->PTR;
+            $tvalue =~ s/^v?(.+)$/v$1/;
+            last;
+        }
+        else {
+            $magic = $magic->MOREMAGIC;
+        }
+    }
+    return $tvalue;
+}
+
+
 # Look for weird version numbers, warn about them and set them to 0
 # before CPAN::Meta chokes.
 sub clean_versions {
@@ -1270,15 +1290,18 @@ sub clean_versions {
     my $reqs = $self->{$key};
     require version;
     for my $module (keys %$reqs) {
+        my $v = $reqs->{$module};
+        my $printable = _find_magic_vstring($v);
+        $v = $printable if length $printable;
         my $version = eval {
             local $SIG{__WARN__} = sub {
               # simulate "use warnings FATAL => 'all'" for vintage perls
               die @_;
             };
-            version->parse($reqs->{$module})->stringify;
+            version->parse($v)->stringify;
         };
         if( $@ || $reqs->{$module} eq '' ) {
-            carp "Unparsable version '$reqs->{$module}' for prerequisite $module";
+            carp "Unparsable version '$v' for prerequisite $module";
             $reqs->{$module} = 0;
         }
         else {
