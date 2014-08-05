@@ -29,8 +29,6 @@ before_install:
   - source ~/perl-travis-helper/init
   - build-perl
   - perl -V
-  - build-dist
-  - cd $BUILD_DIR
 install:
   - true
 script:
