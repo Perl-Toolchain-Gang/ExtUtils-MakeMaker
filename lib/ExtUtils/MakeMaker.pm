@@ -1301,6 +1301,9 @@ sub clean_versions {
             version->parse($v)->stringify;
         };
         if( $@ || $reqs->{$module} eq '' ) {
+            if ( $] < 5.008 && $v !~ /^v?[\d_\.]+$/ ) {
+               $v = sprintf "v%vd", $v;
+            }
             carp "Unparsable version '$v' for prerequisite $module";
             $reqs->{$module} = 0;
         }
