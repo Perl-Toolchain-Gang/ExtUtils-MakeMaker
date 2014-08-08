@@ -1,6 +1,10 @@
 This is a CPAN distribution of the venerable MakeMaker module.  It has been
 backported to work with Perl 5.6.0 and up.
 
+Please note that while this module works on Perl 5.6, it is no longer
+being routinely tested on 5.6. However, patches to repair any breakage
+on 5.6 are still being accepted.
+
 See INSTALL for installation instructions.  Run "perldoc
 ExtUtils::MakeMaker" (while in this source directory before
 installation) for more documentation.
