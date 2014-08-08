@@ -55,7 +55,7 @@ if( $BUILDING_AS_PACKAGE ) {
         'CPAN::Meta::YAML'         => '0.002',
         'ExtUtils::Command'        => '1.16',
         'ExtUtils::Install'        => '1.52',
-        'ExtUtils::Manifest'       => '1.58',
+        'ExtUtils::Manifest'       => '1.65',
         'File::Temp'               => '0.22',
         'JSON::PP'                 => '2.27103',
         'Parse::CPAN::Meta'        => '1.4400',
