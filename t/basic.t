@@ -43,8 +43,9 @@ END {
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
-END { rmtree '../dummy-install'; }
+my $DUMMYINST = '../dummy-install';
+my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
+END { rmtree $DUMMYINST; }
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
@@ -127,7 +128,7 @@ my $install_out = run("$make install");
 is( $?, 0, 'install' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
 
-ok( -r '../dummy-install',     '  install dir created' );
+ok( -r $DUMMYINST,     '  install dir created' );
 my %files = ();
 find( sub {
     # do it case-insensitive for non-case preserving OSs
@@ -137,7 +138,7 @@ find( sub {
     $file =~ s/\.$// if $Is_VMS;
 
     $files{$file} = $File::Find::name;
-}, '../dummy-install' );
+}, $DUMMYINST );
 ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
 ok( $files{'liar.pm'},      '  Liar.pm installed'  );
 ok( $files{'program'},      '  program installed'  );
@@ -394,7 +395,7 @@ note "META file validity"; {
 
 
 # Make sure init_dirscan doesn't go into the distdir
-@mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
+@mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
 
