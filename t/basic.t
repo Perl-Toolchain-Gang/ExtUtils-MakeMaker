@@ -43,7 +43,7 @@ END {
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my $DUMMYINST = '../dummy-install';
+my $DUMMYINST = '../dummy-inštall';
 my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
 END { rmtree $DUMMYINST; }
 
@@ -63,18 +63,18 @@ ok( -e $makefile,       'Makefile exists' );
 
 # -M is flakey on VMS
 my $mtime = (stat($makefile))[9];
-cmp_ok( $Touch_Time, '<=', $mtime,  '  its been touched' );
+cmp_ok( $Touch_Time, '<=', $mtime,  '  been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
 
 my $make = make_run();
 
 {
-    # Supress 'make manifest' noise
+    # Suppress 'make manifest' noise
     local $ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
     my $manifest_out = run("$make manifest");
     ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
-    ok( -s 'MANIFEST',      '  its not empty' );
+    ok( -s 'MANIFEST',      '  not empty' );
 }
 
 END { unlink 'MANIFEST'; }

@@ -9,6 +9,7 @@ require Exporter;
 use ExtUtils::MakeMaker::Config;
 use Carp;
 use File::Path;
+use Encode;
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
@@ -949,6 +950,7 @@ sub check_manifest {
 
 sub parse_args{
     my($self, @args) = @_;
+    @args = map { decode_utf8($_) } @args;
     foreach (@args) {
         unless (m/(.*?)=(.*)/) {
             ++$Verbose if m/^verb/;
