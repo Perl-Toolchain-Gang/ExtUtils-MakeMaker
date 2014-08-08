@@ -2649,7 +2649,8 @@ sub parse_abstract {
     my $result;
 
     local $/ = "\n";
-    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
+    my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
+    open(my $fh, "<$utf8", $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
