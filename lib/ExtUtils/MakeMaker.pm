@@ -1302,7 +1302,7 @@ sub clean_versions {
         };
         if( $@ || $reqs->{$module} eq '' ) {
             if ( $] < 5.008 && $v !~ /^v?[\d_\.]+$/ ) {
-               $v = sprintf "v%vd", $v;
+               $v = sprintf "v%vd", $v unless $v eq '';
             }
             carp "Unparsable version '$v' for prerequisite $module";
             $reqs->{$module} = 0;
