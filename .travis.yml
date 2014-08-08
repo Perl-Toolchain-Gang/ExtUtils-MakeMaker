@@ -5,7 +5,6 @@ notifications:
   irc: "irc.perl.org#makemaker"
   email: false
 perl:
-  - "5.6.2"
   - "5.8.1"
   - "5.8.5"
   - "5.8.7"
@@ -22,7 +21,10 @@ perl:
   - "5.18.0"
   - "5.18"
   - "5.20"
-  - "blead"
+matrix:
+  allow_failures:
+    - perl: "blead"
+    - perl: "5.6.2"
 before_install:
   - git clone git://github.com/haarg/perl-travis-helper ~/perl-travis-helper
   - source ~/perl-travis-helper/init
