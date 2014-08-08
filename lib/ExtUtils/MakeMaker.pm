@@ -3152,6 +3152,12 @@ If no $default is provided an empty string will be used instead.
 
 =back
 
+=head2 Supported versions of Perl
+
+Please note that while this module works on Perl 5.6, it is no longer
+being routinely tested on 5.6 - the earliest Perl version being routinely
+tested, and expressly supported, is 5.8.1. However, patches to repair
+any breakage on 5.6 are still being accepted.
 
 =head1 ENVIRONMENT
 
