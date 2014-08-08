@@ -2649,26 +2649,37 @@ sub parse_abstract {
     my $result;
 
     local $/ = "\n";
-    my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
-    open(my $fh, "<$utf8", $parsefile) or die "Could not open '$parsefile': $!";
+    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
+    my $utf8;
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
     while (<$fh>) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if !$inpod;
         chop;
+
+        if ( /^=encoding\s*(utf8|UTF-8)$/i ) {
+            $utf8 = $1;
+        }
+
         if ( /^($package(?:\.pm)? \s+ -+ \s+)(.*)/x ) {
           $result = $2;
           next;
         }
         next unless $result;
+
         if ( $result && ( /^\s*$/ || /^\=/ ) ) {
           last;
         }
         $result = join ' ', $result, $_;
     }
     close $fh;
+
+    if ( $utf8 and !( $] < 5.008 or !$Config{useperlio} ) ) {
+        require Encode;
+        $result = Encode::decode($utf8, $result);
+    }
 
     return $result;
 }
