@@ -9,7 +9,7 @@ require Exporter;
 use ExtUtils::MakeMaker::Config;
 use Carp;
 use File::Path;
-my $DECODE_UTF8 = eval { use Encode }; # 2 birds, 1 stone
+my $DECODE_UTF8 = eval { use Encode; 1 }; # 2 birds, 1 stone
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
