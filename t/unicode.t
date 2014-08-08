@@ -6,7 +6,6 @@ BEGIN {
 chdir 't';
 
 use strict;
-use utf8;
 use Test::More tests => 6;
 use ExtUtils::MM;
 use MakeMaker::Test::Setup::Unicode;
@@ -43,7 +42,10 @@ SKIP: {
           open my $json_fh, '<:utf8', 'MYMETA.json' or die $!;
           my $json = do { local $/; <$json_fh> };
           close $json_fh;
-          like( $json, qr/Danijel Tašov's great new module/, 'utf8 abstract' );
+
+          require Encode;
+          my $str = Encode::decode( 'utf8', "Danijel Tašov's" );
+          like( $json, qr/$str/, 'utf8 abstract' );
       };
 
     untie *STDOUT;
