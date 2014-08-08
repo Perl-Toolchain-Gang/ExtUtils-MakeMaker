@@ -43,7 +43,7 @@ END {
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my $DUMMYINST = '../dummy-inštall';
+my $DUMMYINST = '../dummy-in'.($] > 5.008 ? 'š' : 's').'tall';
 my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
 END { rmtree $DUMMYINST; }
 
