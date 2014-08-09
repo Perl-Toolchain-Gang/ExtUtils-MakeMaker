@@ -33,8 +33,11 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME          => 'XS::Test',
     VERSION_FROM  => 'lib/XS/Test.pm',
+    TYPEMAPS      => [ 'type map' ],
 );
 END
+
+             'XS-Test/type map'             => '',
 
              'XS-Test/Test.xs'              => <<'END',
 #include "EXTERN.h"

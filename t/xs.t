@@ -13,9 +13,7 @@ use Test::More
     have_compiler()
     ? (tests => 5)
     : (skip_all => "ExtUtils::CBuilder not installed or couldn't find a compiler");
-use File::Find;
 use File::Spec;
-use File::Path;
 
 my $Is_VMS = $^O eq 'VMS';
 my $perl = which_perl();

@@ -3545,6 +3545,7 @@ sub tool_xsubpp {
         }
     }
     push(@tmdeps, "typemap") if -f "typemap";
+    s/( )/\\$1/g for @tmdeps;
     my(@tmargs) = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
         unshift( @tmargs, $self->{XSOPT} );
