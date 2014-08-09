@@ -2651,7 +2651,7 @@ sub parse_abstract {
     local $/ = "\n";
     open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
-    my $utf8;
+    my $pod_encoding;
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
     while (<$fh>) {
@@ -2659,8 +2659,8 @@ sub parse_abstract {
         next if !$inpod;
         chop;
 
-        if ( /^=encoding\s*(utf8|UTF-8)$/i ) {
-            $utf8 = $1;
+        if ( /^=encoding\s*(.*)$/i ) {
+            $pod_encoding = $1;
         }
 
         if ( /^($package(?:\.pm)? \s+ -+ \s+)(.*)/x ) {
@@ -2676,9 +2676,9 @@ sub parse_abstract {
     }
     close $fh;
 
-    if ( $utf8 and !( $] < 5.008 or !$Config{useperlio} ) ) {
+    if ( $pod_encoding and !( $] < 5.008 or !$Config{useperlio} ) ) {
         require Encode;
-        $result = Encode::decode($utf8, $result);
+        $result = Encode::decode($pod_encoding, $result);
     }
 
     return $result;
