@@ -9,7 +9,7 @@ require Exporter;
 use ExtUtils::MakeMaker::Config;
 use Carp;
 use File::Path;
-my $DECODE_UTF8 = eval { require Encode; }; # 2 birds, 1 stone
+my $CAN_DECODE = eval { require Encode::Locale; }; # 2 birds, 1 stone
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
@@ -950,7 +950,7 @@ sub check_manifest {
 
 sub parse_args{
     my($self, @args) = @_;
-    @args = map { Encode::decode_utf8($_) } @args if $DECODE_UTF8;
+    @args = map { Encode::decode(locale => $_) } @args if $CAN_DECODE;
     foreach (@args) {
         unless (m/(.*?)=(.*)/) {
             ++$Verbose if m/^verb/;
