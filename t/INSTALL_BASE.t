@@ -10,6 +10,7 @@ use strict;
 use File::Path;
 use Config;
 my @INSTDIRS = ('../dummy-install', '../dummy  install');
+map { s/ //g } @INSTDIRS if $^O eq 'MSWin32'; # FIXME when MM_Win32 can handle this for dmake
 my $CLEANUP = 1;
 $CLEANUP &&= 1; # so always 1 or numerically 0
 
