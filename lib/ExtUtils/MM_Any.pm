@@ -2049,7 +2049,7 @@ Defines at least these macros.
 sub init_tools {
     my $self = shift;
 
-    $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
+    $self->{ECHO}     ||= $self->oneliner('binmode STDOUT, qq{:raw}; print qq{@ARGV}', ['-l']);
     $self->{ECHO_N}   ||= $self->oneliner('print qq{@ARGV}');
 
     $self->{TOUCH}    ||= $self->oneliner('touch', ["-MExtUtils::Command"]);
