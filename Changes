@@ -1,3 +1,6 @@
+    Bug fixes:
+    - Rewrite the version line eval handling to have less insane edge cases
+
 6.99_07 Wed Jul 30 17:36:14 BST 2014
     Bug fixes:
     - Resolve 'wide character in print' warnings
