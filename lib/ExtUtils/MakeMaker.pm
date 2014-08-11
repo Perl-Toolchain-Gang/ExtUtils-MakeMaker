@@ -9,6 +9,7 @@ require Exporter;
 use ExtUtils::MakeMaker::Config;
 use Carp;
 use File::Path;
+my $CAN_DECODE = eval { require Encode::Locale; }; # 2 birds, 1 stone
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
@@ -949,6 +950,7 @@ sub check_manifest {
 
 sub parse_args{
     my($self, @args) = @_;
+    @args = map { Encode::decode(locale => $_) } @args if $CAN_DECODE;
     foreach (@args) {
         unless (m/(.*?)=(.*)/) {
             ++$Verbose if m/^verb/;
