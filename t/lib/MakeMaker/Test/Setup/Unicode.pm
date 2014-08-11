@@ -12,15 +12,32 @@ use utf8;
 use Config;
 
 my %Files = (
-             'Problem-Module/Makefile.PL'   => <<'END',
+             'Problem-Module/Makefile.PL'   => <<'PL_END',
 use ExtUtils::MakeMaker;
 use utf8;
 
 WriteMakefile(
-    NAME    => 'Problem::Module',
-    AUTHOR  => q{Danijel Tašov},
+    NAME          => 'Problem::Module',
+    ABSTRACT_FROM => 'lib/Problem/Module.pm',
+    AUTHOR        => q{Danijel Tašov},
 );
-END
+PL_END
+
+            'Problem-Module/lib/Problem/Module.pm'  => <<'pm_END',
+use utf8;
+            
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Problem::Module - Danijel Tašov's great new module
+
+=cut
+
+1;
+pm_END
 
 );
 
