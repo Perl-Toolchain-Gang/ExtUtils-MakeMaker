@@ -103,8 +103,6 @@ END
 
 
 sub setup_xs {
-    setup_mm_test_root();
-    chdir 'MM_TEST_ROOT:[t]' if $Is_VMS;
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
