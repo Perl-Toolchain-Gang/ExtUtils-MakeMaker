@@ -7,13 +7,16 @@ BEGIN {
 }
 
 use strict;
+use Config;
 use Test::More tests => 8;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use ExtUtils::MakeMaker;
 use TieOut;
 
-chdir 't';
+use File::Temp qw[tempdir];
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+chdir $tmpdir;
 perl_lib;
 $| = 1;
 
@@ -31,6 +34,11 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
 {
     my $warnings = '';
     local $SIG{__WARN__} = sub {
+        if ( $Config{usecrosscompile} ) {
+            # libraries might not be present on the target system
+            # when cross-compiling
+            return if $_[0] =~ /\A\QWarning (mostly harmless): No library found for \E.+/
+        }
         $warnings = join '', @_;
     };
 
@@ -49,7 +57,7 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
 sub MY::postamble {
     my($self, %extra) = @_;
 
-    is_deeply( \%extra, { FOO => 1, BAR => 'fugawazads' }, 
+    is_deeply( \%extra, { FOO => 1, BAR => 'fugawazads' },
                'postamble args passed' );
 
     return <<OUT;
@@ -60,7 +68,7 @@ OUT
 
 
 ok( open(MAKEFILE, $Makefile) ) or diag "Can't open $Makefile: $!";
-{ local $/; 
+{ local $/;
   like( <MAKEFILE>, qr/^\# This makes sure the postamble gets written\n/m,
         'postamble added to the Makefile' );
 }

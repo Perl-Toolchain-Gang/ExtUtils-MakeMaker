@@ -1,4 +1,4 @@
-package MakeMaker::Test::Setup::Problem;
+package MakeMaker::Test::Setup::Unicode;
 
 @ISA = qw(Exporter);
 require Exporter;
@@ -8,21 +8,18 @@ use strict;
 use File::Path;
 use File::Basename;
 use MakeMaker::Test::Utils;
+use utf8;
+use Config;
 
 my %Files = (
              'Problem-Module/Makefile.PL'   => <<'END',
 use ExtUtils::MakeMaker;
+use utf8;
 
 WriteMakefile(
     NAME    => 'Problem::Module',
+    AUTHOR  => q{Danijel Tašov},
 );
-END
-
-             'Problem-Module/subdir/Makefile.PL'    => <<'END',
-printf "\@INC %s .\n", (grep { $_ eq '.' } @INC) ? "has" : "doesn't have";
-
-warn "I think I'm going to be sick\n";
-die "YYYAaaaakkk\n";
 END
 
 );
@@ -35,7 +32,8 @@ sub setup_recurs {
 
         my $dir = dirname($file);
         mkpath $dir;
-        open(FILE, ">$file") || die "Can't create $file: $!";
+        my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
+        open(FILE, ">$utf8", $file) || die "Can't create $file: $!";
         print FILE $text;
         close FILE;
 
@@ -48,7 +46,7 @@ sub setup_recurs {
     return 1;
 }
 
-sub teardown_recurs {
+sub teardown_recurs { 
     foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {

@@ -1,3 +1,514 @@
+6.99_07 Wed Jul 30 17:36:14 BST 2014
+    Bug fixes:
+    - Resolve 'wide character in print' warnings
+
+6.99_06 Mon Jul 28 15:02:25 BST 2014
+    Enhancements:
+    - Improvements and tests for the spaces-in-stuff handling
+
+6.99_05 Tue Jul 22 12:32:03 BST 2014
+    Enhancements:
+    - Enable working with (including installing to) directories with spaces in names
+
+6.99_04 Sat Jul 12 12:43:08 BST 2014
+    Enhancements:
+    - No longer report each file being manified. Only summarise.
+
+6.99_03 Fri Jul  4 11:02:21 BST 2014
+    Doc Fixes:
+    - PATCHING document has been rewritten as CONTRIBUTING and TODO
+      document has been removed
+
+    Bug Fixes:
+    - Rearranged bundled prereqs so CPAN::Meta::Requirements won't
+      get stomped on if it is installed already, but CPAN::Meta isn't
+
+6.99_02 Thu Jun  5 12:15:28 BST 2014
+    Bug fixes:
+    * MM->parse_version will no longer warn if it could
+      not determine the $VERSION due to syntax errors etc.
+
+6.99_01 Tue Jun  3 22:17:30 BST 2014
+    Bug fixes:
+    * Disregard some warnings during tests when cross-compiling
+
+    Doc fixes:
+    * Clarified the use and limitations of META_ADD, META_MERGE
+
+    Test fixes:
+    * Sanitise env vars in tests
+
+6.98 Tue Apr 29 21:27:59 BST 2014
+
+    No changes from 6.97_02
+
+6.97_02 Mon Apr 28 11:44:56 BST 2014
+    Dist fixes:
+    * Removed redundant File::Spec check from Makefile.PL
+
+6.97_01 Thu Apr 24 14:23:02 BST 2014
+    Bug fixes:
+    * Resolve another regression related to not recursing into distdirs
+
+6.96 Fri Apr 11 21:54:25 BST 2014
+
+    No changes from 6.95_02
+
+6.95_02 Mon Apr  7 15:26:20 BST 2014
+    Bug fixes:
+    * Work-around v5.10.1 for the MIN_PERL_VERSION v-string handling
+
+6.95_01 Wed Apr  2 21:49:22 BST 2014
+    Bug fixes:
+    * Make MIN_PERL_VERSION handle v-strings properly
+
+6.94 Tue Mar 25 19:26:31 GMT 2014
+
+    No changes from 6.93_01
+
+6.93_01 Mon Mar 24 16:53:31 GMT 2014
+    Bug fixes:
+    * Resolved a regression in MM_Unix.pm
+      (https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/96)
+
+6.92 Thu Mar 13 16:18:32 GMT 2014
+
+    No changes from 6.91_01
+
+6.91_01 Thu Mar  6 13:48:22 GMT 2014
+    Test fixes:
+    * Make meta tests more robust to changes in CPAN::Meta
+
+6.90 Thu Feb 20 20:46:04 GMT 2014
+
+    No changes from 6.89_01
+
+6.89_01 Mon Feb 17 15:56:39 GMT 2014
+    Bug fixes:
+    * Libraries are not transitive on Android
+
+6.88 Fri Jan 31 20:49:13 GMT 2014
+
+    No changes from 6.87_05
+
+6.87_05 Tue Jan 28 13:54:21 GMT 2014
+    Bug fixes:
+    * Synchronisation with blead to remove old cross-compilation model
+
+6.87_04 Sun Jan 26 19:29:05 GMT 2014
+    Bug fixes:
+    * On Android, pass PERL_LIB through rel2abs().
+
+6.87_03 Sun Jan 19 17:49:43 GMT 2014
+    Bug fixes:
+    * Get rid of unused printf arguments in dynamic_bs
+
+6.87_02 Sat Jan 18 13:00:36 GMT 2014
+    Doc fixes:
+    * Update documentation for LICENSE attribute.
+
+    Bug fixes:
+    * Get rid of unused printf arguments in dir_target
+
+6.87_01 Sun Jan 12 10:31:41 GMT 2014
+    Doc fixes:
+    * mention that TEST_REQUIRES is in v6.64 and above
+
+6.86 Sat Jan  4 12:17:53 GMT 2014
+
+    No changes from 6.85_07
+
+6.85_07 Wed Jan  1 18:55:22 GMT 2014
+    Bug fixes:
+    * Expanded test coverage for metafiles
+
+    Doc fixes:
+    * Documentation expanded to mention JSON metafiles
+
+6.85_06 Mon Dec 30 23:14:37 GMT 2013
+    Bug fixes:
+    * Explicitly require dynaloader before using mod2fname
+
+6.85_05 Sun Dec 29 11:25:00 GMT 2013
+    Bug fixes:
+    * Export 'configure' section of prereqs when meta-spec version 2
+
+    Doc fixes:
+    * Document BUILD_REQUIRES defaults
+
+6.85_04 Mon Dec 23 15:00:14 GMT 2013
+
+    No changes since v6.85_03 fixing repo tags
+
+6.85_03 Mon Dec 23 14:55:37 GMT 2013
+    Bug fixes:
+    * RT#91540 PREREQ_FATAL not recognised on command line
+
+6.85_02 Tue Dec 17 10:13:28 GMT 2013
+    New features:
+    * Added PPM_UNINSTALL_EXEC and PPM_UNINSTALL_SCRIPT options
+      to PPD generation
+
+6.85_01 Mon Dec 16 13:15:43 GMT 2013
+    Bug Fixes:
+    * harden xsubpp locating loop in MM_Unix
+
+6.84 Sat Nov 30 15:22:35 GMT 2013
+
+    No changes from 6.83_06
+
+6.83_06 Fri Nov 29 21:50:51 GMT 2013
+    Doc fixes:
+    * Correct the documentation for MAGICXS
+
+6.83_05 Mon Nov 25 22:51:11 GMT 2013
+    New Features:
+    * Added MAGICXS attribute to explicitly enable automagic
+      XS building.
+
+    Bug fixes:
+    * RT#90780 fix Macro `BOOTSTRAP' redefined warnings
+    * Only enable automatic OBJECT generation if MAGICXS is true
+
+6.83_04 Sun Nov 17 11:41:43 GMT 2013
+    New Features:
+    * OBJECT can now be specified as an array
+    * build C_FILES/O_FILES/OBJECT automatically from XS
+
+6.83_03 Fri Nov 15 09:44:26 GMT 2013
+    Bug fixes:
+    * Don't recurse into stale dist dirs
+
+6.83_02 Tue Nov 12 11:11:34 GMT 2013
+    Misc:
+    * Enable bootstrapping to work on v5.10.x again
+
+6.83_01 Tue Nov  5 11:43:50 GMT 2013
+    Misc:
+    * disable make parallelism for pure_all target
+
+6.82 Mon Nov  4 19:20:07 GMT 2013
+
+    No changes from 6.81_05
+
+6.81_05 Sat Nov  2 21:29:42 GMT 2013
+    Misc:
+    * Special-case the bundling of version, so
+      that XS versions don't get overwritten
+
+6.81_04 Fri Nov  1 19:54:09 GMT 2013
+    Doc fixes:
+    * Update XSPROTOARG docs for changes in xsubpp
+
+6.81_03 Thu Oct 24 20:50:15 BST 2013
+    Doc Fixes:
+    * Clarify heir-apparent in FAQ
+
+    Misc:
+    * Changed GNU-Style to Unix-Style
+    * VMS will now report 'make' style
+
+6.81_02 Thu Oct 17 12:20:59 BST 2013
+    Misc:
+    * Updated bundled JSON::PP
+
+6.81_01 Wed Oct 16 08:59:03 BST 2013
+    Misc:
+    * Updated bundled Test-Simple
+
+6.80 Tue Oct 15 16:04:50 BST 2013
+
+    No changes from 6.79_04
+
+6.79_04 Fri Oct 11 18:57:51 BST 2013
+    Bug fixes:
+    * Add CP_NONEMPTY to the list of tools in Makefile
+
+6.79_03 Fri Oct 11 13:56:53 BST 2013
+    Bug fixes:
+    * don't copy .bs portably :)
+
+6.79_02 Fri Oct 11 12:58:01 BST 2013
+    Bug fixes:
+    * RT#28992 don't copy .bs files if they are empty
+
+6.79_01 Tue Oct  1 14:59:27 BST 2013
+    VMS fixes:
+    * Remove MM_TEST_ROOT feature for VMS test support
+
+6.78 Mon Sep 23 13:44:39 BST 2013
+
+    No changes from 6.77_08
+
+6.77_08 Sun Sep 22 18:43:23 BST 2013
+    New feature:
+    * Made UNINST an attribute, so removing shadowed modules
+      can be set 'perl Makefile.PL UNINST=1'
+
+6.77_07 Sat Sep 21 09:44:19 BST 2013
+    Bug fixes:
+    * do not set default switches in Test::Harness; not even -w
+
+6.77_06 Thu Sep 19 15:36:59 BST 2013
+    Dist fixes:
+    * Previous tarball was corrupted
+
+6.77_05 Thu Sep 19 14:09:00 BST 2013
+    Bug fixes:
+    * Fix 3 more tests to work in parallel. Now works with HARNESS_OPTIONS=j64
+
+6.77_04 Wed Sep 18 19:23:38 BST 2013
+    Bug fixes:
+    * Fixed PERL_SRC for core tests after parallelisation
+      enhancements were made in 6.77_01
+
+6.77_03 Mon Sep 16 12:20:25 BST 2013
+    VMS fixes:
+    * CCFLAGS may have appendages not from PERL_MM_OPT
+
+6.77_02 Thu Sep 12 21:21:12 BST 2013
+    Bug fixes:
+    * Support 'perl' as a PREREQ_PM target
+    * RT#77029 Support linefeeds in abstract parsing
+    * Skip some tests when cross-compiling core
+
+6.77_01 Tue Sep 10 15:20:42 BST 2013
+    Bug fixes:
+    * RT#7248 warn if NAME is not valid package name
+    * Perl#36539 reverse search order for finding perl
+    * parse_version() should work with taint mode now
+    * RT#69590 enable tests to be run in parallel
+
+6.76 Fri Sep  6 13:32:42 BST 2013
+
+    No changes from 6.75_04
+
+6.75_04 Thu Sep  5 12:07:59 BST 2013
+    Bug fixes:
+    * Sanitise make on MSWin32 when reporting Makefile type
+
+6.75_03 Tue Sep  3 00:24:23 BST 2013
+    New features:
+    * Added RECURSIVE_TEST_FILES attribute to 'test'
+    * Report the type of Makefile being generated
+
+    Bug fixes:
+    * RT#17041 more sortification of hashes to Makefile
+
+6.75_02 Sun Sep  1 21:50:48 BST 2013
+    Bug fixes:
+    * RT#49043 binmode STDIN breaks prompt() on MSWin32
+    * RT#14505 Handle -Wl,-rpath correctly
+    * RT#17041 Sort manification and copying events for perceptive
+      cleanliness
+
+6.75_01 Thu Aug 29 15:06:27 BST 2013
+    New features:
+    * Added NO_PERLLOCAL option to allow suppression of writing
+      installs to perllocal.pod
+    * Added NO_PACKLIST option to allow suppression of writing
+      packlist files for installations
+
+    Bug Fixes:
+    * RT#32894 deal with legitimate linker flags correctly
+    * RT#88222 check that Time::HiRes has 'stat' before using it
+
+    Doc Fixes:
+    * RT#87350 Document DLEXT parameter (sisyphus)
+
+6.74 Tue Aug 27 12:43:05 BST 2013
+    No changes from 6.73_12
+
+6.73_12 Fri Aug 23 10:49:13 BST 2013
+    Bug Fixes:
+    * Preserve runtime requires when PREREQ_PM argument is empty or undef
+      (miyagawa)
+    * RT#88037 regen run of Makefile.PL will use same -MCross arg as
+      initial .PL run (bulk88)
+
+6.73_11 Sat Aug 17 22:51:14 BST 2013
+    Bug Fixes:
+    * RT#87911 prepend SUFFIX with a '.' if one isn't supplied
+
+6.73_10 Fri Aug 16 16:40:09 BST 2013
+    Bug Fixes:
+    * RT#87839 resolve bootstrap problems when required prereqs
+      are missing
+
+6.73_09 Fri Aug  9 19:58:32 BST 2013
+    Bug Fixes:
+    * Bundle code from Text::ParseWords to handle splitting
+      PERL_MM_OPT (actually removing Text::ParseWords this time).
+
+6.73_08 Fri Aug  9 19:49:27 BST 2013
+    Bug Fixes:
+    * Bundle code from Text::ParseWords to handle splitting
+      PERL_MM_OPT.
+
+6.73_07 Wed Aug  7 16:07:04 BST 2013
+    Bug Fixes:
+    * Set ACTIVEPERL_CONFIG_SILENT=1 during tests to make
+      ActivePerl less vocal about things
+
+6.73_06 Tue Aug  6 00:50:08 BST 2013
+    New features:
+    * RT#70201 replace -M with Time::HiRes::stat
+
+    Bug Fixes:
+    * Split PERL_MM_OPT like a shell would, instead of split ' '
+
+    Win32 Fixes:
+    * Correct an oversight with Liblist Kid fix
+
+6.73_05 Mon Aug  5 17:44:00 BST 2013
+    Win32 fixes:
+    * Fix hash randomisation problems with Liblist Kid
+
+6.73_04 Thu Aug  1 22:34:31 BST 2013
+    Doc fixes:
+    * Corrected example for PM => {}
+
+6.73_03 Tue Jul 30 22:09:52 BST 2013
+    Bug Fixes:
+    * Fix clean_subdirs target that was generating
+      warning on BSD
+
+6.73_02 Fri Jul 26 13:32:43 BST 2013
+    Misc:
+    * Updated bundled Parse::CPAN::Meta
+
+6.73_01 Wed Jul 24 23:49:56 BST 2013
+    Bug Fixes:
+    * Robustified parse_version()
+
+6.72 Wed Jul 24 18:38:19 BST 2013
+    No changes from 6.71_01
+
+6.71_01 Wed Jul 24 09:31:07 BST 2013
+    Bug Fixes:
+    * Resolved more regressions in parse_version code
+
+6.70 Tue Jul 23 21:55:23 BST 2013
+    No changes from 6.69_09
+
+6.69_09 Sun Jul 21 09:22:40 BST 2013
+    Bug Fixes:
+    * RT#86976 Fix version parsing bug introduced in 6.69_05
+      Part Deux :)
+
+6.69_08 Wed Jul 17 00:36:28 BST 2013
+    Bug Fixes:
+    * RT#86976 Fix version parsing bug introduced in 6.69_05
+
+6.69_07 Tue Jul 16 15:32:25 BST 2013
+    New features:
+    * RT#4550 report the file created after make dist
+
+    Bug Fixes:
+    * RT#66113 strip control characters from ABSTRACT
+    * RT#20662 Don't check for config.h if it doesn't exist
+
+6.69_06 Fri Jul 12 14:49:32 BST 2013
+    Bug Fixes:
+    * RT#64163 clean_subdirs infinite loop if subdir already gone
+    * RT#79348 doesn't support miniperl in installation paths
+
+    Doc Fixes:
+    * Fix META_MERGE example
+    * RT#31053 Mention configure_requires in PREREQ_FATAL documentation
+    * RT#14680 Document TEST_FILES usage with 'make test'
+    * RT#21285 Document 'make veryclean'
+
+6.69_05 Thu Jul 11 22:10:10 BST 2013
+    Bug Fixes:
+    * Resolve RT#9452 regression with
+      parse_version() (Victor Efimov)
+    * RT#28632 use LD and OPTIMIZE in recursive Makefile.PL
+      invocations (Niko Tyni)
+
+6.69_04 Wed Jul 10 11:48:22 BST 2013
+    Cygwin Fixes:
+    * Revert RT#54703 and apply patch from RT#69401 to
+      resolve /cygdrive issues (Reini Urban)
+
+6.69_03 Tue Jul  9 22:39:54 BST 2013
+    Bug Fixes:
+    * RT#61419 Avoid invisible interactive question when
+      rebuilding Makefile (Slaven Rezic)
+    * VERSION also now really handles v-strings correctly.
+
+    Cygwin Fixes:
+    * RT#54703 - Don't hardcode /cygdrive (Jerry Hedden)
+
+    Misc:
+    * Install into site when 5.12 or above
+
+6.69_02 Tue Jul  2 13:12:51 BST 2013
+    Bug Fixes:
+    * [RT#86609] VERSION_FROM now handles v-strings correctly.
+    * VERSION also now handles v-strings correctly.
+
+    Misc:
+    * Updated bundled CPAN::Meta and removed Version::Requirements
+
+6.69_01 Thu Jun 20 12:49:45 BST 2013
+    Win32 Fixes:
+    * resolve regression on Win32 introduced in 6.67_01
+      (bingos)
+
+6.68 Fri Jun 14 23:26:11 BST 2013
+    No changes from 6.67_05
+
+6.67_05 Thu Jun 13 21:52:46 BST 2013
+    Doc fixes:
+    * RT#86007 - Restore meaning for divorced sentence
+
+6.67_04 Mon Jun 10 20:18:25 BST 2013
+    Bug fixes
+    * Address RT#85406, where specifying 'meta-spec' in
+      META_[ADD|MERGE] would remove all prereqs (bingos)
+
+6.67_03 Wed Jun  5 22:03:28 BST 2013
+    Doc Fixes
+    * Document how to specify meta-spec in META_MERGE (bingos)
+
+6.67_02 Sun Jun  2 18:27:45 BST 2013
+    Bug Fixes
+    * Allow v-prefixed version strings once more (bingos)
+    * Typos fixed (David Steinbrunner)
+    * Resolve test failure with latest CPAN::Meta
+
+6.67_01 Thu Apr 25 21:03:58 BST 2013
+    Doc Fixes
+    * Change references to makemaker.org in the docs
+      (Reported as RT#83246 by dolmen)
+
+    VOS Fixes
+    * 'core' files are keep files (*.kp) on vos, adjust the
+      'clean' target to account for this (Paul Green)
+
+    Win32 Fixes
+    * Increase dmake MAXLINELENGTH to 800000 (RT#77215) as
+      per kmx's recommendations (kmx)
+
+    Cygwin Fixes
+    * Allow linking of Cygwin libraries (Reini Urban)
+
+6.66 Fri Apr 19 17:53:13 BST 2013
+    No changes from 6.65_03
+
+6.65_03 Mon Apr 15 13:44:24 BST 2013
+    Test Fixes
+    * Use File::Temp in parse_* tests to resolve race conditions
+      on 64bit Windows
+      (bingos)
+
+6.65_02 Sun Apr 14 10:56:41 BST 2013
+    Test Fixes
+    * t/xs.t is now running tests against the XS build.
+      (Michael G Schwern) (Leon Timmermans)
+
+
 6.65_01 Tue Mar 19 00:06:17 CET 2013
     New Features
     * Improvements perlcritic support. (M. Schwern)

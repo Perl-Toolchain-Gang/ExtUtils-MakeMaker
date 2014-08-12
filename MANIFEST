@@ -1,5 +1,6 @@
 .perlcriticrc
 bin/instmodsh
+bundled/CPAN-Meta-Requirements/CPAN/Meta/Requirements.pm
 bundled/CPAN-Meta-YAML/CPAN/Meta/YAML.pm
 bundled/CPAN-Meta/CPAN/Meta.pm
 bundled/CPAN-Meta/CPAN/Meta/Converter.pm
@@ -25,12 +26,12 @@ bundled/Scalar-List-Utils/List/Util.pm
 bundled/Scalar-List-Utils/List/Util/PP.pm
 bundled/Scalar-List-Utils/Scalar/Util.pm
 bundled/Scalar-List-Utils/Scalar/Util/PP.pm
-bundled/Version-Requirements/Version/Requirements.pm
 bundled/version/version.pm
 bundled/version/version.pod
 bundled/version/version/Internals.pod
 bundled/version/version/vpp.pm
 Changes
+CONTRIBUTING
 INSTALL
 lib/ExtUtils/Command/MM.pm
 lib/ExtUtils/Liblist.pm
@@ -65,7 +66,6 @@ MANIFEST
 MANIFEST.SKIP
 my/bundles.pm
 NOTES
-PATCHING
 README
 README.packaging
 t/00compile.t
@@ -94,6 +94,7 @@ t/lib/MakeMaker/Test/Setup/PL_FILES.pm
 t/lib/MakeMaker/Test/Setup/Problem.pm
 t/lib/MakeMaker/Test/Setup/Recurs.pm
 t/lib/MakeMaker/Test/Setup/SAS.pm
+t/lib/MakeMaker/Test/Setup/Unicode.pm
 t/lib/MakeMaker/Test/Setup/XS.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
@@ -163,8 +164,8 @@ t/test_boilerplate.t
 t/testdata/reallylongdirectoryname/arch1/Config.pm
 t/testdata/reallylongdirectoryname/arch2/Config.pm
 t/testlib.t
+t/unicode.t
 t/VERSION_FROM.t
 t/WriteEmptyMakefile.t
 t/writemakefile_args.t
 t/xs.t
-TODO

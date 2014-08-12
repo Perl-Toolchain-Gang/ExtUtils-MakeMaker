@@ -20,11 +20,6 @@ use ExtUtils::MakeMaker 6.50;
 
 my $BUILDING_AS_PACKAGE = $ENV{BUILDING_AS_PACKAGE};
 
-BEGIN {
-    die "You have File::Spec version $File::Spec::VERSION\n" . "ExtUtils::MakeMaker requires File::Spec >= 0.8 to build at all.\n"
-      if $File::Spec::VERSION < 0.8;
-}
-
 my $PACKAGE = 'ExtUtils::MakeMaker';
 my $version = do { no strict 'refs'; ${ $PACKAGE . '::VERSION' }; };
 $version =~ s/_//;      # for X.Y_Z alpha releases
@@ -47,6 +42,7 @@ CHANGE_WARN
 
 check_environment();
 
+my %Extra_Params  = ();
 my %Extra_Prereqs = ();
 
 # Special case for MakeMaker being built as a vendor package
@@ -55,23 +51,32 @@ if( $BUILDING_AS_PACKAGE ) {
     # bundle the latest because we might as well, but we don't want to
     # burden vendors with having to update everything.
     %Extra_Prereqs = (
-        'CPAN::Meta'            => '2.112580',
-        'CPAN::Meta::YAML'      => '0.002',
-        'ExtUtils::Command'     => '1.16',
-        'ExtUtils::Install'     => '1.52',
-        'ExtUtils::Manifest'    => '1.58',
-        'File::Temp'            => '0.22',
-        'JSON::PP'              => '2.27103',
-        'Parse::CPAN::Meta'     => '1.4400',
-        'Scalar::Util'          => '1.13',
-        'version'               => '0.82',
-        'Version::Requirements' => '0.101020',
+        'CPAN::Meta'               => '2.113640',
+        'CPAN::Meta::YAML'         => '0.002',
+        'ExtUtils::Command'        => '1.16',
+        'ExtUtils::Install'        => '1.52',
+        'ExtUtils::Manifest'       => '1.58',
+        'File::Temp'               => '0.22',
+        'JSON::PP'                 => '2.27103',
+        'Parse::CPAN::Meta'        => '1.4400',
+        'Scalar::Util'             => '1.13',
+        'version'                  => '0.82',
+        'CPAN::Meta::Requirements' => '2.121',
     );
 
     $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
 }
 else {
-    my::bundles::copy_bundles("bundled", "inc");
+   eval {
+      require ExtUtils::Manifest;
+      require ExtUtils::Command;
+      require ExtUtils::Install;
+   };
+   if ( $@ ) {
+     $Extra_Params{PERL} = "$^X -Iinc";
+   }
+
+   my::bundles::copy_bundles("bundled", "inc");
 }
 
 # Test::Harnesses prior to 2.00 shoved all of @INC onto the command line
@@ -112,7 +117,7 @@ my $MM = WriteMakefile(
 
     CONFIGURE_REQUIRES => {},                  # We don't need ourself to install ourself.
     BUILD_REQUIRES     => { 'Data::Dumper' => 0, },
-    INSTALLDIRS        => 'perl',
+    INSTALLDIRS        => ( $] < 5.012 ? 'perl' : 'site' ),
     LICENSE            => 'perl',
     ABSTRACT_FROM      => "lib/$PACKAGE_FILE.pm",
     AUTHOR             => 'Michael G Schwern <schwern@pobox.com>',
@@ -120,6 +125,8 @@ my $MM = WriteMakefile(
     realclean              => {
         FILES   => "inc"
     },
+
+    %Extra_Params,
 
     $^O =~ /win/i
     ? (
@@ -232,4 +239,14 @@ critic : .perlcriticrc
 END
 
     }
+
+    sub special_targets {
+      my $make_frag = shift->SUPER::special_targets(@_);
+      $make_frag .= <<'MAKE_FRAG';
+.NOTPARALLEL: pure_all
+
+MAKE_FRAG
+      return $make_frag;
+    }
+
 }

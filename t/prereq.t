@@ -8,7 +8,9 @@ BEGIN {
 }
 
 use strict;
+use Config;
 use Test::More tests => 16;
+use File::Temp qw[tempdir];
 
 use TieOut;
 use MakeMaker::Test::Utils;
@@ -16,7 +18,8 @@ use MakeMaker::Test::Setup::BFD;
 
 use ExtUtils::MakeMaker;
 
-chdir 't';
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+chdir $tmpdir;
 
 perl_lib();
 
@@ -33,6 +36,11 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     ok( my $stdout = tie *STDOUT, 'TieOut' );
     my $warnings = '';
     local $SIG{__WARN__} = sub {
+        if ( $Config{usecrosscompile} ) {
+            # libraries might not be present on the target system
+            # when cross-compiling
+            return if $_[0] =~ /\A\QWarning (mostly harmless): No library found for \E.+/
+        }
         $warnings .= join '', @_;
     };
     # prerequisite warnings are disabled while building the perl core:
@@ -53,7 +61,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
             strict  => 99999
         }
     );
-    is $warnings, 
+    is $warnings,
     sprintf("Warning: prerequisite strict 99999 not found. We have %s.\n",
             $strict::VERSION);
 
@@ -64,7 +72,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
             "I::Do::Not::Exist" => 0,
         }
     );
-    is $warnings, 
+    is $warnings,
     "Warning: prerequisite I::Do::Not::Exist 0 not found.\n";
 
 
@@ -89,11 +97,11 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
             "strict"            => 99999,
         }
     );
-    is $warnings, 
+    is $warnings,
     "Warning: prerequisite I::Do::Not::Exist 0 not found.\n".
     sprintf("Warning: prerequisite strict 99999 not found. We have %s.\n",
             $strict::VERSION);
-    
+
     $warnings = '';
     eval {
         WriteMakefile(
@@ -106,7 +114,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
             PREREQ_FATAL    => 1,
         );
     };
-    
+
     is $warnings, '';
     is $@, <<'END', "PREREQ_FATAL";
 MakeMaker FATAL: prerequisites not found.
@@ -131,7 +139,7 @@ END
             PREREQ_FATAL    => 1,
         );
     };
-    
+
     is $warnings, '';
     is $@, <<'END', "PREREQ_FATAL happens before CONFIGURE";
 MakeMaker FATAL: prerequisites not found.

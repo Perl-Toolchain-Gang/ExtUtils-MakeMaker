@@ -1,13 +1,13 @@
 package Test::Simple;
 
-use 5.004;
+use 5.006;
 
 use strict;
 
-our $VERSION = '0.88';
+our $VERSION = '0.99';
 $VERSION = eval $VERSION;    ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
-use Test::Builder::Module;
+use Test::Builder::Module 0.99;
 our @ISA    = qw(Test::Builder::Module);
 our @EXPORT = qw(ok);
 
@@ -121,7 +121,7 @@ Here's an example of a simple .t file for the fictional Film module.
                              Rating   => 'R',
                              NumExplodingSheep => 1
                            });
-    ok( defined($btaste) && ref $btaste eq 'Film,     'new() works' );
+    ok( defined($btaste) && ref $btaste eq 'Film',     'new() works' );
 
     ok( $btaste->Title      eq 'Bad Taste',     'Title() get'    );
     ok( $btaste->Director   eq 'Peter Jackson', 'Director() get' );
@@ -162,9 +162,9 @@ Unfortunately, I can't differentiate any further.
 
 =head1 NOTES
 
-Test::Simple is B<explicitly> tested all the way back to perl 5.004.
+Test::Simple is B<explicitly> tested all the way back to perl 5.6.0.
 
-Test::Simple is thread-safe in perl 5.8.0 and up.
+Test::Simple is thread-safe in perl 5.8.1 and up.
 
 =head1 HISTORY
 

@@ -6,12 +6,12 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 5;
 use ExtUtils::MM;
-use MakeMaker::Test::Setup::Problem;
+use MakeMaker::Test::Setup::Unicode;
 use TieOut;
 
-my $MM = bless { DIR => ['subdir'] }, 'MM';
+my $MM = bless { DIR => ['.'] }, 'MM';
 
 ok( setup_recurs(), 'setup' );
 END {
@@ -30,12 +30,8 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 
     my $warning = '';
     local $SIG{__WARN__} = sub { $warning = join '', @_ };
-    eval { $MM->eval_in_subdirs; };
-
-    is( $stdout->read, qq{\@INC has .\n}, 'cwd in @INC' );
-    like( $@,
-          qr{^ERROR from evaluation of .*subdir.*Makefile.PL: YYYAaaaakkk},
-          'Makefile.PL death in subdir warns' );
+    $MM->eval_in_subdirs;
+	is $warning, '', 'no warning';
 
     untie *STDOUT;
 }

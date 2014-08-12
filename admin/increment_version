@@ -9,8 +9,10 @@ GetOptions(
     "alpha"       => \(my $Alpha),
     "version=s"   => \(my $Version),
     "isodate"     => \(my $Use_ISO_Date),
+    "stable"      => \(my $Stable),
 );
 
+$Alpha = 1 unless $Stable;
 
 sub inc_version {
     my $version = shift;
@@ -28,7 +30,7 @@ sub set_isodate_version {
 
 sub increment_version {
     my($old_version) = @_;
-    
+
     my($version, $alpha) = split /_/, $old_version;
     $alpha ||= '00';
 
@@ -46,7 +48,7 @@ sub increment_version {
     else {
         $new_version = inc_version($version);
     }
-    
+
     return $new_version;
 }
 
@@ -63,8 +65,8 @@ foreach my $file (@files) {
                 $saw_version = 1;
                 my $old_version = $2;
 
-                my $new_version = defined $Version 
-                                    ? $Version 
+                my $new_version = defined $Version
+                                    ? $Version
                                     : increment_version($old_version);
 
                 print "Changed version of $file from $old_version to $new_version\n";

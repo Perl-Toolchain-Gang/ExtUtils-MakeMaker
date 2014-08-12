@@ -1,0 +1,15 @@
+language: perl
+notifications:
+  on_success: never
+  on_failure: always
+  irc: "irc.perl.org#toolchain"
+  email: false
+perl:
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+script:
+  - perl Makefile.PL && make test
+  - make disttest

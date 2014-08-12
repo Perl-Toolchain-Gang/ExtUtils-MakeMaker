@@ -5,7 +5,12 @@
 use strict;
 use lib 't/lib';
 
-use Test::More 'no_plan';
+use Config;
+use Test::More
+    $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "no toolchain installed when cross-compiling")
+    : 'no_plan';
+use File::Temp qw[tempdir];
 
 use ExtUtils::MakeMaker;
 
@@ -17,10 +22,12 @@ my $perl     = which_perl();
 my $makefile = makefile_name();
 my $make     = make_run();
 
+local $ENV{PERL_INSTALL_QUIET};
 
 # Setup our test environment
 {
-    chdir 't';
+    my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+    chdir $tmpdir;
 
     perl_lib;
 
