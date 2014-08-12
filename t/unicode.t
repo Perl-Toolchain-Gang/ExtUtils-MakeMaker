@@ -6,16 +6,17 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use ExtUtils::MM;
 use MakeMaker::Test::Setup::Unicode;
 use TieOut;
+use Config;
 
 my $MM = bless { DIR => ['.'] }, 'MM';
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok( chdir File::Spec->updir );
+    ok( chdir File::Spec->updir, 'chdir updir' );
     ok( teardown_recurs(), 'teardown' );
 }
 
@@ -32,6 +33,20 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
     local $SIG{__WARN__} = sub { $warning = join '', @_ };
     $MM->eval_in_subdirs;
 	is $warning, '', 'no warning';
+
+SKIP: {
+          my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : "utf8";
+          skip 'because it does not support perlio only perl 5.8 or higher.',
+               1 unless $utf8;
+
+          open my $json_fh, '<:utf8', 'MYMETA.json' or die $!;
+          my $json = do { local $/; <$json_fh> };
+          close $json_fh;
+
+          require Encode;
+          my $str = Encode::decode( 'utf8', "Danijel Tašov's" );
+          like( $json, qr/$str/, 'utf8 abstract' );
+      };
 
     untie *STDOUT;
 }

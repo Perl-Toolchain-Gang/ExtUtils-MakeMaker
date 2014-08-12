@@ -52,13 +52,14 @@ my @DATA = (
 );
 
 ok(my $stdout = tie *STDOUT, 'TieOut');
-my $out;
 for my $tuple (@DATA) {
   my ($pkg, $version, $pattern, $descrip, $invertre) = @$tuple;
-  eval { $out=""; $out = capture_make("Fake::$pkg" => $version); };
+  next if $] < 5.008 && $pkg eq 'BareVString' && $descrip =~ m!^2-part!;
+  my $out;
+  eval { $out = capture_make("Fake::$pkg" => $version); };
   is($@, '', "$descrip not fatal");
   if ($invertre) {
-    like ( $out , qr/$pattern/i , "$descrip parses");
+    like ( $out , qr/$pattern/i, "$descrip parses");
   } else {
     unlike ( $out , qr/$pattern/i , "$descrip parses");
   }
