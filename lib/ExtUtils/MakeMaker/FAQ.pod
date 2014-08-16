@@ -469,6 +469,9 @@ C<XSTARGET_EXT> option. For example:
 
 B<CAUTION>: This solution is not crossplatform. Should work with gcc and clang,
 but probably will require more tuning (e.g. will need linking with libstdc++).
+Other modules that you may find helpful to configure your project to work
+across a range of C++ compilers and platforms include: L<ExtUtils::CppGuess>,
+L<ExtUtils::CBuilder> and L<ExtUtils::CChecker>.
 
 B<CAUTION>: If you have already generated F<.c> files before switching
 the suffix, you need to remove these files manually, otherwise MakeMaker will
