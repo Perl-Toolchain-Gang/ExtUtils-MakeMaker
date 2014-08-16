@@ -7,21 +7,15 @@ chdir 't';
 
 use strict;
 
-use Test::More;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::XSCPP;
+use Test::More
+    have_cplusplus()
+    ? (tests => 5)
+    : (skip_all => "ExtUtils::CBuilder not installed or couldn't find a C++ compiler");
 use File::Find;
 use File::Spec;
 use File::Path;
-
-my $Skipped = 0;
-if( have_cplusplus() ) {
-    plan tests => 5;
-}
-else {
-    $Skipped = 1;
-    plan skip_all => "ExtUtils::CBuilder not installed or couldn't find a C++ compiler";
-}
 
 my $Is_VMS = $^O eq 'VMS';
 my $perl = which_perl();
@@ -34,10 +28,8 @@ $| = 1;
 
 ok( setup_xs(), 'setup' );
 END {
-    unless( $Skipped ) {
-        chdir File::Spec->updir or die;
-        teardown_xs(), 'teardown' or die;
-    }
+    chdir File::Spec->updir or die;
+    teardown_xs(), 'teardown' or die;
 }
 
 ok( chdir('XSCPP-Test'), "chdir'd to XSCPP-Test" ) ||
