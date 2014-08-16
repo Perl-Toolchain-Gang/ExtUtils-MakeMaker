@@ -448,7 +448,7 @@ This tip has been brought to you by Nick Ing-Simmons and Stas Bekman.
 
 =item How can I build my xs files as C++
 
-Traditionally the language of source files is determined by suffix 
+Traditionally the language of source files is determined by suffix
 (e.g. F<.c>- C, F<.cpp> or F<.cc> is C++),
 so you need to tell MakeMaker that it should make files with an appropriate
 suffix from your F<.xs> files. It can be done by using
@@ -459,8 +459,8 @@ C<XSTARGET_EXT> option. For example:
   use ExtUtils::MakeMaker;
 
   WriteMakefile(
-      NAME		    => 'Foo',
-      VERSION_FROM	=> 'Foo.pm',
+      NAME          => 'Foo',
+      VERSION_FROM  => 'Foo.pm',
       OBJECT        => q/$(O_FILES)/,
       XSTARGET_EXT  => '.cpp',
       XSOPT         => '-C++ -nolinenumbers',

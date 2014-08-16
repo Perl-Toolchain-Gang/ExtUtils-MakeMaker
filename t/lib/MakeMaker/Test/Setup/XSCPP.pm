@@ -118,7 +118,7 @@ sub setup_xs {
     return 1;
 }
 
-sub teardown_xs { 
+sub teardown_xs {
     foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {
