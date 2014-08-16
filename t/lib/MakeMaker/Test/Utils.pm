@@ -162,7 +162,7 @@ my $had5lib = exists $ENV{PERL5LIB};
 sub perl_lib {
     my $basecwd = (File::Spec->splitdir(getcwd))[-1];
     croak "Basename of cwd needs to be 't' but is '$basecwd'\n"
-	unless $basecwd eq 't';
+        unless $basecwd eq 't';
                                # perl-src/t/
     my $lib =  $ENV{PERL_CORE} ? qq{../lib}
                                # ExtUtils-MakeMaker/t/
@@ -353,23 +353,11 @@ Returns true if there is a compiler available for XS builds.
 
 sub have_compiler {
     my $have_compiler = 0;
-
-    # ExtUtils::CBuilder prints its compilation lines to the screen.
-    # Shut it up.
-    use TieOut;
-    local *STDOUT = *STDOUT;
-    local *STDERR = *STDERR;
-
-    tie *STDOUT, 'TieOut';
-    tie *STDERR, 'TieOut';
-
     eval {
-	require ExtUtils::CBuilder;
-	my $cb = ExtUtils::CBuilder->new;
-
-	$have_compiler = $cb->have_compiler;
+        require ExtUtils::CBuilder;
+        my $cb = ExtUtils::CBuilder->new(quiet=>1);
+        $have_compiler = $cb->have_compiler;
     };
-
     return $have_compiler;
 }
 
