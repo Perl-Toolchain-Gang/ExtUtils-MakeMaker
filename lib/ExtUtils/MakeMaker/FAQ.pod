@@ -467,6 +467,9 @@ C<XSTARGET_EXT> option. For example:
       # ... other attrs ...
   );
 
+B<CAUTION>: This solution is not crossplatform. Should work with gcc and clang,
+but probably will require more tuning (e.g. will need linking with libstdc++).
+
 B<CAUTION>: If you have already generated F<.c> files before switching
 the suffix, you need to remove these files manually, otherwise MakeMaker will
 detect them and add to build. That will lead to strange errors from linker.
