@@ -1047,7 +1047,7 @@ WARNING
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace >= 2);
 
-            my $version_check = qq{$abs -le "require $ver; print qq{VER_OK}"};
+            my $version_check = qq{"$abs" -le "require $ver; print qq{VER_OK}"};
 
             # To avoid using the unportable 2>&1 to suppress STDERR,
             # we close it before running the command.
