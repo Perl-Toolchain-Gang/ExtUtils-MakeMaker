@@ -423,6 +423,18 @@ sub perl_script {
     return;
 }
 
+=item quote_dep
+
+=cut
+
+sub quote_dep {
+    my ($self, $arg) = @_;
+    die <<EOF if $arg =~ / / and not $self->is_make_type('gmake');
+Tried to use make dependency with space in: '$arg'
+Only works with GNU make (gmake).
+EOF
+    return $self->SUPER::quote_dep($arg);
+}
 
 =item xs_o
 
