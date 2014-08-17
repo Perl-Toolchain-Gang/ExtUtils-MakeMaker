@@ -1944,14 +1944,14 @@ sub init_PERL {
     foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
         my $run  = $perl.'RUN';
 
-        $self->{$run}  = "\$($perl)";
+        $self->{$run}  = qq{"\$($perl)"};
 
         # Make sure perl can find itself before it's installed.
         $self->{$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"}
           if $self->{UNINSTALLED_PERL} || $self->{PERL_CORE};
 
         $self->{$perl.'RUNINST'} =
-          sprintf q{$(%sRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"}, $perl;
+          sprintf q{"$(%sRUN)" "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"}, $perl;
     }
 
     return 1;
