@@ -132,7 +132,7 @@ sub c_o {
     my(@m);
 
     my $command = '$(CCCMD)';
-    my $flags   = '$(CCCDLFLAGS) -I$(PERL_INC) $(PASTHRU_DEFINE) $(DEFINE)';
+    my $flags   = '$(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
 
     if (my $cpp = $Config{cpprun}) {
         my $cpp_cmd = $self->const_cccmd;
@@ -387,10 +387,10 @@ sub constants {
                         } $self->installvars),
                    qw(
               PERL_LIB
-              PERL_ARCHLIB
+              PERL_ARCHLIB PERL_ARCHLIBDEP
               LIBPERL_A MYEXTLIB
               FIRST_MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE
-              PERLMAINCC PERL_SRC PERL_INC
+              PERLMAINCC PERL_SRC PERL_INC PERL_INCDEP
               PERL            FULLPERL          ABSPERL
               PERLRUN         FULLPERLRUN       ABSPERLRUN
               PERLRUNINST     FULLPERLRUNINST   ABSPERLRUNINST
@@ -404,6 +404,8 @@ sub constants {
         # pathnames can have sharp signs in them; escape them so
         # make doesn't think it is a comment-start character.
         $self->{$macro} =~ s/#/\\#/g;
+	$self->{$macro} = $self->quote_dep($self->{$macro})
+	  if $ExtUtils::MakeMaker::macro_dep{$macro};
 	push @m, "$macro = $self->{$macro}\n";
     }
 
@@ -443,7 +445,7 @@ MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS}})."
 
     push @m, q{
 # Where is the Config information that we are using/depend on
-CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
+CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
 } if -e File::Spec->catfile( $self->{PERL_INC}, 'config.h' );
 
 
@@ -460,11 +462,11 @@ INST_DYNAMIC     = $self->{INST_DYNAMIC}
 INST_BOOT        = $self->{INST_BOOT}
 };
 
-
     push @m, qq{
 # Extra linker info
 EXPORT_LIST        = $self->{EXPORT_LIST}
 PERL_ARCHIVE       = $self->{PERL_ARCHIVE}
+PERL_ARCHIVEDEP    = $self->{PERL_ARCHIVEDEP}
 PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 };
 
@@ -911,7 +913,7 @@ OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 INST_DYNAMIC_FIX = '.$ld_fix.'
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
+$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
 ');
     if ($armaybe ne ':'){
 	$ldfrom = 'tmp$(LIB_EXT)';
@@ -940,13 +942,13 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
 	# or -R to add paths to the run-time library search path.
         if ($Config{'lddlflags'} =~ /-Wl,-R/) {
-            $libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -Wl,-R$(PERL_ARCHLIB)/CORE -lperl';
+            $libs .= ' "-L$(PERL_INC)" "-Wl,-R$(INSTALLARCHLIB)/CORE" "-Wl,-R$(PERL_ARCHLIB)/CORE" -lperl';
         } elsif ($Config{'lddlflags'} =~ /-R/) {
-            $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -R$(PERL_ARCHLIB)/CORE -lperl';
+            $libs .= ' "-L$(PERL_INC)" "-R$(INSTALLARCHLIB)/CORE" "-R$(PERL_ARCHLIB)/CORE" -lperl';
         } elsif ( $Is{Android} ) {
             # The Android linker will not recognize symbols from
             # libperl unless the module explicitly depends on it.
-            $libs .= ' -L$(PERL_INC) -lperl';
+            $libs .= ' "-L$(PERL_INC)" -lperl';
         }
     }
 
@@ -1708,6 +1710,8 @@ EOP
     	$self->{PERL_LIB} = File::Spec->rel2abs($self->{PERL_LIB});
     	$self->{PERL_ARCHLIB} = File::Spec->rel2abs($self->{PERL_ARCHLIB});
     }
+    $self->{PERL_INCDEP} = $self->{PERL_INC};
+    $self->{PERL_ARCHLIBDEP} = $self->{PERL_ARCHLIB};
 
     # We get SITELIBEXP and SITEARCHEXP directly via
     # Get_from_Config. When we are running standard modules, these
@@ -1801,6 +1805,7 @@ Unix has no need of special linker flags.
 sub init_linker {
     my($self) = shift;
     $self->{PERL_ARCHIVE} ||= '';
+    $self->{PERL_ARCHIVEDEP} ||= '';
     $self->{PERL_ARCHIVE_AFTER} ||= '';
     $self->{EXPORT_LIST}  ||= '';
 }
@@ -1951,7 +1956,7 @@ sub init_PERL {
           if $self->{UNINSTALLED_PERL} || $self->{PERL_CORE};
 
         $self->{$perl.'RUNINST'} =
-          sprintf q{"$(%sRUN)" "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"}, $perl;
+          sprintf q{$(%sRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"}, $perl;
     }
 
     return 1;
@@ -2362,7 +2367,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     $cccmd = $self->const_cccmd($libperl);
     $cccmd =~ s/^CCCMD\s*=\s*//;
-    $cccmd =~ s/\$\(INC\)/ -I$self->{PERL_INC} /;
+    $cccmd =~ s/\$\(INC\)/ "-I$self->{PERL_INC}" /;
     $cccmd .= " $Config{cccdlflags}"
 	if ($Config{useshrplib} eq 'true');
     $cccmd =~ s/\(CC\)/\(PERLMAINCC\)/;
@@ -2508,7 +2513,7 @@ push @m, "
 
 $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 ";
-    push @m, "\t".$self->cd($tmp, qq[$cccmd -I\$(PERL_INC) perlmain.c])."\n";
+    push @m, "\t".$self->cd($tmp, qq[$cccmd "-I\$(PERL_INC)" perlmain.c])."\n";
 
     push @m, qq{
 $tmp/perlmain.c: $makefilename}, q{
@@ -2817,7 +2822,7 @@ sub perldepend {
 # Check for unpropogated config.sh changes. Should never happen.
 # We do NOT just update config.h because that is not sufficient.
 # An out of date config.h is not fatal but complains loudly!
-$(PERL_INC)/config.h: $(PERL_SRC)/config.sh
+$(PERL_INCDEP)/config.h: $(PERL_SRC)/config.sh
 	-$(NOECHO) $(ECHO) "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; $(FALSE)
 
 $(PERL_ARCHLIB)/Config.pm: $(PERL_SRC)/config.sh
@@ -3570,8 +3575,8 @@ sub tool_xsubpp {
         }
     }
     push(@tmdeps, "typemap") if -f "typemap";
+    my @tmargs = map(qq{-typemap "$_"}, @tmdeps);
     $_ = $self->quote_dep($_) for @tmdeps;
-    my(@tmargs) = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
         unshift( @tmargs, $self->{XSOPT} );
     }
@@ -3587,14 +3592,15 @@ sub tool_xsubpp {
 
 
     $self->{XSPROTOARG} = "" unless defined $self->{XSPROTOARG};
-    $xsdir =~ s# #\\ #g;
+    my $xsdirdep = $self->quote_dep($xsdir);
+    # -dep for use when dependency not command
 
     return qq{
 XSUBPPDIR = $xsdir
-XSUBPP = \$(XSUBPPDIR)\$(DFSEP)xsubpp
+XSUBPP = "\$(XSUBPPDIR)\$(DFSEP)xsubpp"
 XSUBPPRUN = \$(PERLRUN) \$(XSUBPP)
 XSPROTOARG = $self->{XSPROTOARG}
-XSUBPPDEPS = @tmdeps \$(XSUBPP)
+XSUBPPDEPS = @tmdeps $xsdirdep\$(DFSEP)xsubpp
 XSUBPPARGS = @tmargs
 XSUBPP_EXTRA_ARGS =
 };
@@ -3711,7 +3717,7 @@ sub xs_o {	# many makes are too dumb to use xs_c then c_o
     '
 .xs$(OBJ_EXT):
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
-	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(PASTHRU_DEFINE) $(DEFINE) $*.c
+	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c
 ';
 }
 

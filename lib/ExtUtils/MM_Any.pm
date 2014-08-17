@@ -2791,7 +2791,7 @@ sub _perl_header_files_fragment {
     return join("\\\n",
                 "PERL_HDRS = ",
                 map {
-                    sprintf( "        \$(PERL_INC)%s%s            ", $separator, $_ )
+                    sprintf( "        \$(PERL_INCDEP)%s%s            ", $separator, $_ )
                 } $self->_perl_header_files()
            ) . "\n\n"
            . "\$(OBJECT) : \$(PERL_HDRS)\n";
