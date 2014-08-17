@@ -3216,6 +3216,17 @@ sub oneliner {
 
 =item quote_literal
 
+Quotes macro literal value suitable for being used on a command line so
+that when expanded by make, will be received by command as given to
+this method:
+
+  my $quoted = $mm->quote_literal(q{it isn't});
+  # returns:
+  #   'it isn'\''t'
+  print MAKEFILE "target:\n\techo $quoted\n";
+  # when run "make target", will output:
+  #   it isn't
+
 =cut
 
 sub quote_literal {
