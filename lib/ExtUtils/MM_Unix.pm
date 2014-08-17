@@ -318,8 +318,6 @@ END
         # SITE*EXP macros are defined in &constants; avoid duplicates here
         next if $once_only{$key};
         $self->{uc $key} = quote_paren($self->{uc $key});
-        $self->{uc $key} =~ s/( )/\\$1/g
-	  if $ExtUtils::MakeMaker::macro_fsentity{uc $key};
         push @m, uc($key) , ' = ' , $self->{uc $key}, "\n";
         $once_only{$key} = 1;
     }
@@ -406,8 +404,6 @@ sub constants {
         # pathnames can have sharp signs in them; escape them so
         # make doesn't think it is a comment-start character.
         $self->{$macro} =~ s/#/\\#/g;
-        $self->{$macro} =~ s/( )/\\$1/g
-	  if $ExtUtils::MakeMaker::macro_fsentity{$macro};
 	push @m, "$macro = $self->{$macro}\n";
     }
 
@@ -882,8 +878,8 @@ $(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
 		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
-	$(NOECHO) $(TOUCH) %s
-	$(CHMOD) $(PERM_RW) %s
+	$(NOECHO) $(TOUCH) "%s"
+	$(CHMOD) $(PERM_RW) "%s"
 MAKE_FRAG
 }
 
@@ -2079,54 +2075,54 @@ pure_perl_install :: all
 };
 
     push @m,
-q{		read }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.$self->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{ \
+q{		read "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
+		write "}.$self->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
     push @m,
-q{		$(INST_LIB) $(DESTINSTALLPRIVLIB) \
-		$(INST_ARCHLIB) $(DESTINSTALLARCHLIB) \
-		$(INST_BIN) $(DESTINSTALLBIN) \
-		$(INST_SCRIPT) $(DESTINSTALLSCRIPT) \
-		$(INST_MAN1DIR) $(DESTINSTALLMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLMAN3DIR)
+q{		"$(INST_LIB)" "$(DESTINSTALLPRIVLIB)" \
+		"$(INST_ARCHLIB)" "$(DESTINSTALLARCHLIB)" \
+		"$(INST_BIN)" "$(DESTINSTALLBIN)" \
+		"$(INST_SCRIPT)" "$(DESTINSTALLSCRIPT)" \
+		"$(INST_MAN1DIR)" "$(DESTINSTALLMAN1DIR)" \
+		"$(INST_MAN3DIR)" "$(DESTINSTALLMAN3DIR)"
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
-		}.$self->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{
+		"}.$self->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{"
 
 
 pure_site_install :: all
 	$(NOECHO) $(MOD_INSTALL) \
 };
     push @m,
-q{		read }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.$self->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{ \
+q{		read "}.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
+		write "}.$self->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
     push @m,
-q{		$(INST_LIB) $(DESTINSTALLSITELIB) \
-		$(INST_ARCHLIB) $(DESTINSTALLSITEARCH) \
-		$(INST_BIN) $(DESTINSTALLSITEBIN) \
-		$(INST_SCRIPT) $(DESTINSTALLSITESCRIPT) \
-		$(INST_MAN1DIR) $(DESTINSTALLSITEMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLSITEMAN3DIR)
+q{		"$(INST_LIB)" "$(DESTINSTALLSITELIB)" \
+		"$(INST_ARCHLIB)" "$(DESTINSTALLSITEARCH)" \
+		"$(INST_BIN)" "$(DESTINSTALLSITEBIN)" \
+		"$(INST_SCRIPT)" "$(DESTINSTALLSITESCRIPT)" \
+		"$(INST_MAN1DIR)" "$(DESTINSTALLSITEMAN1DIR)" \
+		"$(INST_MAN3DIR)" "$(DESTINSTALLSITEMAN3DIR)"
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
-		}.$self->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{
+		"}.$self->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{"
 
 pure_vendor_install :: all
 	$(NOECHO) $(MOD_INSTALL) \
 };
     push @m,
-q{		read }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{ \
-		write }.$self->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{ \
+q{		read "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
+		write "}.$self->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
     push @m,
-q{		$(INST_LIB) $(DESTINSTALLVENDORLIB) \
-		$(INST_ARCHLIB) $(DESTINSTALLVENDORARCH) \
-		$(INST_BIN) $(DESTINSTALLVENDORBIN) \
-		$(INST_SCRIPT) $(DESTINSTALLVENDORSCRIPT) \
-		$(INST_MAN1DIR) $(DESTINSTALLVENDORMAN1DIR) \
-		$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR)
+q{		"$(INST_LIB)" "$(DESTINSTALLVENDORLIB)" \
+		"$(INST_ARCHLIB)" "$(DESTINSTALLVENDORARCH)" \
+		"$(INST_BIN)" "$(DESTINSTALLVENDORBIN)" \
+		"$(INST_SCRIPT)" "$(DESTINSTALLVENDORSCRIPT)" \
+		"$(INST_MAN1DIR)" "$(DESTINSTALLVENDORMAN1DIR)" \
+		"$(INST_MAN3DIR)" "$(DESTINSTALLVENDORMAN3DIR)"
 
 };
 
@@ -2144,37 +2140,37 @@ doc_vendor_install :: all
 
     push @m, q{
 doc_perl_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
+	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" $(INSTALLPRIVLIB) \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
+		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 doc_site_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
+	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" $(INSTALLSITELIB) \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
+		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 doc_vendor_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
+	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" $(INSTALLVENDORLIB) \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
+		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 } unless $self->{NO_PERLLOCAL};
 
@@ -2183,13 +2179,13 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{
+	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{"
 
 uninstall_from_sitedirs ::
-	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{
+	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
 
 uninstall_from_vendordirs ::
-	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{
+	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
 };
 
     join("",@m);
@@ -2343,7 +2339,7 @@ $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
 	$(NOECHO) $(PERLRUNINST) \
-		Makefile.PL DIR=}, $dir, q{ \
+		Makefile.PL DIR="}, $dir, q{" \
 		MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
 		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=};
 
@@ -2521,20 +2517,20 @@ $tmp/perlmain.c: $makefilename}, q{
 		-e "writemain(grep s#.*/auto/##s, split(q| |, q|$(MAP_STATIC)|))" > $@t && $(MV) $@t $@
 
 };
-    push @m, "\t", q{$(NOECHO) $(PERL) $(INSTALLSCRIPT)/fixpmain
+    push @m, "\t", q{$(NOECHO) $(PERL) "$(INSTALLSCRIPT)/fixpmain"
 } if (defined (&Dos::UseLFN) && Dos::UseLFN()==0);
 
 
     push @m, q{
 doc_inst_perl :
-	$(NOECHO) $(ECHO) Appending installation info to $(DESTINSTALLARCHLIB)/perllocal.pod
-	-$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
+	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
+	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Perl binary" "$(MAP_TARGET)" \
 		MAP_STATIC "$(MAP_STATIC)" \
 		MAP_EXTRA "`cat $(INST_ARCHAUTODIR)/extralibs.all`" \
 		MAP_LIBPERL "$(MAP_LIBPERL)" \
-		>> }.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{
+		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 };
 
@@ -2542,7 +2538,7 @@ doc_inst_perl :
 inst_perl : pure_inst_perl doc_inst_perl
 
 pure_inst_perl : $(MAP_TARGET)
-	}.$self->{CP}.q{ $(MAP_TARGET) }.$self->catfile('$(DESTINSTALLBIN)','$(MAP_TARGET)').q{
+	}.$self->{CP}.q{ $(MAP_TARGET) "}.$self->catfile('$(DESTINSTALLBIN)','$(MAP_TARGET)').q{"
 
 clean :: map_clean
 
@@ -3316,7 +3312,7 @@ END
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
     push(@m, <<'MAKE_FRAG') if $self->{MYEXTLIB};
-	$(CP) $(MYEXTLIB) $@
+	$(CP) $(MYEXTLIB) "$@"
 MAKE_FRAG
 
     my $ar;
@@ -3330,12 +3326,12 @@ MAKE_FRAG
     push @m, sprintf <<'MAKE_FRAG', $ar;
 	$(%s) $(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@
 	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > "$(INST_ARCHAUTODIR)/extralibs.ld"
 MAKE_FRAG
 
     # Old mechanism - still available:
     push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> "$(PERL_SRC)/ext.libs"
 MAKE_FRAG
 
     join('', @m);
