@@ -3139,6 +3139,24 @@ MAKE_FRAG
     return $m;
 }
 
+=item quote_dep
+
+  $text = $mm->quote_dep($text);
+
+Method that protects Makefile single-value constants (mainly filenames),
+so that make will still treat them as single values even if they
+inconveniently have spaces in. If the make program being used cannot
+achieve such protection and the given text would need it, throws an
+exception.
+
+=cut
+
+sub quote_dep {
+    my ($self, $arg) = @_;
+    $arg =~ s/( )/\\$1/g;
+    return $arg;
+}
+
 =item quote_paren
 
 Backslashes parentheses C<()> in command line arguments.
@@ -3557,7 +3575,7 @@ sub tool_xsubpp {
         }
     }
     push(@tmdeps, "typemap") if -f "typemap";
-    s/( )/\\$1/g for @tmdeps;
+    $_ = $self->quote_dep($_) for @tmdeps;
     my(@tmargs) = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
         unshift( @tmargs, $self->{XSOPT} );
