@@ -10,6 +10,7 @@ BEGIN {
 use strict;
 use Config;
 use ExtUtils::MakeMaker;
+use utf8;
 
 use Test::More
     $ENV{PERL_CORE} && $Config{'usecrosscompile'}
@@ -24,6 +25,9 @@ use File::Temp qw[tempdir];
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
+my $OLD_CP;
+if ($^O eq "MSWin32") { $OLD_CP = qx(chcp); qx(chcp 1252); } # crude but...
+END { qx(chcp $OLD_CP) if $^O eq "MSWin32" }
 
 my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
 chdir $tmpdir;
@@ -413,7 +417,6 @@ is( $?, 0, 'realclean' ) || diag($realclean_out);
 
 open(STDERR, ">&SAVERR") or die $!;
 close SAVERR;
-
 
 sub _normalize {
     my $hash = shift;
