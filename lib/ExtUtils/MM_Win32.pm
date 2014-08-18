@@ -429,10 +429,16 @@ sub perl_script {
 
 sub quote_dep {
     my ($self, $arg) = @_;
-    die <<EOF if $arg =~ / / and not $self->is_make_type('gmake');
-Tried to use make dependency with space in: '$arg'
-Only works with GNU make (gmake).
+    if ($arg =~ / / and not $self->is_make_type('gmake')) {
+	require Win32;
+	$arg = Win32::GetShortPathName($arg);
+	die <<EOF if not defined $arg or $arg =~ / /;
+Tried to use make dependency with space for non-GNU make:
+  '$arg'
+Fallback to short pathname failed.
 EOF
+	return $arg;
+    }
     return $self->SUPER::quote_dep($arg);
 }
 
