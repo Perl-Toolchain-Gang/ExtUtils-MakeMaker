@@ -26,12 +26,8 @@ exit;
 
 sub run {
     use_ok( 'ExtUtils::Liblist::Kid' );
-
     move_to_os_test_data_dir();
-    alias_kid_ext_for_convenience();
-
     conf_reset();
-
     return test_kid_win32() if $^O eq 'MSWin32';
     return;
 }
@@ -58,20 +54,8 @@ sub move_to_os_test_data_dir {
     return;
 }
 
-# With this we can use a short function name in the tests and use the same
-# one everywhere.
-
-sub alias_kid_ext_for_convenience {
-    my %os_ext_funcs = ( MSWin32 => \&ExtUtils::Liblist::Kid::_win32_ext, );
-    *_kid_ext = $os_ext_funcs{$^O} if $os_ext_funcs{$^O};
-
-    return;
-}
-sub _kid_ext;
-
 # Since liblist is object-based, we need to provide a mock object.
-
-sub _ext { _kid_ext( MockEUMM->new, @_ ); }
+sub _ext { ExtUtils::Liblist::Kid::ext( MockEUMM->new, @_ ); }
 
 sub quote { join ' ', map { qq{"$_"} } @_ }
 sub double { (@_) x 2 }
