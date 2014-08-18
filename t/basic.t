@@ -27,8 +27,8 @@ use File::Temp qw[tempdir];
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
-my $OLD_CP;
-if ($^O eq "MSWin32") { $OLD_CP = qx(chcp); qx(chcp 1252); } # crude but...
+my $OLD_CP; # crude but...
+if ($^O eq "MSWin32") { $OLD_CP = (split ' ', qx(chcp))[3]; qx(chcp 1252); }
 END { qx(chcp $OLD_CP) if $^O eq "MSWin32" }
 
 my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
