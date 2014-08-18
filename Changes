@@ -1,5 +1,22 @@
+6.99_08 Mon Aug 18 14:17:04 BST 2014
     Bug fixes:
+    - Liblist::Kid: can now handle -l:foo.so invocations properly
+    - Scripts will no longer have the 'not running under some shell' code
+      applied when rewriting shebang lines.
+    - version is now used to parse prereqs versions internally
+    - Support UTF8 encoded command-line args and Makefile.PL args
+    - Generated META.files will now always have linefeed EOLs, even on
+      Windows
     - Rewrite the version line eval handling to have less insane edge cases
+
+    Doc fixes:
+    - Documentation now includes links to Dist::Zilla, File::ShareDir and
+      File::ShareDir::Install
+    - Clarified support policy for < v5.8.1 in README
+
+    Misc:
+    - Updated bundled CPAN::Meta::Requirements to version 2.126
+    - Updated bundled ExtUtils::Manifest to version 1.65
 
 6.99_07 Wed Jul 30 17:36:14 BST 2014
     Bug fixes:
