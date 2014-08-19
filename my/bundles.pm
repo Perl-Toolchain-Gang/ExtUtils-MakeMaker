@@ -59,6 +59,11 @@ my %special_dist = (
         print "Using included version of version ($inc_version) because it is not already installed.\n";
         return 1;
     },
+    "json-pp-compat5006" => sub {
+        # Only required by JSON::PP on perls < 5.008
+        return unless $] < 5.008;
+        &should_use_dist;
+    },
 );
 
 
