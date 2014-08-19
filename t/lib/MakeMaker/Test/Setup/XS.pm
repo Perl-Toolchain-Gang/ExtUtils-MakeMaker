@@ -12,8 +12,9 @@ use Config;
 
 my $Is_VMS = $^O eq 'VMS';
 my $Is_Dmake = $^O eq 'MSWin32' && $Config{make} =~ /dmake/i;
+my $Is_Dragonfly = $^O eq 'dragonfly';
 my $typemap = 'type map';
-$typemap =~ s/ //g if $Is_Dmake;
+$typemap =~ s/ //g if $Is_Dragonfly;
 
 my %Files = (
              'XS-Test/lib/XS/Test.pm'     => <<'END',
