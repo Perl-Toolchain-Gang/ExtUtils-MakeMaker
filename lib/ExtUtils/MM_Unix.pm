@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);
-$VERSION = '6.99_07';
+$VERSION = '6.99_08';
 $VERSION = eval $VERSION;  ## no critic [BuiltinFunctions::ProhibitStringyEval]
 
 require ExtUtils::MM_Any;
@@ -2744,35 +2744,23 @@ sub parse_version {
     return $result;
 }
 
-sub get_version
-{
-	my ($self, $parsefile, $sigil, $name) = @_;
-	my $eval = qq{
-		package ExtUtils::MakeMaker::_version;
-		no strict;
-		BEGIN { eval {
-			# Ensure any version() routine which might have leaked
-			# into this package has been deleted.  Interferes with
-			# version->import()
-			undef *version;
-			require version;
-			"version"->import;
-		} }
-
-		local $sigil$name;
-		\$$name=undef;
-		do {
-			$_
-		};
-		\$$name;
-	};
-  $eval = $1 if $eval =~ m{^(.+)}s;
-	local $^W = 0;
-	my $result = eval($eval);  ## no critic
-	#warn "Could not eval '$eval' in $parsefile: $@" if $@;
-	$result;
+sub get_version {
+    my ($self, $parsefile, $sigil, $name) = @_;
+    my $line = $_; # from the while() loop in parse_version
+    {
+        package ExtUtils::MakeMaker::_version;
+        undef *version; # in case of unexpected version() sub
+        eval {
+            require version;
+            version::->import;
+        };
+        no strict;
+        local *{$name};
+        local $^W = 0;
+        eval($line); ## no critic
+        return ${$name};
+    }
 }
-
 
 =item pasthru (o)
 
