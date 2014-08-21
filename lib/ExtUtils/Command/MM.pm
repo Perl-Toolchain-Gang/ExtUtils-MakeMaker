@@ -116,7 +116,7 @@ sub pod2man {
                 'section|s=s', 'release|r=s', 'center|c=s',
                 'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
                 'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
-                'name|n=s', 'perm_rw=i'
+                'name|n=s', 'perm_rw=i', 'utf8|u'
     );
 
     # If there's no files, don't bother going further.
