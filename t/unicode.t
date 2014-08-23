@@ -6,11 +6,16 @@ BEGIN {
 chdir 't';
 
 use strict;
-use Test::More tests => 6;
+use Test::More;
+use Config;
+BEGIN {
+  plan skip_all => 'Need perlio and perl 5.8+.'
+    if $] < 5.008 or !$Config{useperlio};
+  plan tests => 6;
+}
 use ExtUtils::MM;
 use MakeMaker::Test::Setup::Unicode;
 use TieOut;
-use Config;
 
 my $MM = bless { DIR => ['.'] }, 'MM';
 
@@ -23,7 +28,6 @@ END {
 ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
   diag("chdir failed: $!");
 
-
 # Make sure when Makefile.PL's break, they issue a warning.
 # Also make sure Makefile.PL's in subdirs still have '.' in @INC.
 {
@@ -34,19 +38,13 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
     $MM->eval_in_subdirs;
 	is $warning, '', 'no warning';
 
-SKIP: {
-          my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : "utf8";
-          skip 'because it does not support perlio only perl 5.8 or higher.',
-               1 unless $utf8;
+    open my $json_fh, '<:utf8', 'MYMETA.json' or die $!;
+    my $json = do { local $/; <$json_fh> };
+    close $json_fh;
 
-          open my $json_fh, '<:utf8', 'MYMETA.json' or die $!;
-          my $json = do { local $/; <$json_fh> };
-          close $json_fh;
-
-          require Encode;
-          my $str = Encode::decode( 'utf8', "Danijel Tašov's" );
-          like( $json, qr/$str/, 'utf8 abstract' );
-      };
+    require Encode;
+    my $str = Encode::decode( 'utf8', "Danijel Tašov's" );
+    like( $json, qr/$str/, 'utf8 abstract' );
 
     untie *STDOUT;
 }
