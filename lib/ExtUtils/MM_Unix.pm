@@ -2837,7 +2837,7 @@ MAKE_FRAG
         push @m, $self->_perl_header_files_fragment("/"); # Directory separator between $(PERL_INC)/header.h
     }
 
-    push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
+    push @m, join(" ", sort values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
 
     return join "\n", @m;
 }
@@ -3572,7 +3572,7 @@ XSUBPPDEPS = @tmdeps \$(XSUBPP)
 XSUBPPARGS = @tmargs
 XSUBPP_EXTRA_ARGS =
 };
-};
+}
 
 
 =item all_target
