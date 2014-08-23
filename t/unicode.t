@@ -11,10 +11,11 @@ use Config;
 BEGIN {
   plan skip_all => 'Need perlio and perl 5.8+.'
     if $] < 5.008 or !$Config{useperlio};
-  plan tests => 6;
+  plan tests => 7;
 }
 use ExtUtils::MM;
 use MakeMaker::Test::Setup::Unicode;
+use MakeMaker::Test::Utils;
 use TieOut;
 
 my $MM = bless { DIR => ['.'] }, 'MM';
@@ -48,3 +49,15 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 
     untie *STDOUT;
 }
+
+my $make = make_run();
+run("$make");
+
+
+open my $man_fh, '<:utf8', File::Spec->catfile(qw(blib man1 probscript.1)) or die $!;
+my $man = do { local $/; <$man_fh> };
+close $man_fh;
+
+require Encode;
+my $str = Encode::decode( 'utf8', "文档" );
+like( $man, qr/$str/, 'utf8 man-snippet' );
