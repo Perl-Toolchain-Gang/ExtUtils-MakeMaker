@@ -648,3 +648,6 @@ PERLTYPE = $self->{PERLTYPE}
 }
 
 1;
+__END__
+
+=back

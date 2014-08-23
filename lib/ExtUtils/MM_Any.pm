@@ -233,7 +233,7 @@ sub can_dep_space {
 }
 
 
-=item quote_dep
+=head3 quote_dep
 
   $text = $mm->quote_dep($text);
 
