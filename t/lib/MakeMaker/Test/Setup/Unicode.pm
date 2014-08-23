@@ -22,6 +22,7 @@ WriteMakefile(
     AUTHOR        => q{Danijel Tašov},
     EXE_FILES     => [ qw(bin/probscript) ],
     INSTALLMAN1DIR => "some", # even if disabled in $Config{man1dir}
+    MAN1EXT       => 1, # set to 0 if man pages disabled
 );
 PL_END
 
