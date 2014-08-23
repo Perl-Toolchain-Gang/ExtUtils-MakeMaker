@@ -184,6 +184,78 @@ sub can_redirect_error {
 }
 
 
+=head3 is_make_type
+
+    my $is_dmake = $self->is_make_type('dmake');
+
+Returns true if C<<$self->make>> is the given type; possibilities are:
+
+  gmake    GNU make
+  dmake
+  nmake
+  bsdmake  BSD pmake-derived
+
+=cut
+
+sub is_make_type {
+    my($self, $type) = @_;
+    (undef, undef, my $make_basename) = $self->splitpath($self->make);
+    return 1 if $make_basename =~ /\b$type\b/; # executable's filename
+    # now have to run with "-v" and guess
+    my $redirect = $self->can_redirect_error ? '2>&1' : '';
+    my $make = $self->make || $self->{MAKE};
+    my $minus_v = `"$make" -v $redirect`;
+    return 1 if $type eq 'gmake' and $minus_v =~ /GNU make/i;
+    return 1 if $type eq 'bsdmake'
+      and $minus_v =~ /^usage: make \[-BeikNnqrstWwX\]/im;
+    0; # it wasn't whatever you asked
+}
+
+
+=head3 can_dep_space
+
+    my $can_dep_space = $self->can_dep_space;
+
+Returns true if C<make> can handle (probably by quoting)
+dependencies that contain a space. Currently known true for GNU make,
+false for BSD pmake derivative.
+
+=cut
+
+my $cached_dep_space;
+sub can_dep_space {
+    my $self = shift;
+    return $cached_dep_space if defined $cached_dep_space;
+    return $cached_dep_space = 1 if $self->is_make_type('gmake');
+    return $cached_dep_space = 0 if $self->is_make_type('dmake'); # only on W32
+    return $cached_dep_space = 0 if $self->is_make_type('bsdmake');
+    return $cached_dep_space = 1; # assume yes, hope GNU make!
+}
+
+
+=item quote_dep
+
+  $text = $mm->quote_dep($text);
+
+Method that protects Makefile single-value constants (mainly filenames),
+so that make will still treat them as single values even if they
+inconveniently have spaces in. If the make program being used cannot
+achieve such protection and the given text would need it, throws an
+exception.
+
+=cut
+
+sub quote_dep {
+    my ($self, $arg) = @_;
+    die <<EOF unless $self->can_dep_space;
+Tried to use make dependency with space for make that can't:
+  '$arg'
+EOF
+    $arg =~ s/( )/\\$1/g; # how GNU make does it
+    return $arg;
+}
+
+
 =head3 split_command
 
     my @cmds = $MM->split_command($cmd, @args);
