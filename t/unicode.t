@@ -55,13 +55,16 @@ my $make_out = run("$make");
 is $? >> 8, 0, 'Exit code of make == 0';
 
 my $manfile = File::Spec->catfile(qw(blib man1 probscript.1));
-open my $man_fh, '<:utf8', $manfile or die "open $manfile: $!";
-my $man = do { local $/; <$man_fh> };
-close $man_fh;
+SKIP: {
+  skip 'Manpage not generated', 1 unless -f $manfile;
+  open my $man_fh, '<:utf8', $manfile or die "open $manfile: $!";
+  my $man = do { local $/; <$man_fh> };
+  close $man_fh;
 
-require Encode;
-my $str = Encode::decode( 'utf8', "文档" );
-like( $man, qr/$str/, 'utf8 man-snippet' );
+  require Encode;
+  my $str = Encode::decode( 'utf8', "文档" );
+  like( $man, qr/$str/, 'utf8 man-snippet' );
+}
 
 $make_out = run("$make realclean");
 is $? >> 8, 0, 'Exit code of make == 0';
