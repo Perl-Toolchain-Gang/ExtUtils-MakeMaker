@@ -2964,7 +2964,7 @@ PPD_PERLVERS
 
         my %attrs = ( NAME => $name );
         $attrs{VERSION} = $version if $version;
-        my $attrs = join " ", map { qq[$_="$attrs{$_}"] } keys %attrs;
+        my $attrs = join " ", map { qq[$_="$attrs{$_}"] } sort keys %attrs;
         $ppd_xml .= qq(        <REQUIRE $attrs />\n);
     }
 
