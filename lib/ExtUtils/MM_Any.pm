@@ -167,6 +167,23 @@ sub can_run {
 }
 
 
+=head3 can_redirect_error
+
+  $useredirect = MM->can_redirect_error;
+
+True if on an OS where qx operator (or backticks) can redirect C<STDERR>
+onto C<STDOUT>.
+
+=cut
+
+sub can_redirect_error {
+  my $self = shift;
+  $self->os_flavor_is('Unix')
+      or ($self->os_flavor_is('Win32') and !$self->os_flavor_is('Win9x'))
+      or $self->os_flavor_is('OS/2')
+}
+
+
 =head3 split_command
 
     my @cmds = $MM->split_command($cmd, @args);
