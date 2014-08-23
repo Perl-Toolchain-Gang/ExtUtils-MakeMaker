@@ -57,6 +57,9 @@ is $? >> 8, 0, 'Exit code of make == 0';
 my $manfile = File::Spec->catfile(qw(blib man1 probscript.1));
 SKIP: {
   skip 'Manpage not generated', 1 unless -f $manfile;
+  skip 'Pod::Man >= 2.17 needed', 1 unless do {
+    require Pod::Man; $Pod::Man::VERSION >= 2.17;
+  };
   open my $man_fh, '<:utf8', $manfile or die "open $manfile: $!";
   my $man = do { local $/; <$man_fh> };
   close $man_fh;
