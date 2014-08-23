@@ -20,12 +20,13 @@ WriteMakefile(
     NAME          => 'Problem::Module',
     ABSTRACT_FROM => 'lib/Problem/Module.pm',
     AUTHOR        => q{Danijel Tašov},
+    EXE_FILES     => [ qw(bin/probscript) ],
 );
 PL_END
 
             'Problem-Module/lib/Problem/Module.pm'  => <<'pm_END',
 use utf8;
-            
+
 =pod
 
 =encoding utf8
@@ -39,6 +40,16 @@ Problem::Module - Danijel Tašov's great new module
 1;
 pm_END
 
+            'Problem-Module/bin/probscript'  => <<'pl_END',
+#!/usr/bin/perl
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+文档 - Problem script
+pl_END
 );
 
 
@@ -63,7 +74,7 @@ sub setup_recurs {
     return 1;
 }
 
-sub teardown_recurs { 
+sub teardown_recurs {
     foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {
