@@ -21,6 +21,7 @@ WriteMakefile(
     ABSTRACT_FROM => 'lib/Problem/Module.pm',
     AUTHOR        => q{Danijel Tašov},
     EXE_FILES     => [ qw(bin/probscript) ],
+    INSTALLMAN1DIR => "some", # even if disabled in $Config{man1dir}
 );
 PL_END
 

@@ -11,11 +11,11 @@ use Config;
 BEGIN {
   plan skip_all => 'Need perlio and perl 5.8+.'
     if $] < 5.008 or !$Config{useperlio};
-  plan tests => 7;
+  plan tests => 9;
 }
 use ExtUtils::MM;
 use MakeMaker::Test::Setup::Unicode;
-use MakeMaker::Test::Utils;
+use MakeMaker::Test::Utils qw(makefile_name make_run run);
 use TieOut;
 
 my $MM = bless { DIR => ['.'] }, 'MM';
@@ -35,7 +35,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
     my $stdout = tie *STDOUT, 'TieOut' or die;
 
     my $warning = '';
-    local $SIG{__WARN__} = sub { $warning = join '', @_ };
+    local $SIG{__WARN__} = sub { $warning .= join '', @_ };
     $MM->eval_in_subdirs;
 	is $warning, '', 'no warning';
 
@@ -51,7 +51,8 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 }
 
 my $make = make_run();
-run("$make");
+my $make_out = run("$make");
+is $? >> 8, 0, 'Exit code of make == 0';
 
 my $manfile = File::Spec->catfile(qw(blib man1 probscript.1));
 open my $man_fh, '<:utf8', $manfile or die "open $manfile: $!";
@@ -61,3 +62,11 @@ close $man_fh;
 require Encode;
 my $str = Encode::decode( 'utf8', "文档" );
 like( $man, qr/$str/, 'utf8 man-snippet' );
+
+$make_out = run("$make realclean");
+is $? >> 8, 0, 'Exit code of make == 0';
+
+sub makefile_content {
+  open my $fh, '<', makefile_name or die;
+  return <$fh>;
+}
