@@ -53,8 +53,8 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 my $make = make_run();
 run("$make");
 
-
-open my $man_fh, '<:utf8', File::Spec->catfile(qw(blib man1 probscript.1)) or die $!;
+my $manfile = File::Spec->catfile(qw(blib man1 probscript.1));
+open my $man_fh, '<:utf8', $manfile or die "open $manfile: $!";
 my $man = do { local $/; <$man_fh> };
 close $man_fh;
 
