@@ -423,6 +423,11 @@ sub perl_script {
     return;
 }
 
+sub can_dep_space {
+    my $self = shift;
+    1; # with Win32::GetShortPathName
+}
+
 =item quote_dep
 
 =cut
@@ -642,16 +647,4 @@ PERLTYPE = $self->{PERLTYPE}
 
 }
 
-sub is_make_type {
-    my($self, $type) = @_;
-    return !! ($self->make =~ /\b$type(?:\.exe)?$/);
-}
-
 1;
-__END__
-
-=back
-
-=cut
-
-
