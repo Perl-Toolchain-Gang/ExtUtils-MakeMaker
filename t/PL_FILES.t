@@ -10,11 +10,12 @@ use File::Spec;
 use File::Temp qw[tempdir];
 use MakeMaker::Test::Setup::PL_FILES;
 use MakeMaker::Test::Utils;
-use IPC::Cmd qw(can_run);
-use Test::More
-    can_run(make())
-    ? (tests => 9)
-    : (skip_all => "make not available");
+use Config;
+use Test::More;
+use ExtUtils::MM;
+plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "cross-compiling and make not available")
+    : (tests => 9);
 
 my $perl = which_perl();
 my $make = make_run();

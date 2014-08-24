@@ -16,11 +16,12 @@ $CLEANUP &&= 1; # so always 1 or numerically 0
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
-use IPC::Cmd qw(can_run);
 use Test::More;
-plan can_run(make())
-    ? (tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP))
-    : (skip_all => "make not available");
+use Config;
+use ExtUtils::MM;
+plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "cross-compiling and make not available")
+    : (tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP));
 
 my $Is_VMS = $^O eq 'VMS';
 

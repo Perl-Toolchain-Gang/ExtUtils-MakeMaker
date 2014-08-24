@@ -11,12 +11,12 @@ use ExtUtils::MakeMaker;
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
-use IPC::Cmd qw(can_run);
-use Test::More
-    can_run(make())
-    ? 'no_plan'
-    : (skip_all => "make not available");
-
+use Config;
+use Test::More;
+use ExtUtils::MM;
+plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "cross-compiling and make not available")
+    : 'no_plan';
 
 my $perl     = which_perl();
 my $makefile = makefile_name();

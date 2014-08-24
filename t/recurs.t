@@ -13,11 +13,12 @@ use File::Temp qw[tempdir];
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::Recurs;
-use IPC::Cmd qw(can_run);
-use Test::More
-    can_run(make())
-    ? (tests => 26)
-    : (skip_all => "make not available");
+use Config;
+use Test::More;
+use ExtUtils::MM;
+plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "cross-compiling and make not available")
+    : (tests => 26);
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.

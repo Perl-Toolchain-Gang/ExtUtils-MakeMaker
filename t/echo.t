@@ -13,12 +13,12 @@ use ExtUtils::MM;
 use MakeMaker::Test::Utils;
 use File::Temp;
 use Cwd 'abs_path';
-use IPC::Cmd 'can_run';
 
 use Test::More;
-
-plan skip_all => "make not available"
-    unless can_run(make());
+use ExtUtils::MM;
+plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "cross-compiling and make not available")
+    : ();
 
 #--------------------- Setup
 

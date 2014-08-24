@@ -125,6 +125,48 @@ sub can_load_xs {
 }
 
 
+=head3 can_run
+
+  use ExtUtils::MM;
+  my $runnable = MM->can_run($Config{make});
+
+Returns true if we can run the given command. Copied from
+L<IPC::Cmd|IPC::Cmd/"$path = can_run( PROGRAM );">, but modified into
+a method (and removed C<$INSTANCES> capability).
+
+=cut
+
+sub can_run {
+    my ($self, $command) = @_;
+
+    # a lot of VMS executables have a symbol defined
+    # check those first
+    if ( $^O eq 'VMS' ) {
+        require VMS::DCLsym;
+        my $syms = VMS::DCLsym->new;
+        return $command if scalar $syms->getsym( uc $command );
+    }
+
+    my @possibles;
+
+    if( File::Spec->file_name_is_absolute($command) ) {
+        return $self->maybe_command($command);
+
+    } else {
+        for my $dir (
+            File::Spec->path,
+            File::Spec->curdir
+        ) {
+            next if ! $dir || ! -d $dir;
+            my $abs = File::Spec->catfile($self->os_flavor_is('Win32') ? Win32::GetShortPathName( $dir ) : $dir, $command);
+            push @possibles, $abs if $abs = $self->maybe_command($abs);
+        }
+    }
+    return @possibles if wantarray;
+    return shift @possibles;
+}
+
+
 =head3 split_command
 
     my @cmds = $MM->split_command($cmd, @args);
