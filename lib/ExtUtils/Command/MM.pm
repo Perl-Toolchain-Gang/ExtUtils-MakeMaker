@@ -118,6 +118,7 @@ sub pod2man {
                 'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
                 'name|n=s', 'perm_rw=i', 'utf8|u'
     );
+    delete $options{utf8} unless $Pod::Man::VERSION >= 2.17;
 
     # If there's no files, don't bother going further.
     return 0 unless @ARGV;
