@@ -293,7 +293,7 @@ sub full_setup {
     PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE
     PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
     SIGN SKIP TEST_REQUIRES TYPEMAPS UNINST VERSION VERSION_FROM XS XSOPT XSPROTOARG
-    XS_VERSION clean depend dist dynamic_lib linkext macro realclean
+    XSTARGET_EXT XS_VERSION clean depend dist dynamic_lib linkext macro realclean
     tool_autosplit
 
     MAN1EXT MAN3EXT
@@ -2799,6 +2799,11 @@ May be set to C<-protoypes>, C<-noprototypes> or the empty string.  The
 empty string is equivalent to the xsubpp default, or C<-noprototypes>.
 See the xsubpp documentation for details.  MakeMaker
 defaults to the empty string.
+
+=item XSTARGET_EXT
+
+Suffix for files produced from F<.xs> files. It is F<.c> by default, but can be
+set to F<.cpp> if you xs code contains C++.
 
 =item XS_VERSION
 

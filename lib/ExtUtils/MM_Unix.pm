@@ -398,6 +398,7 @@ sub constants {
               PERLRUNINST     FULLPERLRUNINST   ABSPERLRUNINST
               PERL_CORE
               PERM_DIR PERM_RW PERM_RWX
+              XSTARGET_EXT
 
 	      ) )
     {
@@ -1300,7 +1301,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
             next if $self->{NORECURS};
 	    $dir{$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
 	} elsif ($name =~ /\.xs\z/){
-	    my($c); ($c = $name) =~ s/\.xs\z/.c/;
+	    my($c); ($c = $name) =~ s/\.xs\z/$self->{XSTARGET_EXT}/;
 	    $xs{$name} = $c;
 	    $c{$c} = 1;
 	} elsif ($name =~ /\.c(pp|xx|c)?\z/i){  # .c .C .cpp .cxx .cc
@@ -1754,6 +1755,9 @@ EOP
     $self->{MAP_TARGET} ||= "perl";
 
     $self->{LIBPERL_A} ||= "libperl$self->{LIB_EXT}";
+
+    # Default extension for target produced from xs file
+    $self->{XSTARGET_EXT} ||= '.c';
 
     # make a simple check if we find strict
     warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
@@ -3644,7 +3648,8 @@ sub writedoc {
 
 =item xs_c (o)
 
-Defines the suffix rules to compile XS files to C.
+Defines the suffix rules to compile XS files to C (or to C++
+if XSTARGET_EXT set to ".cpp").
 
 =cut
 
@@ -3652,8 +3657,8 @@ sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();
     '
-.xs.c:
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
+.xs$(XSTARGET_EXT):
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*$(XSTARGET_EXT)
 ';
 }
 
@@ -3684,8 +3689,8 @@ sub xs_o {	# many makes are too dumb to use xs_c then c_o
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT):
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
-	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(PASTHRU_DEFINE) $(DEFINE) $*.c
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*$(XSTARGET_EXT)
+	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(PASTHRU_DEFINE) $(DEFINE) $*$(XSTARGET_EXT)
 ';
 }
 
