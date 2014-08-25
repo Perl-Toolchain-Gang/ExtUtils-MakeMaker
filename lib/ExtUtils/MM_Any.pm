@@ -247,7 +247,7 @@ exception.
 
 sub quote_dep {
     my ($self, $arg) = @_;
-    die <<EOF unless $self->can_dep_space;
+    die <<EOF if $arg =~ / / and not $self->can_dep_space;
 Tried to use make dependency with space for make that can't:
   '$arg'
 EOF
