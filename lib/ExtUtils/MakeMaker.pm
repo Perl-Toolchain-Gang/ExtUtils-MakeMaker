@@ -296,6 +296,8 @@ sub full_setup {
     XSTARGET_EXT XS_VERSION clean depend dist dynamic_lib linkext macro realclean
     tool_autosplit
 
+    MAN1EXT MAN3EXT
+
     MACPERL_SRC MACPERL_LIB MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC
     MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED
         /;
@@ -833,7 +835,7 @@ END
 
     foreach my $key (sort keys %$att){
         next if $key eq 'ARGS';
-        my ($v) = neatvalue($att->{$key});
+        my $v;
         if ($key eq 'PREREQ_PM') {
             # CPAN.pm takes prereqs from this field in 'Makefile'
             # and does not know about BUILD_REQUIRES
@@ -1256,11 +1258,11 @@ sub neatvalue {
         push @m, "]";
         return join "", @m;
     }
-    return "$v" unless $t eq 'HASH';
+    return $v unless $t eq 'HASH';
     my(@m, $key, $val);
-    while (($key,$val) = each %$v){
+    for my $key (sort keys %$v) {
         last unless defined $key; # cautious programming in case (undef,undef) is true
-        push(@m,"$key=>".neatvalue($val)) ;
+        push @m,"$key=>".neatvalue($v->{$key});
     }
     return "{ ".join(', ',@m)." }";
 }

@@ -781,9 +781,10 @@ END
     my @man_cmds;
     foreach my $section (qw(1 3)) {
         my $pods = $self->{"MAN${section}PODS"};
-        push @man_cmds, $self->split_command(<<CMD, map {($_,$pods->{$_})} sort keys %$pods);
-	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)
+        my $p2m = sprintf <<CMD, $] > 5.008 ? " -u" : "";
+	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)%s
 CMD
+        push @man_cmds, $self->split_command($p2m, map {($_,$pods->{$_})} sort keys %$pods);
     }
 
     $manify .= "\t\$(NOECHO) \$(NOOP)\n" unless @man_cmds;
