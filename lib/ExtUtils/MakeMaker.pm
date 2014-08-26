@@ -10,6 +10,8 @@ use ExtUtils::MakeMaker::Config;
 use Carp;
 use File::Path;
 my $CAN_DECODE = eval { require Encode::Locale; }; # 2 birds, 1 stone
+eval { Encode::Locale::reinit('UTF-8') }
+  if $CAN_DECODE and $Encode::Locale::ENCODING_LOCALE eq 'US-ASCII';
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
@@ -19,6 +21,7 @@ our @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
 our %macro_fsentity; # whether a macro is a filesystem name
+our %macro_dep; # whether a macro is a dependency
 
 our $VERSION = '6.99_08';
 $VERSION = eval $VERSION;  ## no critic [BuiltinFunctions::ProhibitStringyEval]
@@ -252,6 +255,10 @@ my $PACKNAME = 'PACK000';
 sub full_setup {
     $Verbose ||= 0;
 
+    my @dep_macros = qw/
+    PERL_INCDEP        PERL_ARCHLIBDEP     PERL_ARCHIVEDEP
+    /;
+
     my @fs_macros = qw/
     FULLPERL XSUBPPDIR
 
@@ -302,7 +309,8 @@ sub full_setup {
     MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED
         /;
     push @attrib_help, @fs_macros;
-    @macro_fsentity{@fs_macros} = (1) x @fs_macros;
+    @macro_fsentity{@fs_macros, @dep_macros} = (1) x (@fs_macros+@dep_macros);
+    @macro_dep{@dep_macros} = (1) x @dep_macros;
 
     # IMPORTS is used under OS/2 and Win32
 
@@ -1175,9 +1183,12 @@ sub flush {
     print "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
-    my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
-    open(my $fh,">$utf8", "MakeMaker.tmp")
+    open(my $fh,">", "MakeMaker.tmp")
         or die "Unable to open MakeMaker.tmp: $!";
+    if ($] > 5.008 and $Config{useperlio}) {
+        binmode $fh, ':utf8';
+        binmode $fh, ':encoding(locale)' if $CAN_DECODE;
+    }
 
     for my $chunk (@{$self->{RESULT}}) {
         print $fh "$chunk\n"
