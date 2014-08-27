@@ -130,8 +130,13 @@ sub can_load_xs {
   use ExtUtils::MM;
   my $runnable = MM->can_run($Config{make});
 
-Returns true if we can run the given command. Copied from
-L<IPC::Cmd|IPC::Cmd/"$path = can_run( PROGRAM );">, but modified into
+If called in a scalar context it will return the full path to the binary
+you asked for if it was found, or C<undef> if it was not.
+
+If called in a list context, it will return a list of the full paths to instances
+of the binary where found in C<PATH>, or an empty list if it was not found.
+
+Copied from L<IPC::Cmd|IPC::Cmd/"$path = can_run( PROGRAM );">, but modified into
 a method (and removed C<$INSTANCES> capability).
 
 =cut
