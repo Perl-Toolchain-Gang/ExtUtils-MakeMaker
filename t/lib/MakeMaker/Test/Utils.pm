@@ -305,10 +305,7 @@ sub run {
 
     # Unix, modern Windows and OS/2 from 5.005_54 up can handle 2>&1
     # This makes our failure diagnostics nicer to read.
-    if( MM->os_flavor_is('Unix')                                   or
-        (MM->os_flavor_is('Win32') and !MM->os_flavor_is('Win9x')) or
-        ($] > 5.00554 and MM->os_flavor_is('OS/2'))
-      ) {
+    if (MM->can_redirect_error) {
         return `$cmd 2>&1`;
     }
     else {

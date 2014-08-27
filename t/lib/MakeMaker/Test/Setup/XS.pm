@@ -10,10 +10,9 @@ use File::Basename;
 use MakeMaker::Test::Utils;
 use Config;
 
-my $Is_VMS = $^O eq 'VMS';
-my $Is_Dmake = $^O eq 'MSWin32' && $Config{make} =~ /dmake/i;
+use ExtUtils::MM;
 my $typemap = 'type map';
-$typemap =~ s/ //g if $Is_Dmake;
+$typemap =~ s/ //g unless MM->new({NAME=>'name'})->can_dep_space;
 
 my %Files = (
              'XS-Test/lib/XS/Test.pm'     => <<'END',
