@@ -8,8 +8,12 @@ use strict;
 use File::Path;
 use File::Basename;
 use MakeMaker::Test::Utils;
+use Config;
 
 my $Is_VMS = $^O eq 'VMS';
+my $Is_Dmake = $^O eq 'MSWin32' && $Config{make} =~ /dmake/i;
+my $typemap = 'type map';
+$typemap =~ s/ //g if $Is_Dmake;
 
 my %Files = (
              'XS-Test/lib/XS/Test.pm'     => <<'END',
@@ -27,14 +31,17 @@ bootstrap XS::Test $VERSION;
 1;
 END
 
-             'XS-Test/Makefile.PL'          => <<'END',
+             'XS-Test/Makefile.PL'          => <<END,
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME          => 'XS::Test',
     VERSION_FROM  => 'lib/XS/Test.pm',
+    TYPEMAPS      => [ '$typemap' ],
 );
 END
+
+             "XS-Test/$typemap"             => '',
 
              'XS-Test/Test.xs'              => <<'END',
 #include "EXTERN.h"
