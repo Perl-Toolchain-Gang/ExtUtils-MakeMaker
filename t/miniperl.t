@@ -22,10 +22,6 @@ BEGIN {
       : "no_plan";
 }
 
-BEGIN {
-    ok !$INC{"ExtUtils/MakeMaker.pm"}, "MakeMaker is not yet loaded";
-}
-
 # Disable all XS from here on
 use MakeMaker::Test::NoXS;
 

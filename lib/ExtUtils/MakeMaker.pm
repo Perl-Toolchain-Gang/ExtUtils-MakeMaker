@@ -41,6 +41,7 @@ our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
 # purged.
 my $Is_VMS     = $^O eq 'VMS';
 my $Is_Win32   = $^O eq 'MSWin32';
+my $UNDER_CORE = $ENV{PERL_CORE};
 
 full_setup();
 
@@ -1280,6 +1281,7 @@ sub neatvalue {
 
 sub _find_magic_vstring {
     my $value = shift;
+    return $value if $UNDER_CORE;
     my $tvalue = '';
     require B;
     my $sv = B::svref_2object(\$value);
