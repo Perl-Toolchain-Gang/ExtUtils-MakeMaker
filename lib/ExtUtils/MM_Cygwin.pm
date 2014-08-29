@@ -94,6 +94,7 @@ sub init_linker {
           '$(PERL_INC)' .'/'. ("$Config{libperl}" or "libperl.a");
     }
 
+    $self->{PERL_ARCHIVEDEP} ||= '';
     $self->{PERL_ARCHIVE_AFTER} ||= '';
     $self->{EXPORT_LIST}  ||= '';
 }

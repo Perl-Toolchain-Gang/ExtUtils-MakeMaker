@@ -50,6 +50,7 @@ sub init_linker {
 
     $self->{PERL_ARCHIVE} ||=
       File::Spec->catdir('$(PERL_INC)',$Config{libperl});
+    $self->{PERL_ARCHIVEDEP} ||= '';
     $self->{PERL_ARCHIVE_AFTER} ||= '';
     $self->{EXPORT_LIST}  ||= '';
 }
