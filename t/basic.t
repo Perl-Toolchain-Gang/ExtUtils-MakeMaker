@@ -134,23 +134,29 @@ my $install_out = run("$make install");
 is( $?, 0, 'install' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
 
-ok( -r $DUMMYINST,     '  install dir created' );
-my %files = ();
-find( sub {
-    # do it case-insensitive for non-case preserving OSs
-    my $file = lc $_;
+sub check_dummy_inst {
+    my $loc = shift;
+    my %files = ();
+    find( sub {
+	# do it case-insensitive for non-case preserving OSs
+	my $file = lc $_;
+	# VMS likes to put dots on the end of things that don't have them.
+	$file =~ s/\.$// if $Is_VMS;
+	$files{$file} = $File::Find::name;
+    }, $loc );
+    ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
+    ok( $files{'liar.pm'},      '  Liar.pm installed'  );
+    ok( $files{'program'},      '  program installed'  );
+    ok( $files{'.packlist'},    '  packlist created'   );
+    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    \%files;
+}
 
-    # VMS likes to put dots on the end of things that don't have them.
-    $file =~ s/\.$// if $Is_VMS;
-
-    $files{$file} = $File::Find::name;
-}, $DUMMYINST );
-ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
-ok( $files{'liar.pm'},      '  Liar.pm installed'  );
-ok( $files{'program'},      '  program installed'  );
-ok( $files{'.packlist'},    '  packlist created'   );
-ok( $files{'perllocal.pod'},'  perllocal.pod created' );
-
+SKIP: {
+    ok( -r $DUMMYINST,     '  install dir created' )
+	or skip "$DUMMYINST doesn't exist", 5;
+    check_dummy_inst($DUMMYINST);
+}
 
 SKIP: {
     skip 'VMS install targets do not preserve $(PREFIX)', 8 if $Is_VMS;
@@ -160,13 +166,7 @@ SKIP: {
     like( $install_out, qr/^Installing /m );
 
     ok( -r 'elsewhere',     '  install dir created' );
-    %files = ();
-    find( sub { $files{$_} = $File::Find::name; }, 'elsewhere' );
-    ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( $files{'program'},      '  program installed'  );
-    ok( $files{'.packlist'},    '  packlist created'   );
-    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    check_dummy_inst('elsewhere');
     rmtree('elsewhere');
 }
 
@@ -180,19 +180,10 @@ SKIP: {
     like( $install_out, qr/^Installing /m );
 
     ok( -d 'other',  '  destdir created' );
-    %files = ();
-    my $perllocal;
-    find( sub {
-        $files{$_} = $File::Find::name;
-    }, 'other' );
-    ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( $files{'program'},      '  program installed'  );
-    ok( $files{'.packlist'},    '  packlist created'   );
-    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    my $files = check_dummy_inst('other');
 
-    ok( open(PERLLOCAL, $files{'perllocal.pod'} ) ) ||
-        diag("Can't open $files{'perllocal.pod'}: $!");
+    ok( open(PERLLOCAL, $files->{'perllocal.pod'} ) ) ||
+        diag("Can't open $files->{'perllocal.pod'}: $!");
     { local $/;
       unlike(<PERLLOCAL>, qr/other/, 'DESTDIR should not appear in perllocal');
     }
@@ -221,13 +212,7 @@ SKIP: {
 
     ok( !-d 'elsewhere',       '  install dir not created' );
     ok( -d 'other/elsewhere',  '  destdir created' );
-    %files = ();
-    find( sub { $files{$_} = $File::Find::name; }, 'other/elsewhere' );
-    ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( $files{'program'},      '  program installed'  );
-    ok( $files{'.packlist'},    '  packlist created'   );
-    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    check_dummy_inst('other/elsewhere');
     rmtree('other');
 }
 
