@@ -28,7 +28,15 @@ use File::Temp qw[tempdir];
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 my $OLD_CP; # crude but...
-if ($^O eq "MSWin32") { $OLD_CP = (split ' ', qx(chcp))[3]; qx(chcp 1252); }
+if ($^O eq "MSWin32") {
+    if (qx(chcp) =~ /(\d+)$/) {
+        $OLD_CP = $1;
+    } else {
+        BAIL_OUT( "Can't get code page" );
+    }
+
+    qx(chcp 1252);
+}
 END { qx(chcp $OLD_CP) if $^O eq "MSWin32" }
 
 my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
