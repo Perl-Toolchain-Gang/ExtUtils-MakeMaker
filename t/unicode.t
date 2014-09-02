@@ -45,7 +45,8 @@ if ($] >= 5.008) {
     my $warning = '';
     local $SIG{__WARN__} = sub { $warning .= join '', @_ };
     $MM->eval_in_subdirs;
-	is $warning, '', 'no warning';
+    my $warnlines = grep { !/does not map to/ } split "\n", $warning;
+    is $warnlines, 0, 'no warning' or diag $warning;
 
     open my $json_fh, '<:utf8', 'MYMETA.json' or die $!;
     my $json = do { local $/; <$json_fh> };
