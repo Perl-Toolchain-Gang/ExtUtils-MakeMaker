@@ -37,6 +37,7 @@ WriteMakefile(
     NAME          => 'XS::Test',
     VERSION_FROM  => 'lib/XS/Test.pm',
     TYPEMAPS      => [ '$typemap' ],
+    PERL          => "\$^X -w",
 );
 END
 
