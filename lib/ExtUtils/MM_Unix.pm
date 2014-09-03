@@ -1910,8 +1910,15 @@ sub init_PERL {
 
     $self->{PERL} ||=
         $self->find_perl(5.0, \@perls, \@defpath, $Verbose );
-    # don't check if perl is executable, maybe they have decided to
-    # supply switches with perl
+
+    my $perl = $self->{PERL};
+    my $perlflags = '';
+    while ($perl) {
+	last if -x $perl;
+	last unless $perl =~ s/(\s+\S+)$//;
+	$perlflags = $1.$perlflags;
+    }
+    $self->{PERL} = $perl;
 
     # When built for debugging, VMS doesn't create perl.exe but ndbgperl.exe.
     my $perl_name = 'perl';
@@ -1949,14 +1956,15 @@ sub init_PERL {
     foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
         my $run  = $perl.'RUN';
 
-        $self->{$run}  = qq{"\$($perl)"};
+        $self->{$run}  = qq{"\$($perl)"}.$perlflags;
 
         # Make sure perl can find itself before it's installed.
         $self->{$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"}
           if $self->{UNINSTALLED_PERL} || $self->{PERL_CORE};
 
         $self->{$perl.'RUNINST'} =
-          sprintf q{$(%sRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"}, $perl;
+          sprintf q{$(%sRUN)%s "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"},
+	    $perl, $perlflags;
     }
 
     return 1;
