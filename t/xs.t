@@ -34,15 +34,20 @@ ok( chdir('XS-Test'), "chdir'd to XS-Test" ) ||
   diag("chdir failed: $!");
 
 my @mpl_out = run(qq{$perl Makefile.PL});
+SKIP: {
+  unless (cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' )) {
+    diag(@mpl_out);
+    skip 'perl Makefile.PL failed', 2;
+  }
 
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag(@mpl_out);
+  my $make = make_run();
+  my $make_out = run("$make");
+  unless (is( $?, 0, '  make exited normally' )) {
+      diag $make_out;
+      skip 'Make failed - skipping test', 1;
+  }
 
-my $make = make_run();
-my $make_out = run("$make");
-is( $?, 0,                                 '  make exited normally' ) ||
-    diag $make_out;
-
-my $test_out = run("$make test");
-is( $?, 0,                                 '  make test exited normally' ) ||
-    diag $test_out;
+  my $test_out = run("$make test");
+  is( $?, 0,                                 '  make test exited normally' ) ||
+      diag $test_out;
+}
