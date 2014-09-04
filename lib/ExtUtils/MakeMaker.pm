@@ -7,6 +7,7 @@ BEGIN {require 5.006;}
 
 require Exporter;
 use ExtUtils::MakeMaker::Config;
+use ExtUtils::MakeMaker::version; # ensure we always have or fake version.pm
 use Carp;
 use File::Path;
 my $CAN_DECODE = eval { require Encode::Locale; }; # 2 birds, 1 stone
@@ -1310,7 +1311,6 @@ sub _find_magic_vstring {
 sub clean_versions {
     my($self, $key) = @_;
     my $reqs = $self->{$key};
-    require version;
     for my $module (keys %$reqs) {
         my $v = $reqs->{$module};
         my $printable = _find_magic_vstring($v);
