@@ -1,3 +1,11 @@
+6.99_10 Thu Sep  4 14:28:01 BST 2014
+    Bug fixes:
+    - Fixes for being integrated with core
+    - Fixed the code page reset on MSWin32
+    - Fixed test failures on BSD with UTF8 filenames
+    - Fixed regression with quoting of $(PERL) when
+      command line flags are used
+
 6.99_09 Thu Aug 28 11:01:37 BST 2014
     Enhancements:
     - Support GNU Make on Windows
