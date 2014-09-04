@@ -608,10 +608,7 @@ END
 
             $self->{$key} = $self->{PARENT}{$key};
 
-            unless ($Is_VMS && $key =~ /PERL$/) {
-                $self->{$key} = $self->catdir("..",$self->{$key})
-                  unless $self->file_name_is_absolute($self->{$key});
-            } else {
+            if ($Is_VMS && $key =~ /PERL$/) {
                 # PERL or FULLPERL will be a command verb or even a
                 # command with an argument instead of a full file
                 # specification under VMS.  So, don't turn the command
@@ -621,6 +618,9 @@ END
                 $cmd[1] = $self->catfile('[-]',$cmd[1])
                   unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
                 $self->{$key} = join(' ', @cmd);
+            } else {
+                $self->{$key} = $self->catdir("..",$self->{$key})
+                  unless $self->file_name_is_absolute($self->{$key});
             }
         }
         if ($self->{PARENT}) {
