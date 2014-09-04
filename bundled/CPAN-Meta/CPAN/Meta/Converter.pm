@@ -6,7 +6,7 @@ our $VERSION = '2.120351'; # VERSION
 
 
 use CPAN::Meta::Validator;
-use version (); # Removed 0.82 constraint, EUMM installed CPAN::Meta
+BEGIN { eval "use version ()" || eval "use ExtUtils::MakeMaker::version ()" }
 use Parse::CPAN::Meta 1.4400 ();
 
 sub _dclone {

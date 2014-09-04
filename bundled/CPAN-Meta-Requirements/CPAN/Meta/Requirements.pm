@@ -33,7 +33,7 @@ our $VERSION = '2.126'; # VERSION
 
 use Carp ();
 use Scalar::Util ();
-use version 0.77 (); # the ->parse method
+BEGIN { eval "use version" || eval "use ExtUtils::MakeMaker::version" }
 
 #pod =method new
 #pod
