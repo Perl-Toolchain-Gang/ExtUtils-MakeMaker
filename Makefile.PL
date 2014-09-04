@@ -60,7 +60,7 @@ if( $BUILDING_AS_PACKAGE ) {
         'JSON::PP'                 => '2.27103',
         'Parse::CPAN::Meta'        => '1.4400',
         'Scalar::Util'             => '1.13',
-        'version'                  => '0.82',
+        'version'                  => '0',
         'CPAN::Meta::Requirements' => '2.121',
     );
 

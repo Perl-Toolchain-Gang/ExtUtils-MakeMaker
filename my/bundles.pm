@@ -44,21 +44,6 @@ my %special_dist = (
         print "Using included version of Scalar::Util ($inc_version) because it is not already installed.\n";
         return 1;
     },
-    "version" => sub {
-        # Special case for version, never override the XS version with a
-        # pure Perl version.  Just check that it's there.
-        my $installed = find_installed("version.pm");
-        if ( $] == 5.010000 ) {
-          # Special special case
-          my $installed_version = $installed ? MM->parse_version( $installed ) : 0;
-          return should_use_dist('version') if $installed_version < 0.77;
-        }
-        return if $installed;
-
-        my $inc_version = MM->parse_version("$bundle_dir/version/version.pm");
-        print "Using included version of version ($inc_version) because it is not already installed.\n";
-        return 1;
-    },
     "json-pp-compat5006" => sub {
         # Only required by JSON::PP on perls < 5.008
         return unless $] < 5.008;
