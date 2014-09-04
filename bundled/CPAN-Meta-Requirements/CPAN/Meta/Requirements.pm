@@ -35,6 +35,9 @@ use Carp ();
 use Scalar::Util ();
 BEGIN { eval "use version" || eval "use ExtUtils::MakeMaker::version" }
 
+# Perl 5.10.0 didn't have "is_qv" in version.pm
+*_is_qv = version->can('is_qv') ? sub { $_[0]->is_qv } : sub { exists $_[0]->{qv} };
+
 #pod =method new
 #pod
 #pod   my $req = CPAN::Meta::Requirements->new;
@@ -91,8 +94,8 @@ sub _version_object {
   }
 
   # ensure normal v-string form
-  if ( $vobj->is_qv ) {
-    $vobj = version->parse($vobj->normal);
+  if ( _is_qv($vobj) ) {
+    $vobj = version->new($vobj->normal);
   }
 
   return $vobj;

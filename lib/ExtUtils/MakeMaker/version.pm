@@ -47,6 +47,9 @@ $CLASS = 'version';
         *LAX = \$ExtUtils::MakeMaker::version::regex::LAX;
         *STRICT = \$ExtUtils::MakeMaker::version::regex::STRICT;
     }
+    elsif ( ! version->can('is_qv') ) {
+        *version::is_qv = sub { exists $_[0]->{qv} };
+    }
 }
 
 1;
