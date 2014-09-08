@@ -10,7 +10,7 @@ use Config;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&Mksymlists);
-our $VERSION = '6.99_10';
+our $VERSION = '6.99_11';
 
 sub Mksymlists {
     my(%spec) = @_;

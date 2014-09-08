@@ -1,3 +1,11 @@
+6.99_11 Mon Sep  8 14:20:26 BST 2014
+    Bug fixes:
+    - Handle chcp failure better on MSWin32
+    - Tests should be parallelisable once again
+
+    Doc fixes:
+    - Document that GNU make is usable on MSWin32 now
+
 6.99_10 Thu Sep  4 14:28:01 BST 2014
     Bug fixes:
     - Fixes for being integrated with core
