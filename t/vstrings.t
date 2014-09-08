@@ -14,9 +14,13 @@ use strict;
 use warnings;
 use TieOut;
 use MakeMaker::Test::Utils qw(makefile_name);
+use File::Temp qw[tempdir];
 
 use ExtUtils::MakeMaker;
 use Test::More;
+
+my $tmpdir = tempdir( DIR => '.', CLEANUP => 1 );
+chdir $tmpdir;
 
 sub capture_make {
     my ($package, $version) = @_ ;

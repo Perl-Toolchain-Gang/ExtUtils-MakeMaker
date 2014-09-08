@@ -19,6 +19,7 @@ plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
     : (tests => 20);
 use File::Path;
+use File::Temp qw[tempdir];
 
 use ExtUtils::MakeMaker;
 
@@ -29,7 +30,8 @@ my $perl     = which_perl();
 my $make     = make_run();
 my $makefile = makefile_name();
 
-chdir 't';
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+chdir $tmpdir;
 
 perl_lib();
 
