@@ -2,6 +2,7 @@
 *~
 *.old
 Makefile
+Makefile.pm
 blib/
 pm_to_blib
 Build
