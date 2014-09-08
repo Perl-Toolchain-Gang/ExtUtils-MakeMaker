@@ -1386,14 +1386,18 @@ won't have to face the possibly bewildering errors resulting from
 using the wrong one.
 
 On POSIX systems, that program will likely be GNU Make; on Microsoft
-Windows, it will be either Microsoft NMake or DMake. Note that this
-module does not support generating Makefiles for GNU Make on Windows.
+Windows, it will be either Microsoft NMake, DMake or GNU Make.
 See the section on the L</"MAKE"> parameter for details.
 
-MakeMaker is object oriented. Each directory below the current
+ExtUtils::MakeMaker (EUMM) is object oriented. Each directory below the current
 directory that contains a Makefile.PL is treated as a separate
 object. This makes it possible to write an unlimited number of
 Makefiles with a single invocation of WriteMakefile().
+
+All inputs to WriteMakefile are Unicode characters, not just octets. EUMM
+seeks to handle all of these correctly. It is currently still not possible
+to portably use Unicode characters in module names, because this requires
+Perl to handle Unicode filenames, which is not yet the case on Windows.
 
 =head2 How To Write A Makefile.PL
 
