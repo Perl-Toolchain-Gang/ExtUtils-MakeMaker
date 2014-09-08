@@ -29,15 +29,10 @@ my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 my $OLD_CP; # crude but...
 if ($^O eq "MSWin32") {
-    if (qx(chcp) =~ /(\d+)$/) {
-        $OLD_CP = $1;
-    } else {
-        BAIL_OUT( "Can't get code page" );
-    }
-
-    qx(chcp 1252);
+    $OLD_CP = $1 if qx(chcp) =~ /(\d+)$/ and $? == 0;
+    qx(chcp 1252) if defined $OLD_CP;
 }
-END { qx(chcp $OLD_CP) if $^O eq "MSWin32" }
+END { qx(chcp $OLD_CP) if $^O eq "MSWin32" and defined $OLD_CP }
 
 my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
 chdir $tmpdir;
