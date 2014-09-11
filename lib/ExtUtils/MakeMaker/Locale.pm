@@ -1,7 +1,7 @@
-package Encode::Locale;
+package ExtUtils::MakeMaker::Locale;
 
 use strict;
-our $VERSION = "1.03";
+our $VERSION = "6.99_12";
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -153,7 +153,7 @@ __END__
 
 =head1 NAME
 
-Encode::Locale - Determine the locale encoding
+ExtUtils::MakeMaker::Locale - bundled Encode::Locale
 
 =head1 SYNOPSIS
 

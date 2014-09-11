@@ -30,8 +30,8 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
   diag("chdir failed: $!");
 
 if ($] >= 5.008) {
-  eval { require Encode::Locale; };
-  note "Encode::Locale vars: $Encode::Locale::ENCODING_LOCALE;$Encode::Locale::ENCODING_LOCALE_FS;$Encode::Locale::ENCODING_CONSOLE_IN;$Encode::Locale::ENCODING_CONSOLE_OUT\n" unless $@;
+  eval { require ExtUtils::MakeMaker::Locale; };
+  note "ExtUtils::MakeMaker::Locale vars: $ExtUtils::MakeMaker::Locale::ENCODING_LOCALE;$ExtUtils::MakeMaker::Locale::ENCODING_LOCALE_FS;$ExtUtils::MakeMaker::Locale::ENCODING_CONSOLE_IN;$ExtUtils::MakeMaker::Locale::ENCODING_CONSOLE_OUT\n" unless $@;
   note "Locale env vars: " . join(';', map {
     "$_=$ENV{$_}"
   } grep { /LANG|LC/ } keys %ENV) . "\n";
