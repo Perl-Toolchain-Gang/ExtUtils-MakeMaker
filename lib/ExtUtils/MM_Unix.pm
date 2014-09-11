@@ -2748,7 +2748,7 @@ sub parse_version {
 
     if ( defined $result && $result !~ /^v?[\d_\.]+$/ ) {
       require version;
-      my $normal = eval { version->parse( $result ) };
+      my $normal = eval { version->new( $result ) };
       $result = $normal if defined $normal;
     }
     $result = "undef" unless defined $result;

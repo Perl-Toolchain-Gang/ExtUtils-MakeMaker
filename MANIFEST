@@ -27,10 +27,6 @@ bundled/Scalar-List-Utils/List/Util.pm
 bundled/Scalar-List-Utils/List/Util/PP.pm
 bundled/Scalar-List-Utils/Scalar/Util.pm
 bundled/Scalar-List-Utils/Scalar/Util/PP.pm
-bundled/version/version.pm
-bundled/version/version.pod
-bundled/version/version/Internals.pod
-bundled/version/version/vpp.pm
 Changes
 CONTRIBUTING
 INSTALL
@@ -41,6 +37,9 @@ lib/ExtUtils/MakeMaker.pm
 lib/ExtUtils/MakeMaker/Config.pm
 lib/ExtUtils/MakeMaker/FAQ.pod
 lib/ExtUtils/MakeMaker/Tutorial.pod
+lib/ExtUtils/MakeMaker/version.pm
+lib/ExtUtils/MakeMaker/version/regex.pm
+lib/ExtUtils/MakeMaker/version/vpp.pm
 lib/ExtUtils/Mkbootstrap.pm
 lib/ExtUtils/Mksymlists.pm
 lib/ExtUtils/MM.pm

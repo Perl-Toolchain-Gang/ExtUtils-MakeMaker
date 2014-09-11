@@ -6,8 +6,11 @@ our $VERSION = '2.120351'; # VERSION
 
 
 use CPAN::Meta::Validator;
-use version (); # Removed 0.82 constraint, EUMM installed CPAN::Meta
+BEGIN { eval "use version ()" || eval "use ExtUtils::MakeMaker::version ()" }
 use Parse::CPAN::Meta 1.4400 ();
+
+# Perl 5.10.0 didn't have "is_qv" in version.pm
+*_is_qv = version->can('is_qv') ? sub { $_[0]->is_qv } : sub { exists $_[0]->{qv} };
 
 sub _dclone {
   my $ref = shift;
@@ -320,7 +323,7 @@ sub _clean_version {
   # XXX check defined $v and not just $v because version objects leak memory
   # in boolean context -- dagolden, 2012-02-03
   if ( defined $v ) {
-    return $v->is_qv ? $v->normal : $element;
+    return _is_qv($v) ? $v->normal : $element;
   }
   else {
     return 0;

@@ -1,14 +1,16 @@
-#!perl -w
-package version;
+#--------------------------------------------------------------------------#
+# This is a modified copy of version.pm 0.9909, bundled exclusively for
+# use by ExtUtils::Makemaker and its dependencies to bootstrap when
+# version.pm is not available.  It should not be used by ordinary modules.
+#--------------------------------------------------------------------------#
 
-use 5.005_04;
+package ExtUtils::MakeMaker::version::regex;
+
 use strict;
 
-use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
+use vars qw($VERSION $CLASS $STRICT $LAX);
 
-$VERSION = 0.88;
-
-$CLASS = 'version';
+$VERSION = 0.9909;
 
 #--------------------------------------------------------------------------#
 # Version regexp components
@@ -114,99 +116,7 @@ $LAX =
 
 #--------------------------------------------------------------------------#
 
-eval "use version::vxs $VERSION";
-if ( $@ ) { # don't have the XS version installed
-    eval "use version::vpp $VERSION"; # don't tempt fate
-    die "$@" if ( $@ );
-    push @ISA, "version::vpp";
-    local $^W;
-    *version::qv = \&version::vpp::qv;
-    *version::declare = \&version::vpp::declare;
-    *version::_VERSION = \&version::vpp::_VERSION;
-    if ($] >= 5.009000 && $] < 5.011004) {
-	no strict 'refs';
-	*version::stringify = \&version::vpp::stringify;
-	*{'version::(""'} = \&version::vpp::stringify;
-	*version::new = \&version::vpp::new;
-	*version::parse = \&version::vpp::parse;
-    }
-}
-else { # use XS module
-    push @ISA, "version::vxs";
-    local $^W;
-    *version::declare = \&version::vxs::declare;
-    *version::qv = \&version::vxs::qv;
-    *version::_VERSION = \&version::vxs::_VERSION;
-    *version::vcmp = \&version::vxs::VCMP;
-    if ($] >= 5.009000 && $] < 5.011004) {
-	no strict 'refs';
-	*version::stringify = \&version::vxs::stringify;
-	*{'version::(""'} = \&version::vxs::stringify;
-	*version::new = \&version::vxs::new;
-	*version::parse = \&version::vxs::parse;
-    }
-
-}
-
 # Preloaded methods go here.
-sub import {
-    no strict 'refs';
-    my ($class) = shift;
-
-    # Set up any derived class
-    unless ($class eq 'version') {
-	local $^W;
-	*{$class.'::declare'} =  \&version::declare;
-	*{$class.'::qv'} = \&version::qv;
-    }
-
-    my %args;
-    if (@_) { # any remaining terms are arguments
-	map { $args{$_} = 1 } @_
-    }
-    else { # no parameters at all on use line
-    	%args = 
-	(
-	    qv => 1,
-	    'UNIVERSAL::VERSION' => 1,
-	);
-    }
-
-    my $callpkg = caller();
-    
-    if (exists($args{declare})) {
-	*{$callpkg.'::declare'} = 
-	    sub {return $class->declare(shift) }
-	  unless defined(&{$callpkg.'::declare'});
-    }
-
-    if (exists($args{qv})) {
-	*{$callpkg.'::qv'} =
-	    sub {return $class->qv(shift) }
-	  unless defined(&{$callpkg.'::qv'});
-    }
-
-    if (exists($args{'UNIVERSAL::VERSION'})) {
-	local $^W;
-	*UNIVERSAL::VERSION 
-		= \&version::_VERSION;
-    }
-
-    if (exists($args{'VERSION'})) {
-	*{$callpkg.'::VERSION'} = \&version::_VERSION;
-    }
-
-    if (exists($args{'is_strict'})) {
-	*{$callpkg.'::is_strict'} = \&version::is_strict
-	  unless defined(&{$callpkg.'::is_strict'});
-    }
-
-    if (exists($args{'is_lax'})) {
-	*{$callpkg.'::is_lax'} = \&version::is_lax
-	  unless defined(&{$callpkg.'::is_lax'});
-    }
-}
-
 sub is_strict	{ defined $_[0] && $_[0] =~ qr/ \A $STRICT \z /x }
 sub is_lax	{ defined $_[0] && $_[0] =~ qr/ \A $LAX \z /x }
 
