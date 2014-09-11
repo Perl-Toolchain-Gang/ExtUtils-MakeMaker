@@ -1,3 +1,10 @@
+6.99_12 Thu Sep 11 15:27:31 BST 2014
+    Enhancements:
+    - Now include a fallback version module for bootstrapping
+
+    Bug fixes:
+    - Support libfoo.0.dylib style libraries on Darwin
+
 6.99_11 Mon Sep  8 14:20:26 BST 2014
     Bug fixes:
     - Handle chcp failure better on MSWin32
