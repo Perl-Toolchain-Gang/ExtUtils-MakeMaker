@@ -1,3 +1,7 @@
+6.99_14 Fri Sep 19 14:59:08 BST 2014
+    Bug fixes:
+    - Fixes to fallback version module for core integration problems
+
 6.99_13 Mon Sep 15 20:02:47 BST 2014
     Enhancements:
     - Bundle Encode::Locale as ExtUtils::MakeMaker::Locale
