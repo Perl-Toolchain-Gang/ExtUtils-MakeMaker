@@ -680,10 +680,9 @@ sub new {
 
     $value = _un_vstring($value);
 
-    if ($Config{d_setlocale}) {
-	use POSIX qw/locale_h/;
-	use if $Config{d_setlocale}, 'locale';
-	my $currlocale = setlocale(LC_ALL);
+    if ($Config{d_setlocale} && eval { require POSIX } ) {
+      require locale;
+	my $currlocale = POSIX::setlocale(&POSIX::LC_ALL);
 
 	# if the current locale uses commas for decimal points, we
 	# just replace commas with decimal places, rather than changing
