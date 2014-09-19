@@ -687,7 +687,7 @@ sub new {
 	# if the current locale uses commas for decimal points, we
 	# just replace commas with decimal places, rather than changing
 	# locales
-	if ( localeconv()->{decimal_point} eq ',' ) {
+	if ( POSIX::localeconv()->{decimal_point} eq ',' ) {
 	    $value =~ tr/,/./;
 	}
     }
