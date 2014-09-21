@@ -2318,9 +2318,9 @@ name of the library (see SDBM_File)
 
 The package representing the distribution. For example, C<Test::More>
 or C<ExtUtils::MakeMaker>. It will be used to derive information about
-the distribution such as the L<DISTNAME>, installation locations
+the distribution such as the L</DISTNAME>, installation locations
 within the Perl library and where XS files will be looked for by
-default (see L<XS>).
+default (see L</XS>).
 
 C<NAME> I<must> be a valid Perl package name and it I<must> have an
 associated C<.pm> file. For example, C<Foo::Bar> is a valid C<NAME>
