@@ -190,6 +190,19 @@ sub cflags {
 
     @cflags{qw(cc ccflags optimize shellflags)}
 	= @Config{qw(cc ccflags optimize shellflags)};
+
+    # Perl 5.21.4 adds the (gcc) warning (-Wall ...) and std (-std=c89)
+    # flags to the %Config, and the modules in the core can be built
+    # with those.
+    my @ccextraflags = qw(ccwarnflags ccstdflags);
+    if ($ENV{PERL_CORE}) {
+      for my $x (@ccextraflags) {
+        if (exists $Config{$x}) {
+          $cflags{$x} = $Config{$x};
+        }
+      }
+    }
+
     my($optdebug) = "";
 
     $cflags{shellflags} ||= '';
@@ -256,6 +269,10 @@ sub cflags {
 
     if ($self->{POLLUTE}) {
 	$self->{CCFLAGS} .= ' -DPERL_POLLUTE ';
+    }
+
+    for my $x (@ccextraflags) {
+      $self->{CCFLAGS} .= $cflags{$x} if exists $cflags{$x};
     }
 
     my $pollute = '';
