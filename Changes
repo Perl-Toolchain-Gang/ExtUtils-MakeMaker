@@ -1,3 +1,9 @@
+6.99_16 Thu Oct  2 19:29:49 BST 2014
+    Dist fixes:
+    - Move File::Copy::Recursive from bundled to where it is
+      used, so that it will not get installed as a runtime
+      prereq
+
 6.99_15 Sun Sep 21 13:21:46 BST 2014
     Enhancements:
     - If core, add ccwarnflags and ccstdflags, if available
