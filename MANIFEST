@@ -15,7 +15,6 @@ bundled/ExtUtils-Install/ExtUtils/Installed.pm
 bundled/ExtUtils-Install/ExtUtils/Packlist.pm
 bundled/ExtUtils-Manifest/ExtUtils/Manifest.pm
 bundled/ExtUtils-Manifest/ExtUtils/MANIFEST.SKIP
-bundled/File-Copy-Recursive/File/Copy/Recursive.pm
 bundled/File-Temp/File/Temp.pm
 bundled/JSON-PP-Compat5006/JSON/PP/Compat5006.pm
 bundled/JSON-PP/JSON/PP.pm
