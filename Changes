@@ -1,3 +1,7 @@
+6.99_17 Sun Oct 12 19:37:04 BST 2014
+    Bug fixes:
+    - Fix test that got broke under core since 6.99_15
+
 6.99_16 Thu Oct  2 19:29:49 BST 2014
     Dist fixes:
     - Move File::Copy::Recursive from bundled to where it is
