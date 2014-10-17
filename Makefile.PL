@@ -243,6 +243,7 @@ END
 
     sub special_targets {
       my $make_frag = shift->SUPER::special_targets(@_);
+      return $make_frag if $Is_VMS; # not supported in MMS, MMK
       $make_frag .= <<'MAKE_FRAG';
 .NOTPARALLEL: pure_all
 
