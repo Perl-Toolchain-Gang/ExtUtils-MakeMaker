@@ -1952,6 +1952,9 @@ sub init_PERL {
       ($self->{FULLPERL} = $self->{PERL}) =~ s/\Q$miniperl\E$/$perl_name$Config{exe_ext}/i;
       $self->{FULLPERL} = qq{"$self->{FULLPERL}"}.$perlflags;
     }
+    # Can't have an image name with quotes, and findperl will have
+    # already escaped spaces.
+    $self->{FULLPERL} =~ tr/"//d if $Is{VMS};
 
     $self->{ABSPERL} = $self->{PERL};
     if( $self->file_name_is_absolute($self->{ABSPERL}) ) {
@@ -1965,6 +1968,10 @@ sub init_PERL {
           if $self->{ABSPERL} =~ /\s/;
     }
     $self->{PERL} = qq{"$self->{PERL}"}.$perlflags;
+
+    # Can't have an image name with quotes, and findperl will have
+    # already escaped spaces.
+    $self->{PERL} =~ tr/"//d if $Is{VMS};
 
     # Are we building the core?
     $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
