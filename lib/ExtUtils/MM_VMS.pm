@@ -240,8 +240,8 @@ sub find_perl {
         $rslt = `\@temp_mmvms.com`;
         unlink('temp_mmvms.com');
         if ($rslt =~ /VER_OK/) {
-            print "Using PERL=MCR $vmsfile\n" if $trace;
-            return "MCR $vmsfile";
+            print "Using PERL=$vmsfile\n" if $trace;
+            return $vmsfile;
         }
     }
     print "Unable to find a perl $ver (by these names: @$names, in these dirs: @$dirs)\n";

@@ -1953,10 +1953,7 @@ sub init_PERL {
       $self->{FULLPERL} = qq{"$self->{FULLPERL}"}.$perlflags;
     }
 
-    # Little hack to get around VMS's find_perl putting "MCR" in front
-    # sometimes.
     $self->{ABSPERL} = $self->{PERL};
-    my $has_mcr = $self->{ABSPERL} =~ s/^MCR\s*//;
     if( $self->file_name_is_absolute($self->{ABSPERL}) ) {
         $self->{ABSPERL} = '$(PERL)';
     }
@@ -1966,8 +1963,6 @@ sub init_PERL {
         # Quote the perl command if it contains whitespace
         $self->{ABSPERL} = $self->quote_literal($self->{ABSPERL})
           if $self->{ABSPERL} =~ /\s/;
-
-        $self->{ABSPERL} = 'MCR '.$self->{ABSPERL} if $has_mcr;
     }
     $self->{PERL} = qq{"$self->{PERL}"}.$perlflags;
 
@@ -1980,6 +1975,7 @@ sub init_PERL {
         my $run  = $perl.'RUN';
 
         $self->{$run}  = qq{\$($perl)};
+        $self->{$run}  = 'MCR ' . $self->{$run} if $Is{VMS};
 
         # Make sure perl can find itself before it's installed.
         $self->{$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"}
