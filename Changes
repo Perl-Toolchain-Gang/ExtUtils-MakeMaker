@@ -1,3 +1,12 @@
+6.99_18 Mon Oct 20 10:02:58 BST 2014
+    Bug fixes:
+    - Resolve regression with taint and get_version() [RT#99580]
+
+    VMS fixes:
+    - Avoid .NOTPARALLEL on VMS as it is a syntax error for MMS and MMK
+    - Quotes are not stripped from argv[0] on VMS so need stripping
+    - Move MCR from PERL to PERLRUN on VMS and other *RUN variables
+
 6.99_17 Sun Oct 12 19:37:04 BST 2014
     Bug fixes:
     - Fix test that got broke under core since 6.99_15
