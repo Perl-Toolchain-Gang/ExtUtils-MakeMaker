@@ -2788,6 +2788,7 @@ sub get_version {
         no strict;
         local *{$name};
         local $^W = 0;
+        $line = $1 if $line =~ m{^(.+)}s;
         eval($line); ## no critic
         return ${$name};
     }
