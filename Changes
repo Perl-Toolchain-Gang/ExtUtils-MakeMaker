@@ -1,3 +1,7 @@
+7.00 Wed Oct 22 20:13:38 BST 2014
+
+    No changes from 6.99_18
+
 6.99_18 Mon Oct 20 10:02:58 BST 2014
     Bug fixes:
     - Resolve regression with taint and get_version() [RT#99580]
