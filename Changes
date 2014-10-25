@@ -1,3 +1,7 @@
+7.01_01 Sat Oct 25 13:45:00 BST 2014
+    Bug fixes:
+    - Resolve issue with Win32 perl builds in core
+
 7.00 Wed Oct 22 20:13:38 BST 2014
 
     No changes from 6.99_18

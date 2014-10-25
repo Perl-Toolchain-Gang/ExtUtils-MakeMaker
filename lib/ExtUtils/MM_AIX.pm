@@ -1,7 +1,7 @@
 package ExtUtils::MM_AIX;
 
 use strict;
-our $VERSION = '7.00';
+our $VERSION = '7.01_01';
 
 require ExtUtils::MM_Unix;
 our @ISA = qw(ExtUtils::MM_Unix);
