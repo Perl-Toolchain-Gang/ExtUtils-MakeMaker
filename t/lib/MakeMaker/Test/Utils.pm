@@ -214,7 +214,7 @@ sub make {
     my $make = $Config{make};
     $make = $ENV{MAKE} if exists $ENV{MAKE};
 
-    return qq{$make};
+    return qq{"$make"};
 }
 
 =item B<make_run>
