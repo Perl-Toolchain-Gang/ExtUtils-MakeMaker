@@ -54,7 +54,7 @@ for my $instdir (@INSTDIRS) {
 
   my $make = make_run();
   run("$make");   # this is necessary due to a dmake bug.
-  my $install_out = run(qq{"$make" install});
+  my $install_out = run("$make install");
   is( $?, 0, '  make install exited normally' ) || diag $install_out;
   like( $install_out, qr/^Installing /m, '"Installing" in output' );
 
@@ -80,7 +80,7 @@ for my $instdir (@INSTDIRS) {
   open(STDERR, ">".File::Spec->devnull) or die $!;
 
   if ($CLEANUP) {
-      my $realclean_out = run(qq{"$make" realclean});
+      my $realclean_out = run("$make realclean");
       is( $?, 0, 'realclean' ) || diag($realclean_out);
   }
 
