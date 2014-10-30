@@ -16,10 +16,9 @@ use Cwd 'abs_path';
 
 use Test::More;
 use ExtUtils::MM;
-
-if ( !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'} ) {
-    plan skip_all => 'cross-compiling and make not available';
-}
+plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+    ? (skip_all => "cross-compiling and make not available")
+    : ('no_plan');
 
 #--------------------- Setup
 
