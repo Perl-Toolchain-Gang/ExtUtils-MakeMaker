@@ -1,3 +1,7 @@
+7.01_03 Thu Oct 30 19:12:57 GMT 2014
+    Bug fixes:
+    - Using NMAKE was broken this has been fixed
+
 7.01_02 Sat Oct 25 17:45:46 BST 2014
     Bug fixes:
     - Resolve a regression with FIXIN and core builds on Win32
