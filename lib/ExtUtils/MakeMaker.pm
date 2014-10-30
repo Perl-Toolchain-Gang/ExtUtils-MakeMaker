@@ -34,7 +34,7 @@ $Revision = int $Revision * 10000;
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
 our @ISA = qw(Exporter);
-our @EXPORT    = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
+our @EXPORT    = qw(&WriteMakefile $Verbose &prompt);
 our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
                     &WriteEmptyMakefile);
 
@@ -403,26 +403,6 @@ sub full_setup {
            MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
            PERL FULLPERL
     );
-}
-
-sub writeMakefile {
-    die <<END;
-
-The extension you are trying to build apparently is rather old and
-most probably outdated. We detect that from the fact, that a
-subroutine "writeMakefile" is called, and this subroutine is not
-supported anymore since about October 1994.
-
-Please contact the author or look into CPAN (details about CPAN can be
-found in the FAQ and at http:/www.perl.com) for a more recent version
-of the extension. If you're really desperate, you can try to change
-the subroutine name from writeMakefile to WriteMakefile and rerun
-'perl Makefile.PL', but you're most probably left alone, when you do
-so.
-
-The MakeMaker team
-
-END
 }
 
 sub new {
