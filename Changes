@@ -1,3 +1,11 @@
+7.01_04 Fri Oct 31 09:38:06 GMT 2014
+    API change:
+    - writeMakefile() has been removed after 20 years of being deprecated
+
+    Bug fixes:
+    - Regression in xs.t with older versions of xsubpp has been resolved
+    - We now don't produce Borland C export symbols if BCC support dropped
+
 7.01_03 Thu Oct 30 19:12:57 GMT 2014
     Bug fixes:
     - Using NMAKE was broken this has been fixed
