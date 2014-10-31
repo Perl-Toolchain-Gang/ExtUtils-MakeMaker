@@ -40,15 +40,6 @@ SKIP: {
     skip 'perl Makefile.PL failed', 2;
   }
 
-  # now simulate what Module::Install does, and edit $(PERL) to add flags
-  open my $fh, '<', 'Makefile';
-  my $mtext = join '', <$fh>;
-  close $fh;
-  $mtext =~ s/^(\s*PERL\s*=.*)$/$1 -Mstrict/m;
-  open $fh, '>', 'Makefile';
-  print $fh $mtext;
-  close $fh;
-
   my $make = make_run();
   my $make_out = run("$make");
   unless (is( $?, 0, '  make exited normally' )) {

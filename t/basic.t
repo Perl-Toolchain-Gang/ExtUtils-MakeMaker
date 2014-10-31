@@ -3,6 +3,11 @@
 # This test puts MakeMaker through the paces of a basic perl module
 # build, test and installation of the Big::Fat::Dummy module.
 
+# Module::Install relies on being able to patch the generated Makefile
+# to add flags to $(PERL)
+# This test includes adding ' -Iinc' to $(PERL), and checking 'make install'
+# after that works. Done here as back-compat is considered basic.
+
 BEGIN {
     unshift @INC, 't/lib';
 }
@@ -133,6 +138,14 @@ like( $test_out, qr/All tests successful/,  '  successful' );
 is( $?, 0,                                  '  exited normally' ) ||
     diag $test_out;
 
+# now simulate what Module::Install does, and edit $(PERL) to add flags
+open my $fh, '<', $makefile;
+my $mtext = join '', <$fh>;
+close $fh;
+$mtext =~ s/^(\s*PERL\s*=.*)$/$1 -Iinc/m;
+open $fh, '>', $makefile;
+print $fh $mtext;
+close $fh;
 
 my $install_out = run("$make install");
 is( $?, 0, 'install' ) || diag $install_out;
