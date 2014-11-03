@@ -1930,6 +1930,7 @@ sub init_PERL {
 
     my $perl = $self->{PERL};
     $perl =~ s/^"//;
+    my $has_mcr = $perl =~ s/^MCR\s*//;
     my $perlflags = '';
     my $stripped_perl;
     while ($perl) {
@@ -1939,6 +1940,7 @@ sub init_PERL {
 	$perlflags = $1.$perlflags;
     }
     $self->{PERL} = $stripped_perl;
+    $self->{PERL} = 'MCR '.$self->{PERL} if $has_mcr || $Is{VMS};
 
     # When built for debugging, VMS doesn't create perl.exe but ndbgperl.exe.
     my $perl_name = 'perl';
@@ -1959,7 +1961,7 @@ sub init_PERL {
     # Little hack to get around VMS's find_perl putting "MCR" in front
     # sometimes.
     $self->{ABSPERL} = $self->{PERL};
-    my $has_mcr = $self->{ABSPERL} =~ s/^MCR\s*//;
+    $has_mcr = $self->{ABSPERL} =~ s/^MCR\s*//;
     if( $self->file_name_is_absolute($self->{ABSPERL}) ) {
         $self->{ABSPERL} = '$(PERL)';
     }
