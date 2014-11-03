@@ -3473,6 +3473,8 @@ sub test {
     elsif (!$tests && -d 't') {
         $tests = $self->find_tests;
     }
+    # have to do this because nmake is broken
+    $tests =~ s!/!\\!g if $self->is_make_type('nmake');
     # note: 'test.pl' name is also hardcoded in init_dirscan()
     my(@m);
     push(@m,"
