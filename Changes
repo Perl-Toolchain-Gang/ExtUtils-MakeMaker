@@ -1,3 +1,8 @@
+7.01_05 Mon Nov  3 10:14:11 GMT 2014
+    VMS fixes:
+    - Handle switches in $(PERL) by prepending MCR
+    - Don't quote MAKE on VMS in Test::Utils
+
 7.01_04 Fri Oct 31 09:38:06 GMT 2014
     API change:
     - writeMakefile() has been removed after 20 years of being deprecated

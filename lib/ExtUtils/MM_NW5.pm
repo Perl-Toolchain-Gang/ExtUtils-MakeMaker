@@ -22,7 +22,7 @@ use strict;
 use ExtUtils::MakeMaker::Config;
 use File::Basename;
 
-our $VERSION = '7.01_04';
+our $VERSION = '7.01_05';
 
 require ExtUtils::MM_Win32;
 our @ISA = qw(ExtUtils::MM_Win32);
