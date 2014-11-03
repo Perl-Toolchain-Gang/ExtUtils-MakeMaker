@@ -1,3 +1,11 @@
+7.01_06 Mon Nov  3 20:31:05 GMT 2014
+    Bug fixes:
+    - Resolved regression with TEST_FILES
+
+    Win32 fixes:
+    - Targetted fix for nmake bug
+    - miniperl.t core test fixed for Windows
+
 7.01_05 Mon Nov  3 10:14:11 GMT 2014
     VMS fixes:
     - Handle switches in $(PERL) by prepending MCR
