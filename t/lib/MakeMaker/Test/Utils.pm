@@ -30,6 +30,7 @@ our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
         HARNESS_VERBOSE
         PREFIX
         MAKEFLAGS
+        PERL_INSTALL_QUIET
     );
 
     my %default_env_keys;
