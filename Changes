@@ -1,3 +1,7 @@
+7.01_07 Tue Nov  4 19:26:46 GMT 2014
+    Test fixes:
+    - Changed a regex in pm_to_blib.t to be more forgiving
+
 7.01_06 Mon Nov  3 20:31:05 GMT 2014
     Bug fixes:
     - Resolved regression with TEST_FILES
