@@ -1,3 +1,8 @@
+7.01_09 Thu Nov  6 21:41:32 GMT 2014
+    Test fixes:
+    - Marked a test in pm_to_blib.t as TODO until further
+      investigation can be scheduled
+
 7.01_08 Tue Nov  4 20:24:29 GMT 2014
     Test fixes:
     - roll back change in 7.01_07 and scrub PERL_INSTALL_QUIET
