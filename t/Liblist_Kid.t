@@ -12,6 +12,14 @@ BEGIN {
     package MockEUMM;
     use base 'File::Spec';    # what.
     sub new { return bless {}, 'MockEUMM'; }
+    sub lsdir { # cut'n'paste from LibList::Kid
+        shift;
+        my $rex = qr/$_[1]/;
+        opendir DIR, $_[0];
+        my @out = grep /$rex/, readdir DIR;
+        closedir DIR;
+        return @out;
+    }
 }
 
 package liblist_kid_test;
@@ -19,6 +27,9 @@ package liblist_kid_test;
 use Test::More 'no_plan';
 use ExtUtils::MakeMaker::Config;
 use File::Spec;
+
+# similar to dispatching in EU::LL::Kid
+my $OS = $^O eq 'MSWin32' ? 'win32' : ($^O eq 'VMS' ? 'vms' : 'unix_os2');
 
 run();
 
@@ -29,7 +40,8 @@ sub run {
     move_to_os_test_data_dir();
     conf_reset();
     test_common();
-    test_kid_win32() if $^O eq 'MSWin32';
+    test_kid_unix_os2() if $OS eq 'unix_os2';
+    test_kid_win32() if $OS eq 'win32';
 }
 
 # This allows us to get a clean playing field and ensure that the current
@@ -38,6 +50,7 @@ sub run {
 sub conf_reset {
     delete $Config{$_} for keys %Config;
     $Config{installarchlib} = 'lib';
+    $Config{so} = 'so';
     delete $ENV{LIB};
     delete $ENV{LIBRARY_PATH};
     return;
@@ -47,10 +60,13 @@ sub conf_reset {
 # separation of OS-specific files.
 
 sub move_to_os_test_data_dir {
-    my %os_test_dirs = ( MSWin32 => 't/liblist/win32', );
-    return if !$os_test_dirs{$^O};
+    my %os_test_dirs = (
+        win32 => 't/liblist/win32',
+        unix_os2 => 't/liblist/unix_os2',
+    );
+    return if !$os_test_dirs{$OS};
 
-    chdir $os_test_dirs{$^O} or die "Could not change to liblist test dir '$os_test_dirs{$^O}': $!";
+    chdir $os_test_dirs{$OS} or die "Could not change to liblist test dir '$os_test_dirs{$OS}': $!";
     return;
 }
 
@@ -65,6 +81,13 @@ sub test_common {
     is_deeply( [ _ext( 'unreal_test' ) ], [ ('') x 4 ], 'non-existent file results in empty output' );
     is_deeply( [ _ext( undef, 0, 1 ) ], [ ('') x 4, [] ], 'asking for real names with empty input results in an empty extra array' );
     is_deeply( [ _ext( 'unreal_test',     0, 1 ) ], [ ('') x 4, [] ], 'asking for real names with non-existent file results in an empty extra array' );
+}
+
+sub test_kid_unix_os2 {
+    my @out = _ext( '-L. -lfoo' );
+    my $qlibre = qr/"-L[^"]+"\s+"-lfoo"/;
+    like( $out[0], $qlibre, 'existing file results in quoted extralibs' );
+    like( $out[2], $qlibre, 'existing file results in quotes ldloadlibs' );
 }
 
 sub test_kid_win32 {
