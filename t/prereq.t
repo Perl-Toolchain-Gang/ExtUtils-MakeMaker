@@ -9,7 +9,7 @@ BEGIN {
 
 use strict;
 use Config;
-use Test::More tests => 16;
+use Test::More tests => 17;
 use File::Temp qw[tempdir];
 
 use TieOut;
@@ -58,6 +58,15 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     WriteMakefile(
         NAME            => 'Big::Dummy',
         PREREQ_PM       => {
+            strict  =>  '>= 0, <= 99999',
+        }
+    );
+    is $warnings, '', 'version range';
+
+    $warnings = '';
+    WriteMakefile(
+        NAME            => 'Big::Dummy',
+        PREREQ_PM       => {
             strict  => 99999
         }
     );
@@ -85,7 +94,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     );
     my @warnings = split /\n/, $warnings;
     is @warnings, 2;
-    like $warnings[0], qr{^Unparsable version '' for prerequisite I::Do::Not::Exist\b};
+    like $warnings[0], qr{^Undefined requirement for I::Do::Not::Exist\b};
     is $warnings[1], "Warning: prerequisite I::Do::Not::Exist 0 not found.";
 
 

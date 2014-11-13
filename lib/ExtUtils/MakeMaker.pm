@@ -423,9 +423,22 @@ sub new {
     bless $self, "MM";
 
     # Cleanup all the module requirement bits
+    # require as EUMM Makefile.PL use()s EUMM before installing bundled stuff
+    require CPAN::Meta::Requirements;
+    my %key2cmr;
     for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
         $self->{$key}      ||= {};
-        $self->clean_versions( $key );
+	my $cmr = CPAN::Meta::Requirements->from_string_hash(
+	    $self->{$key},
+	    {
+	      bad_version_hook => sub {
+		carp "Unparsable version '$_[0]' for prerequisite $_[1]";
+		version->new(0);
+	      },
+	    },
+	);
+        $self->{$key} = $cmr->as_string_hash;
+	$key2cmr{$key} = $cmr;
     }
 
 
@@ -495,9 +508,12 @@ END
     my(%initial_att) = %$self; # record initial attributes
 
     my(%unsatisfied) = ();
-    my $prereqs = $self->_all_prereqs;
-    foreach my $prereq (sort keys %$prereqs) {
-        my $required_version = $prereqs->{$prereq};
+    my $cmr = CPAN::Meta::Requirements->new;
+    for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+	$cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
+    }
+    foreach my $prereq (sort $cmr->required_modules) {
+        my $required_version = $cmr->requirements_for_module($prereq);
 
         my $pr_version = 0;
         my $installed_file;
@@ -529,13 +545,13 @@ END
 
             $unsatisfied{$prereq} = 'not installed';
         }
-        elsif ($pr_version < $required_version ){
+        elsif (!$cmr->accepts_module($prereq, $pr_version)){
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $required_version, ($pr_version || 'unknown version')
                   unless $self->{PREREQ_FATAL}
                        or $ENV{PERL_CORE};
 
-            $unsatisfied{$prereq} = $required_version ? $required_version : 'unknown version' ;
+            $unsatisfied{$prereq} = $required_version || 'unknown version' ;
         }
     }
 
@@ -1284,36 +1300,6 @@ sub _find_magic_vstring {
         }
     }
     return $tvalue;
-}
-
-
-# Look for weird version numbers, warn about them and set them to 0
-# before CPAN::Meta chokes.
-sub clean_versions {
-    my($self, $key) = @_;
-    my $reqs = $self->{$key};
-    for my $module (keys %$reqs) {
-        my $v = $reqs->{$module};
-        my $printable = _find_magic_vstring($v);
-        $v = $printable if length $printable;
-        my $version = eval {
-            local $SIG{__WARN__} = sub {
-              # simulate "use warnings FATAL => 'all'" for vintage perls
-              die @_;
-            };
-            version->new($v)->stringify;
-        };
-        if( $@ || $reqs->{$module} eq '' ) {
-            if ( $] < 5.008 && $v !~ /^v?[\d_\.]+$/ ) {
-               $v = sprintf "v%vd", $v unless $v eq '';
-            }
-            carp "Unparsable version '$v' for prerequisite $module";
-            $reqs->{$module} = 0;
-        }
-        else {
-            $reqs->{$module} = $version;
-        }
-    }
 }
 
 sub selfdocument {
@@ -2625,8 +2611,11 @@ doesn't.  See L<Test::More/BAIL_OUT> for more details.
 A hash of modules that are needed to run your module.  The keys are
 the module names ie. Test::More, and the minimum version is the
 value. If the required version number is 0 any version will do.
+The versions given may be a Perl v-string (see L<version>) or a range
+(see L<CPAN::Meta::Requirements>).
 
-This will go into the C<requires> field of your F<META.yml> and the C<runtime> of the C<prereqs> field of your F<META.json>.
+This will go into the C<requires> field of your F<META.yml> and the
+C<runtime> of the C<prereqs> field of your F<META.json>.
 
     PREREQ_PM => {
         # Require Test::More at least 0.47

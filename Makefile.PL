@@ -61,7 +61,7 @@ if( $BUILDING_AS_PACKAGE ) {
         'Parse::CPAN::Meta'        => '1.4400',
         'Scalar::Util'             => '1.13',
         'version'                  => '0',
-        'CPAN::Meta::Requirements' => '2.121',
+        'CPAN::Meta::Requirements' => '2.130', # updates to hooks et al
     );
 
     $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
