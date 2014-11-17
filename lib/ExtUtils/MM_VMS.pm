@@ -2056,6 +2056,21 @@ sub os_flavor {
     return('VMS');
 }
 
+
+=item is_make_type (override)
+
+None of the make types being checked for is viable on VMS,
+plus our $self->{MAKE} is an unexpanded (and unexpandable)
+macro whose value is known only to the make utility itself.
+
+=cut
+
+sub is_make_type {
+    my($self, $type) = @_;
+    return 0;
+}
+
+
 =back
 
 
