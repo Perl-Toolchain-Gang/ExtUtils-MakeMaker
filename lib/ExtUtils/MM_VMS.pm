@@ -489,7 +489,7 @@ sub init_tools {
 
     $self->{MOD_INSTALL} ||=
       $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
-install([ from_to => {split(' ', <STDIN>)}, verbose => '$(VERBINST)', uninstall_shadows => '$(UNINST)', dir_mode => '$(PERM_DIR)' ]);
+install([ from_to => {split('\|', <STDIN>)}, verbose => '$(VERBINST)', uninstall_shadows => '$(UNINST)', dir_mode => '$(PERM_DIR)' ]);
 CODE
 
     $self->{UMASK_NULL} = '! ';
@@ -1192,54 +1192,54 @@ doc__install : doc_site_install
 pure_perl_install ::
 ];
     push @m,
-q[	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+q[	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read|'.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').'|'" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write|'.File::Spec->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').'|'" >>.MM_tmp
 ] unless $self->{NO_PACKLIST};
 
     push @m,
-q[	$(NOECHO) $(ECHO_N) "$(INST_LIB) $(DESTINSTALLPRIVLIB) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_ARCHLIB) $(DESTINSTALLARCHLIB) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_BIN) $(DESTINSTALLBIN) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_SCRIPT) $(DESTINSTALLSCRIPT) " >>.MM_tmp
+q[	$(NOECHO) $(ECHO_N) "$(INST_LIB)|$(DESTINSTALLPRIVLIB)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_ARCHLIB)|$(DESTINSTALLARCHLIB)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_BIN)|$(DESTINSTALLBIN)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_SCRIPT)|$(DESTINSTALLSCRIPT)|" >>.MM_tmp
 	$(NOECHO) $(ECHO_N) "$(INST_MAN1DIR) $(DESTINSTALLMAN1DIR) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR) $(DESTINSTALLMAN3DIR) " >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR)|$(DESTINSTALLMAN3DIR)" >>.MM_tmp
 	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
-	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) "].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q["
 
 # Likewise
 pure_site_install ::
 ];
     push @m,
-q[	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+q[	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read|'.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').'|'" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write|'.File::Spec->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').'|'" >>.MM_tmp
 ] unless $self->{NO_PACKLIST};
 
     push @m,
-q[	$(NOECHO) $(ECHO_N) "$(INST_LIB) $(DESTINSTALLSITELIB) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_ARCHLIB) $(DESTINSTALLSITEARCH) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_BIN) $(DESTINSTALLSITEBIN) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_SCRIPT) $(DESTINSTALLSCRIPT) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_MAN1DIR) $(DESTINSTALLSITEMAN1DIR) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR) $(DESTINSTALLSITEMAN3DIR) " >>.MM_tmp
+q[	$(NOECHO) $(ECHO_N) "$(INST_LIB)|$(DESTINSTALLSITELIB)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_ARCHLIB)|$(DESTINSTALLSITEARCH)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_BIN)|$(DESTINSTALLSITEBIN)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_SCRIPT)|$(DESTINSTALLSCRIPT)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_MAN1DIR)|$(DESTINSTALLSITEMAN1DIR)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR)|$(DESTINSTALLSITEMAN3DIR)" >>.MM_tmp
 	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
-	$(NOECHO) $(WARN_IF_OLD_PACKLIST) ].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) "].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q["
 
 pure_vendor_install ::
 ];
     push @m,
-q[	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read '.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').' '" >.MM_tmp
-	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write '.File::Spec->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').' '" >>.MM_tmp
+q[	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'read|'.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').'|'" >.MM_tmp
+	$(NOECHO) $(PERLRUN) "-MFile::Spec" -e "print 'write|'.File::Spec->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').'|'" >>.MM_tmp
 ] unless $self->{NO_PACKLIST};
 
     push @m,
-q[	$(NOECHO) $(ECHO_N) "$(INST_LIB) $(DESTINSTALLVENDORLIB) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_ARCHLIB) $(DESTINSTALLVENDORARCH) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_BIN) $(DESTINSTALLVENDORBIN) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_SCRIPT) $(DESTINSTALLSCRIPT) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_MAN1DIR) $(DESTINSTALLVENDORMAN1DIR) " >>.MM_tmp
-	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR) $(DESTINSTALLVENDORMAN3DIR) " >>.MM_tmp
+q[	$(NOECHO) $(ECHO_N) "$(INST_LIB)|$(DESTINSTALLVENDORLIB)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_ARCHLIB)|$(DESTINSTALLVENDORARCH)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_BIN)|$(DESTINSTALLVENDORBIN)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_SCRIPT)|$(DESTINSTALLSCRIPT)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_MAN1DIR)|$(DESTINSTALLVENDORMAN1DIR)|" >>.MM_tmp
+	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR)|$(DESTINSTALLVENDORMAN3DIR)" >>.MM_tmp
 	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
 
