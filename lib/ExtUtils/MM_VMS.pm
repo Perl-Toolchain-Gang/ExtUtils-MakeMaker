@@ -1952,10 +1952,6 @@ sub eliminate_macros {
     return '' unless $path;
     $self = {} unless ref $self;
 
-    if ($path =~ /\s/) {
-      return join ' ', map { $self->eliminate_macros($_) } split /\s+/, $path;
-    }
-
     my($npath) = unixify($path);
     # sometimes unixify will return a string with an off-by-one trailing null
     $npath =~ s{\0$}{};
@@ -2013,12 +2009,6 @@ sub fixpath {
     return '' unless $path;
     $self = bless {}, $self unless ref $self;
     my($fixedpath,$prefix,$name);
-
-    if ($path =~ /[ \t]/) {
-      return join ' ',
-             map { $self->fixpath($_,$force_path) }
-	     split /[ \t]+/, $path;
-    }
 
     if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) {
         if ($force_path or $path =~ /(?:DIR\)|\])\Z(?!\n)/) {
