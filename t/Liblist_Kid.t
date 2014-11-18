@@ -48,9 +48,12 @@ sub run {
 # system configuration does not affect the test results.
 
 sub conf_reset {
+    my @save_keys = qw{ so dlsrc osname perllibs };
+    my %save_config;
+    @save_config{ @save_keys } = @Config{ @save_keys };
     delete $Config{$_} for keys %Config;
+    %Config = %save_config;
     $Config{installarchlib} = 'lib';
-    $Config{so} = 'so';
     delete $ENV{LIB};
     delete $ENV{LIBRARY_PATH};
     return;
