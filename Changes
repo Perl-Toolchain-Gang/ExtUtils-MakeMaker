@@ -1,3 +1,15 @@
+7.03_01 Tue Nov 18 21:29:40 GMT 2014
+    VMS fixes:
+    - Handle spaces in install targets
+    - Allow spaces in eliminate_macros and fixpath
+    - Remove fixpath call from ExtUtils::Liblist::Kid::_vms_ext.
+    - Override is_make_type() as checks as unnecessary
+
+    Core fixes:
+    - Wrap parse_abstract() call to Encode in eval() to
+      avoid build failures
+    - Fix issue with CCFLAGS in core
+
 7.02 Sat Nov  8 07:13:40 GMT 2014
 
     No changes from 7.01_09
