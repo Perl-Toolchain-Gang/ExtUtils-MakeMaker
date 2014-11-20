@@ -2816,24 +2816,6 @@ sub _PRINT_PREREQ {
 
 =begin private
 
-=head3 _all_prereqs
-
-  my $prereqs = $self->_all_prereqs;
-
-Returns a hash ref of both PREREQ_PM and BUILD_REQUIRES.
-
-=end private
-
-=cut
-
-sub _all_prereqs {
-    my $self = shift;
-
-    return { %{$self->{PREREQ_PM}}, %{$self->{BUILD_REQUIRES}} };
-}
-
-=begin private
-
 =head3 _perl_header_files
 
   my $perl_header_files= $self->_perl_header_files;
