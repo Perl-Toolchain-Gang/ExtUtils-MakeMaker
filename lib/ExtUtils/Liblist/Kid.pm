@@ -639,6 +639,7 @@ sub _vms_ext {
     my $lib = join( ' ', @fndlibs );
 
     $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
+    $ldlib =~ s/^\s+|\s+$//g;
     warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;
     wantarray ? ( $lib, '', $ldlib, '', ( $give_libs ? \@flibs : () ) ) : $lib;
 }
