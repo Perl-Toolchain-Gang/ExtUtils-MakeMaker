@@ -1176,6 +1176,9 @@ install_perl :: all pure_perl_install doc_perl_install
 install_site :: all pure_site_install doc_site_install
 	$(NOECHO) $(NOOP)
 
+install_vendor :: all pure_vendor_install doc_vendor_install
+	$(NOECHO) $(NOOP)
+
 pure_install :: pure_$(INSTALLDIRS)_install
 	$(NOECHO) $(NOOP)
 
@@ -1294,15 +1297,12 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 
 uninstall_from_perldirs ::
 	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
-	$(NOECHO) $(ECHO) "Uninstall is now deprecated and makes no actual changes."
-	$(NOECHO) $(ECHO) "Please check the list above carefully for errors, and manually remove"
-	$(NOECHO) $(ECHO) "the appropriate files.  Sorry for the inconvenience."
 
 uninstall_from_sitedirs ::
 	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
-	$(NOECHO) $(ECHO) "Uninstall is now deprecated and makes no actual changes."
-	$(NOECHO) $(ECHO) "Please check the list above carefully for errors, and manually remove"
-	$(NOECHO) $(ECHO) "the appropriate files.  Sorry for the inconvenience."
+
+uninstall_from_vendordirs ::
+	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{VENDORARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
 ];
 
     join('',@m);
