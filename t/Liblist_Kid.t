@@ -38,6 +38,20 @@ sub run {
 sub conf_reset {
     delete $Config{$_} for keys %Config;
     $Config{installarchlib} = 'lib';
+    # The following are all used and always are defined in the real world.
+    # Define them to something here to avoid spewing uninitialized value warnings.
+    if ($^O eq 'VMS') {
+        $Config{ldflags}     = '';
+        $Config{dbgprefix}   = '';
+        $Config{perllibs}    = '';
+        $Config{libc}        = '';
+        $Config{ext_ext}     = '';
+        $Config{lib_ext}     = '';
+        $Config{obj_ext}     = '';
+        $Config{so}          = '';
+        $Config{vms_cc_type} = '';
+        $Config{libpth}      = '';
+    }
     delete $ENV{LIB};
     delete $ENV{LIBRARY_PATH};
     return;
@@ -61,10 +75,13 @@ sub quote { join ' ', map { qq{"$_"} } @_ }
 sub double { (@_) x 2 }
 
 sub test_common {
-    is_deeply( [ _ext() ], [ ('') x 4 ], 'empty input results in empty output' );
-    is_deeply( [ _ext( 'unreal_test' ) ], [ ('') x 4 ], 'non-existent file results in empty output' );
-    is_deeply( [ _ext( undef, 0, 1 ) ], [ ('') x 4, [] ], 'asking for real names with empty input results in an empty extra array' );
-    is_deeply( [ _ext( 'unreal_test',     0, 1 ) ], [ ('') x 4, [] ], 'asking for real names with non-existent file results in an empty extra array' );
+    my @expected = ('','','','');
+    $expected[2] = 'PerlShr/Share' if $^O eq 'VMS';
+    is_deeply( [ _ext() ], \@expected, 'empty input results in empty output' );
+    is_deeply( [ _ext( 'unreal_test' ) ], \@expected, 'non-existent file results in empty output' );
+    push @expected, [];
+    is_deeply( [ _ext( undef, 0, 1 ) ], \@expected, 'asking for real names with empty input results in an empty extra array' );
+    is_deeply( [ _ext( 'unreal_test',     0, 1 ) ], \@expected, 'asking for real names with non-existent file results in an empty extra array' );
 }
 
 sub test_kid_win32 {
