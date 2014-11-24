@@ -1,3 +1,8 @@
+7.03_02 Mon Nov 24 13:18:09 GMT 2014
+    VMS fixes:
+    - Fix a couple of missing vendor targets
+    - Remove VAXCCURSE from ExtUtils::Liblist::Kid::_vms_ext.
+
 7.03_01 Tue Nov 18 21:29:40 GMT 2014
     VMS fixes:
     - Handle spaces in install targets
