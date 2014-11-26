@@ -3617,12 +3617,20 @@ sub tool_xsubpp {
                 warn "Typemap $typemap not found.\n";
             }
             else {
-                push(@tmdeps,  $typemap);
+                push(@tmdeps, $typemap);
             }
         }
     }
     push(@tmdeps, "typemap") if -f "typemap";
-    my @tmargs = map(qq{-typemap "$_"}, @tmdeps);
+    # absolutised because with deep-located typemaps, eg "lib/XS/typemap",
+    # if xsubpp is called from top level with
+    #     $(XSUBPP) ... -typemap "lib/XS/typemap" "lib/XS/Test.xs"
+    # it says:
+    #     Can't find lib/XS/type map in (fulldir)/lib/XS
+    # because ExtUtils::ParseXS::process_file chdir's to .xs file's
+    # location. This is the only way to get all specified typemaps used,
+    # wherever located.
+    my @tmargs = map { '-typemap '.$self->quote_literal(File::Spec->rel2abs($_)) } @tmdeps;
     $_ = $self->quote_dep($_) for @tmdeps;
     if( exists $self->{XSOPT} ){
         unshift( @tmargs, $self->{XSOPT} );
