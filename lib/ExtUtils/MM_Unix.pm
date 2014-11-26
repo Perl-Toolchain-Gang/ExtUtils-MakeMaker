@@ -143,30 +143,34 @@ sub c_o {
 };
     }
 
-    push @m, qq{
-.c.s:
-	$command -S $flags \$*.c
+    push @m, sprintf <<'EOF', $command, $flags, $self->xs_obj_opt('$*.s');
 
-.c\$(OBJ_EXT):
-	$command $flags \$*.c
+.c.s :
+	%s -S %s $*.c %s
+EOF
 
-.cpp\$(OBJ_EXT):
-	$command $flags \$*.cpp
-
-.cxx\$(OBJ_EXT):
-	$command $flags \$*.cxx
-
-.cc\$(OBJ_EXT):
-	$command $flags \$*.cc
-};
-
-    push @m, qq{
-.C\$(OBJ_EXT):
-	$command $flags \$*.C
-} if !$Is{OS2} and !$Is{Win32} and !$Is{Dos}; #Case-specific
-
+    my @exts = qw(c cpp cxx cc);
+    push @exts, 'C' if !$Is{OS2} and !$Is{Win32} and !$Is{Dos}; #Case-specific
+    my $oo = $self->xs_obj_opt('$*$(OBJ_EXT)');
+    for my $ext (@exts) {
+	push @m, "\n.$ext\$(OBJ_EXT) :\n\t$command $flags \$*.$ext $oo\n";
+    }
     return join "", @m;
 }
+
+
+=item xs_obj_opt
+
+Takes the object file as an argument, and returns the portion of compile
+command-line that will output to the specified object file.
+
+=cut
+
+sub xs_obj_opt {
+    my ($self, $output_file) = @_;
+    "-o $output_file";
+}
+
 
 =item cflags (o)
 
@@ -974,8 +978,8 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
 	$ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
     }
 
-    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $ldfrom, $libs;
-	%s$(LD) %s $(LDDLFLAGS) %s $(OTHERLDFLAGS) -o $@ $(MYEXTLIB)	\
+    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $self->xs_obj_opt('$@'), $ldfrom, $libs;
+	%s$(LD) %s $(LDDLFLAGS) %s $(OTHERLDFLAGS) %s $(MYEXTLIB)	\
 	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST)	\
 	  $(INST_DYNAMIC_FIX)
 MAKE
@@ -2554,16 +2558,16 @@ $(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" 
 	push @m, "\tcat $catfile >> \$\@\n";
     }
 
-push @m, "
-\$(MAP_TARGET) :: $tmp/perlmain\$(OBJ_EXT) \$(MAP_LIBPERL) \$(MAP_STATIC) \$(INST_ARCHAUTODIR)/extralibs.all
-	\$(MAP_LINKCMD) -o \$\@ \$(OPTIMIZE) $tmp/perlmain\$(OBJ_EXT) \$(LDFROM) \$(MAP_STATIC) \$(LLIBPERL) `cat \$(INST_ARCHAUTODIR)/extralibs.all` \$(MAP_PRELIBS)
-	\$(NOECHO) \$(ECHO) 'To install the new \"\$(MAP_TARGET)\" binary, call'
-	\$(NOECHO) \$(ECHO) '    \$(MAKE) \$(USEMAKEFILE) $makefilename inst_perl MAP_TARGET=\$(MAP_TARGET)'
-	\$(NOECHO) \$(ECHO) 'To remove the intermediate files say'
-	\$(NOECHO) \$(ECHO) '    \$(MAKE) \$(USEMAKEFILE) $makefilename map_clean'
+push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $tmp, ($makefilename) x 2;
+$(MAP_TARGET) :: %s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
+	$(MAP_LINKCMD) %s $(OPTIMIZE) %s/perlmain$(OBJ_EXT) $(LDFROM) $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
+	$(NOECHO) $(ECHO) "To install the new '$(MAP_TARGET)' binary, call"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %s inst_perl MAP_TARGET=$(MAP_TARGET)"
+	$(NOECHO) $(ECHO) "To remove the intermediate files say"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %s map_clean"
 
 $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
-";
+EOF
     push @m, "\t".$self->cd($tmp, qq[$cccmd "-I\$(PERL_INC)" perlmain.c])."\n";
 
     push @m, qq{
@@ -3773,11 +3777,14 @@ only intended for broken make implementations.
 sub xs_o {	# many makes are too dumb to use xs_c then c_o
     my($self) = shift;
     return '' unless $self->needs_linking();
-    '
-.xs$(OBJ_EXT):
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c
-';
+    my $minus_o = $self->xs_obj_opt('$*$(OBJ_EXT)');
+    my $frag = sprintf <<'EOF', $minus_o;
+.xs$(OBJ_EXT) :
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
+	$(MV) $*.xsc $*.c
+	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c %s
+EOF
+    $frag;
 }
 
 

@@ -280,7 +280,7 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 
         my @cc_env = ExtUtils::MM_Win32::_identify_compiler_environment( $config );
 
-        my %cc_env = ( BORLAND => $cc_env[0], GCC => $cc_env[1], DLLTOOL => $cc_env[2] );
+        my %cc_env = ( BORLAND => $cc_env[0], GCC => $cc_env[1], MSVC => $cc_env[2], DLLTOOL => $cc_env[3] );
 
         return \%cc_env;
     }

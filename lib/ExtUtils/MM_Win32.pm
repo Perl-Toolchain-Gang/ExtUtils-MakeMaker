@@ -31,16 +31,17 @@ our $VERSION = '7.05_04';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my ( $BORLAND, $GCC, $DLLTOOL ) = _identify_compiler_environment( \%Config );
+my ( $BORLAND, $GCC, $MSVC, $DLLTOOL ) = _identify_compiler_environment( \%Config );
 
 sub _identify_compiler_environment {
 	my ( $config ) = @_;
 
 	my $BORLAND = $config->{cc} =~ /^bcc/i ? 1 : 0;
 	my $GCC     = $config->{cc} =~ /\bgcc\b/i ? 1 : 0;
+	my $MSVC    = $config->{cc} =~ /\b(?:cl|icl)/i ? 1 : 0; # MSVC can come as clarm.exe, icl=Intel C
 	my $DLLTOOL = $config->{dlltool} || 'dlltool';
 
-	return ( $BORLAND, $GCC, $DLLTOOL );
+	return ( $BORLAND, $GCC, $MSVC, $DLLTOOL );
 }
 
 
@@ -389,7 +390,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 	$(CHMOD) $(PERM_RWX) $@
 ';
 
-    join('',@m);
+    join '', @m;
 }
 
 =item extra_clean_files
@@ -458,14 +459,16 @@ EOF
     return $self->SUPER::quote_dep($arg);
 }
 
-=item xs_o
 
-This target is stubbed out.  Not sure why.
+=item xs_obj_opt
+
+Override to fixup -o flags for MSVC.
 
 =cut
 
-sub xs_o {
-    return ''
+sub xs_obj_opt {
+    my ($self, $output_file) = @_;
+    ($MSVC ? "/Fo" : "-o ") . $output_file;
 }
 
 
