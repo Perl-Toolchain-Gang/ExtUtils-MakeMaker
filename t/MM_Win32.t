@@ -147,7 +147,6 @@ note "init_others creates expected keys"; {
     $mm_w32->init_xs;
 
     my $s_PM = join( " \\\n\t", sort keys %{$mm_w32->{PM}} );
-    my $k_PM = join( " \\\n\t", %{$mm_w32->{PM}} );
 
     my $constants = $mm_w32->constants;
 
@@ -157,7 +156,6 @@ note "init_others creates expected keys"; {
          qr|^MAKEMAKER  \s* = \s* \Q$INC{'ExtUtils/MakeMaker.pm'}\E \s* $|xms,
          qr|^MM_VERSION \s* = \s* \Q$ExtUtils::MakeMaker::VERSION\E \s* $|xms,
          qr|^TO_INST_PM \s* = \s* \Q$s_PM\E \s* $|xms,
-         qr|^PM_TO_BLIB \s* = \s* \Q$k_PM\E \s* $|xms,
         )
     {
         like( $constants, $regex, 'constants() check' );

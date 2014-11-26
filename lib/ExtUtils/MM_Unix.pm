@@ -492,10 +492,7 @@ PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 
     push @m, "
 
-TO_INST_PM = ".$self->wraplist(sort keys %{$self->{PM}})."
-
-PM_TO_BLIB = ".$self->wraplist(map { ($_ => $self->{PM}->{$_}) } sort keys %{$self->{PM}})."
-";
+TO_INST_PM = ".$self->wraplist(map $self->quote_dep($_), sort keys %{$self->{PM}})."\n";
 
     join('',@m);
 }
