@@ -2169,7 +2169,8 @@ linkext below).
 
 =item MAGICXS
 
-When this is set to C<1>, C<OBJECT> will be automagically derived from C<XS>.
+When this is set to C<1>, C<OBJECT> will be automagically derived from
+C<O_FILES>.
 
 =item MAKE
 
