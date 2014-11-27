@@ -1,3 +1,7 @@
+7.03_04 Thu Nov 27 14:35:15 GMT 2014
+    Core fixes:
+    - Do not use ccstdflags with the core extensions
+
 7.03_03 Tue Nov 25 16:37:57 GMT 2014
     Win32 Fixes:
     - Eliminate sub-process spawning when checking make type
