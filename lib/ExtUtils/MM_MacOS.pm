@@ -28,12 +28,8 @@ Since there's little chance of it being repaired, MacOS Classic is fading
 away, and the code was icky to begin with, the code has been deleted to
 make maintenance easier.
 
-Those interested in writing modules for MacPerl should use Module::Build
-which works better than MakeMaker ever did.
-
 Anyone interested in resurrecting this file should pull the old version
-from the MakeMaker CVS repository and contact makemaker@perl.org, but we
-really encourage you to work on Module::Build instead.
+from the MakeMaker CVS repository and contact makemaker@perl.org.
 
 =cut
 
