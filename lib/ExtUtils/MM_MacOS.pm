@@ -5,10 +5,7 @@ use strict;
 our $VERSION = '7.03_04';
 
 sub new {
-    die <<'UNSUPPORTED';
-MacOS Classic (MacPerl) is no longer supported by MakeMaker.
-Please use Module::Build instead.
-UNSUPPORTED
+    die 'MacOS Classic (MacPerl) is no longer supported by MakeMaker';
 }
 
 =head1 NAME
