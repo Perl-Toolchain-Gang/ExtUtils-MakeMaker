@@ -1,3 +1,7 @@
+7.03_05 Fri Nov 28 18:27:09 GMT 2014
+    Doc fixes:
+    - Remove Module::Build encouragement
+
 7.03_04 Thu Nov 27 14:35:15 GMT 2014
     Core fixes:
     - Do not use ccstdflags with the core extensions
