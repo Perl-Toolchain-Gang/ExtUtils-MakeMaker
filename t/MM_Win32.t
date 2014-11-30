@@ -13,6 +13,7 @@ BEGIN {
         plan skip_all => 'This is not Win32';
     }
 }
+plan tests => 62;
 
 use Config;
 use File::Spec;
@@ -364,10 +365,6 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 
     _check_cc_id_value($_) for @tests;
 }
-
-
-done_testing;
-
 
 package FakeOut;
 
