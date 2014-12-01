@@ -1,3 +1,7 @@
+7.03_06 Mon Dec  1 15:35:28 GMT 2014
+    Doc fixes:
+    - Corrected MAGICXS documentation
+
 7.03_05 Fri Nov 28 18:27:09 GMT 2014
     Doc fixes:
     - Remove Module::Build encouragement
