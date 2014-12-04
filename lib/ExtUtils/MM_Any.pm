@@ -1565,8 +1565,8 @@ sub realclean {
     }
 
     # Occasionally files are repeated several times from different sources
-    { my(%f) = map { ($_ => 1) } @files;  @files = keys %f; }
-    { my(%d) = map { ($_ => 1) } @dirs;   @dirs  = keys %d; }
+    { my(%f) = map { ($_ => 1) } @files;  @files = sort keys %f; }
+    { my(%d) = map { ($_ => 1) } @dirs;   @dirs  = sort keys %d; }
 
     my $rm_cmd  = join "\n\t", map { "$_" }
                     $self->split_command('- $(RM_F)',  @files);
