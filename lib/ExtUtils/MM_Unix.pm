@@ -2428,6 +2428,10 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
     # Which *.a files could we make use of...
     my %static;
     require File::Find;
+    # don't use File::Spec here because on Win32 F::F still uses "/"
+    my $installed_version = join('/',
+	'auto', $self->{FULLEXT}, "$self->{BASEEXT}$self->{LIB_EXT}"
+    );
     File::Find::find(sub {
 	return unless m/\Q$self->{LIB_EXT}\E$/;
 
@@ -2473,7 +2477,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
 	# Once the patch to minimod.PL is in the distribution, I can
 	# drop it
-	return if $File::Find::name =~ m:auto/$self->{FULLEXT}/$self->{BASEEXT}$self->{LIB_EXT}\z:;
+	return if $File::Find::name =~ m:\Q$installed_version\E\z:;
 	use Cwd 'cwd';
 	$static{cwd() . "/" . $_}++;
     }, grep( -d $_, @{$searchdirs || []}) );
