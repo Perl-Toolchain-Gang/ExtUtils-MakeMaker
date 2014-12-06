@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 package CPAN::Meta::Requirements;
-our $VERSION = '2.127'; # VERSION
 # ABSTRACT: a set of version requirements for a CPAN dist
+
+our $VERSION = '2.130';
 
 #pod =head1 SYNOPSIS
 #pod
@@ -40,7 +41,12 @@ use Scalar::Util ();
 # install of CPAN::Meta::Requirements, as version.pm will be picked up from
 # prereqs and be available at runtime.
 
-BEGIN { eval "use version ()" or eval "use ExtUtils::MakeMaker::version" } ## no critic
+BEGIN {
+  eval "use version ()"; ## no critic
+  if ( my $err = $@ ) {
+    eval "use ExtUtils::MakeMaker::version" or die $err; ## no critic
+  }
+}
 
 # Perl 5.10.0 didn't have "is_qv" in version.pm
 *_is_qv = version->can('is_qv') ? sub { $_[0]->is_qv } : sub { exists $_[0]->{qv} };
@@ -54,8 +60,9 @@ BEGIN { eval "use version ()" or eval "use ExtUtils::MakeMaker::version" } ## no
 #pod
 #pod =for :list
 #pod * C<bad_version_hook> -- if provided, when a version cannot be parsed into
-#pod   a version object, this code reference will be called with the invalid version
-#pod   string as an argument.  It must return a valid version object.
+#pod   a version object, this code reference will be called with the invalid
+#pod   version string as first argument, and the module name as second
+#pod   argument.  It must return a valid version object.
 #pod
 #pod All other keys are ignored.
 #pod
@@ -94,7 +101,7 @@ sub _find_magic_vstring {
 }
 
 sub _version_object {
-  my ($self, $version) = @_;
+  my ($self, $module, $version) = @_;
 
   my $vobj;
 
@@ -113,7 +120,7 @@ sub _version_object {
 
   if ( my $err = $@ ) {
     my $hook = $self->{bad_version_hook};
-    $vobj = eval { $hook->($version) }
+    $vobj = eval { $hook->($version, $module) }
       if ref $hook eq 'CODE';
     unless (Scalar::Util::blessed($vobj) && $vobj->isa("version")) {
       $err =~ s{ at .* line \d+.*$}{};
@@ -194,7 +201,7 @@ BEGIN {
     my $code = sub {
       my ($self, $name, $version) = @_;
 
-      $version = $self->_version_object( $version );
+      $version = $self->_version_object( $name, $version );
 
       $self->__modify_entry_for($name, $method, $version);
 
@@ -252,7 +259,7 @@ sub add_requirements {
 sub accepts_module {
   my ($self, $module, $version) = @_;
 
-  $version = $self->_version_object( $version );
+  $version = $self->_version_object( $module, $version );
 
   return 1 unless my $range = $self->__entry_for($module);
   return $range->_accepts($version);
@@ -430,10 +437,12 @@ sub as_string_hash {
 #pod =method add_string_requirement
 #pod
 #pod   $req->add_string_requirement('Library::Foo' => '>= 1.208, <= 2.206');
+#pod   $req->add_string_requirement('Library::Foo' => v1.208);
 #pod
 #pod This method parses the passed in string and adds the appropriate requirement
-#pod for the given module.  It understands version ranges as described in the
-#pod L<CPAN::Meta::Spec/Version Ranges>. For example:
+#pod for the given module.  A version can be a Perl "v-string".  It understands
+#pod version ranges as described in the L<CPAN::Meta::Spec/Version Ranges>. For
+#pod example:
 #pod
 #pod =over 4
 #pod
@@ -472,11 +481,18 @@ my %methods_for_op = (
 sub add_string_requirement {
   my ($self, $module, $req) = @_;
 
-  Carp::confess("No requirement string provided for $module")
-    unless defined $req && length $req;
+  unless ( defined $req && length $req ) {
+    $req = 0;
+    $self->_blank_carp($module);
+  }
+
+  my $magic = _find_magic_vstring( $req );
+  if (length $magic) {
+    $self->add_minimum($module => $magic);
+    return;
+  }
 
   my @parts = split qr{\s*,\s*}, $req;
-
 
   for my $part (@parts) {
     my ($op, $ver) = $part =~ m{\A\s*(==|>=|>|<=|<|!=)\s*(.*)\z};
@@ -495,23 +511,32 @@ sub add_string_requirement {
 #pod =method from_string_hash
 #pod
 #pod   my $req = CPAN::Meta::Requirements->from_string_hash( \%hash );
+#pod   my $req = CPAN::Meta::Requirements->from_string_hash( \%hash, \%opts );
 #pod
-#pod This is an alternate constructor for a CPAN::Meta::Requirements object.  It takes
-#pod a hash of module names and version requirement strings and returns a new
-#pod CPAN::Meta::Requirements object.
+#pod This is an alternate constructor for a CPAN::Meta::Requirements
+#pod object. It takes a hash of module names and version requirement
+#pod strings and returns a new CPAN::Meta::Requirements object. As with
+#pod add_string_requirement, a version can be a Perl "v-string". Optionally,
+#pod you can supply a hash-reference of options, exactly as with the L</new>
+#pod method.
 #pod
 #pod =cut
 
-sub from_string_hash {
-  my ($class, $hash) = @_;
+sub _blank_carp {
+  my ($self, $module) = @_;
+  Carp::carp("Undefined requirement for $module treated as '0'");
+}
 
-  my $self = $class->new;
+sub from_string_hash {
+  my ($class, $hash, $options) = @_;
+
+  my $self = $class->new($options);
 
   for my $module (keys %$hash) {
     my $req = $hash->{$module};
     unless ( defined $req && length $req ) {
       $req = 0;
-      Carp::carp("Undefined requirement for $module treated as '0'");
+      $class->_blank_carp($module);
     }
     $self->add_string_requirement($module, $req);
   }
@@ -730,7 +755,7 @@ CPAN::Meta::Requirements - a set of version requirements for a CPAN dist
 
 =head1 VERSION
 
-version 2.127
+version 2.130
 
 =head1 SYNOPSIS
 
@@ -770,7 +795,7 @@ hash reference argument.  Currently, only one key is supported:
 
 =item *
 
-C<bad_version_hook> -- if provided, when a version cannot be parsed into a version object, this code reference will be called with the invalid version string as an argument.  It must return a valid version object.
+C<bad_version_hook> -- if provided, when a version cannot be parsed into a version object, this code reference will be called with the invalid version string as first argument, and the module name as second argument.  It must return a valid version object.
 
 =back
 
@@ -935,10 +960,12 @@ C<$hashref> would contain:
 =head2 add_string_requirement
 
   $req->add_string_requirement('Library::Foo' => '>= 1.208, <= 2.206');
+  $req->add_string_requirement('Library::Foo' => v1.208);
 
 This method parses the passed in string and adds the appropriate requirement
-for the given module.  It understands version ranges as described in the
-L<CPAN::Meta::Spec/Version Ranges>. For example:
+for the given module.  A version can be a Perl "v-string".  It understands
+version ranges as described in the L<CPAN::Meta::Spec/Version Ranges>. For
+example:
 
 =over 4
 
@@ -966,10 +993,14 @@ A version number without an operator is equivalent to specifying a minimum
 =head2 from_string_hash
 
   my $req = CPAN::Meta::Requirements->from_string_hash( \%hash );
+  my $req = CPAN::Meta::Requirements->from_string_hash( \%hash, \%opts );
 
-This is an alternate constructor for a CPAN::Meta::Requirements object.  It takes
-a hash of module names and version requirement strings and returns a new
-CPAN::Meta::Requirements object.
+This is an alternate constructor for a CPAN::Meta::Requirements
+object. It takes a hash of module names and version requirement
+strings and returns a new CPAN::Meta::Requirements object. As with
+add_string_requirement, a version can be a Perl "v-string". Optionally,
+you can supply a hash-reference of options, exactly as with the L</new>
+method.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -1006,9 +1037,13 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge robario
+=for stopwords Ed J Karen Etheridge robario
 
 =over 4
+
+=item *
+
+Ed J <mohawk2@users.noreply.github.com>
 
 =item *
 

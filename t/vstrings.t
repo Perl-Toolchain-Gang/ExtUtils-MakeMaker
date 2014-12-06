@@ -47,18 +47,24 @@ sub makefile_content {
 
 # [ pkg, version, pattern, descrip, invertre ]
 my @DATA = (
-  [ DecimalString => '1.2.3', qr/isn't\s+numeric/, '3-part Decimal String' ],
-  [ VDecimalString => 'v1.2.3', qr/Unparsable\s+version/, '3-part V-Decimal String' ],
-  [ BareVString => v1.2.3, qr/Unparsable\s+version/, '3-part bare V-string' ],
-  [ VDecimalString => 'v1.2', qr/Unparsable\s+version/, '2-part v-decimal string' ],
-  [ BareVString => v1.2, qr/Unparsable\s+version/, '2-part bare v-string' ],
+  [ Undef => undef, qr/isn't\s+numeric/, 'Undef' ],
+  [ ZeroLength => '', qr/isn't\s+numeric/, 'Zero-length' ],
+  [ SemiColon => '0;', qr/isn't\s+numeric/, 'Semi-colon after 0' ],
+  [ Decimal2 => 1.2, qr/isn't\s+numeric/, '2-part Decimal' ],
+  [ Decimal2String => '1.2', qr/isn't\s+numeric/, '2-part Decimal String' ],
+  [ Decimal3String => '1.2.3', qr/isn't\s+numeric/, '3-part Decimal String' ],
+  [ BareV2String => v1.2, qr/Unparsable\s+version/, '2-part bare v-string' ],
+  [ BareV3String => v1.2.3, qr/Unparsable\s+version/, '3-part bare V-string' ],
+  [ V2DecimalString => 'v1.2', qr/Unparsable\s+version/, '2-part v-decimal string' ],
+  [ V3DecimalString => 'v1.2.3', qr/Unparsable\s+version/, '3-part v-Decimal String' ],
   [ BrokenString => 'nan', qr/Unparsable\s+version/, 'random string', 1 ],
+  [ RangeString => '>= 5.0, <= 6.0', qr/Unparsable\s+version/, 'Version range' ],
 );
 
-ok(my $stdout = tie *STDOUT, 'TieOut');
+ok my $stdout = tie(*STDOUT, 'TieOut'), 'tie STDOUT';
 for my $tuple (@DATA) {
   my ($pkg, $version, $pattern, $descrip, $invertre) = @$tuple;
-  next if $] < 5.008 && $pkg eq 'BareVString' && $descrip =~ m!^2-part!;
+  next if $] < 5.008 && $pkg eq 'BareV2String';
   my $out;
   eval { $out = capture_make("Fake::$pkg" => $version); };
   is($@, '', "$descrip not fatal");

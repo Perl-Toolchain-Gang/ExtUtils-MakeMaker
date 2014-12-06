@@ -2790,7 +2790,7 @@ sub _PREREQ_PRINT {
 Implements PRINT_PREREQ, a slightly different version of PREREQ_PRINT
 added by Redhat to, I think, support generating RPMs from Perl modules.
 
-Should not include BUILD_REQUIRES as RPMs do not incluide them.
+Should not include BUILD_REQUIRES as RPMs do not include them.
 
 Refactored out of MakeMaker->new().
 
@@ -2813,24 +2813,6 @@ sub _PRINT_PREREQ {
     exit 0;
 }
 
-
-=begin private
-
-=head3 _all_prereqs
-
-  my $prereqs = $self->_all_prereqs;
-
-Returns a hash ref of both PREREQ_PM and BUILD_REQUIRES.
-
-=end private
-
-=cut
-
-sub _all_prereqs {
-    my $self = shift;
-
-    return { %{$self->{PREREQ_PM}}, %{$self->{BUILD_REQUIRES}} };
-}
 
 =begin private
 
