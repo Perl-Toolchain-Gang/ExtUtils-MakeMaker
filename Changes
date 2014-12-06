@@ -1,3 +1,15 @@
+7.05_01 Sat Dec  6 15:44:55 GMT 2014
+    Enhancements:
+    - version ranges are now supported for PREREQS, etc.
+
+    Bug fixes:
+    - Also quote linker paths to handle spaces
+    - Avoid cmdline duplication if ARCHLIB and LIB are identical
+
+    Test fixes:
+    - Removed done_testing from a number of test files
+    - Added a subdir with a space test
+
 7.04 Tue Dec  2 12:43:48 GMT 2014
 
     No changes from 7.03_06
