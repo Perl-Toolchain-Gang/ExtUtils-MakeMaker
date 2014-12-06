@@ -69,7 +69,7 @@ for my $tuple (@DATA) {
   my ($pkg, $version, $pattern, $descrip, $invertre) = @$tuple;
   SKIP: {
     skip "No vstring test <5.8", 2
-      if $] < 5.008 && $pkg eq 'BareVString' && $descrip =~ m!^2-part!;
+      if $] < 5.008 && $pkg eq 'BareV2String' && $descrip =~ m!^2-part!;
     my $out;
     eval { $out = capture_make("Fake::$pkg" => $version); };
     is($@, '', "$descrip not fatal");
