@@ -20,7 +20,7 @@ use Config;
 use ExtUtils::MM;
 plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 3 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP));
+    : (tests => 4 + $CLEANUP + @INSTDIRS * (15 + $CLEANUP));
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -32,16 +32,19 @@ chdir $tmpdir;
 
 perl_lib;
 
-ok( setup_recurs(), 'setup' );
+my $SPACEDIR = 'space dir';
+ok( setup_recurs($SPACEDIR), 'setup' );
 END {
     ok( chdir File::Spec->updir, 'chdir updir' );
+    ok( chdir File::Spec->updir, 'chdir updir again' );
     ok( teardown_recurs(), 'teardown' ) if $CLEANUP;
     map { rmtree $_ } @INSTDIRS if $CLEANUP;
 }
 
-ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy") || diag("chdir failed; $!");
+ok( chdir(File::Spec->catdir($SPACEDIR, 'Big-Dummy')), "chdir'd to Big-Dummy") || diag("chdir failed; $!");
 
 for my $instdir (@INSTDIRS) {
+  $instdir = File::Spec->rel2abs($instdir);
   my @mpl_out = run(qq{$perl Makefile.PL "INSTALL_BASE=$instdir"});
 
   cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||

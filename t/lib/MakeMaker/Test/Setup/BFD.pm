@@ -96,11 +96,13 @@ END
             );
 
 
+# if given args, those are inserted as components in resulting path, eg:
+# setup_recurs('dir') means instead of creating Big-Dummy/*, dir/Big-Dummy/*
 sub setup_recurs {
-
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = File::Spec->catfile(File::Spec->curdir, split m{\/}, $file);
+        $file = File::Spec->catfile(File::Spec->curdir, @_, split m{\/}, $file);
+        $file = File::Spec->rel2abs($file);
 
         my $dir = dirname($file);
         mkpath $dir;
