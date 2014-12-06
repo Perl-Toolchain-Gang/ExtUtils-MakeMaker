@@ -121,6 +121,7 @@ t/liblist/win32/test.lib
 t/liblist/win32/test.meep
 t/liblist/win32/test2.lib
 t/liblist/win32/vc/vctest.lib
+t/liblist/unix_os2/libfoo.so
 t/Liblist_Kid.t
 t/make.t
 t/MakeMaker_Parameters.t
