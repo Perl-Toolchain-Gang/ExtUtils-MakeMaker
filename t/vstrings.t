@@ -60,6 +60,7 @@ my @DATA = (
   [ BrokenString => 'nan', qr/Unparsable\s+version/, 'random string', 1 ],
   [ RangeString => '>= 5.0, <= 6.0', qr/Unparsable\s+version/, 'Version range' ],
 );
+plan tests => (1 + (@DATA * 2));
 
 plan tests => (1 + (@DATA * 2));
 
