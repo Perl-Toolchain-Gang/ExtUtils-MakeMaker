@@ -1986,19 +1986,22 @@ sub init_PERL {
     $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
     $self->{PERL_CORE} = 0               unless defined $self->{PERL_CORE};
 
+    # Make sure perl can find itself before it's installed.
+    my $lib_paths = $self->{UNINSTALLED_PERL} || $self->{PERL_CORE}
+        ? $self->{PERL_ARCHLIB} ne $self->{PERL_LIB} ?
+            q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"} : q{ "-I$(PERL_LIB)"}
+        : undef;
+    my $inst_lib_paths = $self->{INST_ARCHLIB} ne $self->{INST_LIB}
+        ? 'RUN)'.$perlflags.' "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"'
+        : 'RUN)'.$perlflags.' "-I$(INST_LIB)"';
     # How do we run perl?
     foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
         my $run  = $perl.'RUN';
 
         $self->{$run}  = qq{\$($perl)};
+        $self->{$run} .= $lib_paths if $lib_paths;
 
-        # Make sure perl can find itself before it's installed.
-        $self->{$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"}
-          if $self->{UNINSTALLED_PERL} || $self->{PERL_CORE};
-
-        $self->{$perl.'RUNINST'} =
-          sprintf q{$(%sRUN)%s "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"},
-	    $perl, $perlflags;
+        $self->{$perl.'RUNINST'} = '$('.$perl.$inst_lib_paths;
     }
 
     return 1;
