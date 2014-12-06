@@ -61,19 +61,23 @@ my @DATA = (
   [ RangeString => '>= 5.0, <= 6.0', qr/Unparsable\s+version/, 'Version range' ],
 );
 
+plan tests => (1 + (@DATA * 2));
+
 ok my $stdout = tie(*STDOUT, 'TieOut'), 'tie STDOUT';
+
 for my $tuple (@DATA) {
   my ($pkg, $version, $pattern, $descrip, $invertre) = @$tuple;
-  next if $] < 5.008 && $pkg eq 'BareV2String';
-  my $out;
-  eval { $out = capture_make("Fake::$pkg" => $version); };
-  is($@, '', "$descrip not fatal");
-  if ($invertre) {
-    like ( $out , qr/$pattern/i, "$descrip parses");
-  } else {
-    unlike ( $out , qr/$pattern/i , "$descrip parses");
+  SKIP: {
+    skip "No vstring test <5.8", 2
+      if $] < 5.008 && $pkg eq 'BareVString' && $descrip =~ m!^2-part!;
+    my $out;
+    eval { $out = capture_make("Fake::$pkg" => $version); };
+    is($@, '', "$descrip not fatal");
+    if ($invertre) {
+      like ( $out , qr/$pattern/i, "$descrip parses");
+    } else {
+      unlike ( $out , qr/$pattern/i , "$descrip parses");
+    }
   }
 #  note(join q{}, grep { $_ =~ /Fake/i } makefile_content);
 }
-
-done_testing();
