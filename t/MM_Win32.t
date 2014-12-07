@@ -13,7 +13,7 @@ BEGIN {
         plan skip_all => 'This is not Win32';
     }
 }
-plan tests => 62;
+plan tests => 63;
 
 use Config;
 use File::Spec;
