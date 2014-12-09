@@ -2381,11 +2381,13 @@ sub makeaperl {
     my($self, %attribs) = @_;
     my($makefilename, $searchdirs, $static, $extra, $perlinc, $target, $tmp, $libperl) =
 	@attribs{qw(MAKE DIRS STAT EXTRA INCL TARGET TMP LIBPERL)};
+    s/^(.*)/"-I$1"/ for @{$perlinc || []};
     my(@m);
     push @m, "
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = $target
 FULLPERL      = $self->{FULLPERL}
+MAP_PERLINC   = @{$perlinc || []}
 ";
     return join '', @m if $self->{PARENT};
 
@@ -2504,11 +2506,11 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 # MAP_STATIC doesn't look into subdirs yet. Once "all" is made and we
 # regenerate the Makefiles, MAP_STATIC and the dependencies for
 # extralibs.all are computed correctly
+    my @map_static = reverse sort keys %static;
     push @m, "
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = @{$perlinc || []}
-MAP_STATIC    = ",
-join(" \\\n\t", reverse sort keys %static), "
+MAP_STATIC    = ", join(" \\\n\t", map { qq{"$_"} } @map_static), "
+MAP_STATICDEP = ", join(' ', map { $self->quote_dep($_) } @map_static), "
 
 MAP_PRELIBS   = $Config{perllibs} $Config{cryptlib}
 ";
@@ -2543,9 +2545,11 @@ EOF
 
     # SUNOS ld does not take the full path to a shared library
     my $llibperl = $libperl ? '$(MAP_LIBPERL)' : '-lperl';
+    my $libperl_dep = $self->quote_dep($libperl);
 
     push @m, "
 MAP_LIBPERL = $libperl
+MAP_LIBPERLDEP = $libperl_dep
 LLIBPERL    = $llibperl
 ";
 
@@ -2575,7 +2579,8 @@ EOF
 $tmp/perlmain.c: $makefilename}, q{
 	$(NOECHO) $(ECHO) Writing $@
 	$(NOECHO) $(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
-		-e "writemain(grep s#.*/auto/##s, split(q| |, q|$(MAP_STATIC)|))" > $@t && $(MV) $@t $@
+		-e "writemain(grep(s#.*/auto/##s, @ARGV), q{DynaLoader})" $(MAP_STATIC) > $@t
+	$(MV) $@t $@
 
 };
     push @m, "\t", q{$(NOECHO) $(PERL) "$(INSTALLSCRIPT)/fixpmain"
@@ -3520,11 +3525,13 @@ END
 
     if ($self->needs_linking()) {
 	push(@m, "test_static :: pure_all \$(MAP_TARGET)\n");
-	push(@m, $self->test_via_harness('./$(MAP_TARGET)', '$(TEST_FILES)')) if $tests;
-	push(@m, $self->test_via_script('./$(MAP_TARGET)', '$(TEST_FILE)')) if -f "test.pl";
+	my $target = File::Spec->rel2abs('$(MAP_TARGET)');
+	my $command = qq{"$target" \$(MAP_PERLINC)};
+	push(@m, $self->test_via_harness($command, '$(TEST_FILES)')) if $tests;
+	push(@m, $self->test_via_script($command, '$(TEST_FILE)')) if -f "test.pl";
 	push(@m, "\n");
 	push(@m, "testdb_static :: pure_all \$(MAP_TARGET)\n");
-	push(@m, $self->test_via_script('./$(MAP_TARGET) $(TESTDB_SW)', '$(TEST_FILE)'));
+	push(@m, $self->test_via_script("$command \$(TESTDB_SW)", '$(TEST_FILE)'));
 	push(@m, "\n");
     } else {
 	push @m, "test_static :: test_dynamic\n";

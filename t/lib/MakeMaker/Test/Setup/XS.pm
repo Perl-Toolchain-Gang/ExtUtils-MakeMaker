@@ -2,7 +2,7 @@ package MakeMaker::Test::Setup::XS;
 
 @ISA = qw(Exporter);
 require Exporter;
-@EXPORT = qw(run_tests list_dynamic);
+@EXPORT = qw(run_tests list_dynamic list_static);
 
 use strict;
 use File::Path;
@@ -94,6 +94,14 @@ $label2files{bscode} = +{
 };
 delete $label2files{bscode}->{'t/is_even.t'};
 
+$label2files{static} = +{
+  %{ $label2files{'basic'} }, # make copy
+  'Makefile.PL' => sprintf(
+    $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
+    q{LINKTYPE => 'static'},
+  ),
+};
+
 sub virtual_rename {
   my ($label, $oldfile, $newfile) = @_;
   $label2files{$label}->{$newfile} = delete $label2files{$label}->{$oldfile};
@@ -108,6 +116,12 @@ sub setup_xs {
   my $prefix = "XS-Test$label$sublabel";
   hash2files($prefix, $files);
   return $prefix;
+}
+
+sub list_static {
+  (
+    [ 'static', '', '' ],
+  );
 }
 
 sub list_dynamic {
