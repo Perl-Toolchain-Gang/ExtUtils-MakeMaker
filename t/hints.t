@@ -42,7 +42,7 @@ CLOO
 
     $mm->check_hints;
     is( $mm->{CCFLAGS}, 'basset hounds got long ears' );
-    is( $stderr, "Processing hints file $Hint_File\n" );
+    is( $stderr, "" );
 }
 
 
@@ -62,7 +62,6 @@ CLOO
 
     $mm->check_hints;
     is( $stderr, <<OUT, 'hint files produce errors' );
-Processing hints file $Hint_File
 Argh!
 OUT
 }

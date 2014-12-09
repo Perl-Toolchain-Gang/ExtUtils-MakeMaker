@@ -1111,7 +1111,7 @@ sub _run_hintfile {
     my($hint_file) = shift;
 
     local($@, $!);
-    warn "Processing hints file $hint_file\n";
+    print "Processing hints file $hint_file\n" if $Verbose;
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into @INC
