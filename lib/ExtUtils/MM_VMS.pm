@@ -926,6 +926,24 @@ sub xs_o {
 	$(MV) $(MMS$TARGET_NAME).xsc $(MMS$TARGET_NAME).c
 	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).c /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
 ';
+    if ($self->{XSMULTI}) {
+	for my $ext ($self->_xs_list_basenames) {
+	    my $version = $self->parse_version("$ext.pm");
+	    my $cccmd = $self->{CONST_CCCMD};
+	    $cccmd =~ m/^\s*CCCMD\s*=\s*(.*)\n/m;
+	    $cccmd = $1;
+	    $cccmd =~ s/\b(VERSION=)[^,\)]*/$1\\"$version\\"/;
+	    $cccmd =~ s/\b(XS_VERSION=)[^,\)]*/$1\\"$version\\"/;
+	    #                         1     2
+	    $frag .= sprintf <<'EOF', $ext, $cccmd;
+
+%1$s$(OBJ_EXT) : %1$s.xs
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs > $(MMS$TARGET_NAME).xsc
+	$(MV) $(MMS$TARGET_NAME).xsc $(MMS$TARGET_NAME).c
+	%2$s $(CCCDLFLAGS) $(MMS$TARGET_NAME).c /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
+EOF
+	}
+    }
     $frag;
 }
 
@@ -951,15 +969,29 @@ sub dlsyms {
 sub xs_make_dlsyms {
     my ($self, $attribs, $target, $dep, $name, $dlbase, $funcs, $funclist, $imports, $vars, $extra) = @_;
     my @m;
-    push @m,"\ndynamic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
-      unless $self->{SKIPHASH}{'dynamic'};
-    push @m,"\nstatic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
-      unless $self->{SKIPHASH}{'static'};
-    push @m, sprintf <<'EOF', $target;
-
+    if ($self->{XSMULTI}) {
+	my ($v, $d, $f) = File::Spec->splitpath($target);
+	my @d = File::Spec->splitdir($d);
+	shift @d if $d[0] eq 'lib';
+	my $instloc = $self->catfile('$(INST_ARCHLIB)', 'auto', @d, $f);
+	push @m,"\ndynamic :: $instloc\n\t\$(NOECHO) \$(NOOP)\n"
+	  unless $self->{SKIPHASH}{'dynamic'};
+	push @m,"\nstatic :: $instloc\n\t\$(NOECHO) \$(NOOP)\n"
+	  unless $self->{SKIPHASH}{'static'};
+	push @m, sprintf <<'EOF', $instloc, $target;
+%s : %s
+	$(CP) $(MMS$SOURCE) $(MMS$TARGET)
+EOF
+    } else {
+	push @m,"\ndynamic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
+	  unless $self->{SKIPHASH}{'dynamic'};
+	push @m,"\nstatic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
+	  unless $self->{SKIPHASH}{'static'};
+	push @m, sprintf <<'EOF', $target;
 $(INST_ARCHAUTODIR)$(BASEEXT).opt : %s
 	$(CP) $(MMS$SOURCE) $(MMS$TARGET)
 EOF
+    }
     push @m,
      "\n$target : $dep\n\t",
      q!$(PERLRUN) -MExtUtils::Mksymlists -e "Mksymlists('NAME'=>'!, $name,
@@ -971,7 +1003,9 @@ EOF
     push @m, $extra if defined $extra;
     push @m, qq!);"\n\t!;
     push @m, '	$(PERL) -e "print ""$(INST_STATIC)/Include=';
-    if ($self->{OBJECT} =~ /\bBASEEXT\b/ or
+    if ($self->{XSMULTI}) {
+        push @m, uc($dlbase); # the "DLBASE" - is this right?
+    } elsif ($self->{OBJECT} =~ /\bBASEEXT\b/ or
         $self->{OBJECT} =~ /\b$self->{BASEEXT}\b/i) {
         push @m, ($Config{d_vms_case_sensitive_symbols}
 	           ? uc($self->{BASEEXT}) :'$(BASEEXT)');

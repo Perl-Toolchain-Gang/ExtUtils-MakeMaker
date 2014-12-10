@@ -301,9 +301,9 @@ sub full_setup {
     PERM_DIR PERM_RW PERM_RWX MAGICXS
     PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE
     PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
-    SIGN SKIP TEST_REQUIRES TYPEMAPS UNINST VERSION VERSION_FROM XS XSOPT XSPROTOARG
-    XS_VERSION clean depend dist dynamic_lib linkext macro realclean
-    tool_autosplit
+    SIGN SKIP TEST_REQUIRES TYPEMAPS UNINST VERSION VERSION_FROM XS
+    XSMULTI XSOPT XSPROTOARG XS_VERSION clean depend dist dynamic_lib
+    linkext macro realclean tool_autosplit
 
     MAN1EXT MAN3EXT
 
@@ -2782,6 +2782,17 @@ Hashref of .xs files. MakeMaker will default this.  e.g.
 
 The .c files will automatically be included in the list of files
 deleted by a make clean.
+
+=item XSMULTI
+
+When this is set to C<1>, multiple XS files may be placed under F<lib/>
+next to their corresponding C<*.pm> files (this is essential for compiling
+with the correct C<VERSION> values). This feature should be considered
+experimental, and details of it may change.
+
+This feature was inspired by, and small portions of code copied from,
+L<ExtUtils::MakeMaker::BigHelper>. Hopefully this feature will render
+that module mainly obsolete.
 
 =item XSOPT
 
