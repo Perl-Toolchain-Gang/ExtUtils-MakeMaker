@@ -906,7 +906,8 @@ sub xs_c {
     return '' unless $self->needs_linking();
     '
 .xs.c :
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET)
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET_NAME).xsc
+	$(MV) $(MMS$TARGET_NAME).xsc $(MMS$TARGET_NAME).c
 ';
 }
 
@@ -916,11 +917,16 @@ Use MM[SK] macros, and VMS command line for C compiler.
 
 =cut
 
-sub xs_o {	# many makes are too dumb to use xs_c then c_o
-    my($self) = @_;
-    my $text = $self->SUPER::xs_o;
-    $text =~ s#\$\*#\$(MMS\$TARGET_NAME)#g;
-    $text;
+sub xs_o {
+    my ($self) = @_;
+    return '' unless $self->needs_linking();
+    my $frag = '
+.xs$(OBJ_EXT) :
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET_NAME).xsc
+	$(MV) $(MMS$TARGET_NAME).xsc $(MMS$TARGET_NAME).c
+	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).c /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
+';
+    $frag;
 }
 
 

@@ -2594,15 +2594,16 @@ $(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" 
 	push @m, "\tcat $catfile >> \$\@\n";
     }
 
-push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $tmp, ($makefilename) x 2;
-$(MAP_TARGET) :: %s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
-	$(MAP_LINKCMD) %s $(OPTIMIZE) %s/perlmain$(OBJ_EXT) $(LDFROM) $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
+    #                         1     2                        3
+    push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $makefilename;
+$(MAP_TARGET) :: %1$s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
+	$(MAP_LINKCMD) %2$s $(OPTIMIZE) %1$s/perlmain$(OBJ_EXT) $(LDFROM) $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
 	$(NOECHO) $(ECHO) "To install the new '$(MAP_TARGET)' binary, call"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %s inst_perl MAP_TARGET=$(MAP_TARGET)"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s inst_perl MAP_TARGET=$(MAP_TARGET)"
 	$(NOECHO) $(ECHO) "To remove the intermediate files say"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %s map_clean"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s map_clean"
 
-$tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
+%1$s/perlmain\$(OBJ_EXT): %1$s/perlmain.c
 EOF
     push @m, "\t".$self->cd($tmp, qq[$cccmd "-I\$(PERL_INC)" perlmain.c])."\n";
 
@@ -3839,8 +3840,8 @@ only intended for broken make implementations.
 
 =cut
 
-sub xs_o {	# many makes are too dumb to use xs_c then c_o
-    my($self) = shift;
+sub xs_o {
+    my ($self) = @_;
     return '' unless $self->needs_linking();
     my $minus_o = $self->xs_obj_opt('$*$(OBJ_EXT)');
     my $frag = sprintf <<'EOF', $minus_o;
