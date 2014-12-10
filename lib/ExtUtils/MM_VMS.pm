@@ -924,6 +924,10 @@ sub xs_o {	# many makes are too dumb to use xs_c then c_o
 }
 
 
+sub xs_dlsyms_ext {
+    '.opt';
+}
+
 =item dlsyms (override)
 
 Create VMS linker options files specifying universal symbols for this
@@ -933,44 +937,39 @@ libraries to which it should be linked.
 =cut
 
 sub dlsyms {
-    my($self,%attribs) = @_;
+    my ($self, %attribs) = @_;
+    return '' unless $self->needs_linking;
+    $self->xs_dlsyms_iterator;
+}
 
-    return '' unless $self->needs_linking();
+sub xs_make_dlsyms {
+    my ($self, $attribs, $target, $dep, $name, $dlbase, $funcs, $funclist, $imports, $vars, $extra) = @_;
+    my @m;
+    push @m,"\ndynamic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
+      unless $self->{SKIPHASH}{'dynamic'};
+    push @m,"\nstatic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
+      unless $self->{SKIPHASH}{'static'};
+    push @m, sprintf <<'EOF', $target;
 
-    my($funcs) = $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = $attribs{DL_VARS}  || $self->{DL_VARS}  || [];
-    my($funclist)  = $attribs{FUNCLIST}  || $self->{FUNCLIST}  || [];
-    my(@m);
-
-    unless ($self->{SKIPHASH}{'dynamic'}) {
-	push(@m,'
-dynamic :: $(INST_ARCHAUTODIR)$(BASEEXT).opt
-	$(NOECHO) $(NOOP)
-');
-    }
-
-    push(@m,'
-static :: $(INST_ARCHAUTODIR)$(BASEEXT).opt
-	$(NOECHO) $(NOOP)
-') unless $self->{SKIPHASH}{'static'};
-
-    push @m,'
-$(INST_ARCHAUTODIR)$(BASEEXT).opt : $(BASEEXT).opt
+$(INST_ARCHAUTODIR)$(BASEEXT).opt : %s
 	$(CP) $(MMS$SOURCE) $(MMS$TARGET)
-
-$(BASEEXT).opt : Makefile.PL
-	$(PERLRUN) -e "use ExtUtils::Mksymlists;" -
-	',qq[-e "Mksymlists('NAME' => '$self->{NAME}', 'DL_FUNCS' => ],
-	neatvalue($funcs),q[, 'DL_VARS' => ],neatvalue($vars),
-	q[, 'FUNCLIST' => ],neatvalue($funclist),qq[)"\n];
-
+EOF
+    push @m,
+     "\n$target : $dep\n\t",
+     q!$(PERLRUN) -MExtUtils::Mksymlists -e "Mksymlists('NAME'=>'!, $name,
+     q!', 'DLBASE' => '!,$dlbase,
+     q!', 'DL_FUNCS' => !,neatvalue($funcs),
+     q!, 'FUNCLIST' => !,neatvalue($funclist),
+     q!, 'IMPORTS' => !,neatvalue($imports),
+     q!, 'DL_VARS' => !, neatvalue($vars);
+    push @m, $extra if defined $extra;
+    push @m, qq!);"\n\t!;
     push @m, '	$(PERL) -e "print ""$(INST_STATIC)/Include=';
     if ($self->{OBJECT} =~ /\bBASEEXT\b/ or
         $self->{OBJECT} =~ /\b$self->{BASEEXT}\b/i) {
         push @m, ($Config{d_vms_case_sensitive_symbols}
 	           ? uc($self->{BASEEXT}) :'$(BASEEXT)');
-    }
-    else {  # We don't have a "main" object file, so pull 'em all in
+    } else {  # We don't have a "main" object file, so pull 'em all in
         # Upcase module names if linker is being case-sensitive
         my($upcase) = $Config{d_vms_case_sensitive_symbols};
         my(@omods) = split ' ', $self->eliminate_macros($self->{OBJECT});
@@ -980,7 +979,6 @@ $(BASEEXT).opt : Makefile.PL
             s/.*[:>\/\]]//;       # Trim off dir spec
             $_ = uc if $upcase;
         };
-
         my(@lines);
         my $tmp = shift @omods;
         foreach my $elt (@omods) {
@@ -991,7 +989,6 @@ $(BASEEXT).opt : Makefile.PL
         push @m, '(', join( qq[, -\\n\\t"";" >>\$(MMS\$TARGET)\n\t\$(PERL) -e "print ""], @lines),')';
     }
     push @m, '\n$(INST_STATIC)/Library\n"";" >>$(MMS$TARGET)',"\n";
-
     if (length $self->{LDLOADLIBS}) {
         my($line) = '';
         foreach my $lib (split ' ', $self->{LDLOADLIBS}) {
@@ -1004,9 +1001,7 @@ $(BASEEXT).opt : Makefile.PL
         }
         push @m, "\t\$(PERL) -e \"print qq{$line}\" >>\$(MMS\$TARGET)\n" if $line;
     }
-
-    join('',@m);
-
+    join '', @m;
 }
 
 
@@ -1623,7 +1618,7 @@ map_clean :
 
 =item maketext_filter (override)
 
-Insure that colons marking targets are preceded by space, in order
+Ensure that colons marking targets are preceded by space, in order
 to distinguish the target delimiter from a colon appearing as
 part of a filespec.
 
@@ -1785,7 +1780,7 @@ sub oneliner {
 =item B<echo>
 
 perl trips up on "<foo>" thinking it's an input redirect.  So we use the
-native Write command instead.  Besides, its faster.
+native Write command instead.  Besides, it's faster.
 
 =cut
 

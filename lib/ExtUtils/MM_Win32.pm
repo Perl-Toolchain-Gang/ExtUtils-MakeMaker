@@ -55,31 +55,18 @@ sub _identify_compiler_environment {
 
 sub dlsyms {
     my($self,%attribs) = @_;
+    return '' if $self->{SKIPHASH}{'dynamic'};
+    $self->xs_dlsyms_iterator(\%attribs);
+}
 
-    my($funcs) = $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = $attribs{DL_VARS} || $self->{DL_VARS} || [];
-    my($funclist) = $attribs{FUNCLIST} || $self->{FUNCLIST} || [];
-    my($imports)  = $attribs{IMPORTS} || $self->{IMPORTS} || {};
-    my(@m);
+=item xs_dlsyms_ext
 
-    if (not $self->{SKIPHASH}{'dynamic'}) {
-	push(@m,"
-$self->{BASEEXT}.def: Makefile.PL
-",
-     q!	$(PERLRUN) -MExtUtils::Mksymlists \\
-     -e "Mksymlists('NAME'=>\"!, $self->{NAME},
-     q!\", 'DLBASE' => '!,$self->{DLBASE},
-     # The above two lines quoted differently to work around
-     # a bug in the 4DOS/4NT command line interpreter.  The visible
-     # result of the bug was files named q('extension_name',) *with the
-     # single quotes and the comma* in the extension build directories.
-     q!', 'DL_FUNCS' => !,neatvalue($funcs),
-     q!, 'FUNCLIST' => !,neatvalue($funclist),
-     q!, 'IMPORTS' => !,neatvalue($imports),
-     q!, 'DL_VARS' => !, neatvalue($vars), q!);"
-!);
-    }
-    join('',@m);
+On Win32, is C<.def>.
+
+=cut
+
+sub xs_dlsyms_ext {
+    '.def';
 }
 
 =item replace_manpage_separator

@@ -49,28 +49,6 @@ MAKE_TEXT
 
 sub dlsyms {
     my($self,%attribs) = @_;
-
-    my($funcs) = $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = $attribs{DL_VARS} || $self->{DL_VARS} || [];
-    my($funclist) = $attribs{FUNCLIST} || $self->{FUNCLIST} || [];
-    my($imports)  = $attribs{IMPORTS} || $self->{IMPORTS} || {};
-    my(@m);
-    (my $boot = $self->{NAME}) =~ s/:/_/g;
-
-    if (not $self->{SKIPHASH}{'dynamic'}) {
-	push(@m,"
-$self->{BASEEXT}.def: Makefile.PL
-",
-     '	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -e \'use ExtUtils::Mksymlists; \\
-     Mksymlists("NAME" => "$(NAME)", "DLBASE" => "$(DLBASE)", ',
-     '"VERSION" => "$(VERSION)", "DISTNAME" => "$(DISTNAME)", ',
-     '"INSTALLDIRS" => "$(INSTALLDIRS)", ',
-     '"DL_FUNCS" => ',neatvalue($funcs),
-     ', "FUNCLIST" => ',neatvalue($funclist),
-     ', "IMPORTS" => ',neatvalue($imports),
-     ', "DL_VARS" => ', neatvalue($vars), ');\'
-');
-    }
     if ($self->{IMPORTS} && %{$self->{IMPORTS}}) {
 	# Make import files (needed for static build)
 	-d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp";
@@ -88,7 +66,16 @@ $self->{BASEEXT}.def: Makefile.PL
 	system "cd tmp_imp; $Config::Config{ar} x ../tmpimp$Config::Config{lib_ext}"
 	    and die "Cannot extract import objects: $!, \$?=$?";
     }
-    join('',@m);
+    return '' if $self->{SKIPHASH}{'dynamic'};
+    $self->xs_dlsyms_iterator(\%attribs);
+}
+
+sub xs_dlsyms_ext {
+    '.def';
+}
+
+sub xs_dlsyms_extra {
+    join '', map { qq{, "$_" => "\$($_)"} } qw(VERSION DISTNAME INSTALLDIRS);
 }
 
 sub static_lib_pure_cmd {

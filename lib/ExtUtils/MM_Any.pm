@@ -892,6 +892,91 @@ MAKE_FRAG
 }
 
 
+=head3 xs_dlsyms_ext
+
+Returns file-extension for C<xs_make_dlsyms> method's output file,
+including any "." character.
+
+=cut
+
+sub xs_dlsyms_ext {
+    die "Pure virtual method";
+}
+
+=head3 xs_dlsyms_extra
+
+Returns any extra text to be prepended to the C<$extra> argument of
+C<xs_make_dlsyms>.
+
+=cut
+
+sub xs_dlsyms_extra {
+    '';
+}
+
+=head3 xs_dlsyms_iterator
+
+Iterates over necessary shared objects, calling C<xs_make_dlsyms> method
+for each with appropriate arguments.
+
+=cut
+
+sub xs_dlsyms_iterator {
+    my ($self, $attribs) = @_;
+    return $self->xs_make_dlsyms(
+        $attribs,
+        $self->{BASEEXT} . $self->xs_dlsyms_ext,
+        'Makefile.PL',
+        $self->{NAME},
+        $self->{DLBASE},
+        $attribs->{DL_FUNCS} || $self->{DL_FUNCS} || {},
+        $attribs->{FUNCLIST} || $self->{FUNCLIST} || [],
+        $attribs->{IMPORTS} || $self->{IMPORTS} || {},
+        $attribs->{DL_VARS} || $self->{DL_VARS} || [],
+        $self->xs_dlsyms_extra,
+    );
+}
+
+=head3 xs_make_dlsyms
+
+    $self->xs_make_dlsyms(
+        \%attribs, # hashref from %attribs in caller
+        "$self->{BASEEXT}.def", # output file for Makefile target
+        'Makefile.PL', # dependency
+        $self->{NAME}, # shared object's "name"
+        $self->{DLBASE}, # last ::-separated part of name
+        $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {}, # various params
+        $attribs{FUNCLIST} || $self->{FUNCLIST} || [],
+        $attribs{IMPORTS} || $self->{IMPORTS} || {},
+        $attribs{DL_VARS} || $self->{DL_VARS} || [],
+        # optional extra param that will be added as param to Mksymlists
+    );
+
+Utility method that returns Makefile snippet to call C<Mksymlists>.
+
+=cut
+
+sub xs_make_dlsyms {
+    my ($self, $attribs, $target, $dep, $name, $dlbase, $funcs, $funclist, $imports, $vars, $extra) = @_;
+    my @m = (
+     "\n$target: $dep\n",
+     q!	$(PERLRUN) -MExtUtils::Mksymlists \\
+     -e "Mksymlists('NAME'=>\"!, $name,
+     q!\", 'DLBASE' => '!,$dlbase,
+     # The above two lines quoted differently to work around
+     # a bug in the 4DOS/4NT command line interpreter.  The visible
+     # result of the bug was files named q('extension_name',) *with the
+     # single quotes and the comma* in the extension build directories.
+     q!', 'DL_FUNCS' => !,neatvalue($funcs),
+     q!, 'FUNCLIST' => !,neatvalue($funclist),
+     q!, 'IMPORTS' => !,neatvalue($imports),
+     q!, 'DL_VARS' => !, neatvalue($vars)
+    );
+    push @m, $extra if defined $extra;
+    push @m, qq!);"\n!;
+    join '', @m;
+}
+
 =head3 dynamic (o)
 
 Defines the dynamic target.
