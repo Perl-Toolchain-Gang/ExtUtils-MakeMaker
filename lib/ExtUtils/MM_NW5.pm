@@ -155,77 +155,58 @@ sub static_lib_pure_cmd {
 
 =item dynamic_lib
 
-Defines how to produce the *.so (or equivalent) files.
+Override of utility methods for OS-specific work.
 
 =cut
 
-sub dynamic_lib {
-    my($self, %attribs) = @_;
-    return '' unless $self->needs_linking(); #might be because of a subdir
-
-    return '' unless $self->has_link_code;
-
-    my($otherldflags) = $attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
-    my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
-    my($ldfrom) = '$(LDFROM)';
-
-    (my $boot = $self->{NAME}) =~ s/:/_/g;
-
-    my $m = <<'MAKE_FRAG';
-# This section creates the dynamically loadable $(INST_DYNAMIC)
-# from $(OBJECT) and possibly $(MYEXTLIB).
-OTHERLDFLAGS = '.$otherldflags.'
-INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
-
+sub xs_make_dynamic_lib {
+    my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
+    my @m;
+    # Taking care of long names like FileHandle, ByteLoader, SDBM_File etc
+    if ($to =~ /^\$/) {
+        if ($self->{NLM_SHORT_NAME}) {
+            # deal with shortnames
+            my $newto = q{$(INST_AUTODIR)\\$(NLM_SHORT_NAME).$(DLEXT)};
+            push @m, "$to: $newto\n\n";
+            $to = $newto;
+        }
+    } else {
+        my ($v, $d, $f) = File::Spec->splitpath($to);
+        # relies on $f having a literal "." in it, unlike for $(OBJ_EXT)
+        if ($f =~ /[^\.]{9}\./) {
+            # 9+ chars before '.', need to shorten
+            $f = substr $f, 0, 8;
+        }
+        my $newto = File::Spec->catpath($v, $d, $f);
+        push @m, "$to: $newto\n\n";
+        $to = $newto;
+    }
+    # bits below should be in dlsyms, not here
+    #                               1    2      3       4
+    push @m, sprintf <<'MAKE_FRAG', $to, $from, $todir, $exportlist;
 # Create xdc data for an MT safe NLM in case of mpk build
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(NOECHO) $(ECHO) Export boot_$(BOOT_SYMBOL) > $(BASEEXT).def
-	$(NOECHO) $(ECHO) $(BASE_IMPORT) >> $(BASEEXT).def
-	$(NOECHO) $(ECHO) Import @$(PERL_INC)\perl.imp >> $(BASEEXT).def
+%1$s: %2$s $(MYEXTLIB) $(BOOTSTRAP) %3$s$(DFSEP).exists
+	$(NOECHO) $(ECHO) Export boot_$(BOOT_SYMBOL) > %4$s
+	$(NOECHO) $(ECHO) $(BASE_IMPORT) >> %4$s
+	$(NOECHO) $(ECHO) Import @$(PERL_INC)\perl.imp >> %4$s
 MAKE_FRAG
-
-
     if ( $self->{CCFLAGS} =~ m/ -DMPK_ON /) {
-        $m .= <<'MAKE_FRAG';
-	$(MPKTOOL) $(XDCFLAGS) $(BASEEXT).xdc
-	$(NOECHO) $(ECHO) xdcdata $(BASEEXT).xdc >> $(BASEEXT).def
+        (my $xdc = $exportlist) =~ s#def\z#xdc#;
+        $xdc = '$(BASEEXT).xdc';
+        push @m, sprintf <<'MAKE_FRAG', $xdc, $exportlist;
+	$(MPKTOOL) $(XDCFLAGS) %s
+	$(NOECHO) $(ECHO) xdcdata $(BASEEXT).xdc >> %s
 MAKE_FRAG
     }
-
     # Reconstruct the X.Y.Z version.
     my $version = join '.', map { sprintf "%d", $_ }
                               $] =~ /(\d)\.(\d{3})(\d{2})/;
-    $m .= sprintf '	$(LD) $(LDFLAGS) $(OBJECT:.obj=.obj) -desc "Perl %s Extension ($(BASEEXT))  XS_VERSION: $(XS_VERSION)" -nlmversion $(NLM_VERSION)', $version;
-
-    # Taking care of long names like FileHandle, ByteLoader, SDBM_File etc
-    if($self->{NLM_SHORT_NAME}) {
-        # In case of nlms with names exceeding 8 chars, build nlm in the
-        # current dir, rename and move to auto\lib.
-        $m .= q{ -o $(NLM_SHORT_NAME).$(DLEXT)}
-    } else {
-        $m .= q{ -o $(INST_AUTODIR)\\$(BASEEXT).$(DLEXT)}
-    }
-
-    # Add additional lib files if any (SDBM_File)
-    $m .= q{ $(MYEXTLIB) } if $self->{MYEXTLIB};
-
-    $m .= q{ $(PERL_INC)\Main.lib -commandfile $(BASEEXT).def}."\n";
-
-    if($self->{NLM_SHORT_NAME}) {
-        $m .= <<'MAKE_FRAG';
-	if exist $(INST_AUTODIR)\$(NLM_SHORT_NAME).$(DLEXT) del $(INST_AUTODIR)\$(NLM_SHORT_NAME).$(DLEXT)
-	move $(NLM_SHORT_NAME).$(DLEXT) $(INST_AUTODIR)
-MAKE_FRAG
-    }
-
-    $m .= <<'MAKE_FRAG';
-
+    push @m, sprintf <<'EOF', $from, $version, $to, $exportlist;
+	$(LD) $(LDFLAGS) %s -desc "Perl %s Extension ($(BASEEXT))  XS_VERSION: $(XS_VERSION)" -nlmversion $(NLM_VERSION) -o %s $(MYEXTLIB) $(PERL_INC)\Main.lib -commandfile %s
 	$(CHMOD) 755 $@
-MAKE_FRAG
-
-    return $m;
+EOF
+    join '', @m;
 }
-
 
 1;
 __END__
@@ -233,5 +214,3 @@ __END__
 =back
 
 =cut
-
-

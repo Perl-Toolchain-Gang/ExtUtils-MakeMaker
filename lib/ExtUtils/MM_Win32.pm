@@ -309,59 +309,60 @@ sub static_lib_pure_cmd {
 
 =item dynamic_lib
 
-Complicated stuff for Win32 that I don't understand. :(
+Methods are overridden here: not dynamic_lib itself, but the utility
+ones that do the OS-specific work.
 
 =cut
 
-sub dynamic_lib {
-    my($self, %attribs) = @_;
-    return '' unless $self->needs_linking(); #might be because of a subdir
-
-    return '' unless $self->has_link_code;
-
-    my($otherldflags) = $attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
-    my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
-    my($ldfrom) = '$(LDFROM)';
-    my(@m);
-
-    push(@m,'
-# This section creates the dynamically loadable $(INST_DYNAMIC)
-# from $(OBJECT) and possibly $(MYEXTLIB).
-OTHERLDFLAGS = '.$otherldflags.'
-INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
-
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(INST_DYNAMIC_DEP)
-');
+sub xs_make_dynamic_lib {
+    my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
+    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
     if ($GCC) {
-      push(@m,
-       q{	}.$DLLTOOL.q{ --def $(EXPORT_LIST) --output-exp dll.exp
-	$(LD) -o $@ -Wl,--base-file -Wl,dll.base $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) "$(PERL_ARCHIVE)" $(LDLOADLIBS) dll.exp
-	}.$DLLTOOL.q{ --def $(EXPORT_LIST) --base-file dll.base --output-exp dll.exp
-	$(LD) -o $@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) "$(PERL_ARCHIVE)" $(LDLOADLIBS) dll.exp });
+      # per https://rt.cpan.org/Ticket/Display.html?id=78395 no longer
+      # uses dlltool - relies on post 2002 MinGW
+      #                         1            2
+      push @m, sprintf <<'EOF', $exportlist, $ldfrom;
+	$(LD) %1$s -o $@ $(LDDLFLAGS) %2$s $(OTHERLDFLAGS) $(MYEXTLIB) "$(PERL_ARCHIVE)" $(LDLOADLIBS) -Wl,--enable-auto-image-base
+EOF
     } elsif ($BORLAND) {
-      push(@m,
-       q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
-       .($self->is_make_type('dmake')
-                ? q{"$(PERL_ARCHIVE:s,/,\,)" $(LDLOADLIBS:s,/,\,) }
-		 .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
-		: q{"$(subst /,\,$(PERL_ARCHIVE))" $(subst /,\,$(LDLOADLIBS)) }
-		 .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
-       .q{,$(RESFILES)});
+      my $ldargs = $self->is_make_type('dmake')
+          ? q{"$(PERL_ARCHIVE:s,/,\,)" $(LDLOADLIBS:s,/,\,) $(MYEXTLIB:s,/,\,),}
+          : q{"$(subst /,\,$(PERL_ARCHIVE))" $(subst /,\,$(LDLOADLIBS)) $(subst /,\,$(MYEXTLIB)),};
+      my $subbed;
+      if ($exportlist eq '$(EXPORT_LIST)') {
+          $subbed = $self->is_make_type('dmake')
+              ? q{$(EXPORT_LIST:s,/,\,)}
+              : q{$(subst /,\,$(EXPORT_LIST))};
+      } else {
+            # in XSMULTI, exportlist is per-XS, so have to sub in perl not make
+          ($subbed = $exportlist) =~ s#/#\\#g;
+      }
+      push @m, sprintf <<'EOF', $ldfrom, $ldargs . $subbed;
+        $(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) %s,$@,,%s,$(RESFILES)
+EOF
     } else {	# VC
-      push(@m,
-       q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
-      .q{$(MYEXTLIB) "$(PERL_ARCHIVE)" $(LDLOADLIBS) -def:$(EXPORT_LIST)});
-
+      push @m, sprintf <<'EOF', $ldfrom, $exportlist;
+	$(LD) -out:$@ $(LDDLFLAGS) %s $(OTHERLDFLAGS) $(MYEXTLIB) "$(PERL_ARCHIVE)" $(LDLOADLIBS) -def:%s
+EOF
       # Embed the manifest file if it exists
-      push(@m, q{
-	if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
+      push(@m, q{	if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
 	if exist $@.manifest del $@.manifest});
     }
-    push @m, '
-	$(CHMOD) $(PERM_RWX) $@
-';
+    push @m, "\n\t\$(CHMOD) \$(PERM_RWX) \$\@\n";
 
     join '', @m;
+}
+
+sub xs_dynamic_lib_macros {
+    my ($self, $attribs) = @_;
+    my $otherldflags = $attribs->{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
+    my $inst_dynamic_dep = $attribs->{INST_DYNAMIC_DEP} || "";
+    sprintf <<'EOF', $otherldflags, $inst_dynamic_dep;
+# This section creates the dynamically loadable objects from relevant
+# objects and possibly $(MYEXTLIB).
+OTHERLDFLAGS = %s
+INST_DYNAMIC_DEP = %s
+EOF
 }
 
 =item extra_clean_files

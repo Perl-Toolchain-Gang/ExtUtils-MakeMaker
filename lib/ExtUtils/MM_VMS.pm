@@ -1027,29 +1027,28 @@ Use VMS Link command.
 
 =cut
 
-sub dynamic_lib {
-    my($self, %attribs) = @_;
-    return '' unless $self->needs_linking(); #might be because of a subdir
+sub xs_dynamic_lib_macros {
+    my ($self, $attribs) = @_;
+    my $otherldflags = $attribs->{OTHERLDFLAGS} || "";
+    my $inst_dynamic_dep = $attribs->{INST_DYNAMIC_DEP} || "";
+    sprintf <<'EOF', $otherldflags, $inst_dynamic_dep;
+# This section creates the dynamically loadable objects from relevant
+# objects and possibly $(MYEXTLIB).
+OTHERLDFLAGS = %s
+INST_DYNAMIC_DEP = %s
+EOF
+}
 
-    return '' unless $self->has_link_code();
-
-    my($otherldflags) = $attribs{OTHERLDFLAGS} || "";
-    my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
+sub xs_make_dynamic_lib {
+    my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
     my $shr = $Config{'dbgprefix'} . 'PerlShr';
-    my(@m);
-    push @m,"
-
-OTHERLDFLAGS = $otherldflags
-INST_DYNAMIC_DEP = $inst_dynamic_dep
-
-";
-    push @m, '
-$(INST_DYNAMIC) : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
-	If F$TrnLNm("',$shr,'").eqs."" Then Define/NoLog/User ',"$shr Sys\$Share:$shr.$Config{'dlext'}",'
-	Link $(LDFLAGS) /Shareable=$(MMS$TARGET)$(OTHERLDFLAGS) $(BASEEXT).opt/Option,$(PERL_INC)perlshr_attr.opt/Option
-';
-
-    join('',@m);
+    $exportlist =~ s/.def$/.opt/;  # it's a linker options file
+    #                1    2       3            4     5
+    sprintf <<'EOF', $to, $todir, $exportlist, $shr, "$shr Sys\$Share:$shr.$Config{'dlext'}";
+%1$s : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt %2$s$(DFSEP).exists %3$s $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
+	If F$TrnLNm("%4$s").eqs."" Then Define/NoLog/User %5$s
+	Link $(LDFLAGS) /Shareable=$(MMS$TARGET)$(OTHERLDFLAGS) %3$s/Option,$(PERL_INC)perlshr_attr.opt/Option
+EOF
 }
 
 

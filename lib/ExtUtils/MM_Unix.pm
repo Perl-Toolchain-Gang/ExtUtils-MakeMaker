@@ -919,31 +919,60 @@ Defines how to produce the *.so (or equivalent) files.
 sub dynamic_lib {
     my($self, %attribs) = @_;
     return '' unless $self->needs_linking(); #might be because of a subdir
-
     return '' unless $self->has_link_code;
+    my @m = $self->xs_dynamic_lib_macros(\%attribs);
+    my @libs;
+    @libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
+    push @m, map { $self->xs_make_dynamic_lib(\%attribs, @$_); } @libs;
 
-    my($otherldflags) = $attribs{OTHERLDFLAGS} || "";
-    my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
-    my($armaybe) = $attribs{ARMAYBE} || $self->{ARMAYBE} || ":";
-    my($ldfrom) = '$(LDFROM)';
-    $armaybe = 'ar' if ($Is{OSF} and $armaybe eq ':');
-    my(@m);
-    my $ld_opt = $Is{OS2} ? '$(OPTIMIZE) ' : '';	# Useful on other systems too?
+    return join("\n",@m);
+}
+
+=item xs_dynamic_lib_macros
+
+Defines the macros for the C<dynamic_lib> section.
+
+=cut
+
+sub xs_dynamic_lib_macros {
+    my ($self, $attribs) = @_;
+    my $otherldflags = $attribs->{OTHERLDFLAGS} || "";
+    my $inst_dynamic_dep = $attribs->{INST_DYNAMIC_DEP} || "";
+    my $armaybe = $self->_xs_armaybe($attribs);
+    my $ld_opt = $Is{OS2} ? '$(OPTIMIZE) ' : ''; # Useful on other systems too?
     my $ld_fix = $Is{OS2} ? '|| ( $(RM_F) $@ && sh -c false )' : '';
-    push(@m,'
-# This section creates the dynamically loadable $(INST_DYNAMIC)
-# from $(OBJECT) and possibly $(MYEXTLIB).
-ARMAYBE = '.$armaybe.'
-OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
-INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
-INST_DYNAMIC_FIX = '.$ld_fix.'
+    sprintf <<'EOF', $armaybe, $ld_opt.$otherldflags, $inst_dynamic_dep, $ld_fix;
+# This section creates the dynamically loadable objects from relevant
+# objects and possibly $(MYEXTLIB).
+ARMAYBE = %s
+OTHERLDFLAGS = %s
+INST_DYNAMIC_DEP = %s
+INST_DYNAMIC_FIX = %s
+EOF
+}
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
-');
+sub _xs_armaybe {
+    my ($self, $attribs) = @_;
+    my $armaybe = $attribs->{ARMAYBE} || $self->{ARMAYBE} || ":";
+    $armaybe = 'ar' if ($Is{OSF} and $armaybe eq ':');
+    $armaybe;
+}
+
+=item xs_make_dynamic_lib
+
+Defines the recipes for the C<dynamic_lib> section.
+
+=cut
+
+sub xs_make_dynamic_lib {
+    my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
+    $exportlist = '' if $exportlist ne '$(EXPORT_LIST)';
+    my $armaybe = $self->_xs_armaybe($attribs);
+    my @m = sprintf '%s: %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
     if ($armaybe ne ':'){
-	$ldfrom = 'tmp$(LIB_EXT)';
-	push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
-	push(@m,'	$(RANLIB) '."$ldfrom\n");
+        $ldfrom = 'tmp$(LIB_EXT)';
+        push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
+        push(@m,'	$(RANLIB) '."$ldfrom\n");
     }
     $ldfrom = "-all $ldfrom -none" if $Is{OSF};
 
@@ -962,10 +991,10 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
     my $libs = '$(LDLOADLIBS)';
 
     if (($Is{NetBSD} || $Is{Interix} || $Is{Android}) && $Config{'useshrplib'} eq 'true') {
-	# Use nothing on static perl platforms, and to the flags needed
-	# to link against the shared libperl library on shared perl
-	# platforms.  We peek at lddlflags to see if we need -Wl,-R
-	# or -R to add paths to the run-time library search path.
+        # Use nothing on static perl platforms, and to the flags needed
+        # to link against the shared libperl library on shared perl
+        # platforms.  We peek at lddlflags to see if we need -Wl,-R
+        # or -R to add paths to the run-time library search path.
         if ($Config{'lddlflags'} =~ /-Wl,-R/) {
             $libs .= ' "-L$(PERL_INC)" "-Wl,-R$(INSTALLARCHLIB)/CORE" "-Wl,-R$(PERL_ARCHLIB)/CORE" -lperl';
         } elsif ($Config{'lddlflags'} =~ /-R/) {
@@ -979,22 +1008,16 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
 
     my $ld_run_path_shell = "";
     if ($self->{LD_RUN_PATH} ne "") {
-	$ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
+        $ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
     }
 
-    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $self->xs_obj_opt('$@'), $ldfrom, $libs;
+    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $self->xs_obj_opt('$@'), $ldfrom, $libs, $exportlist;
 	%s$(LD) %s $(LDDLFLAGS) %s $(OTHERLDFLAGS) %s $(MYEXTLIB)	\
-	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST)	\
+	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) %s	\
 	  $(INST_DYNAMIC_FIX)
-MAKE
-
-    push @m, <<'MAKE';
 	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(RM_RF) $(BOOTSTRAP)
-	- $(CP_NONEMPTY) $(BOOTSTRAP) $(INST_BOOT) $(PERM_RW)
 MAKE
-
-    return join('',@m);
+    join '', @m;
 }
 
 =item exescan
