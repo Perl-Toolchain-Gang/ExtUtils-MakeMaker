@@ -178,6 +178,14 @@ END
 virtual_rename('multi', $typemap, "lib/XS/$typemap");
 virtual_rename('multi', 'Test.xs', 'lib/XS/Test.xs');
 
+$label2files{staticmulti} = +{
+  %{ $label2files{'multi'} }, # make copy
+  'Makefile.PL' => sprintf(
+    $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
+    q{LINKTYPE => 'static', XSMULTI => 1,},
+  ),
+};
+
 sub virtual_rename {
   my ($label, $oldfile, $newfile) = @_;
   $label2files{$label}->{$newfile} = delete $label2files{$label}->{$oldfile};
@@ -198,8 +206,10 @@ sub list_static {
   (
     [ 'static', '', '' ],
     [ 'basic', ' static', '_static' ],
+    [ 'multi', ' static', '_static' ],
     [ 'subdirs', ' LINKTYPE=static', ' LINKTYPE=static' ],
     [ 'subdirsstatic', '', '' ],
+    [ 'staticmulti', '', '' ],
   );
 }
 
@@ -211,6 +221,8 @@ sub list_dynamic {
     [ 'subdirsstatic', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'subdirsstatic', ' dynamic', '_dynamic' ],
     [ 'multi', '', '' ],
+    [ 'staticmulti', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
+    [ 'staticmulti', ' dynamic', '_dynamic' ],
   );
 }
 

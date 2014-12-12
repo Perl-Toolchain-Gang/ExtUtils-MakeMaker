@@ -2637,14 +2637,14 @@ $(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" 
 	push @m, "\tcat $catfile >> \$\@\n";
     }
 
-    #                         1     2                        3
-    push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $makefilename;
+    my $ldfrom = $self->{XSMULTI} ? '' : '$(LDFROM)';
+    #                         1     2                        3        4
+    push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $ldfrom, $makefilename;
 $(MAP_TARGET) :: %1$s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
-	$(MAP_LINKCMD) %2$s $(OPTIMIZE) %1$s/perlmain$(OBJ_EXT) $(LDFROM) $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
+	$(MAP_LINKCMD) %2$s $(OPTIMIZE) %1$s/perlmain$(OBJ_EXT) %3$s $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
 	$(NOECHO) $(ECHO) "To install the new '$(MAP_TARGET)' binary, call"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s inst_perl MAP_TARGET=$(MAP_TARGET)"
-	$(NOECHO) $(ECHO) "To remove the intermediate files say"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s map_clean"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %4$s inst_perl MAP_TARGET=$(MAP_TARGET)"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %4$s map_clean"
 
 %1$s/perlmain\$(OBJ_EXT): %1$s/perlmain.c
 EOF
@@ -3415,7 +3415,19 @@ sub static_lib {
     return '' unless $self->has_link_code;
     my(@m);
     my @libs;
-    @libs = ([ qw($(OBJECT) $(INST_STATIC) $(INST_ARCHAUTODIR)) ]);
+    if ($self->{XSMULTI}) {
+	for my $ext ($self->_xs_list_basenames) {
+	    my ($v, $d, $f) = File::Spec->splitpath($ext);
+	    my @d = File::Spec->splitdir($d);
+	    shift @d if $d[0] eq 'lib';
+	    my $instdir = $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+	    my $instfile = $self->catfile($instdir, "$f\$(LIB_EXT)");
+	    my $objfile = "$ext\$(OBJ_EXT)";
+	    push @libs, [ $objfile, $instfile, $instdir ];
+	}
+    } else {
+	@libs = ([ qw($(OBJECT) $(INST_STATIC) $(INST_ARCHAUTODIR)) ]);
+    }
     push @m, map { $self->xs_make_static_lib(@$_); } @libs;
     join "\n", @m;
 }
