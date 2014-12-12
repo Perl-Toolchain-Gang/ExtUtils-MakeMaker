@@ -45,6 +45,7 @@ ok( chdir(File::Spec->catdir($SPACEDIR, 'Big-Dummy')), "chdir'd to Big-Dummy") |
 
 for my $instdir (@INSTDIRS) {
   $instdir = File::Spec->rel2abs($instdir);
+  $instdir = VMS::Filespec::unixpath($instdir) if $Is_VMS;
   my @mpl_out = run(qq{$perl Makefile.PL "INSTALL_BASE=$instdir"});
 
   cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
