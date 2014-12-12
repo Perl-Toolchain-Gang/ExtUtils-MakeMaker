@@ -39,10 +39,11 @@ if ($^O eq "MSWin32") {
 }
 END { qx(chcp $OLD_CP) if $^O eq "MSWin32" and defined $OLD_CP }
 
-my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
-chdir $tmpdir;
+chdir 't';
+perl_lib; # sets $ENV{PERL5LIB} relative to t/
 
-perl_lib;
+my $tmpdir = tempdir( DIR => '../t', CLEANUP => 1 );
+chdir $tmpdir;
 
 my $Touch_Time = calibrate_mtime();
 

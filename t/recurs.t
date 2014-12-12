@@ -27,10 +27,11 @@ delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
-my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
-chdir $tmpdir;
+chdir 't';
+perl_lib; # sets $ENV{PERL5LIB} relative to t/
 
-perl_lib;
+my $tmpdir = tempdir( DIR => '../t', CLEANUP => 1 );
+chdir $tmpdir;
 
 my $Touch_Time = calibrate_mtime();
 

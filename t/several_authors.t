@@ -30,10 +30,11 @@ my $perl     = which_perl();
 my $make     = make_run();
 my $makefile = makefile_name();
 
-my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
-chdir $tmpdir;
+chdir 't';
+perl_lib; # sets $ENV{PERL5LIB} relative to t/
 
-perl_lib();
+my $tmpdir = tempdir( DIR => '../t', CLEANUP => 1 );
+chdir $tmpdir;
 
 ok( setup_recurs(), 'setup' );
 END {

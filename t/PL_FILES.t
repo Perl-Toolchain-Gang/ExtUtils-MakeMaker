@@ -19,9 +19,10 @@ plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
 
 my $perl = which_perl();
 my $make = make_run();
-perl_lib();
+chdir 't';
+perl_lib; # sets $ENV{PERL5LIB} relative to t/
 
-my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+my $tmpdir = tempdir( DIR => '../t', CLEANUP => 1 );
 chdir $tmpdir;
 
 setup;

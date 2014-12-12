@@ -22,10 +22,11 @@ use ExtUtils::MakeMaker::Config;
 # ensure these tests will still work.
 $Config{installman3dir} = 'none';
 
-my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
-chdir $tmpdir;
+chdir 't';
+perl_lib; # sets $ENV{PERL5LIB} relative to t/
 
-perl_lib();
+my $tmpdir = tempdir( DIR => '../t', CLEANUP => 1 );
+chdir $tmpdir;
 
 ok( setup_recurs(), 'setup' );
 END {

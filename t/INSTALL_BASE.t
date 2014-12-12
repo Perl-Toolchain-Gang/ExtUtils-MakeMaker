@@ -26,11 +26,12 @@ my $Is_VMS = $^O eq 'VMS';
 
 my $perl = which_perl();
 
-use File::Temp qw[tempdir];
-my $tmpdir = tempdir( DIR => 't', CLEANUP => $CLEANUP );
-chdir $tmpdir;
+chdir 't';
+perl_lib; # sets $ENV{PERL5LIB} relative to t/
 
-perl_lib;
+use File::Temp qw[tempdir];
+my $tmpdir = tempdir( DIR => '../t', CLEANUP => $CLEANUP );
+chdir $tmpdir;
 
 my $SPACEDIR = 'space dir';
 ok( setup_recurs($SPACEDIR), 'setup' );
