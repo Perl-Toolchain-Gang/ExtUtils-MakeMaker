@@ -2411,12 +2411,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	return join '', @m;
     }
 
-
-
-    my($cccmd, $linkcmd, $lperl);
-
-
-    $cccmd = $self->const_cccmd($libperl);
+    my $cccmd = $self->const_cccmd($libperl);
     $cccmd =~ s/^CCCMD\s*=\s*//;
     $cccmd =~ s/\$\(INC\)/ "-I$self->{PERL_INC}" /;
     $cccmd .= " $Config{cccdlflags}"
@@ -2424,7 +2419,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
     $cccmd =~ s/\(CC\)/\(PERLMAINCC\)/;
 
     # The front matter of the linkcommand...
-    $linkcmd = join ' ', "\$(CC)",
+    my $linkcmd = join ' ', "\$(CC)",
 	    grep($_, @Config{qw(ldflags ccdlflags)});
     $linkcmd =~ s/\s+/ /g;
     $linkcmd =~ s,(perl\.exp),\$(PERL_INC)/$1,;
@@ -2514,6 +2509,7 @@ join(" \\\n\t", reverse sort keys %static), "
 MAP_PRELIBS   = $Config{perllibs} $Config{cryptlib}
 ";
 
+    my $lperl;
     if (defined $libperl) {
 	($lperl = $libperl) =~ s/\$\(A\)/$self->{LIB_EXT}/;
     }
@@ -2534,10 +2530,11 @@ MAP_PRELIBS   = $Config{perllibs} $Config{cryptlib}
           }
         }
 
-	print "Warning: $libperl not found
-    If you're going to build a static perl binary, make sure perl is installed
-    otherwise ignore this warning\n"
-		unless (-f $lperl || defined($self->{PERL_SRC}));
+	print <<EOF unless -f $lperl || defined($self->{PERL_SRC});
+Warning: $libperl not found
+If you're going to build a static perl binary, make sure perl is installed
+otherwise ignore this warning
+EOF
     }
 
     # SUNOS ld does not take the full path to a shared library
