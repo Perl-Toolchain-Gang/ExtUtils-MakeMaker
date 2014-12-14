@@ -36,7 +36,7 @@ our $Filename = __FILE__;   # referenced outside MakeMaker
 our @ISA = qw(Exporter);
 our @EXPORT    = qw(&WriteMakefile $Verbose &prompt);
 our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
-                    &WriteEmptyMakefile);
+                    &WriteEmptyMakefile &open_for_writing);
 
 # These will go away once the last of the Win32 & VMS specific code is
 # purged.
@@ -1199,6 +1199,14 @@ sub skipcheck {
     return '';
 }
 
+# returns filehandle, dies on fail
+sub open_for_writing {
+    my ($file) = @_;
+    open my $fh ,">", $file or die "Unable to open $file: $!";
+    binmode $fh, ':encoding(locale)' if $CAN_DECODE;
+    $fh;
+}
+
 sub flush {
     my $self = shift;
 
@@ -1219,9 +1227,7 @@ sub flush {
     print "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
-    open(my $fh,">", "MakeMaker.tmp")
-        or die "Unable to open MakeMaker.tmp: $!";
-    binmode $fh, ':encoding(locale)' if $CAN_DECODE;
+    my $fh = open_for_writing("MakeMaker.tmp");
 
     for my $chunk (@{$self->{RESULT}}) {
         my $to_write = "$chunk\n";
