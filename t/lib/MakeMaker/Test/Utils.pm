@@ -3,6 +3,8 @@ package MakeMaker::Test::Utils;
 use File::Spec;
 use strict;
 use Config;
+use Cwd qw(getcwd);
+use Carp qw(croak);
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -155,6 +157,9 @@ Sets up environment variables so perl can find its libraries.
 my $old5lib = $ENV{PERL5LIB};
 my $had5lib = exists $ENV{PERL5LIB};
 sub perl_lib {
+    my $basecwd = (File::Spec->splitdir(getcwd))[-1];
+    croak "Basename of cwd needs to be 't' but is '$basecwd'\n"
+	unless $basecwd eq 't';
                                # perl-src/t/
     my $lib =  $ENV{PERL_CORE} ? qq{../lib}
                                # ExtUtils-MakeMaker/t/
