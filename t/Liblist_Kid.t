@@ -48,7 +48,7 @@ sub run {
 # system configuration does not affect the test results.
 
 sub conf_reset {
-    my @save_keys = qw{ so dlsrc osname perllibs };
+    my @save_keys = qw{ so dlsrc osname };
     my %save_config;
     @save_config{ @save_keys } = @Config{ @save_keys };
     delete $Config{$_} for keys %Config;
