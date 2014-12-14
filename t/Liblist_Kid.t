@@ -56,10 +56,10 @@ sub conf_reset {
     $Config{installarchlib} = 'lib';
     # The following are all used and always are defined in the real world.
     # Define them to something here to avoid spewing uninitialized value warnings.
+    $Config{perllibs}    = '';
     if ($^O eq 'VMS') {
         $Config{ldflags}     = '';
         $Config{dbgprefix}   = '';
-        $Config{perllibs}    = '';
         $Config{libc}        = '';
         $Config{ext_ext}     = '';
         $Config{lib_ext}     = '';
