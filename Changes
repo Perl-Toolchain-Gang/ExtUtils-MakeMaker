@@ -1,3 +1,11 @@
+7.05_02 Mon Dec 15 20:06:12 GMT 2014
+    VMS fixes:
+    - Unixify path in t/INSTALL_BASE.t
+
+    Test fixes:
+    - perl_lib calls fixed in tests
+    - t/Liblist_Kid.t fixed for Win32 and others
+
 7.05_01 Sat Dec  6 15:44:55 GMT 2014
     Enhancements:
     - version ranges are now supported for PREREQS, etc.
