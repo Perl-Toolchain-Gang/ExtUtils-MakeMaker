@@ -405,6 +405,13 @@ sub full_setup {
     );
 }
 
+sub _has_cpan_meta_requirements {
+    return eval {
+      require CPAN::Meta::Requirements;
+      CPAN::Meta::Requirements->VERSION(2.130);
+    };
+}
+
 sub new {
     my($class,$self) = @_;
     my($key);
@@ -423,24 +430,34 @@ sub new {
     bless $self, "MM";
 
     # Cleanup all the module requirement bits
-    # require as EUMM Makefile.PL use()s EUMM before installing bundled stuff
-    require CPAN::Meta::Requirements;
     my %key2cmr;
     for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
         $self->{$key}      ||= {};
-	my $cmr = CPAN::Meta::Requirements->from_string_hash(
-	    $self->{$key},
-	    {
-	      bad_version_hook => sub {
-		carp "Unparsable version '$_[0]' for prerequisite $_[1]";
-		version->new(0);
-	      },
-	    },
-	);
-        $self->{$key} = $cmr->as_string_hash;
-	$key2cmr{$key} = $cmr;
+	if (_has_cpan_meta_requirements) {
+	    my $cmr = CPAN::Meta::Requirements->from_string_hash(
+		$self->{$key},
+		{
+		  bad_version_hook => sub {
+		    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as 0";
+		    version->new(0);
+		  },
+		},
+	    );
+	    $self->{$key} = $cmr->as_string_hash;
+	    $key2cmr{$key} = $cmr;
+	} else {
+	    for my $module (sort keys %{ $self->{$key} }) {
+		my $version = $self->{$key}->{$module};
+		if (!defined($version) or !length($version)) {
+		    carp "Undefined requirement for $module treated as '0' (CPAN::Meta::Requirements not available)";
+		} else {
+		    next if $version =~ /^\d+(?:\.\d+(?:_\d+)*)?$/;
+		    carp "Unparsable version '$version' for prerequisite $module treated as 0 (CPAN::Meta::Requirements not available)";
+		}
+		$self->{$key}->{$module} = 0;
+	    }
+	}
     }
-
 
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
         $self->_PREREQ_PRINT;
@@ -508,12 +525,24 @@ END
     my(%initial_att) = %$self; # record initial attributes
 
     my(%unsatisfied) = ();
-    my $cmr = CPAN::Meta::Requirements->new;
-    for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
-	$cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
+    my %prereq2version;
+    my $cmr;
+    if (_has_cpan_meta_requirements) {
+	$cmr = CPAN::Meta::Requirements->new;
+	for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+	    $cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
+	}
+	foreach my $prereq ($cmr->required_modules) {
+	    $prereq2version{$prereq} = $cmr->requirements_for_module($prereq);
+	}
+    } else {
+	for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+	    next unless my $module2version = $self->{$key};
+	    $prereq2version{$_} = $module2version->{$_} for keys %$module2version;
+	}
     }
-    foreach my $prereq (sort $cmr->required_modules) {
-        my $required_version = $cmr->requirements_for_module($prereq);
+    foreach my $prereq (sort keys %prereq2version) {
+        my $required_version = $prereq2version{$prereq};
 
         my $pr_version = 0;
         my $installed_file;
@@ -545,7 +574,11 @@ END
 
             $unsatisfied{$prereq} = 'not installed';
         }
-        elsif (!$cmr->accepts_module($prereq, $pr_version)){
+        elsif (
+	    $cmr
+		? !$cmr->accepts_module($prereq, $pr_version)
+		: $required_version > $pr_version
+	) {
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $required_version, ($pr_version || 'unknown version')
                   unless $self->{PREREQ_FATAL}
