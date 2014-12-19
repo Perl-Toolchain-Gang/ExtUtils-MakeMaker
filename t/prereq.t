@@ -55,14 +55,18 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     );
     is $warnings, '';
 
-    $warnings = '';
-    WriteMakefile(
-        NAME            => 'Big::Dummy',
-        PREREQ_PM       => {
-            strict  =>  '>= 0, <= 99999',
-        }
-    );
-    is $warnings, '', 'version range';
+    SKIP: {
+	skip 'No CMR, no version ranges', 1
+	    unless ExtUtils::MakeMaker::_has_cpan_meta_requirements;
+	$warnings = '';
+	WriteMakefile(
+	    NAME            => 'Big::Dummy',
+	    PREREQ_PM       => {
+		strict  =>  '>= 0, <= 99999',
+	    }
+	);
+	is $warnings, '', 'version range';
+    }
 
     $warnings = '';
     WriteMakefile(
