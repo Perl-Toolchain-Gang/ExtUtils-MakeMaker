@@ -26,7 +26,7 @@ chdir $tmpdir;
 
 ok( setup_recurs(), 'setup' );
 END {
-    ok( chdir File::Spec->updir );
+    ok( chdir File::Spec->updir, 'chdir updir' );
     ok( teardown_recurs(), 'teardown' );
 }
 
@@ -34,7 +34,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
 {
-    ok( my $stdout = tie *STDOUT, 'TieOut' );
+    ok my $stdout = tie(*STDOUT, 'TieOut'), 'tie STDOUT';
     my $warnings = '';
     local $SIG{__WARN__} = sub {
         if ( $Config{usecrosscompile} ) {
@@ -53,7 +53,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
             strict  => 0
         }
     );
-    is $warnings, '';
+    is $warnings, '', 'basic prereq';
 
     SKIP: {
 	skip 'No CMR, no version ranges', 1
@@ -77,7 +77,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     );
     is $warnings,
     sprintf("Warning: prerequisite strict 99999 not found. We have %s.\n",
-            $strict::VERSION);
+            $strict::VERSION), 'strict 99999';
 
     $warnings = '';
     WriteMakefile(
@@ -87,7 +87,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
         }
     );
     is $warnings,
-    "Warning: prerequisite I::Do::Not::Exist 0 not found.\n";
+    "Warning: prerequisite I::Do::Not::Exist 0 not found.\n", 'non-exist prereq';
 
 
     $warnings = '';
@@ -98,9 +98,9 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
         }
     );
     my @warnings = split /\n/, $warnings;
-    is @warnings, 2;
-    like $warnings[0], qr{^Undefined requirement for I::Do::Not::Exist\b};
-    is $warnings[1], "Warning: prerequisite I::Do::Not::Exist 0 not found.";
+    is @warnings, 2, '2 warnings';
+    like $warnings[0], qr{^Undefined requirement for I::Do::Not::Exist\b}, 'undef version warning';
+    is $warnings[1], "Warning: prerequisite I::Do::Not::Exist 0 not found.", 'not found warning';
 
 
     $warnings = '';
@@ -114,7 +114,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     is $warnings,
     "Warning: prerequisite I::Do::Not::Exist 0 not found.\n".
     sprintf("Warning: prerequisite strict 99999 not found. We have %s.\n",
-            $strict::VERSION);
+            $strict::VERSION), '2 bad prereq warnings';
 
     $warnings = '';
     eval {
@@ -129,7 +129,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
         );
     };
 
-    is $warnings, '';
+    is $warnings, '', 'no warnings on PREREQ_FATAL';
     is $@, <<'END', "PREREQ_FATAL";
 MakeMaker FATAL: prerequisites not found.
     I::Do::Not::Exist not installed
@@ -154,7 +154,7 @@ END
         );
     };
 
-    is $warnings, '';
+    is $warnings, '', 'CONFIGURE sub non-exist req no warn';
     is $@, <<'END', "PREREQ_FATAL happens before CONFIGURE";
 MakeMaker FATAL: prerequisites not found.
     I::Do::Not::Exist not installed
