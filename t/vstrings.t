@@ -88,6 +88,7 @@ sub makefile_content {
 
 sub run_test {
   my ($gotrealcmr, $pkg, $version, $okwarningRE, $descrip, $nocmrRE) = @_;
+  local $_;
   SKIP: {
     skip "No vstring test <5.8", 2
       if $] < 5.008 && $pkg eq 'BareV2String' && $descrip =~ m!^2-part!;
