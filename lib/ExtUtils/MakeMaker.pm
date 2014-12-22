@@ -1230,12 +1230,9 @@ sub flush {
     my $fh = open_for_writing("MakeMaker.tmp");
 
     for my $chunk (@{$self->{RESULT}}) {
-        my $to_write = "$chunk\n";
-        if (!$CAN_DECODE && $] > 5.008) {
-            utf8::encode $to_write;
-        }
-        print $fh "$chunk\n"
-            or die "Can't write to MakeMaker.tmp: $!";
+        my $to_write = $chunk;
+        utf8::encode $to_write if !$CAN_DECODE && $] > 5.008;
+        print $fh "$to_write\n" or die "Can't write to MakeMaker.tmp: $!";
     }
 
     close $fh
