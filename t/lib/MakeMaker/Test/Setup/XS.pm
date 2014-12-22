@@ -178,6 +178,14 @@ END
 virtual_rename('multi', $typemap, "lib/XS/$typemap");
 virtual_rename('multi', 'Test.xs', 'lib/XS/Test.xs');
 
+$label2files{bscodemulti} = +{
+  %{ $label2files{'multi'} }, # make copy
+  'lib/XS/Test_BS' => $BS_TEST,
+  't/bs.t' => $T_BOOTSTRAP,
+};
+delete $label2files{bscodemulti}->{'t/is_even.t'};
+delete $label2files{bscodemulti}->{'t/is_odd.t'};
+
 $label2files{staticmulti} = +{
   %{ $label2files{'multi'} }, # make copy
   'Makefile.PL' => sprintf(
@@ -223,6 +231,7 @@ sub list_dynamic {
     [ 'multi', '', '' ],
     [ 'staticmulti', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'staticmulti', ' dynamic', '_dynamic' ],
+    [ 'bscodemulti', '', '' ],
   );
 }
 
