@@ -903,7 +903,7 @@ sub dynamic {
 
     my($self) = shift;
     '
-dynamic :: $(FIRST_MAKEFILE) $(BOOTSTRAP) $(INST_DYNAMIC)
+dynamic :: $(FIRST_MAKEFILE) $(INST_BOOT) $(INST_DYNAMIC)
 	$(NOECHO) $(NOOP)
 ';
 }

@@ -890,19 +890,23 @@ BOOTSTRAP =
 
     my $target = $Is{VMS} ? '$(MMS$TARGET)' : '$@';
 
-    return sprintf <<'MAKE_FRAG', ($target) x 2;
+    return sprintf <<'MAKE_FRAG', $target;
 BOOTSTRAP = $(BASEEXT).bs
 
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DFSEP).exists
+$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP)
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
 		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
-	$(NOECHO) $(TOUCH) "%s"
-	$(CHMOD) $(PERM_RW) "%s"
+	$(NOECHO) $(TOUCH) "%1$s"
+	$(CHMOD) $(PERM_RW) "%1$s"
+
+$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists
+	$(NOECHO) $(RM_RF) %1$s
+	- $(CP_NONEMPTY) $(BOOTSTRAP) %1$s $(PERM_RW)
 MAKE_FRAG
 }
 

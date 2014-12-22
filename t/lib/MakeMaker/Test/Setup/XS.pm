@@ -67,6 +67,16 @@ WriteMakefile(
 );
 END
 
+my $BS_TEST = '$DynaLoader::bscode = q(warn "BIG NOISE";)';
+
+my $T_BOOTSTRAP = <<'EOF';
+use Test::More tests => 1;
+my $w = '';
+$SIG{__WARN__} = sub { $w .= join '', @_; };
+require XS::Test;
+like $w, qr/NOISE/;
+EOF
+
 my %Files = (
   'lib/XS/Test.pm' => $PM_TEST,
   $typemap => '',
@@ -76,6 +86,13 @@ my %Files = (
 );
 
 my %label2files = (basic => \%Files);
+
+$label2files{bscode} = +{
+  %{ $label2files{'basic'} }, # make copy
+  'Test_BS' => $BS_TEST,
+  't/bs.t' => $T_BOOTSTRAP,
+};
+delete $label2files{bscode}->{'t/is_even.t'};
 
 sub virtual_rename {
   my ($label, $oldfile, $newfile) = @_;
@@ -96,6 +113,7 @@ sub setup_xs {
 sub list_dynamic {
   (
     [ 'basic', '', '' ],
+    [ 'bscode', '', '' ],
   );
 }
 
