@@ -74,9 +74,11 @@ t/backwards.t
 t/basic.t
 t/build_man.t
 t/cd.t
+t/cp.t
 t/config.t
 t/dir_target.t
 t/echo.t
+t/eu_command.t
 t/FIRST_MAKEFILE.t
 t/fix_libs.t
 t/fixin.t
