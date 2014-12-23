@@ -12,7 +12,7 @@ use Config;
 
 use ExtUtils::MM;
 my $typemap = 'type map';
-$typemap =~ s/ //g unless MM->new({NAME=>'name'})->can_dep_space;
+$typemap =~ s/ //g unless MM->new({NAME=>'name', NORECURS=>1})->can_dep_space;
 
 my %Files = (
              'XS-Test/lib/XS/Test.pm'     => <<'END',
