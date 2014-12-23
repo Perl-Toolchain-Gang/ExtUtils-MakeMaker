@@ -9,7 +9,6 @@ bundled/CPAN-Meta/CPAN/Meta/History.pm
 bundled/CPAN-Meta/CPAN/Meta/Prereqs.pm
 bundled/CPAN-Meta/CPAN/Meta/Spec.pm
 bundled/CPAN-Meta/CPAN/Meta/Validator.pm
-bundled/ExtUtils-Command/ExtUtils/Command.pm
 bundled/ExtUtils-Install/ExtUtils/Install.pm
 bundled/ExtUtils-Install/ExtUtils/Installed.pm
 bundled/ExtUtils-Install/ExtUtils/Packlist.pm
@@ -28,6 +27,7 @@ bundled/Scalar-List-Utils/Scalar/Util/PP.pm
 Changes
 CONTRIBUTING
 INSTALL
+lib/ExtUtils/Command.pm
 lib/ExtUtils/Command/MM.pm
 lib/ExtUtils/Liblist.pm
 lib/ExtUtils/Liblist/Kid.pm
