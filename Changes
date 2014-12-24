@@ -1,3 +1,7 @@
+7.05_04 Wed Dec 24 14:31:17 GMT 2014
+    Core fixes:
+    - Fix for lack of B module at build time when in core
+
 7.05_03 Wed Dec 24 11:45:58 GMT 2014
     Bug fixes:
     - Revert LibList to a previous working state
