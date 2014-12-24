@@ -1,3 +1,20 @@
+7.05_03 Wed Dec 24 11:45:58 GMT 2014
+    Bug fixes:
+    - Revert LibList to a previous working state
+    - Fix distsignature dependencies for parallel make
+    - Check exit status for commands in "make ci" target
+    - RT#100268 fix wrong variable being used
+    - Make open_for_writing() exportable for utf8 encoding
+    - Made prereqs work minus version-range if no CPAN::Meta::Requirements
+
+    Test fixes:
+    - vstrings test was recfactored
+    - prereqs test acquired labels for all tests
+
+    QA fixes:
+    - use containerised travis builds for extra speed
+    - blead build has been prioritised as it takes the longest
+
 7.05_02 Mon Dec 15 20:06:12 GMT 2014
     VMS fixes:
     - Unixify path in t/INSTALL_BASE.t
