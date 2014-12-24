@@ -409,6 +409,7 @@ sub _has_cpan_meta_requirements {
     return eval {
       require CPAN::Meta::Requirements;
       CPAN::Meta::Requirements->VERSION(2.130);
+      require B; # CMR requires this, for core we have to too.
     };
 }
 
