@@ -41,7 +41,6 @@ reason, do it the long way.
 
     use lib "/path/to/your/home/dir/lib/perl5";
 
-
 =item How do I get MakeMaker and Module::Build to install to the same place?
 
 Module::Build, as of 0.28, supports two ways to install to the same
@@ -116,16 +115,18 @@ goes through its full installation process which may modify it.
 =item PREFIX vs INSTALL_BASE from Module::Build::Cookbook
 
 The behavior of PREFIX is complicated and depends closely on how your
-Perl is configured. The resulting installation locations will vary from
-machine to machine and even different installations of Perl on the same machine.
-Because of this, its difficult to document where prefix will place your modules.
+Perl is configured. The resulting installation locations will vary
+from machine to machine and even different installations of Perl on the
+same machine.  Because of this, its difficult to document where prefix
+will place your modules.
 
-In contrast, INSTALL_BASE has predictable, easy to explain installation locations.
-Now that Module::Build and MakeMaker both have INSTALL_BASE there is little reason
-to use PREFIX other than to preserve your existing installation locations. If you
-are starting a fresh Perl installation we encourage you to use INSTALL_BASE. If
-you have an existing installation installed via PREFIX, consider moving it to an
-installation structure matching INSTALL_BASE and using that instead.
+In contrast, INSTALL_BASE has predictable, easy to explain installation
+locations.  Now that Module::Build and MakeMaker both have INSTALL_BASE
+there is little reason to use PREFIX other than to preserve your existing
+installation locations. If you are starting a fresh Perl installation we
+encourage you to use INSTALL_BASE. If you have an existing installation
+installed via PREFIX, consider moving it to an installation structure
+matching INSTALL_BASE and using that instead.
 
 =back
 
@@ -184,12 +185,13 @@ Its primary advantages are:
 
 =back
 
-Module::Build was long the official heir apparent to MakeMaker.  The rate of
-both its development and adoption has slowed in recent years, though, and it is
-unclear what the future holds for it.  That said, Module::Build set the stage
-for I<something> to become the heir to MakeMaker.  MakeMaker's maintainers have
-long said that it is a dead end and should be kept functioning, but not
-extended with new features.  It's complicated enough as it is!
+Module::Build was long the official heir apparent to MakeMaker.  The
+rate of both its development and adoption has slowed in recent years,
+though, and it is unclear what the future holds for it.  That said,
+Module::Build set the stage for I<something> to become the heir to
+MakeMaker.  MakeMaker's maintainers have long said that it is a dead
+end and should be kept functioning, but not extended with new features.
+It's complicated enough as it is!
 
 =back
 
