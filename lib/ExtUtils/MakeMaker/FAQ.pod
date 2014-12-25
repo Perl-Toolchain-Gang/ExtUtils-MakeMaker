@@ -21,8 +21,12 @@ FAQs, tricks and tips for C<ExtUtils::MakeMaker>.
 =item How do I install a module into my home directory?
 
 If you're not the Perl administrator you probably don't have
-permission to install a module to its default location.  Then you
-should install it for your own use into your home directory like so:
+permission to install a module to its default location. Ways of handling
+this with a B<lot> less manual effort on your part are L<perlbrew>
+and L<local::lib>.
+
+Otherwise, you can install it for your own use into your home directory
+like so:
 
     # Non-unix folks, replace ~ with /path/to/your/home/dir
     perl Makefile.PL INSTALL_BASE=~
@@ -98,8 +102,10 @@ Two ways.  One is to build the module normally...
         make
         make test
 
-...and then set the PERL5LIB environment variable to point at the
-blib/lib and blib/arch directories.
+...and then use L<blib> to point Perl at the built but uninstalled module:
+
+	perl -Mblib script.pl
+	perl -Mblib -e '...'
 
 The other is to install the module in a temporary location.
 
@@ -111,6 +117,7 @@ The other is to install the module in a temporary location.
 And then set PERL5LIB to F<~/tmp/lib/perl5>.  This works well when you
 have multiple modules to work with.  It also ensures that the module
 goes through its full installation process which may modify it.
+Again, L<local::lib> may assist you here.
 
 =item PREFIX vs INSTALL_BASE from Module::Build::Cookbook
 
@@ -190,11 +197,10 @@ rate of both its development and adoption has slowed in recent years,
 though, and it is unclear what the future holds for it.  That said,
 Module::Build set the stage for I<something> to become the heir to
 MakeMaker.  MakeMaker's maintainers have long said that it is a dead
-end and should be kept functioning, but not extended with new features.
-It's complicated enough as it is!
+end and should be kept functioning, while being cautious about extending
+with new features.
 
 =back
-
 
 =head2 Module Writing
 
@@ -209,8 +215,14 @@ modules in your dist, $VERSION is really just bookkeeping and all that's
 important is it goes up every time the module is changed.  Doing this
 by hand is a pain and you often forget.
 
-Simplest way to do it automatically is to use your version control
-system's revision number (you are using version control, right?).
+Probably the easiest way to do this is using F<perl-reversion> in
+L<Perl::Version>:
+
+  perl-reversion -bump
+
+If your version control system supports revision numbers (git doesn't
+easily), the simplest way to do it automatically is to use its revision
+number (you are using version control, right?).
 
 In CVS, RCS and SVN you use $Revision$ (see the documentation of your
 version control system for details).  Every time the file is checked
@@ -302,7 +314,7 @@ do that.  Use at your own risk.  Have fun blowing holes in your foot.
 
 We recommend ptar from Archive::Tar not older than 1.66 with '-C' option.
 
-=item Which zip should I use on Windows for '[nd]make zipdist'?
+=item Which zip should I use on Windows for '[ndg]make zipdist'?
 
 We recommend InfoZIP: L<http://www.info-zip.org/Zip.html>
 
@@ -453,7 +465,19 @@ This tip has been brought to you by Nick Ing-Simmons and Stas Bekman.
 =head1 PATCHING
 
 If you have a question you'd like to see added to the FAQ (whether or
-not you have the answer) please send it to makemaker@perl.org.
+not you have the answer) please either:
+
+=over 2
+
+=item * make a pull request on the MakeMaker github repository
+
+=item * raise a issue on the MakeMaker github repository
+
+=item * file an RT ticket
+
+=item * email makemaker@perl.org
+
+=back
 
 =head1 AUTHOR
 
