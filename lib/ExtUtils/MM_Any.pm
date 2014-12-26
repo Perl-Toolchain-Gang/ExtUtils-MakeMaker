@@ -1139,7 +1139,7 @@ sub metafile_data {
       my $method = $vers =~ m!^2!
                ? '_add_requirements_to_meta_v2'
                : '_add_requirements_to_meta_v1_4';
-      %meta = $self->$method( %meta );
+      $self->$method( \%meta );
     }
 
     while( my($key, $val) = each %$meta_add ) {
@@ -1170,72 +1170,68 @@ sub _metaspec_version {
 }
 
 sub _add_requirements_to_meta_v1_4 {
-    my ( $self, %meta ) = @_;
+    my ( $self, $meta ) = @_;
 
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
     if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
-        $meta{configure_requires} = $self->{CONFIGURE_REQUIRES};
+        $meta->{configure_requires} = $self->{CONFIGURE_REQUIRES};
     } else {
-        $meta{configure_requires} = {
+        $meta->{configure_requires} = {
             'ExtUtils::MakeMaker'       => 0,
         };
     }
 
     if( $self->{ARGS}{BUILD_REQUIRES} ) {
-        $meta{build_requires} = $self->{BUILD_REQUIRES};
+        $meta->{build_requires} = $self->{BUILD_REQUIRES};
     } else {
-        $meta{build_requires} = {
+        $meta->{build_requires} = {
             'ExtUtils::MakeMaker'       => 0,
         };
     }
 
     if( $self->{ARGS}{TEST_REQUIRES} ) {
-        $meta{build_requires} = {
-          %{ $meta{build_requires} },
+        $meta->{build_requires} = {
+          %{ $meta->{build_requires} },
           %{ $self->{TEST_REQUIRES} },
         };
     }
 
-    $meta{requires} = $self->{PREREQ_PM}
+    $meta->{requires} = $self->{PREREQ_PM}
         if defined $self->{PREREQ_PM};
-    $meta{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
+    $meta->{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
         if $self->{MIN_PERL_VERSION};
-
-    return %meta;
 }
 
 sub _add_requirements_to_meta_v2 {
-    my ( $self, %meta ) = @_;
+    my ( $self, $meta ) = @_;
 
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
     if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
-        $meta{prereqs}{configure}{requires} = $self->{CONFIGURE_REQUIRES};
+        $meta->{prereqs}{configure}{requires} = $self->{CONFIGURE_REQUIRES};
     } else {
-        $meta{prereqs}{configure}{requires} = {
+        $meta->{prereqs}{configure}{requires} = {
             'ExtUtils::MakeMaker'       => 0,
         };
     }
 
     if( $self->{ARGS}{BUILD_REQUIRES} ) {
-        $meta{prereqs}{build}{requires} = $self->{BUILD_REQUIRES};
+        $meta->{prereqs}{build}{requires} = $self->{BUILD_REQUIRES};
     } else {
-        $meta{prereqs}{build}{requires} = {
+        $meta->{prereqs}{build}{requires} = {
             'ExtUtils::MakeMaker'       => 0,
         };
     }
 
     if( $self->{ARGS}{TEST_REQUIRES} ) {
-        $meta{prereqs}{test}{requires} = $self->{TEST_REQUIRES};
+        $meta->{prereqs}{test}{requires} = $self->{TEST_REQUIRES};
     }
 
-    $meta{prereqs}{runtime}{requires} = $self->{PREREQ_PM}
+    $meta->{prereqs}{runtime}{requires} = $self->{PREREQ_PM}
         if $self->{ARGS}{PREREQ_PM};
-    $meta{prereqs}{runtime}{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
+    $meta->{prereqs}{runtime}{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
         if $self->{MIN_PERL_VERSION};
-
-    return %meta;
 }
 
 # Adapted from Module::Build::Base
@@ -1469,7 +1465,7 @@ sub mymeta {
                ? '_add_requirements_to_meta_v2'
                : '_add_requirements_to_meta_v1_4';
 
-    $mymeta = { $self->$method( %$mymeta ) };
+    $self->$method( $mymeta );
 
     $mymeta->{dynamic_config} = 0;
 
