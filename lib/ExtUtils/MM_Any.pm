@@ -959,16 +959,16 @@ metafile :
 	$(NOECHO) $(NOOP)
 MAKE_FRAG
 
-    my %metadata   = $self->metafile_data(
+    my $metadata   = $self->metafile_data(
         $self->{META_ADD}   || {},
         $self->{META_MERGE} || {},
     );
 
-    _fix_metadata_before_conversion( \%metadata );
+    _fix_metadata_before_conversion( $metadata );
 
     # paper over validation issues, but still complain, necessary because
     # there's no guarantee that the above will fix ALL errors
-    my $meta = eval { CPAN::Meta->create( \%metadata, { lazy_validation => 1 } ) };
+    my $meta = eval { CPAN::Meta->create( $metadata, { lazy_validation => 1 } ) };
     warn $@ if $@ and
                $@ !~ /encountered CODE.*, but JSON can only represent references to arrays or hashes/;
 
@@ -979,7 +979,7 @@ MAKE_FRAG
         !eval { $meta->as_string }
     )
     {
-        $meta = bless \%metadata, 'CPAN::Meta';
+        $meta = bless $metadata, 'CPAN::Meta';
     }
 
     my @write_metayml = $self->echo(
@@ -1097,7 +1097,7 @@ sub _hash_merge {
 
 =head3 metafile_data
 
-    my @metadata_pairs = $mm->metafile_data(\%meta_add, \%meta_merge);
+    my $metadata_hashref = $mm->metafile_data(\%meta_add, \%meta_merge);
 
 Returns the data which MakeMaker turns into the META.yml file 
 and the META.json file.
@@ -1152,7 +1152,7 @@ sub metafile_data {
         $self->_hash_merge(\%meta, $key, $val);
     }
 
-    return %meta;
+    return \%meta;
 }
 
 
@@ -1453,11 +1453,10 @@ sub mymeta {
     my $v2 = 1;
 
     unless ( $mymeta ) {
-        my @metadata = $self->metafile_data(
+        $mymeta = $self->metafile_data(
             $self->{META_ADD}   || {},
             $self->{META_MERGE} || {},
         );
-        $mymeta = {@metadata};
         $v2 = 0;
     }
 
