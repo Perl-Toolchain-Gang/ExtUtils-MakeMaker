@@ -2543,45 +2543,6 @@ PM) in which case it is run B<before> pm_to_blib and does not include
 INST_LIB and INST_ARCH in its C<@INC>.  This apparently odd behavior
 is there for backwards compatibility (and it's somewhat DWIM).
 
-One use for this might be to configure your module file for local
-conditions, or to automatically insert a version number:
-
-    # common.pl:
-    sub get_version { '0.04' }
-    sub process { my $v = get_version(); s/__VERSION__/$v/g; }
-    1;
-
-    # Makefile.PL:
-    require 'common.pl';
-    my $version = get_version();
-    my @pms = qw(Foo.pm);
-    WriteMakefile(
-      NAME => 'Foo',
-      VERSION => $version,
-      PM => { map { ($_ => "\$(INST_LIB)/$_") } @pms },
-      clean => { FILES => join ' ', @pms },
-    );
-
-    # Foo.pm.PL:
-    require 'common.pl';
-    $_ = join '', <DATA>;
-    process();
-    my $file = shift;
-    open my $fh, '>', $file or die "$file: $!";
-    print $fh $_;
-    __DATA__
-    package Foo;
-    our $VERSION = '__VERSION__';
-    1;
-
-You may notice that C<PL_FILES> is not specified above, since the default
-of mapping each .PL file to its basename works well.
-
-If the generated module were architecture-specific, you could replace
-C<$(INST_LIB)> above with C<$(INST_ARCHLIB)>, although if you locate
-modules under F<lib>, that would involve ensuring any C<lib/> in front
-of the module location were removed.
-
 =item PM
 
 Hashref of .pm files and *.pl files to be installed.  e.g.

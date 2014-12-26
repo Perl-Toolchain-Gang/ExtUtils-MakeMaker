@@ -135,6 +135,49 @@ encourage you to use INSTALL_BASE. If you have an existing installation
 installed via PREFIX, consider moving it to an installation structure
 matching INSTALL_BASE and using that instead.
 
+=item Generating *.pm files with substitutions eg of $VERSION
+
+If you want to configure your module files for local conditions, or to
+automatically insert a version number, you can use EUMM's C<PL_FILES>
+capability, where it will automatically run each F<*.PL> it finds to
+generate its basename. For instance:
+
+    # Makefile.PL:
+    require 'common.pl';
+    my $version = get_version();
+    my @pms = qw(Foo.pm);
+    WriteMakefile(
+      NAME => 'Foo',
+      VERSION => $version,
+      PM => { map { ($_ => "\$(INST_LIB)/$_") } @pms },
+      clean => { FILES => join ' ', @pms },
+    );
+
+    # common.pl:
+    sub get_version { '0.04' }
+    sub process { my $v = get_version(); s/__VERSION__/$v/g; }
+    1;
+
+    # Foo.pm.PL:
+    require 'common.pl';
+    $_ = join '', <DATA>;
+    process();
+    my $file = shift;
+    open my $fh, '>', $file or die "$file: $!";
+    print $fh $_;
+    __DATA__
+    package Foo;
+    our $VERSION = '__VERSION__';
+    1;
+
+You may notice that C<PL_FILES> is not specified above, since the default
+of mapping each .PL file to its basename works well.
+
+If the generated module were architecture-specific, you could replace
+C<$(INST_LIB)> above with C<$(INST_ARCHLIB)>, although if you locate
+modules under F<lib>, that would involve ensuring any C<lib/> in front
+of the module location were removed.
+
 =back
 
 =head2 Common errors and problems
