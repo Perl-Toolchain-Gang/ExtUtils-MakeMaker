@@ -20,6 +20,8 @@ my $Curdir  = __PACKAGE__->curdir;
 my $Rootdir = __PACKAGE__->rootdir;
 my $Updir   = __PACKAGE__->updir;
 
+my $METASPEC_URL = 'http://module-build.sourceforge.net/META-spec-v1.4.html';
+my $METASPEC_V = 1.4;
 
 =head1 NAME
 
@@ -1126,8 +1128,8 @@ sub metafile_data {
 
         generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
         'meta-spec'  => {
-            url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html',
-            version     => 1.4
+            url         => $METASPEC_URL,
+            version     => $METASPEC_V,
         },
     );
 
@@ -1166,7 +1168,7 @@ sub _metaspec_version {
   return $meta_merge->{'meta-spec'}->{version}
     if defined $meta_merge->{'meta-spec'}
        and  defined $meta_merge->{'meta-spec'}->{version};
-  return '1.4';
+  return $METASPEC_V;
 }
 
 sub _add_requirements_to_meta_v1_4 {
