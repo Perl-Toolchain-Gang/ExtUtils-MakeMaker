@@ -986,7 +986,7 @@ MAKE_FRAG
       $meta->as_string({version => "1.4"}), 'META_new.yml'
     );
     my @write_metajson = $self->echo(
-      $meta->as_string(), 'META_new.json'
+      $meta->as_string({version => "2.0"}), 'META_new.json'
     );
 
     my $metayml = join("\n\t", @write_metayml);
@@ -1525,7 +1525,7 @@ sub write_mymeta {
     # not sure if i should just eval this and skip file creation if it
     # blows up
     my $meta_obj = CPAN::Meta->new( $mymeta, { lazy_validation => 1 } );
-    $meta_obj->save( 'MYMETA.json' );
+    $meta_obj->save( 'MYMETA.json', { version => "2.0" } );
     $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );
     return 1;
 }
