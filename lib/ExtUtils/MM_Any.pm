@@ -384,6 +384,19 @@ sub echo {
     return @cmds;
 }
 
+sub echopm {
+    my ($self, $sub, $text) = @_;
+
+    my $echopm = sprintf <<'ECHOPM', quotemeta $text;
+    binmode STDOUT;
+    my $text = "%s";
+    $text = sprintf $text, @ARGV if @ARGV;
+    print $text;
+ECHOPM
+
+    return $self->pm($sub, $echopm);
+}
+
 
 =head3 wraplist
 
@@ -681,7 +694,7 @@ clean :: clean_subdirs
     }
 
     push(@files, qw[$(MAKE_APERL_FILE)
-                    MYMETA.json MYMETA.yml perlmain.c tmon.out mon.out so_locations
+                    MYMETA.json MYMETA.yml Makefile.pm perlmain.c tmon.out mon.out so_locations
                     blibdirs.ts pm_to_blib pm_to_blib.ts
                     *$(OBJ_EXT) *$(LIB_EXT) perl.exe perl perl$(EXE_EXT)
                     $(BOOTSTRAP) $(BASEEXT).bso
@@ -747,11 +760,15 @@ NOOP_FRAG
     my $clean = "clean_subdirs :\n";
 
     for my $dir (@{$self->{DIR}}) {
-        my $subclean = $self->oneliner(sprintf <<'CODE', $dir);
-exit 0 unless chdir '%s';  system '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
+        my $makepm = $self->_new_makepm("clean_subdirs_target");
+        my $pm_run = $self->pmrun($makepm);
+        my $subclean = $self->pm($makepm, sprintf <<"CODE", $dir, $self->{MAKE}, $self->{FIRST_MAKEFILE});
+    exit 0 unless chdir '%s';
+    system '%s clean' if -f '%s';
 CODE
 
-        $clean .= "\t$subclean\n";
+        $clean .= "\t$pm_run\n";
+        push @{$self->{RESULT_PM}}, $subclean;
     }
 
     return $clean;
@@ -980,23 +997,17 @@ MAKE_FRAG
         $meta = bless \%metadata, 'CPAN::Meta';
     }
 
-    my @write_metayml = $self->echo(
-      $meta->as_string({version => "1.4"}), 'META_new.yml'
-    );
-    my @write_metajson = $self->echo(
-      $meta->as_string(), 'META_new.json'
-    );
+    my ($ymlpm, $jsonpm) = map $self->_new_makepm("metafile_target"), 1..2;
+    push @{$self->{RESULT_PM}}, join "",
+      $self->echopm( $ymlpm, $meta->as_string( { version => "1.4" } ) ),
+      $self->echopm( $jsonpm, $meta->as_string );
 
-    my $metayml = join("\n\t", @write_metayml);
-    my $metajson = join("\n\t", @write_metajson);
-    return sprintf <<'MAKE_FRAG', $metayml, $metajson;
+    return sprintf <<'MAKE_FRAG', $self->pmrun($ymlpm), $self->pmrun($jsonpm);
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
-	%s
-	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
+	%s > $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
-	%s
-	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
+	%s > $(DISTVNAME)/META.json
 MAKE_FRAG
 
 }
@@ -1413,20 +1424,18 @@ in the distdir.
 sub distmeta_target {
     my $self = shift;
 
-    my @add_meta = (
-      $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']),
-exit unless -e q{META.yml};
-eval { maniadd({q{META.yml} => q{Module YAML meta-data (added by MakeMaker)}}) }
-    or print "Could not add META.yml to MANIFEST: $${'@'}\n"
-CODE
-      $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd'])
-exit unless -f q{META.json};
-eval { maniadd({q{META.json} => q{Module JSON meta-data (added by MakeMaker)}}) }
-    or print "Could not add META.json to MANIFEST: $${'@'}\n"
-CODE
-    );
+    my ($yamlpm, $jsonpm) = map $self->_new_makepm("distmeta_target"), 1..2;
+    my @files = ({sub => $yamlpm, ext=>'yml', name=>'YAML'}, {sub => $jsonpm, ext=>'json', name=>'JSON'});
 
-    my @add_meta_to_distdir = map { $self->cd('$(DISTVNAME)', $_) } @add_meta;
+    my @add_meta = map $self->pm( $_->{sub}, sprintf <<'CODE', @{$_}{qw( ext ext name ext)} ), @files;
+    use ExtUtils::Manifest 'maniadd';
+    exit unless -f 'META.%s';
+    eval { maniadd( { 'META.%s' => 'Module %s meta-data (added by MakeMaker)' } ) }
+      or print "Could not add META.%s to MANIFEST: $@\n";
+CODE
+    push @{$self->{RESULT_PM}}, join "\n\n", @add_meta;
+
+    my @add_meta_to_distdir = map { $self->cd('$(DISTVNAME)', $_) } map $self->pmrun($_, '..'), $yamlpm, $jsonpm;
 
     return sprintf <<'MAKE', @add_meta_to_distdir;
 distmeta : create_distdir metafile
@@ -1606,15 +1615,16 @@ NOOP_FRAG
     my $rclean = "realclean_subdirs :\n";
 
     foreach my $dir (@{$self->{DIR}}) {
-        foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
-            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
-chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
+        foreach my $makefile ($self->{MAKEFILE_OLD}, $self->{FIRST_MAKEFILE}) {
+            my $makepm = $self->_new_makepm("realclean_subdirs_target");
+            my $pm_run = $self->pmrun($makepm);
+            my $subrclean = $self->pm($makepm, sprintf <<'CODE', $dir, $self->{MAKE}, $self->{USEMAKEFILE}, ($makefile) x 2);
+    chdir '%s';
+    system '%s %s %s realclean' if -f '%s';
 CODE
 
-            $rclean .= sprintf <<'RCLEAN', $subrclean;
-	- %s
-RCLEAN
-
+            $rclean .= "	- $pm_run\n";
+            push @{$self->{RESULT_PM}}, $subrclean;
         }
     }
 
@@ -1655,9 +1665,12 @@ distdir.
 sub distsignature_target {
     my $self = shift;
 
-    my $add_sign = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
-eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }
-    or print "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
+    my $makepm = $self->_new_makepm("distsignature_target");
+
+    push @{$self->{RESULT_PM}}, $self->pm( $makepm, <<'CODE');
+    use ExtUtils::Manifest 'maniadd';
+    eval { maniadd( { 'SIGNATURE' => 'Public-key signature (added by MakeMaker)' } ) }
+      or print "Could not add SIGNATURE to MANIFEST: $@\n"
 CODE
 
     my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s');
@@ -1665,7 +1678,7 @@ CODE
     # cpansign -s complains if SIGNATURE is in the MANIFEST yet does not
     # exist
     my $touch_sig        = $self->cd('$(DISTVNAME)' => '$(TOUCH) SIGNATURE');
-    my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $add_sign );
+    my $add_sign_to_dist = $self->cd('$(DISTVNAME)' => $self->pmrun($makepm, '..') );
 
     return sprintf <<'MAKE', $add_sign_to_dist, $touch_sig, $sign_dist
 distsignature : distmeta
@@ -1767,7 +1780,7 @@ sub init_INST {
     }
 
     my @parentdir = split(/::/, $self->{PARENT_NAME});
-    $self->{INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     @parentdir);
+    $self->{INST_LIBDIR}      = $self->catdir($self->{INST_LIB}, @parentdir);
     $self->{INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', @parentdir);
     $self->{INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto',
                                               '$(FULLEXT)');
@@ -2534,14 +2547,17 @@ pm_to_blib soon.
 sub tool_autosplit {
     my($self, %attribs) = @_;
 
-    my $maxlen = $attribs{MAXLEN} ? '$$AutoSplit::Maxlen=$attribs{MAXLEN};'
+    my $maxlen = $attribs{MAXLEN} ? '$AutoSplit::Maxlen=$attribs{MAXLEN};'
                                   : '';
-
-    my $asplit = $self->oneliner(sprintf <<'PERL_CODE', $maxlen);
-use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)
+    my $makepm = $self->_new_makepm("tool_autosplit");
+    push @{$self->{RESULT_PM}}, $self->pm($makepm, sprintf <<'PERL_CODE', $maxlen);
+    use AutoSplit;
+    %s
+    autosplit($ARGV[0], $ARGV[1], 0, 1, 1);
 PERL_CODE
 
-    return sprintf <<'MAKE_FRAG', $asplit;
+    my $pmrun = $self->pmrun($makepm);
+    my $make = sprintf <<'MAKE_FRAG', $pmrun;
 # Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
 AUTOSPLITFILE = %s
 
@@ -2883,5 +2899,26 @@ ExtUtils::MM_Win32.
 
 
 =cut
+
+sub pmrun {
+    my ($self, $makepm, $lib) = @_;
+    my $cmd = '$(PERLRUN)';
+    $cmd .= " -I$lib" if $lib;
+    return "$cmd -MMakefile -e $makepm";
+}
+
+sub _new_makepm {
+    my ( $self, $name ) = @_;
+    my $id = $#{$self->{MAKEPM}} + 1;
+    my $makepm = sprintf "m%05d_$name", $id;
+    push @{$self->{MAKEPM}}, $makepm;
+    return $makepm;
+}
+
+sub pm {
+    my ($self, $sub, $code) = @_;
+    my $pm = sprintf "sub %s {\n%s}\n", $sub, $code;
+    return $pm;
+}
 
 1;

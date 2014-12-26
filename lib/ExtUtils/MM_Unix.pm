@@ -723,15 +723,19 @@ depends on $(DIST_DEFAULT).
 sub dist_target {
     my($self) = shift;
 
-    my $date_check = $self->oneliner(<<'CODE', ['-l']);
-print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
-    if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(FIRST_MAKEFILE)';
+    my $makepm = $self->_new_makepm("dist_target");
+
+    push @{$self->{RESULT_PM}}, $self->pm($makepm, <<'CODE', ($self->{VERSION_FROM})x 3, $self->{FIRST_MAKEFILE});
+    print 'Warning: Makefile possibly out of date with %s'
+      if -e '%s' and -M '%s' < -M '%s';
 CODE
 
+    my $date_check = $self->pmrun($makepm);
     return sprintf <<'MAKE_FRAG', $date_check;
 dist : $(DIST_DEFAULT) $(FIRST_MAKEFILE)
 	$(NOECHO) %s
 MAKE_FRAG
+
 }
 
 =item B<tardist_target>
@@ -2904,23 +2908,23 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 sub pm_to_blib {
     my $self = shift;
-    my($autodir) = $self->catdir('$(INST_LIB)','auto');
-    my $r = q{
-pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
-};
+    my($autodir) = $self->catdir($self->{INST_LIB},'auto');
+    my $dirs = join ", ", map qq["$_"], map quotemeta, map { ($_, $self->{PM}->{$_}) } sort keys %{$self->{PM}};
+    my $makepm = $self->_new_makepm("pm_to_blib");
 
-    # VMS will swallow '' and PM_FILTER is often empty.  So use q[]
-    my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, '$autodir', q[\$(PM_FILTER)], '\$(PERM_DIR)')
+    push @{$self->{RESULT_PM}}, $self->pm($makepm, sprintf <<"CODE", $dirs, $autodir, $self->{PM_FILTER}||'', $self->{PERM_DIR});
+    use ExtUtils::Install;
+    pm_to_blib({%s}, '%s', '%s', '%s')
 CODE
 
-    my @cmds = $self->split_command($pm_to_blib,
-                  map { ($_, $self->{PM}->{$_}) } sort keys %{$self->{PM}});
+    my $pm_run = $self->pmrun($makepm);
+    return sprintf <<'MAKE', $pm_run;
+pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
+	$(NOECHO) %s
+	$(NOECHO) $(TOUCH) pm_to_blib
 
-    $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
-    $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
+MAKE
 
-    return $r;
 }
 
 =item post_constants (o)
@@ -2983,13 +2987,11 @@ sub ppd {
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 
-    my $ppd_file = '$(DISTNAME).ppd';
-
-    my @ppd_cmds = $self->echo(<<'PPD_HTML', $ppd_file, { append => 0, allow_variables => 1 });
-<SOFTPKG NAME="$(DISTNAME)" VERSION="$(VERSION)">
+    my $ppd_xml = (<<"PPD_HTML");
+<SOFTPKG NAME="%s" VERSION="%s">
 PPD_HTML
 
-    my $ppd_xml = sprintf <<'PPD_HTML', $abstract, $author;
+    $ppd_xml .= sprintf <<"PPD_HTML", $abstract, $author;
     <ABSTRACT>%s</ABSTRACT>
     <AUTHOR>%s</AUTHOR>
 PPD_HTML
@@ -3062,12 +3064,14 @@ PPD_OUT
 </SOFTPKG>
 PPD_XML
 
-    push @ppd_cmds, $self->echo($ppd_xml, $ppd_file, { append => 1 });
+    my $makepm = $self->_new_makepm("ppd");
+    push @{$self->{RESULT_PM}}, $self->echopm( $makepm, $ppd_xml);
 
-    return sprintf <<'PPD_OUT', join "\n\t", @ppd_cmds;
+    my $pmrun = $self->pmrun($makepm);
+    return sprintf <<'PPD_OUT', $pmrun;
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	%s
+	%s -- $(DISTNAME) $(VERSION) > $(DISTNAME).ppd
 PPD_OUT
 
 }
