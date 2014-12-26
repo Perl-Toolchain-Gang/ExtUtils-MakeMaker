@@ -67,10 +67,6 @@ my @METASPEC20 = (
         version => 2
     },
 );
-my @REQ14 = (
-    configure_requires => { 'ExtUtils::MakeMaker' => 0, },
-    build_requires => { 'ExtUtils::MakeMaker' => 0, },
-);
 my @REQ20 = (
     configure => { requires => { 'ExtUtils::MakeMaker' => 0, }, },
     build => { requires => { 'ExtUtils::MakeMaker' => 0, }, },
@@ -133,17 +129,8 @@ my @GENERIC_OUT = (
         author          => ['Some Guy'],
         prereqs => {
             @REQ20,
-            configure => {
-                requires    => {
-                    Stuff       => 2.34,
-                },
-            },
-            runtime => {
-                requires => {
-                    Foo => 2.34,
-                    Bar => 4.56,
-                },
-            },
+            configure => { requires => { Stuff => 2.34, }, },
+            runtime => { requires => { Foo => 2.34, Bar => 4.56, }, },
         },
         no_index        => {
             directory           => [qw(t inc)],
@@ -164,11 +151,7 @@ my @GENERIC_OUT = (
         @GENERIC_OUT,
         prereqs => {
             @REQ20,
-            runtime => {
-                requires => {
-                    perl => 5.006,
-                },
-            },
+            runtime => { requires => { perl => 5.006, }, },
         },
     }, 'MIN_PERL_VERSION meta-spec 1.4';
 }
@@ -182,11 +165,7 @@ my @GENERIC_OUT = (
     is_deeply $mm->metafile_data, {
         prereqs => {
             @REQ20,
-            runtime         => {
-                requires    => {
-                    'perl'  => '5.006',
-                },
-            },
+            runtime => { requires => { 'perl' => '5.006', }, },
         },
         @GENERIC_OUT,
     }, 'MIN_PERL_VERSION meta-spec 2.0';
@@ -197,9 +176,7 @@ my @GENERIC_OUT = (
     my $mm = $new_mm->(
         @GENERIC_IN,
         MIN_PERL_VERSION => 5.006,
-        PREREQ_PM => {
-            'Foo::Bar'  => 1.23,
-        },
+        PREREQ_PM => { 'Foo::Bar' => 1.23, },
     );
     is_deeply $mm->metafile_data, {
         @GENERIC_OUT,
@@ -219,18 +196,12 @@ my @GENERIC_OUT = (
 {
     my $mm = $new_mm->(
         @GENERIC_IN,
-        CONFIGURE_REQUIRES => {
-            "Fake::Module1" => 1.01,
-        },
+        CONFIGURE_REQUIRES => { "Fake::Module1" => 1.01, },
     );
     is_deeply $mm->metafile_data( {}, { @METASPEC14 }, ), {
         prereqs => {
             @REQ20,
-            configure       => {
-                requires    => {
-                    'Fake::Module1'         => 1.01,
-                },
-            },
+            configure => { requires => { 'Fake::Module1' => 1.01, }, },
         },
         @GENERIC_OUT,
     },'CONFIGURE_REQUIRES meta-spec 1.4';
@@ -240,18 +211,12 @@ my @GENERIC_OUT = (
 {
     my $mm = $new_mm->(
         @GENERIC_IN,
-        CONFIGURE_REQUIRES => {
-            "Fake::Module1" => 1.01,
-        },
+        CONFIGURE_REQUIRES => { "Fake::Module1" => 1.01, },
     );
     is_deeply $mm->metafile_data, {
         prereqs => {
             @REQ20,
-            configure       => {
-                requires    => {
-                    'Fake::Module1'         => 1.01,
-                },
-            },
+            configure => { requires => { 'Fake::Module1' => 1.01, }, },
         },
         @GENERIC_OUT,
     },'CONFIGURE_REQUIRES meta-spec 2.0';
@@ -261,18 +226,13 @@ my @GENERIC_OUT = (
 {
     my $mm = $new_mm->(
         @GENERIC_IN,
-        BUILD_REQUIRES => {
-            "Fake::Module1" => 1.01,
-        },
+        BUILD_REQUIRES => { "Fake::Module1" => 1.01, },
+        META_MERGE => { "meta-spec" => { version => 1.4 }},
     );
     is_deeply $mm->metafile_data( {}, { @METASPEC14 }, ), {
         prereqs => {
             @REQ20,
-            build           => {
-                requires    => {
-                    'Fake::Module1'         => 1.01,
-                },
-            },
+            build => { requires => { 'Fake::Module1' => 1.01, }, },
         },
         @GENERIC_OUT,
     },'BUILD_REQUIRES meta-spec 1.4';
@@ -282,19 +242,12 @@ my @GENERIC_OUT = (
 {
     my $mm = $new_mm->(
         @GENERIC_IN,
-        BUILD_REQUIRES => {
-            "Fake::Module1" => 1.01,
-        },
-        META_MERGE => { "meta-spec" => { version => 2 }},
+        BUILD_REQUIRES => { "Fake::Module1" => 1.01, },
     );
     is_deeply $mm->metafile_data, {
         prereqs => {
             @REQ20,
-            build           => {
-                requires    => {
-                    'Fake::Module1'         => 1.01,
-                },
-            },
+            build => { requires => { 'Fake::Module1' => 1.01, }, },
         },
         @GENERIC_OUT,
     },'BUILD_REQUIRES meta-spec 2.0';
@@ -304,18 +257,13 @@ my @GENERIC_OUT = (
 {
     my $mm = $new_mm->(
         @GENERIC_IN,
-        TEST_REQUIRES => {
-            "Fake::Module1"     => 1.01,
-        },
+        TEST_REQUIRES => { "Fake::Module1" => 1.01, },
+        META_MERGE => { "meta-spec" => { version => 1.4 }},
     );
     is_deeply $mm->metafile_data( {}, { @METASPEC14 }, ), {
         prereqs => {
             @REQ20,
-            test            => {
-                requires    => {
-                    "Fake::Module1"         => 1.01,
-                },
-            },
+            test => { requires => { "Fake::Module1" => 1.01, }, },
         },
         @GENERIC_OUT,
     },'TEST_REQUIRES meta-spec 1.4';
@@ -325,19 +273,12 @@ my @GENERIC_OUT = (
 {
     my $mm = $new_mm->(
         @GENERIC_IN,
-        TEST_REQUIRES => {
-            "Fake::Module1"     => 1.01,
-        },
-        META_MERGE => { "meta-spec" => { version => 2 }},
+        TEST_REQUIRES => { "Fake::Module1" => 1.01, },
     );
     is_deeply $mm->metafile_data, {
         prereqs => {
             @REQ20,
-            test            => {
-                requires    => {
-                    "Fake::Module1"         => 1.01,
-                },
-            },
+            test => { requires => { "Fake::Module1" => 1.01, }, },
         },
         @GENERIC_OUT,
     },'TEST_REQUIRES meta-spec 2.0';
@@ -347,9 +288,7 @@ my @GENERIC_OUT = (
 SKIP: {
     my $mm = $new_mm->(
         @GENERIC_IN,
-        BUILD_REQUIRES => {
-            "Fake::Module1" => 1.01,
-        },
+        BUILD_REQUIRES => { "Fake::Module1" => 1.01, },
         META_ADD => (my $meta_add = { build_requires => {}, configure_requires => {} }),
     );
     is_deeply $mm->metafile_data($meta_add), {
@@ -380,11 +319,7 @@ SKIP: {
                 },
             },
             @REQ20,
-            build    => {
-                requires => {
-                    'Fake::Module1'       => 1.01,
-                },
-            },
+            build => { requires => { 'Fake::Module1' => 1.01, }, },
         },
         release_status => 'testing',
         resources => {
