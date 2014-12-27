@@ -347,18 +347,8 @@ Returns a suitable string describing the type of makefile being written.
 
 =cut
 
-sub make_type {
-    my ($self) = @_;
-    # This needs a bit more work for more wacky OSen
-    if ( $self->os_flavor_is('Win32') ) {
-        my $make = $self->make;
-        $make = +( File::Spec->splitpath( $make ) )[-1];
-        $make =~ s!\.exe$!!i;
-        return "$make-style";
-    }
-    return "$Config{make}-style" if $^O eq 'VMS';
-    return 'Unix-style';
-}
+# override if this isn't suitable!
+sub make_type { return 'Unix-style'; }
 
 
 =head3 stashmeta

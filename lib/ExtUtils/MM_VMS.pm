@@ -2071,6 +2071,15 @@ sub is_make_type {
 }
 
 
+=item make_type (override)
+
+Returns a suitable string describing the type of makefile being written.
+
+=cut
+
+sub make_type { "$Config{make}-style"; }
+
+
 =back
 
 
