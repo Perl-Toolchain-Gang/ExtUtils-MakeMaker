@@ -2543,7 +2543,6 @@ PM) in which case it is run B<before> pm_to_blib and does not include
 INST_LIB and INST_ARCH in its C<@INC>.  This apparently odd behavior
 is there for backwards compatibility (and it's somewhat DWIM).
 
-
 =item PM
 
 Hashref of .pm files and *.pl files to be installed.  e.g.

@@ -99,7 +99,7 @@ Refactoring and Cleanup
 
 Backwards Compatibility
 
-- MakeMaker must be backwards compatible to 5.6.0.
+- MakeMaker must be backwards compatible to 5.6.2.
   Avoid any obvious 5.8-isms. 
 
 - MakeMaker should avoid having module dependencies.
@@ -171,7 +171,7 @@ Tests
 
 - Tests would be nice, but I'm not going to pretend testing MakeMaker
   is easy.  If nothing else, let us know how you tested your patch by
-  hand.
+  hand. It does really help everyone if you can improve tests, though!
 
 - Travis CI (https://travis-ci.org) is good sources of testing
   machines of many perl versions.  Accounts are free.
