@@ -14,11 +14,11 @@ use MakeMaker::Test::Utils;
 use File::Temp;
 use Cwd 'abs_path';
 
-use Test::More tests => 18;
 use ExtUtils::MM;
-plan !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
+use Test::More
+    !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : ();
+    : (tests => 18);
 
 #--------------------- Setup
 
