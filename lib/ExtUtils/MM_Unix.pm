@@ -1190,11 +1190,12 @@ sub _fixin_replace_shebang {
             = reverse grep { $self->file_name_is_absolute($_) } $self->path;
         $interpreter = '';
 
-         foreach my $dir (@absdirs) {
-            if ( $self->maybe_command($cmd) ) {
+        foreach my $dir (@absdirs) {
+            my $maybefile = File::Spec->catfile($dir,$cmd);
+            if ( $self->maybe_command($maybefile) ) {
                 warn "Ignoring $interpreter in $file\n"
                     if $Verbose && $interpreter;
-                $interpreter = $self->catfile( $dir, $cmd );
+                $interpreter = $maybefile;
             }
         }
     }
