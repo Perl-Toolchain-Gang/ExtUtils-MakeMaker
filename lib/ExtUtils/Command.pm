@@ -2,17 +2,12 @@ package ExtUtils::Command;
 
 use 5.00503;
 use strict;
-use Carp;
-use File::Copy;
-use File::Compare;
-use File::Basename;
-use File::Path qw(rmtree);
 require Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
 @ISA       = qw(Exporter);
 @EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
                 dos2unix);
-$VERSION = '1.16';
+$VERSION = '1.19';
 
 my $Is_VMS   = $^O eq 'VMS';
 my $Is_VMS_mode = $Is_VMS;
@@ -32,7 +27,7 @@ if( $Is_VMS ) {
         my $unix_rpt = $ENV{'DECC$FILENAME_UNIX_REPORT'} || '';
         my $efs_charset = $ENV{'DECC$EFS_CHARSET'} || '';
         my $efs_case = $ENV{'DECC$EFS_CASE_PRESERVE'} || '';
-        $vms_unix_rpt = $unix_rpt =~ /^[ET1]/i; 
+        $vms_unix_rpt = $unix_rpt =~ /^[ET1]/i;
         $vms_efs = $efs_charset =~ /^[ET1]/i;
         $vms_case = $efs_case =~ /^[ET1]/i;
     }
@@ -97,7 +92,7 @@ sub expand_wildcards
 
 Concatenates all files mentioned on command line to STDOUT.
 
-=cut 
+=cut
 
 sub cat ()
 {
@@ -111,7 +106,7 @@ sub cat ()
 
 Sets modified time of destination to that of source.
 
-=cut 
+=cut
 
 sub eqtime
 {
@@ -126,12 +121,13 @@ sub eqtime
 
 Removes files and directories - recursively (even if readonly)
 
-=cut 
+=cut
 
 sub rm_rf
 {
  expand_wildcards();
- rmtree([grep -e $_,@ARGV],0,0);
+ require File::Path;
+ File::Path::rmtree([grep -e $_,@ARGV],0,0);
 }
 
 =item rm_f
@@ -140,7 +136,7 @@ sub rm_rf
 
 Removes files (even if readonly)
 
-=cut 
+=cut
 
 sub rm_f {
     expand_wildcards();
@@ -154,7 +150,8 @@ sub rm_f {
 
         next if _unlink($file);
 
-        carp "Cannot delete $file: $!";
+        require Carp;
+        Carp::carp("Cannot delete $file: $!");
     }
 }
 
@@ -173,9 +170,9 @@ sub _unlink {
 
     touch file ...
 
-Makes files exist, with current timestamp 
+Makes files exist, with current timestamp
 
-=cut 
+=cut
 
 sub touch {
     my $t    = time;
@@ -197,18 +194,22 @@ destination is an existing directory.
 
 Returns true if all moves succeeded, false otherwise.
 
-=cut 
+=cut
 
 sub mv {
     expand_wildcards();
     my @src = @ARGV;
     my $dst = pop @src;
 
-    croak("Too many arguments") if (@src > 1 && ! -d $dst);
+    if (@src > 1 && ! -d $dst) {
+        require Carp;
+        Carp::croak("Too many arguments");
+    }
 
+    require File::Copy;
     my $nok = 0;
     foreach my $src (@src) {
-        $nok ||= !move($src,$dst);
+        $nok ||= !File::Copy::move($src,$dst);
     }
     return !$nok;
 }
@@ -230,11 +231,15 @@ sub cp {
     my @src = @ARGV;
     my $dst = pop @src;
 
-    croak("Too many arguments") if (@src > 1 && ! -d $dst);
+    if (@src > 1 && ! -d $dst) {
+        require Carp;
+        Carp::croak("Too many arguments");
+    }
 
+    require File::Copy;
     my $nok = 0;
     foreach my $src (@src) {
-        $nok ||= !copy($src,$dst);
+        $nok ||= !File::Copy::copy($src,$dst);
 
         # Win32 does not update the mod time of a copied file, just the
         # created time which make does not look at.
@@ -249,7 +254,7 @@ sub cp {
 
 Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 
-=cut 
+=cut
 
 sub chmod {
     local @ARGV = @ARGV;
@@ -257,6 +262,7 @@ sub chmod {
     expand_wildcards();
 
     if( $Is_VMS_mode && $Is_VMS_noefs) {
+        require File::Spec;
         foreach my $idx (0..$#ARGV) {
             my $path = $ARGV[$idx];
             next unless -d $path;
@@ -280,11 +286,12 @@ sub chmod {
 
 Creates directories, including any parent directories.
 
-=cut 
+=cut
 
 sub mkpath
 {
  expand_wildcards();
+ require File::Path;
  File::Path::mkpath([@ARGV],0,0777);
 }
 
@@ -295,7 +302,7 @@ sub mkpath
 Tests if a file exists.  I<Exits> with 0 if it does, 1 if it does not (ie.
 shell's idea of true and false).
 
-=cut 
+=cut
 
 sub test_f
 {
@@ -337,9 +344,9 @@ sub dos2unix {
 	my $orig = $_;
 	my $temp = '.dos2unix_tmp';
 	open ORIG, $_ or do { warn "dos2unix can't open $_: $!"; return };
-	open TEMP, ">$temp" or 
+	open TEMP, ">$temp" or
 	    do { warn "dos2unix can't create .dos2unix_tmp: $!"; return };
-        while (my $line = <ORIG>) { 
+        while (my $line = <ORIG>) {
             $line =~ s/\015\012/\012/g;
             print TEMP $line;
         }
