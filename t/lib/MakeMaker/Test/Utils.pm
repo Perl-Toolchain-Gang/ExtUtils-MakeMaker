@@ -357,32 +357,27 @@ Returns true if there is a compiler available for XS builds.
 
 =cut
 
-sub have_compiler {
-    my $have_compiler = 0;
-    eval {
-        require ExtUtils::CBuilder;
-        my $cb = ExtUtils::CBuilder->new(quiet=>1);
-        $have_compiler = $cb->have_compiler;
-    };
-    return $have_compiler;
-}
+sub have_compiler { run_cbuilder('have_compiler'); }
 
 =item have_cplusplus
 
-  $have_compiler = have_cplusplus;
+  $have_cplusplus = have_cplusplus;
 
 Returns true if there is a C++ compiler available for XS builds.
 
 =cut
 
-sub have_cplusplus {
-    my $have_cplusplus = 0;
+sub have_cplusplus { run_cbuilder('have_cplusplus'); }
+
+sub run_cbuilder {
+    my $method = shift;
+    my $retval = 0;
     eval {
         require ExtUtils::CBuilder;
         my $cb = ExtUtils::CBuilder->new(quiet=>1);
-        $have_cplusplus = $cb->have_cplusplus;
+        $retval = $cb->$method;
     };
-    return $have_cplusplus;
+    return $retval;
 }
 
 =item slurp
