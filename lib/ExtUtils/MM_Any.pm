@@ -341,6 +341,24 @@ sub _expand_macros {
 }
 
 
+=head3 stashmeta
+
+    my @recipelines = $MM->stashmeta($text, $file);
+
+Generates a set of C<@recipelines> which will result in the literal
+C<$text> ending up in literal C<$file> when the recipe is executed. Call
+it once, with all the text you want in C<$file>. Make macros will not
+be expanded, so the locations will be fixed at configure-time, not
+at build-time.
+
+=cut
+
+sub stashmeta {
+    my($self, $text, $file) = @_;
+    $self->echo($text, $file, { allow_variables => 0, append => 0 });
+}
+
+
 =head3 echo
 
     my @commands = $MM->echo($text);
@@ -360,7 +378,7 @@ all C<$>.
 
 Example of use:
 
-    my $make = map "\t$_\n", $MM->echo($text, $file);
+    my $make = join '', map "\t$_\n", $MM->echo($text, $file);
 
 =cut
 
@@ -966,10 +984,10 @@ MAKE_FRAG
 
     my $meta = _fix_metadata_before_conversion( $metadata );
 
-    my @write_metayml = $self->echo(
+    my @write_metayml = $self->stashmeta(
       $meta->as_string({version => "1.4"}), 'META_new.yml'
     );
-    my @write_metajson = $self->echo(
+    my @write_metajson = $self->stashmeta(
       $meta->as_string({version => "2.0"}), 'META_new.json'
     );
 
