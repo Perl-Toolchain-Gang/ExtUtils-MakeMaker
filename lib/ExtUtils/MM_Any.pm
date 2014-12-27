@@ -920,8 +920,8 @@ END
     my @man_cmds;
     foreach my $section (qw(1 3)) {
         my $pods = $self->{"MAN${section}PODS"};
-        my $p2m = sprintf <<CMD, $] > 5.008 ? " -u" : "";
-	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)%s
+        my $p2m = sprintf <<'CMD', $section, $] > 5.008 ? " -u" : "";
+	$(NOECHO) $(POD2MAN) --section=%s --perm_rw=$(PERM_RW)%s
 CMD
         push @man_cmds, $self->split_command($p2m, map {($_,$pods->{$_})} sort keys %$pods);
     }
