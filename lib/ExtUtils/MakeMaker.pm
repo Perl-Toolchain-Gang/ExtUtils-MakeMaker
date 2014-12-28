@@ -456,17 +456,7 @@ sub new {
 
     $self->extract_ARGV(\@ARGV);
 
-    # RT#91540 PREREQ_FATAL not recognized on command line
-    if (%$unsatisfied_prereqs && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join "\n", map {"    $_ $unsatisfied_prereqs->{$_}"}
-                            sort { $a cmp $b } keys %$unsatisfied_prereqs;
-        die <<"END";
-MakeMaker FATAL: prerequisites not found.
-$failedprereqs
-
-Please install these modules first and rerun 'perl Makefile.PL'.
-END
-    }
+    $self->check_PREREQ_FATAL($unsatisfied_prereqs); # after ARGV processed
 
     $self->{NAME} ||= $self->guess_name;
     warn "Warning: NAME must be a package name\n"
@@ -484,6 +474,21 @@ END
     $self->generate_makefile;
 
     $self;
+}
+
+sub check_PREREQ_FATAL {
+    my ($self, $unsatisfied_prereqs) = @_;
+    # RT#91540 PREREQ_FATAL not recognized on command line
+    if (%$unsatisfied_prereqs && $self->{PREREQ_FATAL}){
+        my $failedprereqs = join "\n", map {"    $_ $unsatisfied_prereqs->{$_}"}
+                            sort { $a cmp $b } keys %$unsatisfied_prereqs;
+        die <<"END";
+MakeMaker FATAL: prerequisites not found.
+$failedprereqs
+
+Please install these modules first and rerun 'perl Makefile.PL'.
+END
+    }
 }
 
 sub extract_CONFIGURE {
