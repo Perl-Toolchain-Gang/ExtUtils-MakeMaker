@@ -2790,6 +2790,39 @@ sub platform_constants {
     return '';
 }
 
+=head3 post_constants (o)
+
+Returns an empty string per default. Dedicated to overrides from
+within Makefile.PL after all constants have been defined.
+
+=cut
+
+sub post_constants {
+    "";
+}
+
+=head3 post_initialize (o)
+
+Returns an empty string per default. Used in Makefile.PLs to add some
+chunk of text to the Makefile after the object is initialized.
+
+=cut
+
+sub post_initialize {
+    "";
+}
+
+=head3 postamble (o)
+
+Returns an empty string. Can be used in Makefile.PLs to write some
+text to the Makefile at the end.
+
+=cut
+
+sub postamble {
+    "";
+}
+
 =begin private
 
 =head3 _PREREQ_PRINT

@@ -2930,39 +2930,6 @@ CODE
     return $r;
 }
 
-=item post_constants (o)
-
-Returns an empty string per default. Dedicated to overrides from
-within Makefile.PL after all constants have been defined.
-
-=cut
-
-sub post_constants{
-    "";
-}
-
-=item post_initialize (o)
-
-Returns an empty string per default. Used in Makefile.PLs to add some
-chunk of text to the Makefile after the object is initialized.
-
-=cut
-
-sub post_initialize {
-    "";
-}
-
-=item postamble (o)
-
-Returns an empty string. Can be used in Makefile.PLs to write some
-text to the Makefile at the end.
-
-=cut
-
-sub postamble {
-    "";
-}
-
 # transform dot-separated version string into comma-separated quadruple
 # examples:  '1.2.3.4.5' => '1,2,3,4'
 #            '1.2.3'     => '1,2,3,0'
