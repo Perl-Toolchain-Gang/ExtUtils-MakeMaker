@@ -696,10 +696,8 @@ END
     }
 
     $self->{NAME} ||= $self->guess_name;
-
     warn "Warning: NAME must be a package name\n"
       unless $self->{NAME} =~ m!^[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*$!;
-
     ($self->{NAME_SYM} = $self->{NAME}) =~ s/\W+/_/g;
 
     $self->init_MAKE;
@@ -772,7 +770,6 @@ END
         $self->{SKIPHASH}{$skip} = 1;
     }
     delete $self->{SKIP}; # free memory
-
     if ($self->{PARENT}) {
         for (qw/install dist dist_basics dist_core distdir dist_test dist_ci/) {
             $self->{SKIPHASH}{$_} = 1;
@@ -791,7 +788,7 @@ END
         $method .= '_target' unless $self->can($method);
 
         print "Processing Makefile '$section' section\n" if ($Verbose >= 2);
-        my($skipit) = $self->skipcheck($section);
+        my($skipit) = $self->skipsection($section);
         if ($skipit){
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";
         } else {
@@ -1158,7 +1155,7 @@ sub mv_all_methods {
     }
 }
 
-sub skipcheck {
+sub skipsection {
     my($self) = shift;
     my($section) = @_;
     if ($section eq 'dynamic') {
