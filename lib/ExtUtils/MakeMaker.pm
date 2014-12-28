@@ -427,43 +427,10 @@ sub new {
     bless $self, "MM"; # for use as object; reblessed in ->setup_MY
 
     # Cleanup all the module requirement bits
-    my %key2cmr;
-    for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
-        $self->{$key}      ||= {};
-        if (_has_cpan_meta_requirements) {
-            my $cmr = CPAN::Meta::Requirements->from_string_hash(
-                $self->{$key},
-                {
-                  bad_version_hook => sub {
-                    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as 0";
-                    version->new(0);
-                  },
-                },
-            );
-            $self->{$key} = $cmr->as_string_hash;
-            $key2cmr{$key} = $cmr;
-        } else {
-            for my $module (sort keys %{ $self->{$key} }) {
-                my $version = $self->{$key}->{$module};
-                if (!defined($version) or !length($version)) {
-                    carp "Undefined requirement for $module treated as '0' (CPAN::Meta::Requirements not available)";
-                } else {
-                    next if $version =~ /^\d+(?:\.\d+(?:_\d+)*)?$/;
-                    carp "Unparsable version '$version' for prerequisite $module treated as 0 (CPAN::Meta::Requirements not available)";
-                }
-                $self->{$key}->{$module} = 0;
-            }
-        }
-    }
+    my $cmrstash = $self->clean_versions;
 
-    if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
-        $self->_PREREQ_PRINT;
-    }
-
-    # PRINT_PREREQ is RedHatism.
-    if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
-        $self->_PRINT_PREREQ;
-   }
+    $self->_PREREQ_PRINT if "@ARGV" =~ /\bPREREQ_PRINT\b/;
+    $self->_PRINT_PREREQ if "@ARGV" =~ /\bPRINT_PREREQ\b/; # RedHatism.
 
     if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}) {
         check_manifest();
@@ -476,7 +443,7 @@ sub new {
     my %configure_att;         # record &{$self->{CONFIGURE}} attributes
     my(%initial_att) = %$self; # record initial attributes
 
-    my $unsatisfied_prereqs = $self->check_prereqs(\%key2cmr);
+    my $unsatisfied_prereqs = $self->check_prereqs($cmrstash);
 
     if (defined $self->{CONFIGURE}) {
         if (ref $self->{CONFIGURE} eq 'CODE') {
@@ -670,6 +637,39 @@ END
     push @{$self->{RESULT}}, "\n# End.";
 
     $self;
+}
+
+sub clean_versions {
+    my ($self) = @_;
+    my %key2cmr;
+    for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
+        $self->{$key}      ||= {};
+        if (_has_cpan_meta_requirements) {
+            my $cmr = CPAN::Meta::Requirements->from_string_hash(
+                $self->{$key},
+                {
+                  bad_version_hook => sub {
+                    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as 0";
+                    version->new(0);
+                  },
+                },
+            );
+            $self->{$key} = $cmr->as_string_hash;
+            $key2cmr{$key} = $cmr;
+        } else {
+            for my $module (sort keys %{ $self->{$key} }) {
+                my $version = $self->{$key}->{$module};
+                if (!defined($version) or !length($version)) {
+                    carp "Undefined requirement for $module treated as '0' (CPAN::Meta::Requirements not available)";
+                } else {
+                    next if $version =~ /^\d+(?:\.\d+(?:_\d+)*)?$/;
+                    carp "Unparsable version '$version' for prerequisite $module treated as 0 (CPAN::Meta::Requirements not available)";
+                }
+                $self->{$key}->{$module} = 0;
+            }
+        }
+    }
+    \%key2cmr;
 }
 
 sub check_prereqs {
