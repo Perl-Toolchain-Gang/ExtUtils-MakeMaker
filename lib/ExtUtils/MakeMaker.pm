@@ -448,21 +448,8 @@ sub new {
     $self->extract_hints;
 
     $self->check_min_perl_version;
-
-    my %configure_att;         # record &{$self->{CONFIGURE}} attributes
-    my(%initial_att) = %$self; # record initial attributes
-
     my $unsatisfied_prereqs = $self->check_prereqs($cmrstash);
-
-    if (defined $self->{CONFIGURE}) {
-        if (ref $self->{CONFIGURE} eq 'CODE') {
-            %configure_att = %{&{$self->{CONFIGURE}}};
-            _convert_compat_attrs(\%configure_att);
-            %$self = (%$self, %configure_att);
-        } else {
-            croak "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
-        }
-    }
+    my ($initial_att, $configure_att) = $self->extract_CONFIGURE;
 
     local @Parent = @Parent;    # Protect against non-local exits
     $self->extract_PARENT;
@@ -493,10 +480,24 @@ END
         File::Spec->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
-    $self->makefile_preamble(\@ARGV, \%initial_att, \%configure_att);
+    $self->makefile_preamble(\@ARGV, $initial_att, $configure_att);
     $self->generate_makefile;
 
     $self;
+}
+
+sub extract_CONFIGURE {
+    my ($self) = @_;
+    my %initial_att = %$self; # record initial attributes
+    my %configure_att;        # record &{$self->{CONFIGURE}} attributes
+    if (defined $self->{CONFIGURE}) {
+        croak "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n"
+            unless ref $self->{CONFIGURE} eq 'CODE';
+        %configure_att = %{&{$self->{CONFIGURE}}};
+        _convert_compat_attrs(\%configure_att);
+        while (my ($k, $v) = each %configure_att) { $self->{$k} = $v }
+    }
+    (\%initial_att, \%configure_att);
 }
 
 sub makefile_preamble {
