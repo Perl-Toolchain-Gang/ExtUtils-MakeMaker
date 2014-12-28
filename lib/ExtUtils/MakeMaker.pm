@@ -434,30 +434,30 @@ sub new {
     my %key2cmr;
     for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
         $self->{$key}      ||= {};
-	if (_has_cpan_meta_requirements) {
-	    my $cmr = CPAN::Meta::Requirements->from_string_hash(
-		$self->{$key},
-		{
-		  bad_version_hook => sub {
-		    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as 0";
-		    version->new(0);
-		  },
-		},
-	    );
-	    $self->{$key} = $cmr->as_string_hash;
-	    $key2cmr{$key} = $cmr;
-	} else {
-	    for my $module (sort keys %{ $self->{$key} }) {
-		my $version = $self->{$key}->{$module};
-		if (!defined($version) or !length($version)) {
-		    carp "Undefined requirement for $module treated as '0' (CPAN::Meta::Requirements not available)";
-		} else {
-		    next if $version =~ /^\d+(?:\.\d+(?:_\d+)*)?$/;
-		    carp "Unparsable version '$version' for prerequisite $module treated as 0 (CPAN::Meta::Requirements not available)";
-		}
-		$self->{$key}->{$module} = 0;
-	    }
-	}
+        if (_has_cpan_meta_requirements) {
+            my $cmr = CPAN::Meta::Requirements->from_string_hash(
+                $self->{$key},
+                {
+                  bad_version_hook => sub {
+                    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as 0";
+                    version->new(0);
+                  },
+                },
+            );
+            $self->{$key} = $cmr->as_string_hash;
+            $key2cmr{$key} = $cmr;
+        } else {
+            for my $module (sort keys %{ $self->{$key} }) {
+                my $version = $self->{$key}->{$module};
+                if (!defined($version) or !length($version)) {
+                    carp "Undefined requirement for $module treated as '0' (CPAN::Meta::Requirements not available)";
+                } else {
+                    next if $version =~ /^\d+(?:\.\d+(?:_\d+)*)?$/;
+                    carp "Unparsable version '$version' for prerequisite $module treated as 0 (CPAN::Meta::Requirements not available)";
+                }
+                $self->{$key}->{$module} = 0;
+            }
+        }
     }
 
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
@@ -529,18 +529,18 @@ END
     my %prereq2version;
     my $cmr;
     if (_has_cpan_meta_requirements) {
-	$cmr = CPAN::Meta::Requirements->new;
-	for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
-	    $cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
-	}
-	foreach my $prereq ($cmr->required_modules) {
-	    $prereq2version{$prereq} = $cmr->requirements_for_module($prereq);
-	}
+        $cmr = CPAN::Meta::Requirements->new;
+        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+            $cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
+        }
+        foreach my $prereq ($cmr->required_modules) {
+            $prereq2version{$prereq} = $cmr->requirements_for_module($prereq);
+        }
     } else {
-	for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
-	    next unless my $module2version = $self->{$key};
-	    $prereq2version{$_} = $module2version->{$_} for keys %$module2version;
-	}
+        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+            next unless my $module2version = $self->{$key};
+            $prereq2version{$_} = $module2version->{$_} for keys %$module2version;
+        }
     }
     foreach my $prereq (sort keys %prereq2version) {
         my $required_version = $prereq2version{$prereq};
@@ -576,10 +576,10 @@ END
             $unsatisfied{$prereq} = 'not installed';
         }
         elsif (
-	    $cmr
-		? !$cmr->accepts_module($prereq, $pr_version)
-		: $required_version > $pr_version
-	) {
+            $cmr
+                ? !$cmr->accepts_module($prereq, $pr_version)
+                : $required_version > $pr_version
+        ) {
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $required_version, ($pr_version || 'unknown version')
                   unless $self->{PREREQ_FATAL}
@@ -1115,64 +1115,28 @@ sub _run_hintfile {
 
 sub mv_all_methods {
     my($from,$to) = @_;
-
-    # Here you see the *current* list of methods that are overridable
-    # from Makefile.PL via MY:: subroutines. As of VERSION 5.07 I'm
-    # still trying to reduce the list to some reasonable minimum --
-    # because I want to make it easier for the user. A.K.
-
     local $SIG{__WARN__} = sub {
         # can't use 'no warnings redefined', 5.6 only
         warn @_ unless $_[0] =~ /^Subroutine .* redefined/
     };
     foreach my $method (@Overridable) {
-
-        # We cannot say "next" here. Nick might call MY->makeaperl
-        # which isn't defined right now
-
-        # Above statement was written at 4.23 time when Tk-b8 was
-        # around. As Tk-b9 only builds with 5.002something and MM 5 is
-        # standard, we try to enable the next line again. It was
-        # commented out until MM 5.23
-
         next unless defined &{"${from}::$method"};
+        no strict 'refs';   ## no critic
+        *{"${to}::$method"} = \&{"${from}::$method"};
+
+        # If we delete a method, then it will be undefined and cannot
+        # be called.  But as long as we have Makefile.PLs that rely on
+        # %MY:: being intact, we have to fill the hole with an
+        # inheriting method:
 
         {
-            no strict 'refs';   ## no critic
-            *{"${to}::$method"} = \&{"${from}::$method"};
-
-            # If we delete a method, then it will be undefined and cannot
-            # be called.  But as long as we have Makefile.PLs that rely on
-            # %MY:: being intact, we have to fill the hole with an
-            # inheriting method:
-
-            {
-                package MY;
-                my $super = "SUPER::".$method;
-                *{$method} = sub {
-                    shift->$super(@_);
-                };
-            }
+            package MY;
+            my $super = "SUPER::".$method;
+            *{$method} = sub {
+                shift->$super(@_);
+            };
         }
     }
-
-    # We have to clean out %INC also, because the current directory is
-    # changed frequently and Graham Barr prefers to get his version
-    # out of a History.pl file which is "required" so wouldn't get
-    # loaded again in another extension requiring a History.pl
-
-    # With perl5.002_01 the deletion of entries in %INC caused Tk-b11
-    # to core dump in the middle of a require statement. The required
-    # file was Tk/MMutil.pm.  The consequence is, we have to be
-    # extremely careful when we try to give perl a reason to reload a
-    # library with same name.  The workaround prefers to drop nothing
-    # from %INC and teach the writers not to use such libraries.
-
-#    my $inc;
-#    foreach $inc (keys %INC) {
-#       #warn "***$inc*** deleted";
-#       delete $INC{$inc};
-#    }
 }
 
 sub skipcheck {
