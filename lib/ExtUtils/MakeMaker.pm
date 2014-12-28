@@ -476,80 +476,7 @@ sub new {
     my %configure_att;         # record &{$self->{CONFIGURE}} attributes
     my(%initial_att) = %$self; # record initial attributes
 
-    my(%unsatisfied) = ();
-    my %prereq2version;
-    my $cmr;
-    if (_has_cpan_meta_requirements) {
-        $cmr = CPAN::Meta::Requirements->new;
-        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
-            $cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
-        }
-        foreach my $prereq ($cmr->required_modules) {
-            $prereq2version{$prereq} = $cmr->requirements_for_module($prereq);
-        }
-    } else {
-        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
-            next unless my $module2version = $self->{$key};
-            $prereq2version{$_} = $module2version->{$_} for keys %$module2version;
-        }
-    }
-    foreach my $prereq (sort keys %prereq2version) {
-        my $required_version = $prereq2version{$prereq};
-
-        my $pr_version = 0;
-        my $installed_file;
-
-        if ( $prereq eq 'perl' ) {
-          if ( defined $required_version && $required_version =~ /^v?[\d_\.]+$/
-               || $required_version !~ /^v?[\d_\.]+$/ ) {
-            require version;
-            my $normal = eval { version->new( $required_version ) };
-            $required_version = $normal if defined $normal;
-          }
-          $installed_file = $prereq;
-          $pr_version = $];
-        }
-        else {
-          $installed_file = MM->_installed_file_for_module($prereq);
-          $pr_version = MM->parse_version($installed_file) if $installed_file;
-          $pr_version = 0 if $pr_version eq 'undef';
-        }
-
-        # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
-        $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
-
-        if (!$installed_file) {
-            warn sprintf "Warning: prerequisite %s %s not found.\n",
-              $prereq, $required_version
-                   unless $self->{PREREQ_FATAL}
-                       or $ENV{PERL_CORE};
-
-            $unsatisfied{$prereq} = 'not installed';
-        }
-        elsif (
-            $cmr
-                ? !$cmr->accepts_module($prereq, $pr_version)
-                : $required_version > $pr_version
-        ) {
-            warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
-              $prereq, $required_version, ($pr_version || 'unknown version')
-                  unless $self->{PREREQ_FATAL}
-                       or $ENV{PERL_CORE};
-
-            $unsatisfied{$prereq} = $required_version || 'unknown version' ;
-        }
-    }
-
-    if (%unsatisfied && $self->{PREREQ_FATAL}) {
-        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"}
-                            sort { $a cmp $b } keys %unsatisfied;
-        die <<"END";
-MakeMaker FATAL: prerequisites not found.
-$failedprereqs
-
-Please install these modules first and rerun 'perl Makefile.PL'.
-END
-    }
+    my $unsatisfied_prereqs = $self->check_prereqs(\%key2cmr);
 
     if (defined $self->{CONFIGURE}) {
         if (ref $self->{CONFIGURE} eq 'CODE') {
@@ -623,9 +550,9 @@ END
     }
 
     # RT#91540 PREREQ_FATAL not recognized on command line
-    if (%unsatisfied && $self->{PREREQ_FATAL}) {
-        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"}
-                            sort { $a cmp $b } keys %unsatisfied;
+    if (%$unsatisfied_prereqs && $self->{PREREQ_FATAL}){
+        my $failedprereqs = join "\n", map {"    $_ $unsatisfied_prereqs->{$_}"}
+                            sort { $a cmp $b } keys %$unsatisfied_prereqs;
         die <<"END";
 MakeMaker FATAL: prerequisites not found.
 $failedprereqs
@@ -743,6 +670,78 @@ END
     push @{$self->{RESULT}}, "\n# End.";
 
     $self;
+}
+
+sub check_prereqs {
+    my ($self, $key2cmr) = @_;
+    my %unsatisfied = ();
+    my %prereq2version;
+    my $cmr;
+    if (_has_cpan_meta_requirements) {
+        $cmr = CPAN::Meta::Requirements->new;
+        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+            $cmr->add_requirements($key2cmr->{$key}) if $key2cmr->{$key};
+        }
+        foreach my $prereq ($cmr->required_modules) {
+            $prereq2version{$prereq} = $cmr->requirements_for_module($prereq);
+        }
+    } else {
+        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+            next unless my $module2version = $self->{$key};
+            $prereq2version{$_} = $module2version->{$_} for keys %$module2version;
+        }
+    }
+    foreach my $prereq (sort keys %prereq2version) {
+        my $required_version = $prereq2version{$prereq};
+        my $pr_version = 0;
+        my $installed_file;
+        if ( $prereq eq 'perl' ) {
+          if ( defined $required_version && $required_version =~ /^v?[\d_\.]+$/
+               || $required_version !~ /^v?[\d_\.]+$/ ) {
+            require version;
+            my $normal = eval { version->new( $required_version ) };
+            $required_version = $normal if defined $normal;
+          }
+          $installed_file = $prereq;
+          $pr_version = $];
+        }
+        else {
+          $installed_file = MM->_installed_file_for_module($prereq);
+          $pr_version = MM->parse_version($installed_file) if $installed_file;
+          $pr_version = 0 if $pr_version eq 'undef';
+        }
+        # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
+        $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
+        if (!$installed_file) {
+            warn sprintf "Warning: prerequisite %s %s not found.\n",
+              $prereq, $required_version
+                   unless $self->{PREREQ_FATAL}
+                       or $ENV{PERL_CORE};
+            $unsatisfied{$prereq} = 'not installed';
+        }
+        elsif (
+            $cmr
+                ? !$cmr->accepts_module($prereq, $pr_version)
+                : $required_version > $pr_version
+        ) {
+            warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
+              $prereq, $required_version, ($pr_version || 'unknown version')
+                  unless $self->{PREREQ_FATAL}
+                       or $ENV{PERL_CORE};
+            $unsatisfied{$prereq} = $required_version || 'unknown version' ;
+        }
+    }
+    if (%unsatisfied && $self->{PREREQ_FATAL}){
+        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"}
+                            sort { $a cmp $b } keys %unsatisfied;
+        die <<"END";
+MakeMaker FATAL: prerequisites not found.
+$failedprereqs
+
+Please install these modules first and rerun 'perl Makefile.PL'.
+END
+    }
+    \%unsatisfied;
 }
 
 sub check_min_perl_version {
