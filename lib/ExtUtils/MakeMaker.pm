@@ -18,6 +18,7 @@ our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
 our @Get_from_Config;   # referenced by MM_Unix
 our @MM_Sections;
+our @init_methods;
 our @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
@@ -323,41 +324,43 @@ sub full_setup {
     # MM_Sections are the sections we have to call explicitly
     # in Overridable we have subroutines that are used indirectly
 
+    @MM_Sections = qw(
+        post_initialize const_config constants platform_constants
+        tool_autosplit tool_xsubpp tools_other
 
-    @MM_Sections =
-        qw(
+        makemakerdflt
 
- post_initialize const_config constants platform_constants
- tool_autosplit tool_xsubpp tools_other
+        dist macro depend cflags const_loadlibs const_cccmd
+        post_constants
 
- makemakerdflt
+        pasthru
 
- dist macro depend cflags const_loadlibs const_cccmd
- post_constants
+        special_targets
+        c_o xs_c xs_o
+        top_targets blibdirs linkext dlsyms dynamic_bs dynamic
+        dynamic_lib static static_lib manifypods processPL
+        installbin subdirs
+        clean_subdirs clean realclean_subdirs realclean
+        metafile signature
+        dist_basics dist_core distdir dist_test dist_ci distmeta distsignature
+        install force perldepend makefile staticmake test ppd
+    ); # loses section ordering
 
- pasthru
-
- special_targets
- c_o xs_c xs_o
- top_targets blibdirs linkext dlsyms dynamic_bs dynamic
- dynamic_lib static static_lib manifypods processPL
- installbin subdirs
- clean_subdirs clean realclean_subdirs realclean
- metafile signature
- dist_basics dist_core distdir dist_test dist_ci distmeta distsignature
- install force perldepend makefile staticmake test ppd
-
-          ); # loses section ordering
+    @init_methods = qw(init_MAKE init_main);
+    my @Overridable_init = qw(
+        init_VERSION init_dist init_INST init_INSTALL init_DEST init_dirscan
+        init_PM init_MANPODS init_xs init_PERL init_DIRFILESEP init_linker
+    );
+    push @init_methods, @Overridable_init;
+    push @init_methods, qw(
+        init_ABSTRACT init_tools init_others init_platform init_PERM
+    );
 
     @Overridable = @MM_Sections;
     push @Overridable, qw[
-
- libscan makeaperl needs_linking
- subdir_x test_via_harness test_via_script
-
- init_VERSION init_dist init_INST init_INSTALL init_DEST init_dirscan
- init_PM init_MANPODS init_xs init_PERL init_DIRFILESEP init_linker
-                         ];
+        libscan makeaperl needs_linking
+        subdir_x test_via_harness test_via_script
+    ], @Overridable_init;
 
     push @MM_Sections, qw[
 
@@ -482,35 +485,16 @@ END
       unless $self->{NAME} =~ m!^[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*$!;
     ($self->{NAME_SYM} = $self->{NAME}) =~ s/\W+/_/g;
 
-    $self->init_MAKE;
-    $self->init_main;
-    $self->init_VERSION;
-    $self->init_dist;
-    $self->init_INST;
-    $self->init_INSTALL;
-    $self->init_DEST;
-    $self->init_dirscan;
-    $self->init_PM;
-    $self->init_MANPODS;
-    $self->init_xs;
-    $self->init_PERL;
-    $self->init_DIRFILESEP;
-    $self->init_linker;
-    $self->init_ABSTRACT;
+    for my $method (@init_methods) { $self->$method }
 
     $self->arch_check(
         $INC{'Config.pm'},
         File::Spec->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
-    $self->init_tools();
-    $self->init_others();
-    $self->init_platform();
-    $self->init_PERM();
     my($argv) = neatvalue(\@ARGV);
     $argv =~ s/^\[/(/;
     $argv =~ s/\]$/)/;
-
     push @{$self->{RESULT}}, <<END;
 # This Makefile is for the $self->{NAME} extension to perl.
 #
