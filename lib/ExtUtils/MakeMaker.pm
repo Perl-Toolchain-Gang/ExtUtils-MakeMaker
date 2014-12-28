@@ -621,11 +621,6 @@ END
         }
     }
 
-    # This is for old Makefiles written pre 5.00, will go away
-    if ( Carp::longmess("") =~ /runsubdirpl/s ){
-        carp("WARNING: Please rerun 'perl Makefile.PL' to regenerate your Makefiles\n");
-    }
-
     my $newclass = ++$PACKNAME;
     local @Parent = @Parent;    # Protect against non-local exits
     {
