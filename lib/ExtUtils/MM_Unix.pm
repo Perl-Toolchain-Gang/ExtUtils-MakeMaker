@@ -1451,7 +1451,10 @@ sub init_MAN3PODS {
     # To force inclusion, just name it "Configure.pod", or override
     # MAN3PODS
     foreach my $name (keys %manifypods) {
-	if ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) {
+	if (
+            ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) or
+            ( $name eq 'README.pod') # don't manify top-level README.pod
+        ) {
 	    delete $manifypods{$name};
 	    next;
 	}
