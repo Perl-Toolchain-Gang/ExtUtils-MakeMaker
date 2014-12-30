@@ -884,13 +884,13 @@ sub c_o {
     return '' unless $self->needs_linking();
     '
 .c$(OBJ_EXT) :
-	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).c
+	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).c /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
 
 .cpp$(OBJ_EXT) :
-	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).cpp
+	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).cpp /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
 
 .cxx$(OBJ_EXT) :
-	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).cxx
+	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).cxx /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
 
 ';
 }
@@ -918,12 +918,9 @@ Use MM[SK] macros, and VMS command line for C compiler.
 
 sub xs_o {	# many makes are too dumb to use xs_c then c_o
     my($self) = @_;
-    return '' unless $self->needs_linking();
-    '
-.xs$(OBJ_EXT) :
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs >$(MMS$TARGET_NAME).c
-	$(CCCMD) $(CCCDLFLAGS) $(MMS$TARGET_NAME).c
-';
+    my $text = $self->SUPER::xs_o;
+    $text =~ s#\$\*#\$(MMS\$TARGET_NAME)#g;
+    $text;
 }
 
 
@@ -1010,6 +1007,18 @@ $(BASEEXT).opt : Makefile.PL
 
     join('',@m);
 
+}
+
+
+=item xs_obj_opt
+
+Override to fixup -o flags.
+
+=cut
+
+sub xs_obj_opt {
+    my ($self, $output_file) = @_;
+    "/OBJECT=$output_file";
 }
 
 =item dynamic_lib (override)
