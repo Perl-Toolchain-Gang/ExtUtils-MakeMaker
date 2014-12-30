@@ -52,7 +52,7 @@ if( $BUILDING_AS_PACKAGE ) {
     # burden vendors with having to update everything.
     %Extra_Prereqs = (
         'CPAN::Meta'               => '2.143240', # compat with CMR 2.130
-        'CPAN::Meta::YAML'         => '0.002',
+        'CPAN::Meta::YAML'         => '0.011', # CM 2.143240 needs
         'ExtUtils::Command'        => '1.16',
         'ExtUtils::Install'        => '1.52',
         'ExtUtils::Manifest'       => '1.65',
