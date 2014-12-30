@@ -58,7 +58,7 @@ if( $BUILDING_AS_PACKAGE ) {
         'ExtUtils::Manifest'       => '1.65',
         'File::Temp'               => '0.22',
         'JSON::PP'                 => '2.27103',
-        'Parse::CPAN::Meta'        => '1.4400',
+        'Parse::CPAN::Meta'        => '1.4414', # required by above CPAN::Meta
         'Scalar::Util'             => '1.13',
         'version'                  => '0',
         'CPAN::Meta::Requirements' => '2.130', # updates to hooks et al
