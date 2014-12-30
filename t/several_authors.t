@@ -22,6 +22,7 @@ use File::Path;
 use File::Temp qw[tempdir];
 
 use ExtUtils::MakeMaker;
+my $CM = eval { require CPAN::Meta; };
 
 # avoid environment variables interfering with our make runs
 delete @ENV{qw(LIB MAKEFLAGS)};
@@ -112,14 +113,15 @@ note "ppd output"; {
 }
 
 
-note "META.yml output"; {
+note "META.yml output"; SKIP: {
+    skip 'Failed to load CPAN::Meta', 5 unless $CM;
     my $distdir  = 'Multiple-Authors-0.05';
     $distdir =~ s{\.}{_}g if $Is_VMS;
 
     my $meta_yml = "$distdir/META.yml";
     my $meta_json = "$distdir/META.json";
     my @make_out    = run(qq{$make metafile});
-    END { rmtree $distdir }
+    END { rmtree $distdir if defined $distdir }
 
     cmp_ok( $?, '==', 0, 'Make metafile exiting normally' ) || diag(@make_out);
 

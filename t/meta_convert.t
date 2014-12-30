@@ -6,7 +6,10 @@ BEGIN {
 
 use strict;
 use warnings;
-use Test::More 'no_plan';
+use Test::More;
+eval { require CPAN::Meta; };
+plan skip_all => 'Failed to load CPAN::Meta' if $@;
+plan 'no_plan';
 
 require ExtUtils::MM_Any;
 

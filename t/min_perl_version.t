@@ -21,6 +21,7 @@ use Test::More
 use File::Path;
 
 use ExtUtils::MakeMaker;
+my $CM = eval { require CPAN::Meta; };
 
 # avoid environment variables interfering with our make runs
 delete @ENV{qw(LIB MAKEFLAGS)};
@@ -147,6 +148,7 @@ note "PREREQ_PRINT output"; {
 
         package _Prereq::Print::WithMPV;          ## no critic
         our($PREREQ_PM, $BUILD_REQUIRES, $MIN_PERL_VERSION, $ERR);
+        $BUILD_REQUIRES = undef; # suppress "used only once"
         $ERR = '';
         eval {
             eval $prereq_out;                     ## no critic
@@ -194,14 +196,15 @@ note "ppd output"; {
 }
 
 
-note "META.yml output"; {
+note "META.yml output"; SKIP: {
+    skip 'Failed to load CPAN::Meta', 4 unless $CM;
     my $distdir  = 'Min-PerlVers-0.05';
     $distdir =~ s{\.}{_}g if $Is_VMS;
 
     my $meta_yml = "$distdir/META.yml";
     my $meta_json = "$distdir/META.json";
     my @make_out    = run(qq{$make metafile});
-    END { rmtree $distdir }
+    END { rmtree $distdir if defined $distdir }
 
     for my $case (
         ['META.yml', $meta_yml],
