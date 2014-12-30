@@ -8,9 +8,9 @@ use Test::More tests => 31;
 use Data::Dumper;
 use File::Temp;
 use Cwd;
-use Parse::CPAN::Meta;
 
 require ExtUtils::MM_Any;
+my $PCM = eval { require Parse::CPAN::Meta; };
 
 sub in_dir(&;$) {
     my $code = shift;
@@ -629,7 +629,7 @@ my $new_mm = sub {
 
 # Test _REQUIRES key priority over META_ADD
 
-{
+SKIP: {
     my $mm = $new_mm->(
         DISTNAME        => 'Foo-Bar',
         VERSION         => 1.23,
@@ -667,6 +667,8 @@ my $new_mm = sub {
 
 
     # Yes, this is all hard coded.
+    eval { require CPAN::Meta; };
+    skip 'Loading CPAN::Meta failed', 6 if $@;
     require CPAN::Meta;
     my $want_mymeta = {
         name            => 'ExtUtils-MakeMaker',
@@ -728,7 +730,7 @@ my $new_mm = sub {
               'MYMETA YAML data (BUILD_REQUIRES wins)';
 }
 
-{
+SKIP: {
     my $mm = $new_mm->(
         DISTNAME            => 'Foo-Bar',
         VERSION             => 1.23,
@@ -737,6 +739,8 @@ my $new_mm = sub {
         TEST_REQUIRES       => { "Fake::Module2" => 1.23 },
     );
 
+    eval { require CPAN::Meta; };
+    skip 'Loading CPAN::Meta failed', 5 if $@;
     my $meta = $mm->mymeta('t/META_for_testing.json');
     is($meta->{configure_requires}, undef, "no configure_requires in v2 META");
     is($meta->{build_requires}, undef, "no build_requires in v2 META");
@@ -759,7 +763,7 @@ my $new_mm = sub {
     );
 }
 
-note "CPAN::Meta bug using the module version instead of the meta spec version"; {
+note "CPAN::Meta bug using the module version instead of the meta spec version"; SKIP: {
     my $mm = $new_mm->(
         NAME      => 'GD::Barcode::Code93',
         AUTHOR    => 'Chris DiMartino',
@@ -771,6 +775,7 @@ note "CPAN::Meta bug using the module version instead of the meta spec version";
         VERSION   => '1.4',
     );
 
+    skip 'Loading Parse::CPAN::Meta failed', 5 unless $PCM;
     my $meta = $mm->mymeta("t/META_for_testing_tricky_version.yml");
     is $meta->{'meta-spec'}{version}, 2, "internally, our MYMETA struct is v2";
 
@@ -788,13 +793,14 @@ note "CPAN::Meta bug using the module version instead of the meta spec version";
 }
 
 
-note "A bad license string"; {
+note "A bad license string"; SKIP: {
     my $mm = $new_mm->(
         DISTNAME  => 'Foo::Bar',
         VERSION   => '1.4',
         LICENSE   => 'death and retribution',
     );
 
+    skip 'Loading Parse::CPAN::Meta failed', 2 unless $PCM;
     in_dir {
         my $meta = $mm->mymeta;
         $mm->write_mymeta($meta);
