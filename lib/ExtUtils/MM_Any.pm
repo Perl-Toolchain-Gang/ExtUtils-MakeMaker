@@ -20,6 +20,8 @@ my $Curdir  = __PACKAGE__->curdir;
 my $Rootdir = __PACKAGE__->rootdir;
 my $Updir   = __PACKAGE__->updir;
 
+my $METASPEC_URL = 'https://metacpan.org/pod/CPAN::Meta::Spec';
+my $METASPEC_V = 2;
 
 =head1 NAME
 
@@ -918,8 +920,8 @@ END
     my @man_cmds;
     foreach my $section (qw(1 3)) {
         my $pods = $self->{"MAN${section}PODS"};
-        my $p2m = sprintf <<CMD, $] > 5.008 ? " -u" : "";
-	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)%s
+        my $p2m = sprintf <<'CMD', $section, $] > 5.008 ? " -u" : "";
+	$(NOECHO) $(POD2MAN) --section=%s --perm_rw=$(PERM_RW)%s
 CMD
         push @man_cmds, $self->split_command($p2m, map {($_,$pods->{$_})} sort keys %$pods);
     }
@@ -957,34 +959,18 @@ metafile :
 	$(NOECHO) $(NOOP)
 MAKE_FRAG
 
-    my %metadata   = $self->metafile_data(
+    my $metadata   = $self->metafile_data(
         $self->{META_ADD}   || {},
         $self->{META_MERGE} || {},
     );
 
-    _fix_metadata_before_conversion( \%metadata );
-
-    # paper over validation issues, but still complain, necessary because
-    # there's no guarantee that the above will fix ALL errors
-    my $meta = eval { CPAN::Meta->create( \%metadata, { lazy_validation => 1 } ) };
-    warn $@ if $@ and
-               $@ !~ /encountered CODE.*, but JSON can only represent references to arrays or hashes/;
-
-    # use the original metadata straight if the conversion failed
-    # or if it can't be stringified.
-    if( !$meta                                                  ||
-        !eval { $meta->as_string( { version => "1.4" } ) }      ||
-        !eval { $meta->as_string }
-    )
-    {
-        $meta = bless \%metadata, 'CPAN::Meta';
-    }
+    my $meta = _fix_metadata_before_conversion( $metadata );
 
     my @write_metayml = $self->echo(
       $meta->as_string({version => "1.4"}), 'META_new.yml'
     );
     my @write_metajson = $self->echo(
-      $meta->as_string(), 'META_new.json'
+      $meta->as_string({version => "2.0"}), 'META_new.json'
     );
 
     my $metayml = join("\n\t", @write_metayml);
@@ -1032,11 +1018,18 @@ sub _fix_metadata_before_conversion {
         $metadata->{version} = '';
     }
 
-    my $validator = CPAN::Meta::Validator->new( $metadata );
-    return if $validator->is_valid;
-
+    my $validator2 = CPAN::Meta::Validator->new( $metadata );
+    my @errors;
+    push @errors, $validator2->errors if !$validator2->is_valid;
+    my $validator14 = CPAN::Meta::Validator->new(
+        {
+            %$metadata,
+            'meta-spec' => { version => 1.4 },
+        }
+    );
+    push @errors, $validator14->errors if !$validator14->is_valid;
     # fix non-camelcase custom resource keys (only other trick we know)
-    for my $error ( $validator->errors ) {
+    for my $error ( @errors ) {
         my ( $key ) = ( $error =~ /Custom resource '(.*)' must be in CamelCase./ );
         next if !$key;
 
@@ -1044,17 +1037,33 @@ sub _fix_metadata_before_conversion {
         ( my $new_key = $key ) =~ s/[^_a-zA-Z]//g;
 
         # if that doesn't work, uppercase first one
-        $new_key = ucfirst $new_key if !$validator->custom_1( $new_key );
+        $new_key = ucfirst $new_key if !$validator14->custom_1( $new_key );
 
         # copy to new key if that worked
         $metadata->{resources}{$new_key} = $metadata->{resources}{$key}
-          if $validator->custom_1( $new_key );
+          if $validator14->custom_1( $new_key );
 
         # and delete old one in any case
         delete $metadata->{resources}{$key};
     }
 
-    return;
+    # paper over validation issues, but still complain, necessary because
+    # there's no guarantee that the above will fix ALL errors
+    my $meta = eval { CPAN::Meta->create( $metadata, { lazy_validation => 1 } ) };
+    warn $@ if $@ and
+               $@ !~ /encountered CODE.*, but JSON can only represent references to arrays or hashes/;
+
+    # use the original metadata straight if the conversion failed
+    # or if it can't be stringified.
+    if( !$meta                                                  ||
+        !eval { $meta->as_string( { version => $METASPEC_V } ) }      ||
+        !eval { $meta->as_string }
+    )
+    {
+        $meta = bless $metadata, 'CPAN::Meta';
+    }
+
+    $meta;
 }
 
 
@@ -1095,10 +1104,10 @@ sub _hash_merge {
 
 =head3 metafile_data
 
-    my @metadata_pairs = $mm->metafile_data(\%meta_add, \%meta_merge);
+    my $metadata_hashref = $mm->metafile_data(\%meta_add, \%meta_merge);
 
 Returns the data which MakeMaker turns into the META.yml file 
-and the META.json file.
+and the META.json file. It is always in version 2.0 of the format.
 
 Values of %meta_add will overwrite any existing metadata in those
 keys.  %meta_merge will be merged with them.
@@ -1109,48 +1118,65 @@ sub metafile_data {
     my $self = shift;
     my($meta_add, $meta_merge) = @_;
 
+    $meta_add = {} unless $meta_add;
+    $meta_merge = {} unless $meta_merge;
+
+    my $version = _normalize_version($self->{VERSION});
+    my $release_status = ($version =~ /_/) ? 'unstable' : 'stable';
     my %meta = (
         # required
-        name         => $self->{DISTNAME},
-        version      => _normalize_version($self->{VERSION}),
         abstract     => $self->{ABSTRACT} || 'unknown',
-        license      => $self->{LICENSE} || 'unknown',
+        author       => defined($self->{AUTHOR}) ? $self->{AUTHOR} : ['unknown'],
         dynamic_config => 1,
+        generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
+        license      => $self->{LICENSE} || ['unknown'],
+        'meta-spec'  => {
+            url         => $METASPEC_URL,
+            version     => $METASPEC_V,
+        },
+        name         => $self->{DISTNAME},
+        release_status => $release_status,
+        version      => $version,
 
         # optional
-        distribution_type => $self->{PM} ? 'module' : 'script',
-
-        no_index     => {
-            directory   => [qw(t inc)]
-        },
-
-        generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
-        'meta-spec'  => {
-            url         => 'http://module-build.sourceforge.net/META-spec-v1.4.html',
-            version     => 1.4
-        },
+        no_index     => { directory => [qw(t inc)] },
     );
+    $self->_add_requirements_to_meta(\%meta);
 
-    # The author key is required and it takes a list.
-    $meta{author}   = defined $self->{AUTHOR}    ? $self->{AUTHOR} : [];
-
-    {
-      my $vers = _metaspec_version( $meta_add, $meta_merge );
-      my $method = $vers =~ m!^2!
-               ? '_add_requirements_to_meta_v2'
-               : '_add_requirements_to_meta_v1_4';
-      %meta = $self->$method( %meta );
+    # upgrade $meta_add and $meta_merge to 2.0 if needed, using
+    # our own function, which only knows about prereqs;
+    # CPAN::Meta::Converter adds all the mandatory fields like author,
+    # which we don't want.
+    for my $frag ($meta_add, $meta_merge) {
+        if (_metaspec_version($frag) !~ /^2/) {
+            # 1.x, do our best to upgrade
+            $frag->{prereqs}{configure}{requires} = delete $frag->{configure_requires}
+        	if $frag->{configure_requires};
+            $frag->{prereqs}{build}{requires} = delete $frag->{build_requires}
+        	if $frag->{build_requires};
+            $frag->{prereqs}{runtime}{requires} = delete $frag->{requires}
+        	if $frag->{requires};
+        }
     }
 
+    # if we upgraded a 1.x _ADD fragment, we gave it a prereqs key that
+    # will override all prereqs, which is more than the user asked for;
+    # instead, we'll go inside the prereqs and override all those
+    my $v1_add = _metaspec_version($meta_add) !~ /^2/;
     while( my($key, $val) = each %$meta_add ) {
-        $meta{$key} = $val;
+        if ($v1_add and $key eq 'prereqs') {
+            $meta{$key}{$_} = $val->{$_} for keys %$val;
+        } elsif ($key ne 'meta-spec') {
+            $meta{$key} = $val;
+        }
     }
 
     while( my($key, $val) = each %$meta_merge ) {
+        next if $key eq 'meta-spec';
         $self->_hash_merge(\%meta, $key, $val);
     }
 
-    return %meta;
+    return \%meta;
 }
 
 
@@ -1158,84 +1184,61 @@ sub metafile_data {
 
 =cut
 
+sub _add_requirements_to_meta {
+    my ( $self, $meta ) = @_;
+    # Check the original args so we can tell between the user setting it
+    # to an empty hash and it just being initialized.
+    $meta->{prereqs}{configure}{requires} = $self->{ARGS}{CONFIGURE_REQUIRES}
+        ? $self->{CONFIGURE_REQUIRES}
+        : { 'ExtUtils::MakeMaker' => 0, };
+    $meta->{prereqs}{build}{requires} = $self->{ARGS}{BUILD_REQUIRES}
+        ? $self->{BUILD_REQUIRES}
+        : { 'ExtUtils::MakeMaker' => 0, };
+    $meta->{prereqs}{test}{requires} = $self->{TEST_REQUIRES}
+        if $self->{ARGS}{TEST_REQUIRES};
+    $meta->{prereqs}{runtime}{requires} = $self->{PREREQ_PM}
+        if $self->{ARGS}{PREREQ_PM};
+    $meta->{prereqs}{runtime}{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
+        if $self->{MIN_PERL_VERSION};
+}
+
+# spec version of given fragment - if not given, assume 1.4
 sub _metaspec_version {
-  my ( $meta_add, $meta_merge ) = @_;
-  return $meta_add->{'meta-spec'}->{version}
-    if defined $meta_add->{'meta-spec'}
-       and defined $meta_add->{'meta-spec'}->{version};
-  return $meta_merge->{'meta-spec'}->{version}
-    if defined $meta_merge->{'meta-spec'}
-       and  defined $meta_merge->{'meta-spec'}->{version};
+  my ( $meta ) = @_;
+  return $meta->{'meta-spec'}->{version}
+    if defined $meta->{'meta-spec'}
+       and defined $meta->{'meta-spec'}->{version};
   return '1.4';
 }
 
 sub _add_requirements_to_meta_v1_4 {
-    my ( $self, %meta ) = @_;
-
+    my ( $self, $meta ) = @_;
     # Check the original args so we can tell between the user setting it
     # to an empty hash and it just being initialized.
     if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
-        $meta{configure_requires} = $self->{CONFIGURE_REQUIRES};
+        $meta->{configure_requires} = $self->{CONFIGURE_REQUIRES};
     } else {
-        $meta{configure_requires} = {
+        $meta->{configure_requires} = {
             'ExtUtils::MakeMaker'       => 0,
         };
     }
-
     if( $self->{ARGS}{BUILD_REQUIRES} ) {
-        $meta{build_requires} = $self->{BUILD_REQUIRES};
+        $meta->{build_requires} = $self->{BUILD_REQUIRES};
     } else {
-        $meta{build_requires} = {
+        $meta->{build_requires} = {
             'ExtUtils::MakeMaker'       => 0,
         };
     }
-
     if( $self->{ARGS}{TEST_REQUIRES} ) {
-        $meta{build_requires} = {
-          %{ $meta{build_requires} },
+        $meta->{build_requires} = {
+          %{ $meta->{build_requires} },
           %{ $self->{TEST_REQUIRES} },
         };
     }
-
-    $meta{requires} = $self->{PREREQ_PM}
+    $meta->{requires} = $self->{PREREQ_PM}
         if defined $self->{PREREQ_PM};
-    $meta{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
+    $meta->{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
         if $self->{MIN_PERL_VERSION};
-
-    return %meta;
-}
-
-sub _add_requirements_to_meta_v2 {
-    my ( $self, %meta ) = @_;
-
-    # Check the original args so we can tell between the user setting it
-    # to an empty hash and it just being initialized.
-    if( $self->{ARGS}{CONFIGURE_REQUIRES} ) {
-        $meta{prereqs}{configure}{requires} = $self->{CONFIGURE_REQUIRES};
-    } else {
-        $meta{prereqs}{configure}{requires} = {
-            'ExtUtils::MakeMaker'       => 0,
-        };
-    }
-
-    if( $self->{ARGS}{BUILD_REQUIRES} ) {
-        $meta{prereqs}{build}{requires} = $self->{BUILD_REQUIRES};
-    } else {
-        $meta{prereqs}{build}{requires} = {
-            'ExtUtils::MakeMaker'       => 0,
-        };
-    }
-
-    if( $self->{ARGS}{TEST_REQUIRES} ) {
-        $meta{prereqs}{test}{requires} = $self->{TEST_REQUIRES};
-    }
-
-    $meta{prereqs}{runtime}{requires} = $self->{PREREQ_PM}
-        if $self->{ARGS}{PREREQ_PM};
-    $meta{prereqs}{runtime}{requires}{perl} = _normalize_version($self->{MIN_PERL_VERSION})
-        if $self->{MIN_PERL_VERSION};
-
-    return %meta;
 }
 
 # Adapted from Module::Build::Base
@@ -1455,21 +1458,15 @@ sub mymeta {
     my $v2 = 1;
 
     unless ( $mymeta ) {
-        my @metadata = $self->metafile_data(
+        $mymeta = $self->metafile_data(
             $self->{META_ADD}   || {},
             $self->{META_MERGE} || {},
         );
-        $mymeta = {@metadata};
         $v2 = 0;
     }
 
     # Overwrite the non-configure dependency hashes
-
-    my $method = $v2
-               ? '_add_requirements_to_meta_v2'
-               : '_add_requirements_to_meta_v1_4';
-
-    $mymeta = { $self->$method( %$mymeta ) };
+    $self->_add_requirements_to_meta($mymeta);
 
     $mymeta->{dynamic_config} = 0;
 
@@ -1521,13 +1518,9 @@ sub write_mymeta {
 
     return unless _has_cpan_meta();
 
-    _fix_metadata_before_conversion( $mymeta );
+    my $meta_obj = _fix_metadata_before_conversion( $mymeta );
 
-    # this can still blow up
-    # not sure if i should just eval this and skip file creation if it
-    # blows up
-    my $meta_obj = CPAN::Meta->new( $mymeta, { lazy_validation => 1 } );
-    $meta_obj->save( 'MYMETA.json' );
+    $meta_obj->save( 'MYMETA.json', { version => "2.0" } );
     $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );
     return 1;
 }
