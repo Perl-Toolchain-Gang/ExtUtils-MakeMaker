@@ -9,7 +9,7 @@ use File::Basename;
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
-use ExtUtils::MakeMaker qw($Verbose);
+use ExtUtils::MakeMaker qw($Verbose write_file_via_tmp);
 
 use ExtUtils::MakeMaker::Config;
 
@@ -22,6 +22,7 @@ my $Updir   = __PACKAGE__->updir;
 
 my $METASPEC_URL = 'https://metacpan.org/pod/CPAN::Meta::Spec';
 my $METASPEC_V = 2;
+my $STASHDIR = '_eumm';
 
 =head1 NAME
 
@@ -341,6 +342,42 @@ sub _expand_macros {
 }
 
 
+=head3 make_type
+
+Returns a suitable string describing the type of makefile being written.
+
+=cut
+
+# override if this isn't suitable!
+sub make_type { return 'Unix-style'; }
+
+
+=head3 stashmeta
+
+    my @recipelines = $MM->stashmeta($text, $file);
+
+Generates a set of C<@recipelines> which will result in the literal
+C<$text> ending up in literal C<$file> when the recipe is executed. Call
+it once, with all the text you want in C<$file>. Make macros will not
+be expanded, so the locations will be fixed at configure-time, not
+at build-time.
+
+=cut
+
+sub stashmeta {
+    my($self, $text, $file) = @_;
+    -d $STASHDIR or die "$STASHDIR: $!" unless mkdir $STASHDIR;
+    my $stashfile = File::Spec->catfile($STASHDIR, $file);
+    write_file_via_tmp($stashfile, [ $text ]);
+    my $qlfile = $self->quote_literal($file);
+    my $qlstashfile = $self->quote_literal($stashfile);
+    (
+	sprintf('-$(NOECHO) $(RM_F) %s', $qlfile),
+	sprintf('-$(NOECHO) $(CP) %s %s', $qlstashfile, $qlfile),
+    );
+}
+
+
 =head3 echo
 
     my @commands = $MM->echo($text);
@@ -360,7 +397,7 @@ all C<$>.
 
 Example of use:
 
-    my $make = map "\t$_\n", $MM->echo($text, $file);
+    my $make = join '', map "\t$_\n", $MM->echo($text, $file);
 
 =cut
 
@@ -659,7 +696,7 @@ clean :: clean_subdirs
 ');
 
     my @files = sort values %{$self->{XS}}; # .c files from *.xs files
-    my @dirs  = qw(blib);
+    my @dirs  = qw(blib _eumm);
 
     # Normally these are all under blib but they might have been
     # redefined.
@@ -966,10 +1003,10 @@ MAKE_FRAG
 
     my $meta = _fix_metadata_before_conversion( $metadata );
 
-    my @write_metayml = $self->echo(
+    my @write_metayml = $self->stashmeta(
       $meta->as_string({version => "1.4"}), 'META_new.yml'
     );
-    my @write_metajson = $self->echo(
+    my @write_metajson = $self->stashmeta(
       $meta->as_string({version => "2.0"}), 'META_new.json'
     );
 

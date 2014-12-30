@@ -658,6 +658,20 @@ PERLTYPE = $self->{PERLTYPE}
 
 }
 
+=item make_type
+
+Returns a suitable string describing the type of makefile being written.
+
+=cut
+
+sub make_type {
+    my ($self) = @_;
+    my $make = $self->make;
+    $make = +( File::Spec->splitpath( $make ) )[-1];
+    $make =~ s!\.exe$!!i;
+    return "$make-style";
+}
+
 1;
 __END__
 

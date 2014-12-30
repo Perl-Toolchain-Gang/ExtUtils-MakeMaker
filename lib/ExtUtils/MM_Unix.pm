@@ -2988,21 +2988,19 @@ sub ppd {
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 
-    my $ppd_file = '$(DISTNAME).ppd';
+    my $ppd_file = "$self->{DISTNAME}.ppd";
 
-    my @ppd_cmds = $self->echo(<<'PPD_HTML', $ppd_file, { append => 0, allow_variables => 1 });
-<SOFTPKG NAME="$(DISTNAME)" VERSION="$(VERSION)">
-PPD_HTML
+    my @ppd_chunks = qq(<SOFTPKG NAME="$self->{DISTNAME}" VERSION="$self->{VERSION}">\n);
 
-    my $ppd_xml = sprintf <<'PPD_HTML', $abstract, $author;
+    push @ppd_chunks, sprintf <<'PPD_HTML', $abstract, $author;
     <ABSTRACT>%s</ABSTRACT>
     <AUTHOR>%s</AUTHOR>
 PPD_HTML
 
-    $ppd_xml .= "    <IMPLEMENTATION>\n";
+    push @ppd_chunks, "    <IMPLEMENTATION>\n";
     if ( $self->{MIN_PERL_VERSION} ) {
         my $min_perl_version = $self->_ppd_version($self->{MIN_PERL_VERSION});
-        $ppd_xml .= sprintf <<'PPD_PERLVERS', $min_perl_version;
+        push @ppd_chunks, sprintf <<'PPD_PERLVERS', $min_perl_version;
         <PERLCORE VERSION="%s" />
 PPD_PERLVERS
 
@@ -3022,7 +3020,7 @@ PPD_PERLVERS
         my %attrs = ( NAME => $name );
         $attrs{VERSION} = $version if $version;
         my $attrs = join " ", map { qq[$_="$attrs{$_}"] } sort keys %attrs;
-        $ppd_xml .= qq(        <REQUIRE $attrs />\n);
+        push @ppd_chunks, qq(        <REQUIRE $attrs />\n);
     }
 
     my $archname = $Config{archname};
@@ -3032,28 +3030,28 @@ PPD_PERLVERS
         # version that changes when binary compatibility may change
         $archname .= "-$Config{PERL_REVISION}.$Config{PERL_VERSION}";
     }
-    $ppd_xml .= sprintf <<'PPD_OUT', $archname;
+    push @ppd_chunks, sprintf <<'PPD_OUT', $archname;
         <ARCHITECTURE NAME="%s" />
 PPD_OUT
 
     if ($self->{PPM_INSTALL_SCRIPT}) {
         if ($self->{PPM_INSTALL_EXEC}) {
-            $ppd_xml .= sprintf qq{        <INSTALL EXEC="%s">%s</INSTALL>\n},
+            push @ppd_chunks, sprintf qq{        <INSTALL EXEC="%s">%s</INSTALL>\n},
                   $self->{PPM_INSTALL_EXEC}, $self->{PPM_INSTALL_SCRIPT};
         }
         else {
-            $ppd_xml .= sprintf qq{        <INSTALL>%s</INSTALL>\n},
+            push @ppd_chunks, sprintf qq{        <INSTALL>%s</INSTALL>\n},
                   $self->{PPM_INSTALL_SCRIPT};
         }
     }
 
     if ($self->{PPM_UNINSTALL_SCRIPT}) {
         if ($self->{PPM_UNINSTALL_EXEC}) {
-            $ppd_xml .= sprintf qq{        <UNINSTALL EXEC="%s">%s</UNINSTALL>\n},
+            push @ppd_chunks, sprintf qq{        <UNINSTALL EXEC="%s">%s</UNINSTALL>\n},
                   $self->{PPM_UNINSTALL_EXEC}, $self->{PPM_UNINSTALL_SCRIPT};
         }
         else {
-            $ppd_xml .= sprintf qq{        <UNINSTALL>%s</UNINSTALL>\n},
+            push @ppd_chunks, sprintf qq{        <UNINSTALL>%s</UNINSTALL>\n},
                   $self->{PPM_UNINSTALL_SCRIPT};
         }
     }
@@ -3061,13 +3059,13 @@ PPD_OUT
     my ($bin_location) = $self->{BINARY_LOCATION} || '';
     $bin_location =~ s/\\/\\\\/g;
 
-    $ppd_xml .= sprintf <<'PPD_XML', $bin_location;
+    push @ppd_chunks, sprintf <<'PPD_XML', $bin_location;
         <CODEBASE HREF="%s" />
     </IMPLEMENTATION>
 </SOFTPKG>
 PPD_XML
 
-    push @ppd_cmds, $self->echo($ppd_xml, $ppd_file, { append => 1 });
+    my @ppd_cmds = $self->stashmeta(join('', @ppd_chunks), $ppd_file);
 
     return sprintf <<'PPD_OUT', join "\n\t", @ppd_cmds;
 # Creates a PPD (Perl Package Description) for a binary distribution.
