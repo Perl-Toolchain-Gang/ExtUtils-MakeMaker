@@ -11,6 +11,7 @@ use Cwd;
 
 require ExtUtils::MM_Any;
 my $PCM = eval { require Parse::CPAN::Meta; };
+my $CM = eval { require CPAN::Meta; };
 
 sub in_dir(&;$) {
     my $code = shift;
@@ -667,8 +668,7 @@ SKIP: {
 
 
     # Yes, this is all hard coded.
-    eval { require CPAN::Meta; };
-    skip 'Loading CPAN::Meta failed', 6 if $@;
+    skip 'Loading CPAN::Meta failed', 6 unless $CM;
     require CPAN::Meta;
     my $want_mymeta = {
         name            => 'ExtUtils-MakeMaker',
@@ -739,8 +739,7 @@ SKIP: {
         TEST_REQUIRES       => { "Fake::Module2" => 1.23 },
     );
 
-    eval { require CPAN::Meta; };
-    skip 'Loading CPAN::Meta failed', 5 if $@;
+    skip 'Loading CPAN::Meta failed', 5 unless $CM;
     my $meta = $mm->mymeta('t/META_for_testing.json');
     is($meta->{configure_requires}, undef, "no configure_requires in v2 META");
     is($meta->{build_requires}, undef, "no build_requires in v2 META");
