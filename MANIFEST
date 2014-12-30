@@ -64,7 +64,6 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 my/bundles.pm
-NOTES
 README
 README.packaging
 t/00compile.t
