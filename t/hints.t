@@ -7,6 +7,7 @@ use lib 't/lib';
 
 use File::Temp qw[tempdir];
 my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir;
 use File::Spec;
 
