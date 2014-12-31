@@ -43,7 +43,7 @@ use Carp ();
 BEGIN {
   eval "use version ()"; ## no critic
   if ( my $err = $@ ) {
-    eval "use ExtUtils::MakeMaker::version" or die $err; ## no critic
+    eval "require ExtUtils::MakeMaker::version" or die $err; ## no critic
   }
 }
 
