@@ -16,7 +16,6 @@ bundled/ExtUtils-Install/ExtUtils/Packlist.pm
 bundled/ExtUtils-Manifest/ExtUtils/Manifest.pm
 bundled/ExtUtils-Manifest/ExtUtils/MANIFEST.SKIP
 bundled/File-Temp/File/Temp.pm
-bundled/JSON-PP-Compat5006/JSON/PP/Compat5006.pm
 bundled/JSON-PP/JSON/PP.pm
 bundled/JSON-PP/JSON/PP/Boolean.pm
 bundled/Parse-CPAN-Meta/Parse/CPAN/Meta.pm

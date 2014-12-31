@@ -44,13 +44,14 @@ my %special_dist = (
         print "Using included version of Scalar::Util ($inc_version) because it is not already installed.\n";
         return 1;
     },
-    "json-pp-compat5006" => sub {
-        # Only required by JSON::PP on perls < 5.008
-        return unless $] < 5.008;
+    "cpan-meta" => sub {
+        # Only for perls > 5.008
+        return if $] < 5.008;
         &should_use_dist;
     },
 );
 
+$special_dist{"parse-cpan-meta"} = $special_dist{"cpan-meta-yaml"} = $special_dist{"json-pp"} = $special_dist{"cpan-meta"};
 
 sub add_bundles_to_inc {
     opendir my $dh, $bundle_dir or die "Can't open bundles directory: $!";
