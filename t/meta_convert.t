@@ -11,6 +11,7 @@ use File::Temp qw[tempdir];
 require ExtUtils::MM_Any;
 
 my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir or die "chdir $tmpdir: $!";
 
 my $METAJSON = File::Spec->catfile('_eumm', 'META_new.json');

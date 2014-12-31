@@ -11,15 +11,14 @@ use MakeMaker::Test::Utils;
 use Config;
 
 use File::Temp qw[tempdir];
-use File::Spec;
+use Cwd;
 use ExtUtils::MM;
 # this is to avoid MM->new overwriting _eumm in top dir
-my $tempdir = tempdir(DIR => File::Spec->curdir, CLEANUP => 1);
+my $tempdir = tempdir(DIR => getcwd, CLEANUP => 1);
 chdir $tempdir;
 my $typemap = 'type map';
 $typemap =~ s/ //g unless MM->new({NAME=>'name', NORECURS=>1})->can_dep_space;
 chdir File::Spec->updir;
-undef $tempdir;
 
 my %Files = (
              'XS-Test/lib/XS/Test.pm'     => <<'END',

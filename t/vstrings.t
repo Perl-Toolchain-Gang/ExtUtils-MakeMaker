@@ -20,6 +20,7 @@ use Test::More;
 use ExtUtils::MakeMaker;
 
 my $tmpdir = tempdir( DIR => '.', CLEANUP => 1 );
+use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir;
 
 my $UNDEFRE = qr/Undefined requirement .* treated as '0'/;

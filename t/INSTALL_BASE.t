@@ -32,6 +32,7 @@ perl_lib; # sets $ENV{PERL5LIB} relative to t/
 
 use File::Temp qw[tempdir];
 my $tmpdir = tempdir( DIR => '../t', CLEANUP => $CLEANUP );
+use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir;
 
 my $SPACEDIR = 'space dir';
