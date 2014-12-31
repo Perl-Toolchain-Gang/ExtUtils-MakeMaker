@@ -503,6 +503,9 @@ And of course a very basic test:
 
 This tip has been brought to you by Nick Ing-Simmons and Stas Bekman.
 
+An alternative way to achieve this can be seen in L<Gtk2::CodeGen>
+and L<Glib::CodeGen>.
+
 =back
 
 =head1 DESIGN

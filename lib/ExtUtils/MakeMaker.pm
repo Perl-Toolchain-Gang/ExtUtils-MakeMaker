@@ -2524,23 +2524,22 @@ Defining PM in the Makefile.PL will override PMLIBDIRS.
 A filter program, in the traditional Unix sense (input from stdin, output
 to stdout) that is passed on each .pm file during the build (in the
 pm_to_blib() phase).  It is empty by default, meaning no filtering is done.
+You could use:
 
-Great care is necessary when defining the command if quoting needs to be
-done.  For instance, you would need to say:
+  PM_FILTER => 'perl -ne "print unless /^\\#/"',
 
-  {'PM_FILTER' => 'grep -v \\"^\\#\\"'}
+to remove all the leading comments on the fly during the build.  In order
+to be as portable as possible, please consider using a Perl one-liner
+rather than Unix (or other) utilities, as above.  The # is escaped for
+the Makefile, since what is going to be generated will then be:
 
-to remove all the leading comments on the fly during the build.  The
-extra \\ are necessary, unfortunately, because this variable is interpolated
-within the context of a Perl program built on the command line, and double
-quotes are what is used with the -e switch to build that command line.  The
-# is escaped for the Makefile, since what is going to be generated will then
-be:
+  PM_FILTER = perl -ne "print unless /^\#/"
 
-  PM_FILTER = grep -v \"^\#\"
-
-Without the \\ before the #, we'd have the start of a Makefile comment,
+Without the \ before the #, we'd have the start of a Makefile comment,
 and the macro would be incorrectly defined.
+
+You will almost certainly be better off using the C<PL_FILES> system,
+instead. See above, or the L<ExtUtils::MakeMaker::FAQ> entry.
 
 =item POLLUTE
 
