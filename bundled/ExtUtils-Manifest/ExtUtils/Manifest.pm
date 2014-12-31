@@ -5,12 +5,12 @@ use Config;
 use File::Basename;
 use File::Copy 'copy';
 use File::Find;
-use File::Spec;
+use File::Spec 0.8;
 use Carp;
 use strict;
 use warnings;
 
-our $VERSION = '1.65';
+our $VERSION = '1.70';
 our @ISA = ('Exporter');
 our @EXPORT_OK = qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
@@ -62,6 +62,10 @@ our $DEFAULT_MSKIP = File::Spec->catfile( dirname(__FILE__), "$MANIFEST.SKIP" );
 =head1 NAME
 
 ExtUtils::Manifest - utilities to write and check a MANIFEST file
+
+=head1 VERSION
+
+version 1.70
 
 =head1 SYNOPSIS
 
@@ -195,7 +199,7 @@ sub manifind {
     # $File::Find::name is unavailable.
     # Also, it's okay to use / here, because MANIFEST files use Unix-style
     # paths.
-    find({wanted => $wanted},
+    find({wanted => $wanted, follow_fast => 1},
 	 $Is_MacOS ? ":" : ".");
 
     return $found;
@@ -354,7 +358,7 @@ sub maniread {
 
         # filename may contain spaces if enclosed in ''
         # (in which case, \\ and \' are escapes)
-        if (($file, $comment) = /^'(\\[\\']|.+)+'\s*(.*)/) {
+        if (($file, $comment) = /^'((?:\\[\\']|.+)+)'\s*(.*)/) {
             $file =~ s/\\([\\'])/$1/g;
         }
         else {
@@ -893,9 +897,14 @@ L<ExtUtils::MakeMaker> which has handy targets for most of the functionality.
 
 Andreas Koenig C<andreas.koenig@anima.de>
 
-Maintained by Michael G Schwern C<schwern@pobox.com> within the
-ExtUtils-MakeMaker package and, as a separate CPAN package, by
-Randy Kobes C<r.kobes@uwinnipeg.ca>.
+Currently maintained by the Perl Toolchain Gang.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1996- by Andreas Koenig.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
 
