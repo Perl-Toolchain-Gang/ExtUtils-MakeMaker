@@ -372,8 +372,8 @@ sub stashmeta {
     my $qlfile = $self->quote_literal($file);
     my $qlstashfile = $self->quote_literal($stashfile);
     (
-	sprintf('-$(NOECHO) $(RM_F) %s', $qlfile),
-	sprintf('-$(NOECHO) $(CP) %s %s', $qlstashfile, $qlfile),
+        sprintf('-$(NOECHO) $(RM_F) %s', $qlfile),
+        sprintf('-$(NOECHO) $(CP) %s %s', $qlstashfile, $qlfile),
     );
 }
 
@@ -1001,7 +1001,7 @@ MAKE_FRAG
         $self->{META_MERGE} || {},
     );
 
-    my $meta = _fix_metadata_before_conversion( $metadata );
+    my $meta = $self->_fix_metadata_before_conversion( $metadata );
 
     my @write_metayml = $self->stashmeta(
       $meta->as_string({version => "1.4"}), 'META_new.yml'
@@ -1028,7 +1028,7 @@ MAKE_FRAG
 
 =head3 _fix_metadata_before_conversion
 
-    _fix_metadata_before_conversion( \%metadata );
+    $mm->_fix_metadata_before_conversion( \%metadata );
 
 Fixes errors in the metadata before it's handed off to CPAN::Meta for
 conversion. This hopefully results in something that can be used further
@@ -1039,7 +1039,7 @@ on, no guarantee is made though.
 =cut
 
 sub _fix_metadata_before_conversion {
-    my ( $metadata ) = @_;
+    my ( $self, $metadata ) = @_;
 
     # we should never be called unless this already passed but
     # prefer to be defensive in case somebody else calls this
@@ -1048,7 +1048,6 @@ sub _fix_metadata_before_conversion {
 
     my $bad_version = $metadata->{version} &&
                       !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
-
     # just delete all invalid versions
     if( $bad_version ) {
         warn "Can't parse version '$metadata->{version}'\n";
@@ -1095,9 +1094,15 @@ sub _fix_metadata_before_conversion {
     if( !$meta                                                  ||
         !eval { $meta->as_string( { version => $METASPEC_V } ) }      ||
         !eval { $meta->as_string }
-    )
-    {
+    ) {
         $meta = bless $metadata, 'CPAN::Meta';
+    }
+
+    my $now_license = $meta->as_struct({ version => 2 })->{license};
+    if ($self->{LICENSE} and $self->{LICENSE} ne 'unknown' and
+        @{$now_license} == 1 and $now_license->[0] eq 'unknown'
+    ) {
+        warn "Invalid LICENSE value '$self->{LICENSE}' ignored\n";
     }
 
     $meta;
@@ -1166,7 +1171,7 @@ sub metafile_data {
         author       => defined($self->{AUTHOR}) ? $self->{AUTHOR} : ['unknown'],
         dynamic_config => 1,
         generated_by => "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
-        license      => $self->{LICENSE} || ['unknown'],
+        license      => [ $self->{LICENSE} || 'unknown' ],
         'meta-spec'  => {
             url         => $METASPEC_URL,
             version     => $METASPEC_V,
@@ -1188,11 +1193,11 @@ sub metafile_data {
         if (_metaspec_version($frag) !~ /^2/) {
             # 1.x, do our best to upgrade
             $frag->{prereqs}{configure}{requires} = delete $frag->{configure_requires}
-        	if $frag->{configure_requires};
+                if $frag->{configure_requires};
             $frag->{prereqs}{build}{requires} = delete $frag->{build_requires}
-        	if $frag->{build_requires};
+                if $frag->{build_requires};
             $frag->{prereqs}{runtime}{requires} = delete $frag->{requires}
-        	if $frag->{requires};
+                if $frag->{requires};
         }
     }
 
@@ -1555,7 +1560,7 @@ sub write_mymeta {
 
     return unless _has_cpan_meta();
 
-    my $meta_obj = _fix_metadata_before_conversion( $mymeta );
+    my $meta_obj = $self->_fix_metadata_before_conversion( $mymeta );
 
     $meta_obj->save( 'MYMETA.json', { version => "2.0" } );
     $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );

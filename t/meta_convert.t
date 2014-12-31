@@ -72,6 +72,16 @@ my @DATA = (
         "version object in provides",
         qr/['"]?version['"]?\s*:\s*['"]v1\.2\.3['"]/,
     ],
+    [
+        [
+            DISTNAME   => 'Bad::License',
+            VERSION    => '2.34',
+            LICENSE   => 'death and retribution',
+        ],
+        qr/Invalid LICENSE value/,
+        "Bad licence warns",
+        qr/['"]?version['"]?\s*:\s*['"]2\.34['"]/,
+    ],
 );
 
 plan tests => 3 * @DATA;

@@ -4,7 +4,6 @@ BEGIN {
 
 use strict;
 use Test::More tests => 31;
-
 use Data::Dumper;
 use File::Temp;
 use Cwd;
@@ -16,39 +15,30 @@ my $CM = eval { require CPAN::Meta; };
 sub in_dir(&;$) {
     my $code = shift;
     my $dir = shift || File::Temp->newdir;
-
     # chdir to the new directory
     my $orig_dir = cwd();
     chdir $dir or die "Can't chdir to $dir: $!";
-
     # Run the code, but trap the error so we can chdir back
     my $return;
     my $ok = eval { $return = $code->(); 1; };
     my $err = $@;
-
     # chdir back
     chdir $orig_dir or die "Can't chdir to $orig_dir: $!";
-
     # rethrow if necessary
     die $err unless $ok;
-
     return $return;
 }
 
 sub mymeta_ok {
     my($have, $want, $name) = @_;
-
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-
     my $have_gen = delete $have->{generated_by};
     my $want_gen = delete $want->{generated_by};
     my $have_url = delete $have->{'meta-spec'}->{url};
     my $want_url = delete $want->{'meta-spec'}->{url};
-
     is_deeply $have, $want, $name;
     like $have_gen, qr{CPAN::Meta}, "CPAN::Meta mentioned in the generated_by";
     like $have_url, qr{CPAN::Meta::Spec}, "CPAN::Meta::Spec mentioned in meta-spec URL";
-
     return;
 }
 
@@ -109,10 +99,7 @@ my @GENERIC_OUT = (
         DISTNAME        => 'Foo-Bar',
         VERSION         => 1.23,
         AUTHOR          => ['Some Guy'],
-        PREREQ_PM       => {
-            Foo                 => 2.34,
-            Bar                 => 4.56,
-        },
+        PREREQ_PM       => { Foo => 2.34, Bar => 4.56, },
     );
     is_deeply $mm->metafile_data(
         {
@@ -336,11 +323,9 @@ SKIP: {
         generated_by => "ExtUtils::MakeMaker version 6.5707, CPAN::Meta::Converter version 2.110580",
         @METASPEC20,
     };
-
     mymeta_ok $mm->mymeta("t/META_for_testing.json"),
               $want_mymeta,
               'MYMETA JSON data (BUILD_REQUIRES wins)';
-
     mymeta_ok $mm->mymeta("t/META_for_testing.yml"),
               $want_mymeta,
               'MYMETA YAML data (BUILD_REQUIRES wins)';
@@ -353,7 +338,6 @@ SKIP: {
         BUILD_REQUIRES      => { "Fake::Module1" => 1.01 },
         TEST_REQUIRES       => { "Fake::Module2" => 1.23 },
     );
-
     skip 'Loading CPAN::Meta failed', 5 unless $CM;
     my $meta = $mm->mymeta('t/META_for_testing.json');
     is($meta->{configure_requires}, undef, "no configure_requires in v2 META");
@@ -387,7 +371,6 @@ SKIP: {
         },
         VERSION   => '1.4',
     );
-
     skip 'Loading Parse::CPAN::Meta failed', 5 unless $PCM;
     my $meta = $mm->mymeta("t/META_for_testing_tricky_version.yml");
     is $meta->{'meta-spec'}{version}, 2, "internally, our MYMETA struct is v2";
@@ -402,18 +385,19 @@ SKIP: {
     };
 }
 
-
 note "A bad license string";
 SKIP: {
+    skip 'Loading Parse::CPAN::Meta failed', 2 unless $PCM;
     my $mm = $new_mm->(
         @GENERIC_IN,
         LICENSE   => 'death and retribution',
     );
-
-    skip 'Loading Parse::CPAN::Meta failed', 2 unless $PCM;
     in_dir {
         my $meta = $mm->mymeta;
-        $mm->write_mymeta($meta);
+        {
+            local $SIG{__WARN__} = sub {}; # suppress "Invalid" warning
+            $mm->write_mymeta($meta);
+        }
         my $meta_yml = Parse::CPAN::Meta->load_file("MYMETA.yml");
         is $meta_yml->{license}, "unknown", "in yaml";
         my $meta_json = Parse::CPAN::Meta->load_file("MYMETA.json");
