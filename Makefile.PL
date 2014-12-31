@@ -104,8 +104,10 @@ my $MM = WriteMakefile(
 
     META_MERGE => {
         no_index => {
-            package   => [ 'DynaLoader', 'in' ],    # "in" is a PAUSE misparse.
-            directory => [ 'bundled', 'my' ],
+            # Module::Metadata is inferring version from $version::VERSION
+            # "in" is a PAUSE misparse.
+            package   => [ qw(DynaLoader in version) ],
+            directory => [ qw(bundled my) ],
         },
         resources => {
             license     => 'http://dev.perl.org/licenses/',
