@@ -461,12 +461,7 @@ sub new {
     local @Parent = @Parent;    # Protect against non-local exits
     $self->extract_PARENT;
 
-    if ($self->{PARENT}) {
-        my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
-        $self->parse_args(@fm) if @fm;
-    } else {
-        $self->parse_args(_shellwords($ENV{PERL_MM_OPT} || ''), @ARGV);
-    }
+    $self->extract_ARGV(\@ARGV);
 
     # RT#91540 PREREQ_FATAL not recognized on command line
     if (%$unsatisfied_prereqs && $self->{PREREQ_FATAL}){
@@ -570,6 +565,16 @@ END
     push @{$self->{RESULT}}, "\n# End.";
 
     $self;
+}
+
+sub extract_ARGV {
+    my ($self, $argvref) = @_;
+    if ($self->{PARENT}) {
+        my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
+        $self->parse_args(@fm) if @fm;
+    } else {
+        $self->parse_args(_shellwords($ENV{PERL_MM_OPT} || ''), @ARGV);
+    }
 }
 
 sub extract_PARENT {
