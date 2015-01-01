@@ -24,6 +24,7 @@ my @Prepend_parent;
 my %Recognized_Att_Keys;
 our %macro_fsentity; # whether a macro is a filesystem name
 our %macro_dep; # whether a macro is a dependency
+my @children_skip;
 
 our $VERSION = '7.05_07';
 $VERSION = eval $VERSION;  ## no critic [BuiltinFunctions::ProhibitStringyEval]
@@ -405,6 +406,11 @@ sub full_setup {
            MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
            PERL FULLPERL
     );
+
+    # in generate_makefile - EUMM's with a PARENT skip these sections
+    @children_skip = qw(
+        install dist dist_basics dist_core distdir dist_test dist_ci
+    );
 }
 
 sub _has_cpan_meta_requirements {
@@ -488,44 +494,7 @@ END
     );
 
     $self->makefile_preamble(\@ARGV, \%initial_att, \%configure_att);
-
-    # turn the SKIP array into a SKIPHASH hash
-    for my $skip (@{$self->{SKIP} || []}) {
-        $self->{SKIPHASH}{$skip} = 1;
-    }
-    delete $self->{SKIP}; # free memory
-    if ($self->{PARENT}) {
-        for (qw/install dist dist_basics dist_core distdir dist_test dist_ci/) {
-            $self->{SKIPHASH}{$_} = 1;
-        }
-    }
-
-    # We run all the subdirectories now. They don't have much to query
-    # from the parent, but the parent has to query them: if they need linking!
-    unless ($self->{NORECURS}) {
-        $self->eval_in_subdirs if @{$self->{DIR}};
-    }
-
-    foreach my $section ( @MM_Sections ) {
-        # Support for new foo_target() methods.
-        my $method = $section;
-        $method .= '_target' unless $self->can($method);
-
-        print "Processing Makefile '$section' section\n" if ($Verbose >= 2);
-        my($skipit) = $self->skipsection($section);
-        if ($skipit) {
-            push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";
-        } else {
-            my(%a) = %{$self->{$section} || {}};
-            push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
-            push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
-            push @{$self->{RESULT}}, $self->maketext_filter(
-                $self->$method( %a )
-            );
-        }
-    }
-
-    push @{$self->{RESULT}}, "\n# End.";
+    $self->generate_makefile;
 
     $self;
 }
@@ -573,6 +542,34 @@ sub extract_ARGV {
     } else {
         $self->parse_args(_shellwords($ENV{PERL_MM_OPT} || ''), @ARGV);
     }
+}
+
+sub generate_makefile {
+    my ($self) = @_;
+    # turn the SKIP array into a SKIPHASH hash
+    $self->{SKIPHASH}{$_} = 1 for @{$self->{SKIP} || []};
+    delete $self->{SKIP}; # free memory
+    if ($self->{PARENT}) { $self->{SKIPHASH}{$_} = 1 for @children_skip }
+    # We run all the subdirectories now. They don't have much to query
+    # from the parent, but the parent has to query them: if they need linking!
+    $self->eval_in_subdirs if @{$self->{DIR}} and not $self->{NORECURS};
+    foreach my $section ( @MM_Sections ) {
+        print "Processing Makefile '$section' section\n" if ($Verbose >= 2);
+        if ($self->skipsection($section)){
+            push @{$self->{RESULT}}, "\n# --- MakeMaker $section section skipped.";
+        } else {
+            my(%a) = %{$self->{$section} || {}};
+            push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
+            push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
+            # Support new foo_target() methods.
+            my $method = $section;
+            $method .= '_target' unless $self->can($method);
+            push @{$self->{RESULT}}, $self->maketext_filter(
+                $self->$method( %a )
+            );
+        }
+    }
+    push @{$self->{RESULT}}, "\n# End.";
 }
 
 sub extract_PARENT {
