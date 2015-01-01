@@ -487,44 +487,7 @@ END
         File::Spec->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
-    my($argv) = neatvalue(\@ARGV);
-    $argv =~ s/^\[/(/;
-    $argv =~ s/\]$/)/;
-    push @{$self->{RESULT}}, <<END;
-# This Makefile is for the $self->{NAME} extension to perl.
-#
-# It was generated automatically by MakeMaker version
-# $VERSION (Revision: $Revision) from the contents of
-# Makefile.PL. Don't edit this file, edit Makefile.PL instead.
-#
-#       ANY CHANGES MADE HERE WILL BE LOST!
-#
-#   MakeMaker ARGV: $argv
-#
-END
-
-    push @{$self->{RESULT}}, $self->_MakeMaker_Parameters_section(\%initial_att);
-
-    if (defined $self->{CONFIGURE}) {
-       push @{$self->{RESULT}}, <<END;
-
-#   MakeMaker 'CONFIGURE' Parameters:
-END
-        if (scalar(keys %configure_att) > 0) {
-            foreach my $key (sort keys %configure_att) {
-               next if $key eq 'ARGS';
-               my($v) = neatvalue($configure_att{$key});
-               $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
-               $v =~ tr/\n/ /s;
-               push @{$self->{RESULT}}, "#     $key => $v";
-            }
-        }
-        else
-        {
-           push @{$self->{RESULT}}, "# no values returned";
-        }
-        undef %configure_att;  # free memory
-    }
+    $self->makefile_preamble(\@ARGV, \%initial_att, \%configure_att);
 
     # turn the SKIP array into a SKIPHASH hash
     for my $skip (@{$self->{SKIP} || []}) {
@@ -565,6 +528,41 @@ END
     push @{$self->{RESULT}}, "\n# End.";
 
     $self;
+}
+
+sub makefile_preamble {
+    my ($self, $argvref, $initial_att, $configure_att) = @_;
+    my ($argv) = neatvalue($argvref);
+    $argv =~ s/^\[/(/;
+    $argv =~ s/\]$/)/;
+    my $results = $self->{RESULT}; # cache, plus looks nicer
+    push @$results, <<END;
+# This Makefile is for the $self->{NAME} extension to perl.
+#
+# It was generated automatically by MakeMaker version
+# $VERSION (Revision: $Revision) from the contents of
+# Makefile.PL. Don't edit this file, edit Makefile.PL instead.
+#
+#       ANY CHANGES MADE HERE WILL BE LOST!
+#
+#   MakeMaker ARGV: $argv
+#
+END
+    push @$results, $self->_MakeMaker_Parameters_section($initial_att);
+    if (defined $self->{CONFIGURE}) {
+        push @$results, "\n#   MakeMaker 'CONFIGURE' Parameters:\n";
+        if (scalar(keys %$configure_att) > 0) {
+            foreach my $key (sort keys %$configure_att) {
+               next if $key eq 'ARGS';
+               my($v) = neatvalue($configure_att->{$key});
+               $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
+               $v =~ tr/\n/ /s;
+               push @$results, "#     $key => $v";
+            }
+        } else {
+           push @$results, "# no values returned";
+        }
+    }
 }
 
 sub extract_ARGV {
