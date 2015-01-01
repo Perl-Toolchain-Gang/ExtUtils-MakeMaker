@@ -432,44 +432,35 @@ sub new {
     } else {
         $self = {};
     }
-
     setup_MY($self, ++$PACKNAME); # blesses
 
-    # Cleanup all the module requirement bits
-    my $cmrstash = $self->clean_versions;
-
-    $self->_PREREQ_PRINT if "@ARGV" =~ /\bPREREQ_PRINT\b/;
-    $self->_PRINT_PREREQ if "@ARGV" =~ /\bPRINT_PREREQ\b/; # RedHatism.
-
-    if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}) {
-        check_manifest();
-    }
-
     $self->extract_hints;
-
-    $self->check_min_perl_version;
-    my $unsatisfied_prereqs = $self->check_prereqs($cmrstash);
-    my ($initial_att, $configure_att) = $self->extract_CONFIGURE;
-
     local @Parent = @Parent;    # Protect against non-local exits
     $self->extract_PARENT;
-
     $self->extract_ARGV(\@ARGV);
-
-    $self->check_PREREQ_FATAL($unsatisfied_prereqs); # after ARGV processed
-
     $self->{NAME} ||= $self->guess_name;
     warn "Warning: NAME must be a package name\n"
       unless $self->{NAME} =~ m!^[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*$!;
     ($self->{NAME_SYM} = $self->{NAME}) =~ s/\W+/_/g;
 
-    for my $method (@init_methods) { $self->$method }
-
+    # Cleanup all the module requirement bits
+    my $cmrstash = $self->clean_versions;
+    $self->_PREREQ_PRINT if "@ARGV" =~ /\bPREREQ_PRINT\b/;
+    $self->_PRINT_PREREQ if "@ARGV" =~ /\bPRINT_PREREQ\b/; # RedHatism.
+    if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}) {
+        check_manifest();
+    }
+    $self->check_min_perl_version;
+    my $unsatisfied_prereqs = $self->check_prereqs($cmrstash);
+    $self->check_PREREQ_FATAL($unsatisfied_prereqs); # after ARGV processed
+    # CONFIGURE after PREREQ_FATAL so can rely on prereqs being present
+    my ($initial_att, $configure_att) = $self->extract_CONFIGURE;
     $self->arch_check(
         $INC{'Config.pm'},
         File::Spec->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
+    for my $method (@init_methods) { $self->$method }
     $self->makefile_preamble(\@ARGV, $initial_att, $configure_att);
     $self->generate_makefile;
 
