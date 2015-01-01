@@ -66,17 +66,11 @@ sub _sprintf562 {
 
 sub WriteMakefile {
     croak "WriteMakefile: Need even number of args" if @_ % 2;
-
-    require ExtUtils::MY;
     my %att = @_;
-
     _convert_compat_attrs(\%att);
-
     _verify_att(\%att);
-
     my $mm = MM->new(\%att);
     $mm->flush;
-
     return $mm;
 }
 
@@ -137,40 +131,34 @@ my %Special_Sigs = (
 
 sub _convert_compat_attrs { #result of running several times should be same
     my($att) = @_;
-    if (exists $att->{AUTHOR}) {
-        if ($att->{AUTHOR}) {
-            if (!ref($att->{AUTHOR})) {
-                my $t = $att->{AUTHOR};
-                $att->{AUTHOR} = [$t];
-            }
-        } else {
-                $att->{AUTHOR} = [];
+    for my $key (qw(AUTHOR)) {
+        next if !exists $att->{$key} or ref $att->{$key};
+        if (!$att->{$key}) {
+            $att->{$key} = [];
+        } elsif (!ref $att->{$key}) {
+            $att->{$key} = [ $att->{$key} ];
         }
     }
 }
 
 sub _verify_att {
     my($att) = @_;
-
     while( my($key, $val) = each %$att ) {
         my $sig = $Att_Sigs{$key};
         unless( defined $sig ) {
             warn "WARNING: $key is not a known parameter.\n";
             next;
         }
-
         my @sigs   = ref $sig ? @$sig : $sig;
         my $given  = ref $val;
         unless( grep { _is_of_type($val, $_) } @sigs ) {
             my $takes = join " or ", map { _format_att($_) } @sigs;
-
             my $has = _format_att($given);
             warn "WARNING: $key takes a $takes not a $has.\n".
                  "         Please inform the author.\n";
         }
     }
 }
-
 
 # Check if a given thing is a reference or instance of $type
 sub _is_of_type {
@@ -234,8 +222,8 @@ sub eval_in_subdirs {
     local @INC = map eval {abs_path($_) if -e} || $_, @INC;
     push @INC, '.';     # '.' has to always be at the end of @INC
 
-    foreach my $dir (@{$self->{DIR}}){
-        my($abs) = $self->catdir($pwd,$dir);
+    foreach my $dir (@{$self->{DIR}}) {
+        my($abs) = File::Spec->catdir($pwd,$dir);
         eval { $self->eval_in_x($abs); };
         last if $@;
     }
@@ -395,7 +383,7 @@ sub full_setup {
     # 5.5.3 doesn't have any concept of vendor libs
     push @Get_from_Config, qw( vendorarchexp vendorlibexp ) if $] >= 5.006;
 
-    foreach my $item (@attrib_help){
+    foreach my $item (@attrib_help) {
         $Recognized_Att_Keys{$item} = 1;
     }
     foreach my $item (@Get_from_Config) {
@@ -425,21 +413,18 @@ sub _has_cpan_meta_requirements {
 }
 
 sub new {
-    my($class,$self) = @_;
-    my($key);
+    my ($class,$self) = @_;
+
+    print "MakeMaker (v$VERSION)\n" if $Verbose;
 
     _convert_compat_attrs($self) if defined $self && $self;
 
     # Store the original args passed to WriteMakefile()
-    foreach my $k (keys %$self) {
-        $self->{ARGS}{$k} = $self->{$k};
-    }
+    foreach my $k (keys %$self) { $self->{ARGS}{$k} = $self->{$k}; }
 
     $self = {} unless defined $self;
 
-    # Temporarily bless it into MM so it can be used as an
-    # object.  It will be blessed into a temp package later.
-    bless $self, "MM";
+    bless $self, "MM"; # for use as object; reblessed in ->setup_MY
 
     # Cleanup all the module requirement bits
     my %key2cmr;
@@ -480,12 +465,11 @@ sub new {
         $self->_PRINT_PREREQ;
    }
 
-    print "MakeMaker (v$VERSION)\n" if $Verbose;
-    if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}){
+    if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}) {
         check_manifest();
     }
 
-    check_hints($self);
+    $self->check_hints;
 
     if ( defined $self->{MIN_PERL_VERSION}
           && $self->{MIN_PERL_VERSION} !~ /^v?[\d_\.]+$/ ) {
@@ -600,7 +584,7 @@ END
         }
     }
 
-    if (%unsatisfied && $self->{PREREQ_FATAL}){
+    if (%unsatisfied && $self->{PREREQ_FATAL}) {
         my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"}
                             sort { $a cmp $b } keys %unsatisfied;
         die <<"END";
@@ -634,7 +618,7 @@ END
         @{"$newclass\:\:ISA"} = 'MM';
     }
 
-    if (defined $Parent[-2]){
+    if (defined $Parent[-2]) {
         $self->{PARENT} = $Parent[-2];
         for my $key (@Prepend_parent) {
             next unless defined $self->{PARENT}{$key};
@@ -652,14 +636,14 @@ END
                 # into a filespec, but do add a level to the path of
                 # the argument if not already absolute.
                 my @cmd = split /\s+/, $self->{$key};
-                $cmd[1] = $self->catfile('[-]',$cmd[1])
+                $cmd[1] = File::Spec->catfile('[-]',$cmd[1])
                   unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
                 $self->{$key} = join(' ', @cmd);
             } else {
                 my $value = $self->{$key};
                 # not going to test in FS so only stripping start
                 $value =~ s/^"// if $key =~ /PERL$/;
-                $value = $self->catdir("..", $value)
+                $value = File::Spec->catdir($self->updir, $value)
                   unless $self->file_name_is_absolute($value);
                 $value = qq{"$value} if $key =~ /PERL$/;
                 $self->{$key} = $value;
@@ -677,14 +661,13 @@ END
             }
         }
         my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
-        parse_args($self,@fm) if @fm;
-    }
-    else {
-        parse_args($self, _shellwords($ENV{PERL_MM_OPT} || ''),@ARGV);
+        $self->parse_args(@fm) if @fm;
+    } else {
+        $self->parse_args(_shellwords($ENV{PERL_MM_OPT} || ''), @ARGV);
     }
 
     # RT#91540 PREREQ_FATAL not recognized on command line
-    if (%unsatisfied && $self->{PREREQ_FATAL}){
+    if (%unsatisfied && $self->{PREREQ_FATAL}) {
         my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"}
                             sort { $a cmp $b } keys %unsatisfied;
         die <<"END";
@@ -718,7 +701,7 @@ END
 
     $self->arch_check(
         $INC{'Config.pm'},
-        $self->catfile($Config{'archlibexp'}, "Config.pm")
+        File::Spec->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
     $self->init_tools();
@@ -750,7 +733,7 @@ END
 #   MakeMaker 'CONFIGURE' Parameters:
 END
         if (scalar(keys %configure_att) > 0) {
-            foreach my $key (sort keys %configure_att){
+            foreach my $key (sort keys %configure_att) {
                next if $key eq 'ARGS';
                my($v) = neatvalue($configure_att{$key});
                $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
@@ -782,14 +765,14 @@ END
         $self->eval_in_subdirs if @{$self->{DIR}};
     }
 
-    foreach my $section ( @MM_Sections ){
+    foreach my $section ( @MM_Sections ) {
         # Support for new foo_target() methods.
         my $method = $section;
         $method .= '_target' unless $self->can($method);
 
         print "Processing Makefile '$section' section\n" if ($Verbose >= 2);
         my($skipit) = $self->skipsection($section);
-        if ($skipit){
+        if ($skipit) {
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";
         } else {
             my(%a) = %{$self->{$section} || {}};
@@ -894,7 +877,7 @@ sub _MakeMaker_Parameters_section {
 #   MakeMaker Parameters:
 END
 
-    foreach my $key (sort keys %$att){
+    foreach my $key (sort keys %$att) {
         next if $key eq 'ARGS';
         my $v;
         if ($key eq 'PREREQ_PM') {
@@ -1033,9 +1016,9 @@ sub parse_args{
     }
 
     # catch old-style 'potential_libs' and inform user how to 'upgrade'
-    if (defined $self->{potential_libs}){
+    if (defined $self->{potential_libs}) {
         my($msg)="'potential_libs' => '$self->{potential_libs}' should be";
-        if ($self->{potential_libs}){
+        if ($self->{potential_libs}) {
             print "$msg changed to:\n\t'LIBS' => ['$self->{potential_libs}']\n";
         } else {
             print "$msg deleted.\n";
@@ -1044,7 +1027,7 @@ sub parse_args{
         delete $self->{potential_libs};
     }
     # catch old-style 'ARMAYBE' and inform user how to 'upgrade'
-    if (defined $self->{ARMAYBE}){
+    if (defined $self->{ARMAYBE}) {
         my($armaybe) = $self->{ARMAYBE};
         print "ARMAYBE => '$armaybe' should be changed to:\n",
                         "\t'dynamic_lib' => {ARMAYBE => '$armaybe'}\n";
@@ -1052,7 +1035,7 @@ sub parse_args{
         $self->{dynamic_lib} = { %dl, ARMAYBE => $armaybe};
         delete $self->{ARMAYBE};
     }
-    if (defined $self->{LDTARGET}){
+    if (defined $self->{LDTARGET}) {
         print "LDTARGET should be changed to LDFROM\n";
         $self->{LDFROM} = $self->{LDTARGET};
         delete $self->{LDTARGET};
@@ -1073,7 +1056,7 @@ sub parse_args{
         $self->{EXCLUDE_EXT} = [grep $_, split '\s+', $self->{EXCLUDE_EXT}];
     }
 
-    foreach my $mmkey (sort keys %$self){
+    foreach my $mmkey (sort keys %$self) {
         next if $mmkey eq 'ARGS';
         print "  $mmkey => ", neatvalue($self->{$mmkey}), "\n" if $Verbose;
         print "'$mmkey' is not a known MakeMaker parameter name.\n"
@@ -1085,19 +1068,14 @@ sub parse_args{
 sub check_hints {
     my($self) = @_;
     # We allow extension-specific hints files.
-
     require File::Spec;
-    my $curdir = File::Spec->curdir;
-
-    my $hint_dir = File::Spec->catdir($curdir, "hints");
+    my $hint_dir = File::Spec->catdir(File::Spec->curdir, "hints");
     return unless -d $hint_dir;
-
     # First we look for the best hintsfile we have
     my($hint)="${^O}_$Config{osvers}";
     $hint =~ s/\./_/g;
     $hint =~ s/_$//;
     return unless $hint;
-
     # Also try without trailing minor version numbers.
     while (1) {
         last if -f File::Spec->catfile($hint_dir, "$hint.pl");  # found
@@ -1105,20 +1083,16 @@ sub check_hints {
         last unless $hint =~ s/_[^_]*$//; # nothing to cut off
     }
     my $hint_file = File::Spec->catfile($hint_dir, "$hint.pl");
-
     return unless -f $hint_file;    # really there
-
-    _run_hintfile($self, $hint_file);
+    $self->_run_hintfile($hint_file);
 }
 
 sub _run_hintfile {
     our $self;
     local($self) = shift;       # make $self available to the hint file.
     my($hint_file) = shift;
-
     local($@, $!);
     print "Processing hints file $hint_file\n" if $Verbose;
-
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into @INC
     local @INC = (File::Spec->curdir, @INC);
@@ -1315,9 +1289,9 @@ sub _find_magic_vstring {
 sub selfdocument {
     my($self) = @_;
     my(@m);
-    if ($Verbose){
+    if ($Verbose) {
         push @m, "\n# Full list of MakeMaker attribute values:";
-        foreach my $key (sort keys %$self){
+        foreach my $key (sort keys %$self) {
             next if $key eq 'RESULT' || $key =~ /^[A-Z][a-z]/;
             my($v) = neatvalue($self->{$key});
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
