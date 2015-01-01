@@ -456,41 +456,9 @@ sub new {
     }
 
     local @Parent = @Parent;    # Protect against non-local exits
-    push @Parent, $self;
-    if (defined $Parent[-2]) {
-        $self->{PARENT} = $Parent[-2];
-        for my $key (@Prepend_parent) {
-            next unless defined $self->{PARENT}{$key};
-            # Don't stomp on WriteMakefile() args.
-            next if defined $self->{ARGS}{$key} and
-                    $self->{ARGS}{$key} eq $self->{$key};
-            $self->{$key} = $self->{PARENT}{$key};
-            if ($Is_VMS && $key =~ /PERL$/) {
-                # PERL or FULLPERL will be a command verb or even a
-                # command with an argument instead of a full file
-                # specification under VMS.  So, don't turn the command
-                # into a filespec, but do add a level to the path of
-                # the argument if not already absolute.
-                my @cmd = split /\s+/, $self->{$key};
-                $cmd[1] = File::Spec->catfile('[-]',$cmd[1])
-                  unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
-                $self->{$key} = join(' ', @cmd);
-            } else {
-                my $value = $self->{$key};
-                # not going to test in FS so only stripping start
-                $value =~ s/^"// if $key =~ /PERL$/;
-                $value = File::Spec->catdir($self->updir, $value)
-                  unless $self->file_name_is_absolute($value);
-                $value = qq{"$value} if $key =~ /PERL$/;
-                $self->{$key} = $value;
-            }
-        }
-        $self->{PARENT}->{CHILDREN}->{ref $self} = $self;
-        foreach my $o (qw(POLLUTE PERL_CORE LINKTYPE LD OPTIMIZE)) {
-            # inherit, but only if not already specified
-            next if exists $self->{$o} or not exists $self->{PARENT}->{$o};
-            $self->{$o} = $self->{PARENT}->{$o};
-        }
+    $self->extract_PARENT;
+
+    if ($self->{PARENT}) {
         my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
         $self->parse_args(@fm) if @fm;
     } else {
@@ -618,6 +586,46 @@ END
     push @{$self->{RESULT}}, "\n# End.";
 
     $self;
+}
+
+sub extract_PARENT {
+    my ($self) = @_;
+    push @Parent, $self;
+    if (defined $Parent[-2]) {
+        $self->{PARENT} = $Parent[-2];
+        for my $key (@Prepend_parent) {
+            next unless defined $self->{PARENT}{$key};
+            # Don't stomp on WriteMakefile() args.
+            next if defined $self->{ARGS}{$key} and
+                    $self->{ARGS}{$key} eq $self->{$key};
+            $self->{$key} = $self->{PARENT}{$key};
+            if ($Is_VMS && $key =~ /PERL$/) {
+                # PERL or FULLPERL will be a command verb or even a
+                # command with an argument instead of a full file
+                # specification under VMS.  So, don't turn the command
+                # into a filespec, but do add a level to the path of
+                # the argument if not already absolute.
+                my @cmd = split /\s+/, $self->{$key};
+                $cmd[1] = $self->catfile('[-]',$cmd[1])
+                  unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
+                $self->{$key} = join(' ', @cmd);
+            } else {
+                my $value = $self->{$key};
+                # not going to test in FS so only stripping start
+                $value =~ s/^"// if $key =~ /PERL$/;
+                $value = $self->catdir($self->updir, $value)
+                  unless $self->file_name_is_absolute($value);
+                $value = qq{"$value} if $key =~ /PERL$/;
+                $self->{$key} = $value;
+            }
+        }
+        $self->{PARENT}->{CHILDREN}->{ref $self} = $self;
+        foreach my $o (qw(POLLUTE PERL_CORE LINKTYPE LD OPTIMIZE)) {
+            # inherit, but only if not already specified
+            next if exists $self->{$o} or not exists $self->{PARENT}->{$o};
+            $self->{$o} = $self->{PARENT}->{$o};
+        }
+    }
 }
 
 sub setup_MY {
