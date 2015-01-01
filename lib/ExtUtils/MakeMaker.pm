@@ -469,7 +469,7 @@ sub new {
         check_manifest();
     }
 
-    $self->check_hints;
+    $self->extract_hints;
 
     if ( defined $self->{MIN_PERL_VERSION}
           && $self->{MIN_PERL_VERSION} !~ /^v?[\d_\.]+$/ ) {
@@ -1065,7 +1065,7 @@ sub parse_args{
     $| = 1 if $Verbose;
 }
 
-sub check_hints {
+sub extract_hints {
     my($self) = @_;
     # We allow extension-specific hints files.
     require File::Spec;

@@ -40,9 +40,9 @@ CLOO
     my $stderr = '';
     local $SIG{__WARN__} = sub { $stderr .= join '', @_ };
 
-    $mm->check_hints;
-    is( $mm->{CCFLAGS}, 'basset hounds got long ears' );
-    is( $stderr, "" );
+    $mm->extract_hints;
+    is $mm->{CCFLAGS}, 'basset hounds got long ears', 'CCFLAGS override';
+    is( $stderr, '', "no warnings" );
 }
 
 
@@ -60,7 +60,7 @@ CLOO
     my $stderr = '';
     local $SIG{__WARN__} = sub { $stderr .= join '', @_ };
 
-    $mm->check_hints;
+    $mm->extract_hints;
     is( $stderr, <<OUT, 'hint files produce errors' );
 Argh!
 OUT
