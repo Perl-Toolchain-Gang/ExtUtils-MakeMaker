@@ -424,7 +424,7 @@ sub new {
         $self = {};
     }
 
-    bless $self, "MM"; # for use as object; reblessed in ->setup_MY
+    setup_MY($self, ++$PACKNAME); # blesses
 
     # Cleanup all the module requirement bits
     my $cmrstash = $self->clean_versions;
@@ -449,36 +449,22 @@ sub new {
         if (ref $self->{CONFIGURE} eq 'CODE') {
             %configure_att = %{&{$self->{CONFIGURE}}};
             _convert_compat_attrs(\%configure_att);
-            $self = { %$self, %configure_att };
+            %$self = (%$self, %configure_att);
         } else {
             croak "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
         }
     }
 
-    my $newclass = ++$PACKNAME;
     local @Parent = @Parent;    # Protect against non-local exits
-    {
-        print "Blessing Object into class [$newclass]\n" if $Verbose>=2;
-        mv_all_methods("MY",$newclass);
-        bless $self, $newclass;
-        push @Parent, $self;
-        require ExtUtils::MY;
-
-        no strict 'refs';   ## no critic;
-        @{"$newclass\:\:ISA"} = 'MM';
-    }
-
+    push @Parent, $self;
     if (defined $Parent[-2]) {
         $self->{PARENT} = $Parent[-2];
         for my $key (@Prepend_parent) {
             next unless defined $self->{PARENT}{$key};
-
             # Don't stomp on WriteMakefile() args.
             next if defined $self->{ARGS}{$key} and
                     $self->{ARGS}{$key} eq $self->{$key};
-
             $self->{$key} = $self->{PARENT}{$key};
-
             if ($Is_VMS && $key =~ /PERL$/) {
                 # PERL or FULLPERL will be a command verb or even a
                 # command with an argument instead of a full file
@@ -499,16 +485,11 @@ sub new {
                 $self->{$key} = $value;
             }
         }
-        if ($self->{PARENT}) {
-            $self->{PARENT}->{CHILDREN}->{$newclass} = $self;
-            foreach my $opt (qw(POLLUTE PERL_CORE LINKTYPE LD OPTIMIZE)) {
-                if (exists $self->{PARENT}->{$opt}
-                    and not exists $self->{$opt})
-                    {
-                        # inherit, but only if already unspecified
-                        $self->{$opt} = $self->{PARENT}->{$opt};
-                    }
-            }
+        $self->{PARENT}->{CHILDREN}->{ref $self} = $self;
+        foreach my $o (qw(POLLUTE PERL_CORE LINKTYPE LD OPTIMIZE)) {
+            # inherit, but only if not already specified
+            next if exists $self->{$o} or not exists $self->{PARENT}->{$o};
+            $self->{$o} = $self->{PARENT}->{$o};
         }
         my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
         $self->parse_args(@fm) if @fm;
@@ -637,6 +618,18 @@ END
     push @{$self->{RESULT}}, "\n# End.";
 
     $self;
+}
+
+sub setup_MY {
+    my ($self, $newclass) = @_;
+    print "Blessing Object into class [$newclass]\n" if $Verbose>=2;
+    bless $self, $newclass;
+    mv_all_methods("MY", $newclass);
+    require ExtUtils::MY;
+    {
+        no strict 'refs';   ## no critic;
+        @{"$newclass\:\:ISA"} = 'MM';
+    }
 }
 
 sub clean_versions {
