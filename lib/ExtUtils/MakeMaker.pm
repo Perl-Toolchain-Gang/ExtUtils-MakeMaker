@@ -451,8 +451,7 @@ sub new {
         check_manifest();
     }
     $self->check_min_perl_version;
-    my $unsatisfied_prereqs = $self->check_prereqs($cmrstash);
-    $self->check_PREREQ_FATAL($unsatisfied_prereqs); # after ARGV processed
+    $self->check_prereqs($cmrstash); # must be after ARGV processed
     # CONFIGURE after PREREQ_FATAL so can rely on prereqs being present
     my ($initial_att, $configure_att) = $self->extract_CONFIGURE;
     $self->arch_check(
@@ -465,21 +464,6 @@ sub new {
     $self->generate_makefile;
 
     $self;
-}
-
-sub check_PREREQ_FATAL {
-    my ($self, $unsatisfied_prereqs) = @_;
-    # RT#91540 PREREQ_FATAL not recognized on command line
-    if (%$unsatisfied_prereqs && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join "\n", map {"    $_ $unsatisfied_prereqs->{$_}"}
-                            sort { $a cmp $b } keys %$unsatisfied_prereqs;
-        die <<"END";
-MakeMaker FATAL: prerequisites not found.
-$failedprereqs
-
-Please install these modules first and rerun 'perl Makefile.PL'.
-END
-    }
 }
 
 sub extract_CONFIGURE {
@@ -723,7 +707,17 @@ $failedprereqs
 Please install these modules first and rerun 'perl Makefile.PL'.
 END
     }
-    \%unsatisfied;
+    # RT#91540 PREREQ_FATAL not recognized on command line
+    if (%unsatisfied && $self->{PREREQ_FATAL}){
+        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"}
+                            sort { $a cmp $b } keys %unsatisfied;
+        die <<"END";
+MakeMaker FATAL: prerequisites not found.
+$failedprereqs
+
+Please install these modules first and rerun 'perl Makefile.PL'.
+END
+    }
 }
 
 sub check_min_perl_version {
