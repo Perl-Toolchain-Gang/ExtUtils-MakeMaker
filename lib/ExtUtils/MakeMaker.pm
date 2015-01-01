@@ -417,12 +417,12 @@ sub new {
 
     print "MakeMaker (v$VERSION)\n" if $Verbose;
 
-    _convert_compat_attrs($self) if defined $self && $self;
-
-    # Store the original args passed to WriteMakefile()
-    foreach my $k (keys %$self) { $self->{ARGS}{$k} = $self->{$k}; }
-
-    $self = {} unless defined $self;
+    if (defined $self && $self) {
+        _convert_compat_attrs($self);
+        $self->{ARGS} = +{ %$self }; # Store original WriteMakefile args
+    } else {
+        $self = {};
+    }
 
     bless $self, "MM"; # for use as object; reblessed in ->setup_MY
 
