@@ -884,29 +884,38 @@ Defines targets for bootstrap files.
 
 sub dynamic_bs {
     my($self, %attribs) = @_;
-    return '
-BOOTSTRAP =
-' unless $self->has_link_code();
+    return "\nBOOTSTRAP =\n" unless $self->has_link_code();
+    my @exts;
+    @exts = '$(BASEEXT)';
+    return join "\n",
+        "BOOTSTRAP = @{[map { qq{$_.bs} } @exts]}\n",
+        map { $self->_xs_make_bs($_) } @exts;
+}
 
-    my $target = $Is{VMS} ? '$(MMS$TARGET)' : '$@';
-
-    return sprintf <<'MAKE_FRAG', $target;
-BOOTSTRAP = $(BASEEXT).bs
-
+sub _xs_make_bs {
+    my ($self, $basename) = @_;
+    my ($v, $d, $f) = File::Spec->splitpath($basename);
+    my @d = File::Spec->splitdir($d);
+    my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+    $instdir = '$(INST_ARCHAUTODIR)' if $basename eq '$(BASEEXT)';
+    my $instfile = File::Spec->catfile($instdir, "$f.bs");
+    my $exists = File::Spec->catfile($instdir, '.exists');
+    #                             1          2          3
+    return sprintf <<'MAKE_FRAG', $basename, $instfile, $exists;
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP)
-	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
+%1$s.bs : $(FIRST_MAKEFILE) $(BOOTDEP)
+	$(NOECHO) $(ECHO) "Running Mkbootstrap for %1$s ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
-		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
-	$(NOECHO) $(TOUCH) "%1$s"
-	$(CHMOD) $(PERM_RW) "%1$s"
+		-e "Mkbootstrap('%1$s','$(BSLOADLIBS)');"
+	$(NOECHO) $(TOUCH) "%1$s.bs"
+	$(CHMOD) $(PERM_RW) "%1$s.bs"
 
-$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(NOECHO) $(RM_RF) %1$s
-	- $(CP_NONEMPTY) $(BOOTSTRAP) %1$s $(PERM_RW)
+%2$s : %1$s.bs %3$s
+	$(NOECHO) $(RM_RF) %2$s
+	- $(CP_NONEMPTY) %1$s.bs %2$s $(PERM_RW)
 MAKE_FRAG
 }
 
@@ -985,8 +994,7 @@ sub xs_make_dynamic_lib {
     # is using them.  This is painful if one for instance tries to restart
     # a failed build because the link command will fail unnecessarily 'cos
     # the shared object/library is 'busy'.
-    push(@m,'	$(RM_F) $@
-');
+    push(@m,"	\$(RM_F) \$\@\n");
 
     my $libs = '$(LDLOADLIBS)';
 
