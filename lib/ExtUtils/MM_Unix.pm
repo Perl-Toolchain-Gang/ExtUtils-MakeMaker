@@ -1058,9 +1058,9 @@ WARNING
                 $abs = $name;
             } elsif ($self->canonpath($name) eq
                      $self->canonpath(basename($name))) {  # foo
-                $abs = $self->catfile($dir, $name);
+                $abs = File::Spec->catfile($dir, $name);
             } else {                                            # foo/bar
-                $abs = $self->catfile($Curdir, $name);
+                $abs = File::Spec->catfile($Curdir, $name);
             }
             print "Checking $abs\n" if ($trace >= 2);
             next unless $self->maybe_command($abs);
@@ -1318,7 +1318,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	if (-d $name){
 	    next if -l $name; # We do not support symlinks at all
             next if $self->{NORECURS};
-	    $dir{$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
+	    $dir{$name} = $name if (-f File::Spec->catfile($name,"Makefile.PL"));
 	} elsif ($name =~ /\.xs\z/){
 	    my($c); ($c = $name) =~ s/\.xs\z/.c/;
 	    $xs{$name} = $c;
@@ -1338,10 +1338,10 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 		($pl_files{$name} = $name) =~ s/[._]pl\z//i ;
 	    }
 	    else {
-                $pm{$name} = $self->catfile($self->{INST_LIBDIR},$name);
+                $pm{$name} = File::Spec->catfile($self->{INST_LIBDIR},$name);
             }
 	} elsif ($name =~ /\.(p[ml]|pod)\z/){
-	    $pm{$name} = $self->catfile($self->{INST_LIBDIR},$name);
+	    $pm{$name} = File::Spec->catfile($self->{INST_LIBDIR},$name);
 	}
     }
 
@@ -1418,7 +1418,7 @@ sub init_MAN1PODS {
 	    next unless $self->_has_pod($name);
 
 	    $self->{MAN1PODS}->{$name} =
-		$self->catfile("\$(INST_MAN1DIR)",
+		File::Spec->catfile("\$(INST_MAN1DIR)",
 			       basename($name).".\$(MAN1EXT)");
 	}
     }
@@ -1464,13 +1464,13 @@ sub init_MAN3PODS {
 	$manpagename =~ s/\.p(od|m|l)\z//;
 	# everything below lib is ok
 	unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
-	    $manpagename = $self->catfile(
+	    $manpagename = File::Spec->catfile(
 	        split(/::/,$self->{PARENT_NAME}),$manpagename
 	    );
 	}
 	$manpagename = $self->replace_manpage_separator($manpagename);
 	$self->{MAN3PODS}->{$name} =
-	    $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
+	    File::Spec->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
     }
 }
 
@@ -1562,7 +1562,7 @@ sub init_PM {
                 if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
 	                                       {$1}i;
 
-	    my($inst) = $self->catfile($prefix,$striplibpath);
+	    my($inst) = File::Spec->catfile($prefix,$striplibpath);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
@@ -1609,7 +1609,7 @@ sub init_main {
 ### Only UNIX:
 ###    ($self->{FULLEXT} =
 ###     $self->{NAME}) =~ s!::!/!g ; #eg. BSD/Foo/Socket
-    $self->{FULLEXT} = $self->catdir(split /::/, $self->{NAME});
+    $self->{FULLEXT} = File::Spec->catdir(split /::/, $self->{NAME});
 
 
     # Copied from DynaLoader:
@@ -1645,11 +1645,11 @@ sub init_main {
 
     unless ($self->{PERL_SRC}){
         foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
-            my $dir = $self->catdir(($Updir) x $dir_count);
+            my $dir = File::Spec->catdir(($Updir) x $dir_count);
 
-            if (-f $self->catfile($dir,"config_h.SH")   &&
-                -f $self->catfile($dir,"perl.h")        &&
-                -f $self->catfile($dir,"lib","strict.pm")
+            if (-f File::Spec->catfile($dir,"config_h.SH")   &&
+                -f File::Spec->catfile($dir,"perl.h")        &&
+                -f File::Spec->catfile($dir,"lib","strict.pm")
             ) {
                 $self->{PERL_SRC}=$dir ;
                 last;
@@ -1661,19 +1661,19 @@ sub init_main {
       $self->{PERL_CORE} and !$self->{PERL_SRC};
 
     if ($self->{PERL_SRC}){
-	$self->{PERL_LIB}     ||= $self->catdir("$self->{PERL_SRC}","lib");
+	$self->{PERL_LIB}     ||= File::Spec->catdir("$self->{PERL_SRC}","lib");
 
         $self->{PERL_ARCHLIB} = $self->{PERL_LIB};
         $self->{PERL_INC}     = ($Is{Win32}) ?
-            $self->catdir($self->{PERL_LIB},"CORE") : $self->{PERL_SRC};
+            File::Spec->catdir($self->{PERL_LIB},"CORE") : $self->{PERL_SRC};
 
 	# catch a situation that has occurred a few times in the past:
 	unless (
-		-s $self->catfile($self->{PERL_SRC},'cflags')
+		-s File::Spec->catfile($self->{PERL_SRC},'cflags')
 		or
 		$Is{VMS}
 		&&
-		-s $self->catfile($self->{PERL_SRC},'vmsish.h')
+		-s File::Spec->catfile($self->{PERL_SRC},'vmsish.h')
 		or
 		$Is{Win32}
 	       ){
@@ -1696,23 +1696,23 @@ from the perl source tree.
         my $old = $self->{PERL_LIB} || $self->{PERL_ARCHLIB} || $self->{PERL_INC};
 	$self->{PERL_LIB}     ||= $Config{privlibexp};
 	$self->{PERL_ARCHLIB} ||= $Config{archlibexp};
-	$self->{PERL_INC}     = $self->catdir("$self->{PERL_ARCHLIB}","CORE"); # wild guess for now
+	$self->{PERL_INC}     = File::Spec->catdir("$self->{PERL_ARCHLIB}","CORE"); # wild guess for now
 	my $perl_h;
 
-	if (not -f ($perl_h = $self->catfile($self->{PERL_INC},"perl.h"))
+	if (not -f ($perl_h = File::Spec->catfile($self->{PERL_INC},"perl.h"))
 	    and not $old){
 	    # Maybe somebody tries to build an extension with an
 	    # uninstalled Perl outside of Perl build tree
 	    my $lib;
 	    for my $dir (@INC) {
-	      $lib = $dir, last if -e $self->catfile($dir, "Config.pm");
+	      $lib = $dir, last if -e File::Spec->catfile($dir, "Config.pm");
 	    }
 	    if ($lib) {
               # Win32 puts its header files in /perl/src/lib/CORE.
               # Unix leaves them in /perl/src.
-	      my $inc = $Is{Win32} ? $self->catdir($lib, "CORE" )
+	      my $inc = $Is{Win32} ? File::Spec->catdir($lib, "CORE" )
                                   : dirname $lib;
-	      if (-e $self->catfile($inc, "perl.h")) {
+	      if (-e File::Spec->catfile($inc, "perl.h")) {
 		$self->{PERL_LIB}	   = $lib;
 		$self->{PERL_ARCHLIB}	   = $lib;
 		$self->{PERL_INC}	   = $inc;
@@ -1783,7 +1783,7 @@ EOP
     # make a simple check if we find strict
     warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
         (strict.pm not found)"
-        unless -f $self->catfile("$self->{PERL_LIB}","strict.pm") ||
+        unless -f File::Spec->catfile("$self->{PERL_LIB}","strict.pm") ||
                $self->{NAME} eq "ExtUtils::MakeMaker";
 }
 
@@ -2079,11 +2079,11 @@ sub init_xs {
 
     if ($self->has_link_code()) {
         $self->{INST_STATIC}  =
-          $self->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT)$(LIB_EXT)');
+          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT)$(LIB_EXT)');
         $self->{INST_DYNAMIC} =
-          $self->catfile('$(INST_ARCHAUTODIR)', '$(DLBASE).$(DLEXT)');
+          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(DLBASE).$(DLEXT)');
         $self->{INST_BOOT}    =
-          $self->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT).bs');
+          File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT).bs');
     } else {
         $self->{INST_STATIC}  = '';
         $self->{INST_DYNAMIC} = '';
@@ -2131,8 +2131,8 @@ pure_perl_install :: all
 };
 
     push @m,
-q{		read "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
-		write "}.$self->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
+q{		read "}.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
+		write "}.File::Spec->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
     push @m,
@@ -2143,15 +2143,15 @@ q{		"$(INST_LIB)" "$(DESTINSTALLPRIVLIB)" \
 		"$(INST_MAN1DIR)" "$(DESTINSTALLMAN1DIR)" \
 		"$(INST_MAN3DIR)" "$(DESTINSTALLMAN3DIR)"
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
-		"}.$self->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{"
+		"}.File::Spec->catdir('$(SITEARCHEXP)','auto','$(FULLEXT)').q{"
 
 
 pure_site_install :: all
 	$(NOECHO) $(MOD_INSTALL) \
 };
     push @m,
-q{		read "}.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
-		write "}.$self->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{" \
+q{		read "}.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
+		write "}.File::Spec->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
     push @m,
@@ -2162,14 +2162,14 @@ q{		"$(INST_LIB)" "$(DESTINSTALLSITELIB)" \
 		"$(INST_MAN1DIR)" "$(DESTINSTALLSITEMAN1DIR)" \
 		"$(INST_MAN3DIR)" "$(DESTINSTALLSITEMAN3DIR)"
 	$(NOECHO) $(WARN_IF_OLD_PACKLIST) \
-		"}.$self->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{"
+		"}.File::Spec->catdir('$(PERL_ARCHLIB)','auto','$(FULLEXT)').q{"
 
 pure_vendor_install :: all
 	$(NOECHO) $(MOD_INSTALL) \
 };
     push @m,
-q{		read "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
-		write "}.$self->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{" \
+q{		read "}.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
+		write "}.File::Spec->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
     push @m,
@@ -2204,7 +2204,7 @@ doc_perl_install :: all
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
+		>> "}.File::Spec->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 doc_site_install :: all
 	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
@@ -2215,7 +2215,7 @@ doc_site_install :: all
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
+		>> "}.File::Spec->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 doc_vendor_install :: all
 	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
@@ -2226,7 +2226,7 @@ doc_vendor_install :: all
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
+		>> "}.File::Spec->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 } unless $self->{NO_PERLLOCAL};
 
@@ -2235,13 +2235,13 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{"
+	$(NOECHO) $(UNINSTALL) "}.File::Spec->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{"
 
 uninstall_from_sitedirs ::
-	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
+	$(NOECHO) $(UNINSTALL) "}.File::Spec->catfile('$(SITEARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
 
 uninstall_from_vendordirs ::
-	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
+	$(NOECHO) $(UNINSTALL) "}.File::Spec->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
 };
 
     join("",@m);
@@ -2264,7 +2264,7 @@ sub installbin {
 
     my %fromto;
     for my $from (@exefiles) {
-	my($path)= $self->catfile('$(INST_SCRIPT)', basename($from));
+	my($path)= File::Spec->catfile('$(INST_SCRIPT)', basename($from));
 
 	local($_) = $path; # for backwards compatibility
 	my $to = $self->libscan($path);
@@ -2587,7 +2587,7 @@ doc_inst_perl :
 		MAP_STATIC "$(MAP_STATIC)" \
 		MAP_EXTRA "`cat $(INST_ARCHAUTODIR)/extralibs.all`" \
 		MAP_LIBPERL "$(MAP_LIBPERL)" \
-		>> "}.$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
+		>> "}.File::Spec->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q{"
 
 };
 
@@ -2595,7 +2595,7 @@ doc_inst_perl :
 inst_perl : pure_inst_perl doc_inst_perl
 
 pure_inst_perl : $(MAP_TARGET)
-	}.$self->{CP}.q{ $(MAP_TARGET) "}.$self->catfile('$(DESTINSTALLBIN)','$(MAP_TARGET)').q{"
+	}.$self->{CP}.q{ $(MAP_TARGET) "}.File::Spec->catfile('$(DESTINSTALLBIN)','$(MAP_TARGET)').q{"
 
 clean :: map_clean
 
@@ -2911,7 +2911,7 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 sub pm_to_blib {
     my $self = shift;
-    my($autodir) = $self->catdir('$(INST_LIB)','auto');
+    my($autodir) = File::Spec->catdir('$(INST_LIB)','auto');
     my $r = q{
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 };
@@ -3088,7 +3088,7 @@ sub prefixify {
         warn "    cannot prefix, using default.\n" if $Verbose >= 2;
         warn "    no default!\n" if !$default && $Verbose >= 2;
 
-        $path = $self->catdir($rprefix, $default) if $default;
+        $path = File::Spec->catdir($rprefix, $default) if $default;
     }
 
     print "    now $path\n" if $Verbose >= 2;
@@ -3372,7 +3372,7 @@ sub staticmake {
     # And as it's not yet built, we add the current extension
     # but only if it has some C code (or XS code, which implies C code)
     if (@{$self->{C}}) {
-	@static = $self->catfile($self->{INST_ARCHLIB},
+	@static = File::Spec->catfile($self->{INST_ARCHLIB},
 				 "auto",
 				 $self->{FULLEXT},
 				 "$self->{BASEEXT}$self->{LIB_EXT}"
@@ -3571,8 +3571,8 @@ sub tool_xsubpp {
 
     my $foundxsubpp = 0;
     foreach my $dir (@xsubpp_dirs) {
-        $xsdir = $self->catdir($dir, 'ExtUtils');
-        if( -r $self->catfile($xsdir, "xsubpp") ) {
+        $xsdir = File::Spec->catdir($dir, 'ExtUtils');
+        if( -r File::Spec->catfile($xsdir, "xsubpp") ) {
             $foundxsubpp = 1;
             last;
         }
@@ -3580,7 +3580,7 @@ sub tool_xsubpp {
     die "ExtUtils::MM_Unix::tool_xsubpp : Can't find xsubpp" if !$foundxsubpp;
 
     my $tmdir   = File::Spec->catdir($self->{PERL_LIB},"ExtUtils");
-    my(@tmdeps) = $self->catfile($tmdir,'typemap');
+    my(@tmdeps) = File::Spec->catfile($tmdir,'typemap');
     if( $self->{TYPEMAPS} ){
         foreach my $typemap (@{$self->{TYPEMAPS}}){
             if( ! -f  $typemap ) {
