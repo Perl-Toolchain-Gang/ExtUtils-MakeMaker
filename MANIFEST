@@ -68,6 +68,7 @@ README
 README.packaging
 t/00compile.t
 t/01perl_bugs.t
+t/02-xsdynamic.t
 t/arch_check.t
 t/backwards.t
 t/basic.t
@@ -169,4 +170,3 @@ t/VERSION_FROM.t
 t/vstrings.t
 t/WriteEmptyMakefile.t
 t/writemakefile_args.t
-t/xs.t

@@ -2,13 +2,15 @@ package MakeMaker::Test::Setup::XS;
 
 @ISA = qw(Exporter);
 require Exporter;
-@EXPORT = qw(setup_xs teardown_xs);
+@EXPORT = qw(run_tests list_dynamic);
 
 use strict;
 use File::Path;
-use File::Basename;
 use MakeMaker::Test::Utils;
 use Config;
+use Carp qw(croak);
+use Test::More;
+use File::Spec;
 
 use File::Temp qw[tempdir];
 use Cwd;
@@ -20,44 +22,23 @@ my $typemap = 'type map';
 $typemap =~ s/ //g unless MM->new({NAME=>'name', NORECURS=>1})->can_dep_space;
 chdir File::Spec->updir;
 
-my %Files = (
-             'XS-Test/lib/XS/Test.pm'     => <<'END',
+my $PM_TEST = <<'END';
 package XS::Test;
-
 require Exporter;
 require DynaLoader;
-
 $VERSION = 1.01;
 @ISA    = qw(Exporter DynaLoader);
 @EXPORT = qw(is_even);
-
 bootstrap XS::Test $VERSION;
-
 1;
 END
 
-             'XS-Test/Makefile.PL'          => <<END,
-use ExtUtils::MakeMaker;
-
-WriteMakefile(
-    NAME          => 'XS::Test',
-    VERSION_FROM  => 'lib/XS/Test.pm',
-    TYPEMAPS      => [ '$typemap' ],
-    PERL          => "\$^X -w",
-);
-END
-
-             "XS-Test/$typemap"             => '',
-
-             'XS-Test/Test.xs'              => <<'END',
+my $XS_TEST = <<'END';
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-
 MODULE = XS::Test       PACKAGE = XS::Test
-
 PROTOTYPES: DISABLE
-
 int
 is_even(input)
        int     input
@@ -67,42 +48,87 @@ is_even(input)
        RETVAL
 END
 
-             'XS-Test/t/is_even.t'          => <<'END',
+my $T_TEST = <<'END';
 #!/usr/bin/perl -w
-
 use Test::More tests => 3;
-
 use_ok "XS::Test";
 ok !is_even(1);
 ok is_even(2);
 END
-            );
 
+my $MAKEFILEPL = <<'END';
+use ExtUtils::MakeMaker;
+WriteMakefile(
+  NAME          => 'XS::%s',
+  VERSION_FROM  => '%s',
+  TYPEMAPS      => [ %s ],
+  PERL          => "$^X -w",
+  %s
+);
+END
 
-sub setup_xs {
+my %Files = (
+  'lib/XS/Test.pm' => $PM_TEST,
+  $typemap => '',
+  'Test.xs' => $XS_TEST,
+  't/is_even.t' => $T_TEST,
+  'Makefile.PL' => sprintf($MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'}, ''),
+);
 
-    while(my($file, $text) = each %Files) {
-        # Convert to a relative, native file path.
-        $file = File::Spec->catfile(File::Spec->curdir, split m{\/}, $file);
+my %label2files = (basic => \%Files);
 
-        my $dir = dirname($file);
-        mkpath $dir;
-        open(FILE, ">$file") || die "Can't create $file: $!";
-        print FILE $text;
-        close FILE;
-    }
-
-    return 1;
+sub virtual_rename {
+  my ($label, $oldfile, $newfile) = @_;
+  $label2files{$label}->{$newfile} = delete $label2files{$label}->{$oldfile};
 }
 
-sub teardown_xs {
-    foreach my $file (keys %Files) {
-        my $dir = dirname($file);
-        if( -e $dir ) {
-            rmtree($dir) || return;
-        }
+sub setup_xs {
+  my ($label, $sublabel) = @_;
+  croak "Must supply label" unless defined $label;
+  my $files = $label2files{$label};
+  croak "Must supply valid label" unless defined $files;
+  croak "Must supply sublabel" unless defined $sublabel;
+  my $prefix = "XS-Test$label$sublabel";
+  hash2files($prefix, $files);
+  return $prefix;
+}
+
+sub list_dynamic {
+  (
+    [ 'basic', '', '' ],
+  );
+}
+
+sub run_tests {
+  my ($perl, $label, $add_target, $add_testtarget) = @_;
+  my $sublabel = $add_target;
+  $sublabel =~ s#[\s=]##g;
+  ok( my $dir = setup_xs($label, $sublabel), "setup $label$sublabel" );
+
+  ok( chdir($dir), "chdir'd to $dir" ) || diag("chdir failed: $!");
+
+  my @mpl_out = run(qq{$perl Makefile.PL});
+  SKIP: {
+    unless (cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' )) {
+      diag(@mpl_out);
+      skip 'perl Makefile.PL failed', 2;
     }
-    return 1;
+
+    my $make = make_run();
+    my $make_cmd = $make . (defined $add_target ? $add_target : '');
+    my $make_out = run($make_cmd);
+    unless (is( $?, 0, "$make_cmd exited normally" )) {
+        diag $make_out;
+        skip 'Make failed - skipping test', 1;
+    }
+
+    my $test_cmd = "$make test" . (defined $add_testtarget ? $add_testtarget : '');
+    my $test_out = run($test_cmd);
+    is( $?, 0, "$test_cmd exited normally" ) || diag $test_out;
+  }
+
+  chdir File::Spec->updir or die;
+  ok rmtree($dir), "teardown $dir";
 }
 
 1;
