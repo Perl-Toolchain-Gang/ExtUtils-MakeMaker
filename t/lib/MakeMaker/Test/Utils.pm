@@ -5,6 +5,8 @@ use strict;
 use Config;
 use Cwd qw(getcwd);
 use Carp qw(croak);
+use File::Path;
+use File::Basename;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -18,6 +20,7 @@ our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
                  have_compiler slurp
                  $Is_VMS $Is_MacOS
                  run_ok
+                 hash2files
                 );
 
 
@@ -389,6 +392,31 @@ sub slurp {
     close $fh;
 
     return $text;
+}
+
+=item hash2files
+
+  hash2files('dirname', { 'filename' => 'some content' });
+
+Goes through given hash-ref, treating each key as a /-separated filename
+under the specified directory, and writing the value into it. Will create
+any necessary directories.
+
+Will die if errors occur.
+
+=cut
+
+sub hash2files {
+    my ($prefix, $hashref) = @_;
+    while(my ($file, $text) = each %$hashref) {
+        # Convert to a relative, native file path.
+        $file = File::Spec->catfile(File::Spec->curdir, $prefix, split m{\/}, $file);
+        my $dir = dirname($file);
+        mkpath $dir;
+        open FILE, ">$file" or die "Can't create $file: $!";
+        print FILE $text;
+        close FILE;
+    }
 }
 
 =back
