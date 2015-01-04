@@ -886,7 +886,11 @@ sub dynamic_bs {
     my($self, %attribs) = @_;
     return "\nBOOTSTRAP =\n" unless $self->has_link_code();
     my @exts;
-    @exts = '$(BASEEXT)';
+    if ($self->{XSMULTI}) {
+	@exts = $self->_xs_list_basenames;
+    } else {
+	@exts = '$(BASEEXT)';
+    }
     return join "\n",
         "BOOTSTRAP = @{[map { qq{$_.bs} } @exts]}\n",
         map { $self->_xs_make_bs($_) } @exts;
@@ -896,6 +900,7 @@ sub _xs_make_bs {
     my ($self, $basename) = @_;
     my ($v, $d, $f) = File::Spec->splitpath($basename);
     my @d = File::Spec->splitdir($d);
+    shift @d if $self->{XSMULTI} and $d[0] eq 'lib';
     my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
     $instdir = '$(INST_ARCHAUTODIR)' if $basename eq '$(BASEEXT)';
     my $instfile = File::Spec->catfile($instdir, "$f.bs");
@@ -931,7 +936,21 @@ sub dynamic_lib {
     return '' unless $self->has_link_code;
     my @m = $self->xs_dynamic_lib_macros(\%attribs);
     my @libs;
-    @libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
+    if ($self->{XSMULTI}) {
+	my @exts = $self->_xs_list_basenames;
+	for my $ext (@exts) {
+	    my ($v, $d, $f) = File::Spec->splitpath($ext);
+	    my @d = File::Spec->splitdir($d);
+	    shift @d if $d[0] eq 'lib';
+	    my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+	    my $instfile = File::Spec->catfile($instdir, "$f.\$(DLEXT)");
+	    my $objfile = "$ext\$(OBJ_EXT)";
+	    my $exportlist = "$ext.def";
+	    push @libs, [ $objfile, $instfile, $instdir, $objfile, $exportlist ];
+	}
+    } else {
+	@libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
+    }
     push @m, map { $self->xs_make_dynamic_lib(\%attribs, @$_); } @libs;
 
     return join("\n",@m);
@@ -1602,7 +1621,14 @@ sub init_PM {
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
 	    return unless $inst;
-	    $self->{PM}{$path} = $inst;
+	    if ($self->{XSMULTI} and $inst =~ /\.xs\z/) {
+		my($base); ($base = $path) =~ s/\.xs\z//;
+		$self->{XS}{$path} = "$base.c";
+		push @{$self->{C}}, "$base.c";
+		push @{$self->{O_FILES}}, "$base$self->{OBJ_EXT}";
+	    } else {
+		$self->{PM}{$path} = $inst;
+	    }
 	}, @{$self->{PMLIBDIRS}});
     }
 }
@@ -2119,6 +2145,23 @@ sub init_xs {
           File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(DLBASE).$(DLEXT)');
         $self->{INST_BOOT}    =
           File::Spec->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT).bs');
+	if ($self->{XSMULTI}) {
+	    my @exts = $self->_xs_list_basenames;
+	    my (@statics, @dynamics, @boots);
+	    for my $ext (@exts) {
+		my ($v, $d, $f) = File::Spec->splitpath($ext);
+		my @d = File::Spec->splitdir($d);
+		shift @d if defined $d[0] and $d[0] eq 'lib';
+		my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+		my $instfile = File::Spec->catfile($instdir, $f);
+		push @statics, "$instfile\$(LIB_EXT)";
+		push @dynamics, "$instfile.\$(DLEXT)";
+		push @boots, "$instfile.bs";
+	    }
+	    $self->{INST_STATIC} = join ' ', @statics;
+	    $self->{INST_DYNAMIC} = join ' ', @dynamics;
+	    $self->{INST_BOOT} = join ' ', @boots;
+	}
     } else {
         $self->{INST_STATIC}  = '';
         $self->{INST_DYNAMIC} = '';
@@ -2594,14 +2637,14 @@ $(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" 
 	push @m, "\tcat $catfile >> \$\@\n";
     }
 
-    #                         1     2                        3
-    push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $makefilename;
+    my $ldfrom = $self->{XSMULTI} ? '' : '$(LDFROM)';
+    #                         1     2                        3        4
+    push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $ldfrom, $makefilename;
 $(MAP_TARGET) :: %1$s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
-	$(MAP_LINKCMD) %2$s $(OPTIMIZE) %1$s/perlmain$(OBJ_EXT) $(LDFROM) $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
+	$(MAP_LINKCMD) %2$s $(OPTIMIZE) %1$s/perlmain$(OBJ_EXT) %3$s $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
 	$(NOECHO) $(ECHO) "To install the new '$(MAP_TARGET)' binary, call"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s inst_perl MAP_TARGET=$(MAP_TARGET)"
-	$(NOECHO) $(ECHO) "To remove the intermediate files say"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s map_clean"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %4$s inst_perl MAP_TARGET=$(MAP_TARGET)"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %4$s map_clean"
 
 %1$s/perlmain\$(OBJ_EXT): %1$s/perlmain.c
 EOF
@@ -3372,7 +3415,19 @@ sub static_lib {
     return '' unless $self->has_link_code;
     my(@m);
     my @libs;
-    @libs = ([ qw($(OBJECT) $(INST_STATIC) $(INST_ARCHAUTODIR)) ]);
+    if ($self->{XSMULTI}) {
+	for my $ext ($self->_xs_list_basenames) {
+	    my ($v, $d, $f) = File::Spec->splitpath($ext);
+	    my @d = File::Spec->splitdir($d);
+	    shift @d if $d[0] eq 'lib';
+	    my $instdir = $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+	    my $instfile = $self->catfile($instdir, "$f\$(LIB_EXT)");
+	    my $objfile = "$ext\$(OBJ_EXT)";
+	    push @libs, [ $objfile, $instfile, $instdir ];
+	}
+    } else {
+	@libs = ([ qw($(OBJECT) $(INST_STATIC) $(INST_ARCHAUTODIR)) ]);
+    }
     push @m, map { $self->xs_make_static_lib(@$_); } @libs;
     join "\n", @m;
 }
@@ -3835,8 +3890,10 @@ sub xs_cpp {
 
 =item xs_o (o)
 
-Defines suffix rules to go from XS to object files directly. This is
-only intended for broken make implementations.
+Defines suffix rules to go from XS to object files directly. This was
+originally only intended for broken make implementations, but is now
+necessary for per-XS file under C<XSMULTI>, since each XS file might
+have an individual C<$(VERSION)>.
 
 =cut
 
@@ -3850,6 +3907,25 @@ sub xs_o {
 	$(MV) $*.xsc $*.c
 	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c %s
 EOF
+    if ($self->{XSMULTI}) {
+	for my $ext ($self->_xs_list_basenames) {
+	    my $pmfile = "$ext.pm";
+	    croak "$ext.xs has no matching $pmfile: $!" unless -f $pmfile;
+	    my $version = $self->parse_version($pmfile);
+	    my $cccmd = $self->{CONST_CCCMD};
+	    $cccmd =~ s/^\s*CCCMD\s*=\s*//;
+	    $cccmd =~ s/\$\(DEFINE_VERSION\)/-DVERSION=\\"$version\\"/;
+	    $cccmd =~ s/\$\(XS_DEFINE_VERSION\)/-DXS_VERSION=\\"$version\\"/;
+	    #                         1     2       3
+	    $frag .= sprintf <<'EOF', $ext, $cccmd, $minus_o;
+
+%1$s$(OBJ_EXT): %1$s.xs
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
+	$(MV) $*.xsc $*.c
+	%2$s $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c %3$s
+EOF
+	}
+    }
     $frag;
 }
 

@@ -650,6 +650,11 @@ The blibdirs.ts target is deprecated.  Depend on blibdirs instead.
 
 =cut
 
+sub _xs_list_basenames {
+    my ($self) = @_;
+    map { (my $b = $_) =~ s/\.xs$//; $b } sort keys %{ $self->{XS} };
+}
+
 sub blibdirs_target {
     my $self = shift;
 
@@ -658,6 +663,14 @@ sub blibdirs_target {
                                            bin script
                                            man1dir man3dir
                                           );
+    if ($self->{XSMULTI}) {
+        for my $ext ($self->_xs_list_basenames) {
+            my ($v, $d, $f) = File::Spec->splitpath($ext);
+            my @d = File::Spec->splitdir($d);
+            shift @d if $d[0] eq 'lib';
+            push @dirs, $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+	}
+    }
 
     my @exists = map { $_.'$(DFSEP).exists' } @dirs;
 
@@ -696,6 +709,10 @@ clean :: clean_subdirs
 ');
 
     my @files = sort values %{$self->{XS}}; # .c files from *.xs files
+    push @files, map {
+	my $file = $_;
+	map { $file.$_ } $self->{OBJ_EXT}, qw(.def _def.old .bs .bso .exp .base);
+    } $self->_xs_list_basenames;
     my @dirs  = qw(blib _eumm);
 
     # Normally these are all under blib but they might have been
@@ -923,18 +940,37 @@ for each with appropriate arguments.
 
 sub xs_dlsyms_iterator {
     my ($self, $attribs) = @_;
-    return $self->xs_make_dlsyms(
-        $attribs,
-        $self->{BASEEXT} . $self->xs_dlsyms_ext,
-        'Makefile.PL',
-        $self->{NAME},
-        $self->{DLBASE},
-        $attribs->{DL_FUNCS} || $self->{DL_FUNCS} || {},
-        $attribs->{FUNCLIST} || $self->{FUNCLIST} || [],
-        $attribs->{IMPORTS} || $self->{IMPORTS} || {},
-        $attribs->{DL_VARS} || $self->{DL_VARS} || [],
-        $self->xs_dlsyms_extra,
-    );
+    if ($self->{XSMULTI}) {
+        my @m;
+        for my $ext ($self->_xs_list_basenames) {
+            my @parts = File::Spec->splitdir($ext);
+            shift @parts if $parts[0] eq 'lib';
+            my $name = join '::', @parts;
+            push @m, $self->xs_make_dlsyms(
+                $attribs,
+                $ext . $self->xs_dlsyms_ext,
+                "$ext.xs",
+                $name,
+                $parts[-1],
+                {}, [], {}, [],
+                $self->xs_dlsyms_extra . q!, 'FILE' => ! . neatvalue($ext),
+            );
+        }
+        return join "\n", @m;
+    } else {
+        return $self->xs_make_dlsyms(
+            $attribs,
+            $self->{BASEEXT} . $self->xs_dlsyms_ext,
+            'Makefile.PL',
+            $self->{NAME},
+            $self->{DLBASE},
+            $attribs->{DL_FUNCS} || $self->{DL_FUNCS} || {},
+            $attribs->{FUNCLIST} || $self->{FUNCLIST} || [],
+            $attribs->{IMPORTS} || $self->{IMPORTS} || {},
+            $attribs->{DL_VARS} || $self->{DL_VARS} || [],
+            $self->xs_dlsyms_extra,
+        );
+    }
 }
 
 =head3 xs_make_dlsyms

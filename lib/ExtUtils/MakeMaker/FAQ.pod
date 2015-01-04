@@ -366,9 +366,7 @@ We recommend InfoZIP: L<http://www.info-zip.org/Zip.html>
 
 =head2 XS
 
-=over 4
-
-=item How do I prevent "object version X.XX does not match bootstrap parameter Y.YY" errors?
+=head3 How do I prevent "object version X.XX does not match bootstrap parameter Y.YY" errors?
 
 XS code is very sensitive to the module version number and will
 complain if the version number in your Perl module doesn't match.  If
@@ -383,12 +381,28 @@ WriteMakefile() arguments.
     depend => { '$(FIRST_MAKEFILE)' => '$(VERSION_FROM)' }
 
 
-=item How do I make two or more XS files coexist in the same directory?
+=head3 How do I make two or more XS files coexist in the same directory?
 
 Sometimes you need to have two and more XS files in the same package.
-One way to go is to put them into separate directories, but sometimes
-this is not the most suitable solution. The following technique allows
-you to put two (and more) XS files in the same directory.
+There are three ways: C<XSMULTI>, separate directories, and bootstrapping
+one XS from another.
+
+=head4 XSMULTI
+
+Structure your modules so they are all located under F<lib>, such that
+C<Foo::Bar> is in F<lib/Foo/Bar.pm> and F<lib/Foo/Bar.xs>, etc. Have your
+top-level C<WriteMakefile> set the variable C<XSMULTI> to a true value.
+
+Er, that's it.
+
+=head4 Separate directories
+
+Put each XS files into separate directories, each with their own
+F<Makefile.PL>. Make sure each of those F<Makefile.PL>s has the correct
+C<CFLAGS>, C<INC>, C<LIBS> etc. You will need to make sure the top-level
+F<Makefile.PL> refers to each of these using C<DIR>.
+
+=head4 Bootstrapping
 
 Let's assume that we have a package C<Cool::Foo>, which includes
 C<Cool::Foo> and C<Cool::Bar> modules each having a separate XS
