@@ -2283,7 +2283,7 @@ sub installbin {
     push(@m, qq{
 EXE_FILES = @exefiles
 
-pure_all :: @to
+pure_nolink :: @to
 	\$(NOECHO) \$(NOOP)
 
 realclean ::
@@ -3326,7 +3326,11 @@ sub static {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
-static :: $(FIRST_MAKEFILE) $(INST_STATIC)
+static :: $(FIRST_MAKEFILE) $(INST_STATIC) subdirs_static
+	$(NOECHO) $(NOOP)
+
+# define this here not top_targets in case someone overrides that
+subdirs_static ::
 	$(NOECHO) $(NOOP)
 ';
 }
@@ -3425,14 +3429,15 @@ Helper subroutine for subdirs
 =cut
 
 sub subdir_x {
-    my($self, $subdir) = @_;
+    my($self, $subdir, $target) = @_;
 
     my $subdir_cmd = $self->cd($subdir,
-      '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) all $(PASTHRU)'
+      sprintf '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) %s $(PASTHRU)', $target
     );
-    return sprintf <<'EOT', $subdir_cmd;
+    my $sd_target = 'subdirs' . ($target eq 'all' ? '' : "_$target");
+    return sprintf <<'EOT', $sd_target, $subdir_cmd;
 
-subdirs ::
+%s ::
 	$(NOECHO) %s
 EOT
 
@@ -3452,7 +3457,9 @@ sub subdirs {
     # subdirectories containing further Makefile.PL scripts.
     # It calls the subdir_x() method for each subdirectory.
     foreach my $dir (@{$self->{DIR}}){
-	push(@m, $self->subdir_x($dir));
+	push @m, $self->subdir_x($dir, 'all');
+	push @m, $self->subdir_x($dir, 'static');
+	push @m, $self->subdir_x($dir, 'dynamic');
 ####	print "Including $dir subdirectory\n";
     }
     if (@m){
@@ -3502,6 +3509,10 @@ test :: \$(TEST_TYPE) subdirs-test
 subdirs-test ::
 	\$(NOECHO) \$(NOOP)
 
+# defined here as well as top_targets in case someone overrides that
+pure_nolink ::
+	\$(NOECHO) \$(NOOP)
+
 ");
 
     foreach my $dir (@{ $self->{DIR} }) {
@@ -3518,14 +3529,14 @@ END
 	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 
-    push(@m, "test_dynamic :: pure_all\n");
+    push(@m, "test_dynamic :: pure_nolink dynamic\n");
     push(@m, $self->test_via_harness('$(FULLPERLRUN)', '$(TEST_FILES)'))
       if $tests;
     push(@m, $self->test_via_script('$(FULLPERLRUN)', '$(TEST_FILE)'))
       if -f "test.pl";
     push(@m, "\n");
 
-    push(@m, "testdb_dynamic :: pure_all\n");
+    push(@m, "testdb_dynamic :: pure_nolink dynamic\n");
     push(@m, $self->test_via_script('$(FULLPERLRUN) $(TESTDB_SW)',
                                     '$(TEST_FILE)'));
     push(@m, "\n");
@@ -3534,13 +3545,13 @@ END
     push @m, "test_ : test_dynamic\n\n";
 
     if ($self->needs_linking()) {
-	push(@m, "test_static :: pure_all \$(MAP_TARGET)\n");
+	push(@m, "test_static :: pure_nolink static \$(MAP_TARGET)\n");
 	my $target = File::Spec->rel2abs('$(MAP_TARGET)');
 	my $command = qq{"$target" \$(MAP_PERLINC)};
 	push(@m, $self->test_via_harness($command, '$(TEST_FILES)')) if $tests;
 	push(@m, $self->test_via_script($command, '$(TEST_FILE)')) if -f "test.pl";
 	push(@m, "\n");
-	push(@m, "testdb_static :: pure_all \$(MAP_TARGET)\n");
+	push(@m, "testdb_static :: pure_nolink static \$(MAP_TARGET)\n");
 	push(@m, $self->test_via_script("$command \$(TESTDB_SW)", '$(TEST_FILE)'));
 	push(@m, "\n");
     } else {
@@ -3683,7 +3694,10 @@ sub top_targets {
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
     push @m, '
-pure_all :: config pm_to_blib subdirs linkext
+pure_all :: pure_nolink linkext
+	$(NOECHO) $(NOOP)
+
+pure_nolink :: config pm_to_blib subdirs
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)

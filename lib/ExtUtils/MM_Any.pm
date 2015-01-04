@@ -903,7 +903,11 @@ sub dynamic {
 
     my($self) = shift;
     '
-dynamic :: $(FIRST_MAKEFILE) $(INST_BOOT) $(INST_DYNAMIC)
+dynamic :: $(FIRST_MAKEFILE) $(INST_BOOT) $(INST_DYNAMIC) subdirs_dynamic
+	$(NOECHO) $(NOOP)
+
+# define this here not top_targets in case someone overrides that
+subdirs_dynamic ::
 	$(NOECHO) $(NOOP)
 ';
 }
