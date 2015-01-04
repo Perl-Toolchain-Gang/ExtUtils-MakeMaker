@@ -9,7 +9,7 @@ use File::Basename;
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
-use ExtUtils::MakeMaker qw($Verbose write_file_via_tmp);
+use ExtUtils::MakeMaker qw($Verbose write_file_via_tmp neatvalue);
 
 use ExtUtils::MakeMaker::Config;
 
