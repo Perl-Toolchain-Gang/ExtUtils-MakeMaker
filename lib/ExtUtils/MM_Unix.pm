@@ -884,29 +884,38 @@ Defines targets for bootstrap files.
 
 sub dynamic_bs {
     my($self, %attribs) = @_;
-    return '
-BOOTSTRAP =
-' unless $self->has_link_code();
+    return "\nBOOTSTRAP =\n" unless $self->has_link_code();
+    my @exts;
+    @exts = '$(BASEEXT)';
+    return join "\n",
+        "BOOTSTRAP = @{[map { qq{$_.bs} } @exts]}\n",
+        map { $self->_xs_make_bs($_) } @exts;
+}
 
-    my $target = $Is{VMS} ? '$(MMS$TARGET)' : '$@';
-
-    return sprintf <<'MAKE_FRAG', $target;
-BOOTSTRAP = $(BASEEXT).bs
-
+sub _xs_make_bs {
+    my ($self, $basename) = @_;
+    my ($v, $d, $f) = File::Spec->splitpath($basename);
+    my @d = File::Spec->splitdir($d);
+    my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+    $instdir = '$(INST_ARCHAUTODIR)' if $basename eq '$(BASEEXT)';
+    my $instfile = File::Spec->catfile($instdir, "$f.bs");
+    my $exists = File::Spec->catfile($instdir, '.exists');
+    #                             1          2          3
+    return sprintf <<'MAKE_FRAG', $basename, $instfile, $exists;
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-$(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP)
-	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
+%1$s.bs : $(FIRST_MAKEFILE) $(BOOTDEP)
+	$(NOECHO) $(ECHO) "Running Mkbootstrap for %1$s ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
-		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
-	$(NOECHO) $(TOUCH) "%1$s"
-	$(CHMOD) $(PERM_RW) "%1$s"
+		-e "Mkbootstrap('%1$s','$(BSLOADLIBS)');"
+	$(NOECHO) $(TOUCH) "%1$s.bs"
+	$(CHMOD) $(PERM_RW) "%1$s.bs"
 
-$(INST_BOOT) : $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(NOECHO) $(RM_RF) %1$s
-	- $(CP_NONEMPTY) $(BOOTSTRAP) %1$s $(PERM_RW)
+%2$s : %1$s.bs %3$s
+	$(NOECHO) $(RM_RF) %2$s
+	- $(CP_NONEMPTY) %1$s.bs %2$s $(PERM_RW)
 MAKE_FRAG
 }
 
@@ -919,31 +928,60 @@ Defines how to produce the *.so (or equivalent) files.
 sub dynamic_lib {
     my($self, %attribs) = @_;
     return '' unless $self->needs_linking(); #might be because of a subdir
-
     return '' unless $self->has_link_code;
+    my @m = $self->xs_dynamic_lib_macros(\%attribs);
+    my @libs;
+    @libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
+    push @m, map { $self->xs_make_dynamic_lib(\%attribs, @$_); } @libs;
 
-    my($otherldflags) = $attribs{OTHERLDFLAGS} || "";
-    my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
-    my($armaybe) = $attribs{ARMAYBE} || $self->{ARMAYBE} || ":";
-    my($ldfrom) = '$(LDFROM)';
-    $armaybe = 'ar' if ($Is{OSF} and $armaybe eq ':');
-    my(@m);
-    my $ld_opt = $Is{OS2} ? '$(OPTIMIZE) ' : '';	# Useful on other systems too?
+    return join("\n",@m);
+}
+
+=item xs_dynamic_lib_macros
+
+Defines the macros for the C<dynamic_lib> section.
+
+=cut
+
+sub xs_dynamic_lib_macros {
+    my ($self, $attribs) = @_;
+    my $otherldflags = $attribs->{OTHERLDFLAGS} || "";
+    my $inst_dynamic_dep = $attribs->{INST_DYNAMIC_DEP} || "";
+    my $armaybe = $self->_xs_armaybe($attribs);
+    my $ld_opt = $Is{OS2} ? '$(OPTIMIZE) ' : ''; # Useful on other systems too?
     my $ld_fix = $Is{OS2} ? '|| ( $(RM_F) $@ && sh -c false )' : '';
-    push(@m,'
-# This section creates the dynamically loadable $(INST_DYNAMIC)
-# from $(OBJECT) and possibly $(MYEXTLIB).
-ARMAYBE = '.$armaybe.'
-OTHERLDFLAGS = '.$ld_opt.$otherldflags.'
-INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
-INST_DYNAMIC_FIX = '.$ld_fix.'
+    sprintf <<'EOF', $armaybe, $ld_opt.$otherldflags, $inst_dynamic_dep, $ld_fix;
+# This section creates the dynamically loadable objects from relevant
+# objects and possibly $(MYEXTLIB).
+ARMAYBE = %s
+OTHERLDFLAGS = %s
+INST_DYNAMIC_DEP = %s
+INST_DYNAMIC_FIX = %s
+EOF
+}
 
-$(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)
-');
+sub _xs_armaybe {
+    my ($self, $attribs) = @_;
+    my $armaybe = $attribs->{ARMAYBE} || $self->{ARMAYBE} || ":";
+    $armaybe = 'ar' if ($Is{OSF} and $armaybe eq ':');
+    $armaybe;
+}
+
+=item xs_make_dynamic_lib
+
+Defines the recipes for the C<dynamic_lib> section.
+
+=cut
+
+sub xs_make_dynamic_lib {
+    my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
+    $exportlist = '' if $exportlist ne '$(EXPORT_LIST)';
+    my $armaybe = $self->_xs_armaybe($attribs);
+    my @m = sprintf '%s: %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
     if ($armaybe ne ':'){
-	$ldfrom = 'tmp$(LIB_EXT)';
-	push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
-	push(@m,'	$(RANLIB) '."$ldfrom\n");
+        $ldfrom = 'tmp$(LIB_EXT)';
+        push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
+        push(@m,'	$(RANLIB) '."$ldfrom\n");
     }
     $ldfrom = "-all $ldfrom -none" if $Is{OSF};
 
@@ -956,16 +994,15 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
     # is using them.  This is painful if one for instance tries to restart
     # a failed build because the link command will fail unnecessarily 'cos
     # the shared object/library is 'busy'.
-    push(@m,'	$(RM_F) $@
-');
+    push(@m,"	\$(RM_F) \$\@\n");
 
     my $libs = '$(LDLOADLIBS)';
 
     if (($Is{NetBSD} || $Is{Interix} || $Is{Android}) && $Config{'useshrplib'} eq 'true') {
-	# Use nothing on static perl platforms, and to the flags needed
-	# to link against the shared libperl library on shared perl
-	# platforms.  We peek at lddlflags to see if we need -Wl,-R
-	# or -R to add paths to the run-time library search path.
+        # Use nothing on static perl platforms, and to the flags needed
+        # to link against the shared libperl library on shared perl
+        # platforms.  We peek at lddlflags to see if we need -Wl,-R
+        # or -R to add paths to the run-time library search path.
         if ($Config{'lddlflags'} =~ /-Wl,-R/) {
             $libs .= ' "-L$(PERL_INC)" "-Wl,-R$(INSTALLARCHLIB)/CORE" "-Wl,-R$(PERL_ARCHLIB)/CORE" -lperl';
         } elsif ($Config{'lddlflags'} =~ /-R/) {
@@ -979,22 +1016,16 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPO
 
     my $ld_run_path_shell = "";
     if ($self->{LD_RUN_PATH} ne "") {
-	$ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
+        $ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
     }
 
-    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $self->xs_obj_opt('$@'), $ldfrom, $libs;
+    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $self->xs_obj_opt('$@'), $ldfrom, $libs, $exportlist;
 	%s$(LD) %s $(LDDLFLAGS) %s $(OTHERLDFLAGS) %s $(MYEXTLIB)	\
-	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST)	\
+	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) %s	\
 	  $(INST_DYNAMIC_FIX)
-MAKE
-
-    push @m, <<'MAKE';
 	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(RM_RF) $(BOOTSTRAP)
-	- $(CP_NONEMPTY) $(BOOTSTRAP) $(INST_BOOT) $(PERM_RW)
 MAKE
-
-    return join('',@m);
+    join '', @m;
 }
 
 =item exescan
@@ -2283,7 +2314,7 @@ sub installbin {
     push(@m, qq{
 EXE_FILES = @exefiles
 
-pure_all :: @to
+pure_nolink :: @to
 	\$(NOECHO) \$(NOOP)
 
 realclean ::
@@ -2563,15 +2594,16 @@ $(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" 
 	push @m, "\tcat $catfile >> \$\@\n";
     }
 
-push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $tmp, ($makefilename) x 2;
-$(MAP_TARGET) :: %s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
-	$(MAP_LINKCMD) %s $(OPTIMIZE) %s/perlmain$(OBJ_EXT) $(LDFROM) $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
+    #                         1     2                        3
+    push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $makefilename;
+$(MAP_TARGET) :: %1$s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
+	$(MAP_LINKCMD) %2$s $(OPTIMIZE) %1$s/perlmain$(OBJ_EXT) $(LDFROM) $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
 	$(NOECHO) $(ECHO) "To install the new '$(MAP_TARGET)' binary, call"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %s inst_perl MAP_TARGET=$(MAP_TARGET)"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s inst_perl MAP_TARGET=$(MAP_TARGET)"
 	$(NOECHO) $(ECHO) "To remove the intermediate files say"
-	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %s map_clean"
+	$(NOECHO) $(ECHO) "    $(MAKE) $(USEMAKEFILE) %3$s map_clean"
 
-$tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
+%1$s/perlmain\$(OBJ_EXT): %1$s/perlmain.c
 EOF
     push @m, "\t".$self->cd($tmp, qq[$cccmd "-I\$(PERL_INC)" perlmain.c])."\n";
 
@@ -3326,34 +3358,83 @@ sub static {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
-static :: $(FIRST_MAKEFILE) $(INST_STATIC)
+static :: $(FIRST_MAKEFILE) $(INST_STATIC) subdirs_static
+	$(NOECHO) $(NOOP)
+
+# define this here not top_targets in case someone overrides that
+subdirs_static ::
 	$(NOECHO) $(NOOP)
 ';
 }
 
-=item static_lib (o)
-
-Defines how to produce the *.a (or equivalent) files.
-
-=cut
-
 sub static_lib {
     my($self) = @_;
     return '' unless $self->has_link_code;
-
     my(@m);
-    push(@m, <<'END');
+    my @libs;
+    @libs = ([ qw($(OBJECT) $(INST_STATIC) $(INST_ARCHAUTODIR)) ]);
+    push @m, map { $self->xs_make_static_lib(@$_); } @libs;
+    join "\n", @m;
+}
 
-$(INST_STATIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
-	$(RM_RF) $@
-END
+=item xs_make_static_lib
 
+Defines the recipes for the C<static_lib> section.
+
+=cut
+
+sub xs_make_static_lib {
+    my ($self, $from, $to, $todir) = @_;
+    my @m = sprintf '%s: %s $(MYEXTLIB) %s$(DFSEP).exists'."\n", $to, $from, $todir;
+    push @m, "\t\$(RM_F) \"\$\@\"\n";
+    push @m, $self->static_lib_fixtures;
+    push @m, $self->static_lib_pure_cmd($from);
+    push @m, "\t\$(CHMOD) \$(PERM_RWX) \$\@\n";
+    push @m, $self->static_lib_closures($todir);
+    join '', @m;
+}
+
+=item static_lib_closures
+
+Records C<$(EXTRALIBS)> in F<extralibs.ld> and F<$(PERL_SRC)/ext.libs>.
+
+=cut
+
+sub static_lib_closures {
+    my ($self, $todir) = @_;
+    my @m = sprintf <<'MAKE_FRAG', $todir;
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > %s$(DFSEP)extralibs.ld
+MAKE_FRAG
+    # Old mechanism - still available:
+    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)$(DFSEP)ext.libs
+MAKE_FRAG
+    @m;
+}
+
+=item static_lib_fixtures
+
+Handles copying C<$(MYEXTLIB)> as starter for final static library that
+then gets added to.
+
+=cut
+
+sub static_lib_fixtures {
+    my ($self) = @_;
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, <<'MAKE_FRAG') if $self->{MYEXTLIB};
-	$(CP) $(MYEXTLIB) "$@"
-MAKE_FRAG
+    return unless $self->{MYEXTLIB};
+    "\t\$(CP) \$(MYEXTLIB) \"\$\@\"\n";
+}
 
+=item static_lib_pure_cmd
+
+Defines how to run the archive utility.
+
+=cut
+
+sub static_lib_pure_cmd {
+    my ($self, $from) = @_;
     my $ar;
     if (exists $self->{FULL_AR} && -x $self->{FULL_AR}) {
         # Prefer the absolute pathed ar if available so that PATH
@@ -3362,18 +3443,10 @@ MAKE_FRAG
     } else {
         $ar = 'AR';
     }
-    push @m, sprintf <<'MAKE_FRAG', $ar;
-	$(%s) $(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@
-	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > "$(INST_ARCHAUTODIR)/extralibs.ld"
+    sprintf <<'MAKE_FRAG', $ar, $from;
+	$(%s) $(AR_STATIC_ARGS) "$@" %s
+	$(RANLIB) "$@"
 MAKE_FRAG
-
-    # Old mechanism - still available:
-    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> "$(PERL_SRC)/ext.libs"
-MAKE_FRAG
-
-    join('', @m);
 }
 
 =item staticmake (o)
@@ -3425,14 +3498,15 @@ Helper subroutine for subdirs
 =cut
 
 sub subdir_x {
-    my($self, $subdir) = @_;
+    my($self, $subdir, $target) = @_;
 
     my $subdir_cmd = $self->cd($subdir,
-      '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) all $(PASTHRU)'
+      sprintf '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) %s $(PASTHRU)', $target
     );
-    return sprintf <<'EOT', $subdir_cmd;
+    my $sd_target = 'subdirs' . ($target eq 'all' ? '' : "_$target");
+    return sprintf <<'EOT', $sd_target, $subdir_cmd;
 
-subdirs ::
+%s ::
 	$(NOECHO) %s
 EOT
 
@@ -3452,7 +3526,9 @@ sub subdirs {
     # subdirectories containing further Makefile.PL scripts.
     # It calls the subdir_x() method for each subdirectory.
     foreach my $dir (@{$self->{DIR}}){
-	push(@m, $self->subdir_x($dir));
+	push @m, $self->subdir_x($dir, 'all');
+	push @m, $self->subdir_x($dir, 'static');
+	push @m, $self->subdir_x($dir, 'dynamic');
 ####	print "Including $dir subdirectory\n";
     }
     if (@m){
@@ -3502,6 +3578,10 @@ test :: \$(TEST_TYPE) subdirs-test
 subdirs-test ::
 	\$(NOECHO) \$(NOOP)
 
+# defined here as well as top_targets in case someone overrides that
+pure_nolink ::
+	\$(NOECHO) \$(NOOP)
+
 ");
 
     foreach my $dir (@{ $self->{DIR} }) {
@@ -3518,14 +3598,14 @@ END
 	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 
-    push(@m, "test_dynamic :: pure_all\n");
+    push(@m, "test_dynamic :: pure_nolink dynamic\n");
     push(@m, $self->test_via_harness('$(FULLPERLRUN)', '$(TEST_FILES)'))
       if $tests;
     push(@m, $self->test_via_script('$(FULLPERLRUN)', '$(TEST_FILE)'))
       if -f "test.pl";
     push(@m, "\n");
 
-    push(@m, "testdb_dynamic :: pure_all\n");
+    push(@m, "testdb_dynamic :: pure_nolink dynamic\n");
     push(@m, $self->test_via_script('$(FULLPERLRUN) $(TESTDB_SW)',
                                     '$(TEST_FILE)'));
     push(@m, "\n");
@@ -3534,13 +3614,13 @@ END
     push @m, "test_ : test_dynamic\n\n";
 
     if ($self->needs_linking()) {
-	push(@m, "test_static :: pure_all \$(MAP_TARGET)\n");
+	push(@m, "test_static :: pure_nolink static \$(MAP_TARGET)\n");
 	my $target = File::Spec->rel2abs('$(MAP_TARGET)');
 	my $command = qq{"$target" \$(MAP_PERLINC)};
 	push(@m, $self->test_via_harness($command, '$(TEST_FILES)')) if $tests;
 	push(@m, $self->test_via_script($command, '$(TEST_FILE)')) if -f "test.pl";
 	push(@m, "\n");
-	push(@m, "testdb_static :: pure_all \$(MAP_TARGET)\n");
+	push(@m, "testdb_static :: pure_nolink static \$(MAP_TARGET)\n");
 	push(@m, $self->test_via_script("$command \$(TESTDB_SW)", '$(TEST_FILE)'));
 	push(@m, "\n");
     } else {
@@ -3683,7 +3763,10 @@ sub top_targets {
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
     push @m, '
-pure_all :: config pm_to_blib subdirs linkext
+pure_all :: pure_nolink linkext
+	$(NOECHO) $(NOOP)
+
+pure_nolink :: config pm_to_blib subdirs
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)
@@ -3757,8 +3840,8 @@ only intended for broken make implementations.
 
 =cut
 
-sub xs_o {	# many makes are too dumb to use xs_c then c_o
-    my($self) = shift;
+sub xs_o {
+    my ($self) = @_;
     return '' unless $self->needs_linking();
     my $minus_o = $self->xs_obj_opt('$*$(OBJ_EXT)');
     my $frag = sprintf <<'EOF', $minus_o;

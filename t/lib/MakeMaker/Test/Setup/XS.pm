@@ -149,6 +149,14 @@ $label2files{subdirs} = +{
 };
 virtual_rename('subdirs', 'lib/XS/Test.pm', 'Test.pm');
 
+$label2files{subdirsstatic} = +{
+  %{ $label2files{'subdirs'} }, # make copy
+  'Makefile.PL' => sprintf(
+    $MAKEFILEPL, 'Test', 'Test.pm', qq{'$typemap'},
+    q{DEFINE => '-DINVAR=input', LINKTYPE => 'static',},
+  ),
+};
+
 sub virtual_rename {
   my ($label, $oldfile, $newfile) = @_;
   $label2files{$label}->{$newfile} = delete $label2files{$label}->{$oldfile};
@@ -168,6 +176,9 @@ sub setup_xs {
 sub list_static {
   (
     [ 'static', '', '' ],
+    [ 'basic', ' static', '_static' ],
+    [ 'subdirs', ' LINKTYPE=static', ' LINKTYPE=static' ],
+    [ 'subdirsstatic', '', '' ],
   );
 }
 
@@ -176,6 +187,8 @@ sub list_dynamic {
     [ 'basic', '', '' ],
     [ 'bscode', '', '' ],
     [ 'subdirs', '', '' ],
+    [ 'subdirsstatic', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
+    [ 'subdirsstatic', ' dynamic', '_dynamic' ],
   );
 }
 
