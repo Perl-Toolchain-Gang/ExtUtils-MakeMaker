@@ -224,14 +224,16 @@ sub list_static {
 sub list_dynamic {
   (
     [ 'basic', '', '' ],
-    $^O ne 'MSWin32' ? ([ 'bscode', '', '' ]) : (), # DynaLoader different
+    $^O ne 'MSWin32' ? (
+        [ 'bscode', '', '' ],
+        [ 'bscodemulti', '', '' ],
+    ) : (), # DynaLoader different
     [ 'subdirs', '', '' ],
     [ 'subdirsstatic', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'subdirsstatic', ' dynamic', '_dynamic' ],
     [ 'multi', '', '' ],
     [ 'staticmulti', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'staticmulti', ' dynamic', '_dynamic' ],
-    [ 'bscodemulti', '', '' ],
   );
 }
 
