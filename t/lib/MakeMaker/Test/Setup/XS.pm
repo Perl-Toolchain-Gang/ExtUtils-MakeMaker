@@ -77,6 +77,40 @@ require XS::Test;
 like $w, qr/NOISE/;
 EOF
 
+my $PM_OTHER = <<'END';
+package XS::Other;
+require Exporter;
+require DynaLoader;
+$VERSION = 1.20;
+@ISA    = qw(Exporter DynaLoader);
+@EXPORT = qw(is_odd);
+bootstrap XS::Other $VERSION;
+1;
+END
+
+my $XS_OTHER = <<'END';
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+MODULE = XS::Other       PACKAGE = XS::Other
+PROTOTYPES: DISABLE
+int
+is_odd(input)
+       int     input
+   CODE:
+       RETVAL = (INVAR % 2 == 1);
+   OUTPUT:
+       RETVAL
+END
+
+my $T_OTHER = <<'END';
+#!/usr/bin/perl -w
+use Test::More tests => 3;
+use_ok "XS::Other";
+ok is_odd(1);
+ok !is_odd(2);
+END
+
 my %Files = (
   'lib/XS/Test.pm' => $PM_TEST,
   $typemap => '',
@@ -101,6 +135,19 @@ $label2files{static} = +{
     q{LINKTYPE => 'static'},
   ),
 };
+
+$label2files{subdirs} = +{
+  %{ $label2files{'basic'} }, # make copy
+  'Makefile.PL' => sprintf(
+    $MAKEFILEPL, 'Test', 'Test.pm', qq{'$typemap'},
+    q{DEFINE => '-DINVAR=input',},
+  ),
+  'Other/Makefile.PL' => sprintf($MAKEFILEPL, 'Other', 'Other.pm', qq{}, ''),
+  'Other/Other.pm' => $PM_OTHER,
+  'Other/Other.xs' => $XS_OTHER,
+  't/is_odd.t' => $T_OTHER,
+};
+virtual_rename('subdirs', 'lib/XS/Test.pm', 'Test.pm');
 
 sub virtual_rename {
   my ($label, $oldfile, $newfile) = @_;
@@ -128,6 +175,7 @@ sub list_dynamic {
   (
     [ 'basic', '', '' ],
     [ 'bscode', '', '' ],
+    [ 'subdirs', '', '' ],
   );
 }
 

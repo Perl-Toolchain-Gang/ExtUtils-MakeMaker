@@ -2829,7 +2829,16 @@ sub get_version {
 =item pasthru (o)
 
 Defines the string that is passed to recursive make calls in
-subdirectories.
+subdirectories. The variables like C<PASTHRU_DEFINE> are used in each
+level, and passed downwards on the command-line with e.g. the value of
+that level's DEFINE. Example:
+
+    # Level 0 has DEFINE = -Dfunky
+    # This code will define level 0's PASTHRU=PASTHRU_DEFINE="$(DEFINE)
+    #     $(PASTHRU_DEFINE)"
+    # Level 0's $(CCCMD) will include macros $(DEFINE) and $(PASTHRU_DEFINE)
+    # So will level 1's, so when level 1 compiles, it will get right values
+    # And so ad infinitum
 
 =cut
 
@@ -2850,8 +2859,9 @@ sub pasthru {
     }
 
     foreach my $key (qw(DEFINE INC)) {
-        next unless defined $self->{$key};
-	push @pasthru, "PASTHRU_$key=\"\$(PASTHRU_$key)\"";
+        # unconditionally pass through even if not defined in Makefile.PL
+        # in case given on make command-line
+        push @pasthru, qq{PASTHRU_$key="\$($key) \$(PASTHRU_$key)"};
     }
 
     push @m, "\nPASTHRU = ", join ($sep, @pasthru), "\n";

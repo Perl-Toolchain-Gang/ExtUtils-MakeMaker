@@ -481,7 +481,10 @@ banner.
 
 sub pasthru {
     my($self) = shift;
-    return "PASTHRU = " . ($self->is_make_type('nmake') ? "-nologo" : "");
+    my $old = $self->SUPER::pasthru;
+    return $old unless $self->is_make_type('nmake');
+    $old =~ s/(PASTHRU\s*=\s*)/$1 -nologo /;
+    $old;
 }
 
 
