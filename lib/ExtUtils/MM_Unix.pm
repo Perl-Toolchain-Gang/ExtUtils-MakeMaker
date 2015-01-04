@@ -3869,7 +3869,8 @@ sub xs_c {
     return '' unless $self->needs_linking();
     '
 .xs.c:
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc
+	$(MV) $*.xsc $*.c
 ';
 }
 
@@ -3884,7 +3885,8 @@ sub xs_cpp {
     return '' unless $self->needs_linking();
     '
 .xs.cpp:
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.cpp
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
+	$(MV) $*.xsc $*.cpp
 ';
 }
 
