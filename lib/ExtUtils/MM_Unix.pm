@@ -904,7 +904,7 @@ sub _xs_make_bs {
     my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
     $instdir = '$(INST_ARCHAUTODIR)' if $basename eq '$(BASEEXT)';
     my $instfile = File::Spec->catfile($instdir, "$f.bs");
-    my $exists = File::Spec->catfile($instdir, '.exists');
+    my $exists = "$instdir\$(DFSEP).exists"; # match blibdirs_target
     #                             1          2          3
     return sprintf <<'MAKE_FRAG', $basename, $instfile, $exists;
 # As Mkbootstrap might not write a file (if none is required)
