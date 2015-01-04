@@ -1164,11 +1164,13 @@ sub skipcheck {
     return '';
 }
 
-# returns filehandle, dies on fail
+# returns filehandle, dies on fail. :raw so no :crlf
 sub open_for_writing {
     my ($file) = @_;
     open my $fh ,">", $file or die "Unable to open $file: $!";
-    binmode $fh, ':encoding(locale)' if $CAN_DECODE;
+    my @layers = ':raw';
+    push @layers, join ' ', ':encoding(locale)' if $CAN_DECODE;
+    binmode $fh, join ' ', @layers;
     $fh;
 }
 
