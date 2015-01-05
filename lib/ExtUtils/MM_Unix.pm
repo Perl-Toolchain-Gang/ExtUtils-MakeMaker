@@ -11,6 +11,7 @@ use File::Basename qw(basename dirname);
 our %Config_Override;
 our %XS_ext2src = qw(
     xs c
+    xscc cpp
 );
 my $xspat = join '|', keys %XS_ext2src;
 our $XS_extRE = qr/\.($xspat)\z/;

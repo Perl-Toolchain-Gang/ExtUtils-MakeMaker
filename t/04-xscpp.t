@@ -14,6 +14,8 @@ use Test::More;
 plan skip_all => "ExtUtils::CBuilder not installed or no C++ compiler"
   unless have_cplusplus();
 plan skip_all => 'Dynaloading not enabled' if $Config{usedl} ne 'define';
+plan skip_all => 'No ExtUtils::CppGuess'
+  unless eval { require ExtUtils::CppGuess };
 my @tests = list_cpp();
 plan skip_all => "No tests" unless @tests;
 plan tests => 6 * @tests;
