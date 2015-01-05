@@ -2787,6 +2787,7 @@ sub parse_abstract {
 
     local $/ = "\n";
     open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
+    binmode $fh;
     my $inpod = 0;
     my $pod_encoding;
     my $package = $self->{DISTNAME};
@@ -2794,7 +2795,7 @@ sub parse_abstract {
     while (<$fh>) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if !$inpod;
-        chop;
+        s#\r*\n\z##; # handle CRLF input
 
         if ( /^=encoding\s*(.*)$/i ) {
             $pod_encoding = $1;
