@@ -2335,7 +2335,7 @@ sub installbin {
     my($self) = shift;
 
     return "" unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
-    my @exefiles = @{$self->{EXE_FILES}};
+    my @exefiles = sort @{$self->{EXE_FILES}};
     return "" unless @exefiles;
 
     @exefiles = map vmsify($_), @exefiles if $Is{VMS};
@@ -2351,7 +2351,7 @@ sub installbin {
         $to = vmsify($to) if $Is{VMS};
 	$fromto{$from} = $to;
     }
-    my @to   = values %fromto;
+    my @to   = sort values %fromto;
 
     my @m;
     push(@m, qq{
@@ -2369,15 +2369,15 @@ realclean ::
 
 
     # A target for each exe file.
-    while (my($from,$to) = each %fromto) {
-	last unless defined $from;
-
-	push @m, sprintf <<'MAKE', $to, $from, $to, $from, $to, $to, $to;
-%s : %s $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
-	$(NOECHO) $(RM_F) %s
-	$(CP) %s %s
-	$(FIXIN) %s
-	-$(NOECHO) $(CHMOD) $(PERM_RWX) %s
+    my @froms = sort keys %fromto;
+    for my $from (@froms) {
+        #                          1      2
+        push @m, sprintf <<'MAKE', $from, $fromto{$from};
+%2$s : %1$s $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) %2$s
+	$(CP) %1$s %2$s
+	$(FIXIN) %2$s
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) %2$s
 
 MAKE
 
