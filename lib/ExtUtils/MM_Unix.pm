@@ -459,9 +459,9 @@ MM_REVISION = $self->{MM_REVISION}
     push @m, "
 # Handy lists of source code files:
 XS_FILES = ".$self->wraplist(sort keys %{$self->{XS}})."
-C_FILES  = ".$self->wraplist(@{$self->{C}})."
-O_FILES  = ".$self->wraplist(@{$self->{O_FILES}})."
-H_FILES  = ".$self->wraplist(@{$self->{H}})."
+C_FILES  = ".$self->wraplist(sort @{$self->{C}})."
+O_FILES  = ".$self->wraplist(sort @{$self->{O_FILES}})."
+H_FILES  = ".$self->wraplist(sort @{$self->{H}})."
 MAN1PODS = ".$self->wraplist(sort keys %{$self->{MAN1PODS}})."
 MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS}})."
 ";
