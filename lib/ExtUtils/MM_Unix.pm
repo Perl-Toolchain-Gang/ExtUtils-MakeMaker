@@ -3559,8 +3559,7 @@ sub subdir_x {
     my $subdir_cmd = $self->cd($subdir,
       sprintf '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) %s $(PASTHRU)', $target
     );
-    my $sd_target = 'subdirs' . ($target eq 'all' ? '' : "_$target");
-    return sprintf <<'EOT', $sd_target, $subdir_cmd;
+    return sprintf <<'EOT', "subdirs_$target", $subdir_cmd;
 
 %s ::
 	$(NOECHO) %s
@@ -3582,9 +3581,7 @@ sub subdirs {
     # subdirectories containing further Makefile.PL scripts.
     # It calls the subdir_x() method for each subdirectory.
     foreach my $dir (@{$self->{DIR}}){
-	push @m, $self->subdir_x($dir, 'all');
-	push @m, $self->subdir_x($dir, 'static');
-	push @m, $self->subdir_x($dir, 'dynamic');
+	push @m, map $self->subdir_x($dir, $_), qw(pure_nolink static dynamic);
 ####	print "Including $dir subdirectory\n";
     }
     if (@m){
@@ -3822,10 +3819,24 @@ sub top_targets {
 pure_all :: pure_nolink linkext
 	$(NOECHO) $(NOOP)
 
-pure_nolink :: config pm_to_blib subdirs
+pure_nolink :: config pm_to_blib subdirs_pure_nolink
 	$(NOECHO) $(NOOP)
 
-subdirs :: $(MYEXTLIB)
+# this is in case of overrides, no longer used by EUMM natively
+subdirs :: subdirs_$(LINKTYPE)
+	$(NOECHO) $(NOOP)
+
+# in case LINKTYPE not set
+subdirs_ :: subdirs_dynamic
+	$(NOECHO) $(NOOP)
+
+subdirs_pure_nolink ::
+	$(NOECHO) $(NOOP)
+
+subdirs_dynamic :: $(MYEXTLIB)
+	$(NOECHO) $(NOOP)
+
+subdirs_static :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
 config :: $(FIRST_MAKEFILE) blibdirs
