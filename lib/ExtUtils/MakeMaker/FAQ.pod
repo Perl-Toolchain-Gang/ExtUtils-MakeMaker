@@ -552,6 +552,10 @@ F<Makefile.PL>, give C<XSMULTI> as 1. You will make your distribution
 much more portable, with much less effort for yourself, if you use
 L<ExtUtils::CppGuess> for C++ compiler configuration information.
 
+Likewise, if you want XSUBS in Objective C, use the file extension
+F<.xsm>, and they will automatically be converted using C<xsubpp> to a
+F<.m> file. You will have to supply appropriate values for C<CC> etc.
+
 =head1 DESIGN
 
 =head2 MakeMaker object hierarchy (simplified)
