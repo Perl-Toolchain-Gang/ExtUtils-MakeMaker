@@ -139,6 +139,7 @@ END
 note "PREREQ_PRINT output"; {
     my $prereq_out = run(qq{$perl Makefile.PL "PREREQ_PRINT=1"});
     is( $?, 0,            'PREREQ_PRINT exiting normally' );
+    $prereq_out =~ s/.*(\$PREREQ_PM\s*=)/$1/s; # strip off errors eg from chcp
     my $prereq_out_sane = $prereq_out =~ /^\s*\$PREREQ_PM\s*=/;
     ok( $prereq_out_sane, '  and talking like we expect' ) ||
         diag($prereq_out);
@@ -166,7 +167,7 @@ note "PRINT_PREREQ output"; {
     is( $?, 0,                      'PRINT_PREREQ exiting normally' );
     ok( $prereq_out !~ /^warning/i, '  and not complaining loudly' );
     like( $prereq_out,
-        qr/^perl\(perl\) \s* >= 5\.005 \s+ perl\(strict\) \s* >= \s* 0 \s*$/x,
+        qr/^perl\(perl\) \s* >= 5\.005 \s+ perl\(strict\) \s* >= \s* 0 \s*$/mx,
                                     'dump has prereqs and perl version' );
 }
 
