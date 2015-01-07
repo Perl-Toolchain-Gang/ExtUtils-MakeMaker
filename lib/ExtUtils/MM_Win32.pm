@@ -36,7 +36,7 @@ my ( $BORLAND, $GCC, $MSVC, $DLLTOOL ) = _identify_compiler_environment( \%Confi
 sub _identify_compiler_environment {
 	my ( $config ) = @_;
 
-	my $BORLAND = $config->{cc} =~ /^bcc/i ? 1 : 0;
+	my $BORLAND = $config->{cc} =~ /\bbcc/i ? 1 : 0;
 	my $GCC     = $config->{cc} =~ /\bgcc\b/i ? 1 : 0;
 	my $MSVC    = $config->{cc} =~ /\b(?:cl|icl)/i ? 1 : 0; # MSVC can come as clarm.exe, icl=Intel C
 	my $DLLTOOL = $config->{dlltool} || 'dlltool';
