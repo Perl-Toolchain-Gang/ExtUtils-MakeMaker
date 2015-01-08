@@ -12,7 +12,7 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 110;
+        plan tests => 109;
     }
 }
 
@@ -98,7 +98,6 @@ foreach ( qw /
   ppd
   prefixify
   processPL
-  quote_paren
   realclean
   static
   static_lib

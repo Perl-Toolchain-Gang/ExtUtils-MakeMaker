@@ -288,9 +288,6 @@ sub cflags {
 	$pollute = '$(PERL_MALLOC_DEF)';
     }
 
-    $self->{CCFLAGS}  = quote_paren($self->{CCFLAGS});
-    $self->{OPTIMIZE} = quote_paren($self->{OPTIMIZE});
-
     return $self->{CFLAGS} = qq{
 CCFLAGS = $self->{CCFLAGS}
 OPTIMIZE = $self->{OPTIMIZE}
@@ -341,7 +338,6 @@ END
     foreach my $key (@{$self->{CONFIG}}){
         # SITE*EXP macros are defined in &constants; avoid duplicates here
         next if $once_only{$key};
-        $self->{uc $key} = quote_paren($self->{uc $key});
         push @m, uc($key) , ' = ' , $self->{uc $key}, "\n";
         $once_only{$key} = 1;
     }
