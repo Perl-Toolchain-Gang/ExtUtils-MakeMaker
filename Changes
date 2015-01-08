@@ -1,21 +1,25 @@
 7.05_06
     Enhancements:
     - Refactored XS handling
-    - XSMULTI
+    - XSMULTI=>1 - put multiple *.xs under lib, it "just works"
+    - pure_all target split so can do "make dynamic" and "make static"
 
     Bug fixes:
     - dist_ci target fixed for nmake
-    - ?
+    - Avoid dmake warning with XS
+    - Borland and GNU compiler can be specified with full path
+    - Fix parallel-build problems with split of pure_all target
+    - Make Win32 miniperl tests pass if no chcp
+    - Fix metadata extraction problem with *.pm with CRLF
 
     Test fixes:
-    - ?
+    - Now tested: XS builds of static, bootstrap code system
+    - XS tests now pluggable
+    - Win32 t/basic.t now tries Win32 module before chcp
 
     Doc fixes:
     - FAQ updated for XSMULTI
-    - ?
-
-    Dist fixes:
-    - ?
+    - Improve doc for oneliner method
 
 7.05_05 Wed Dec 31 22:42:17 GMT 2014
     Enhancements:
