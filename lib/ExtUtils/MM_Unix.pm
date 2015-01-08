@@ -3914,7 +3914,9 @@ sub xs_o {
     my ($self) = @_;
     return '' unless $self->needs_linking();
     my $minus_o = $self->xs_obj_opt('$*$(OBJ_EXT)');
-    my $frag = sprintf <<'EOF', $minus_o;
+    my $frag = '';
+    # dmake makes noise about ambiguous rule
+    $frag .= sprintf <<'EOF', $minus_o unless $self->is_make_type('dmake');
 .xs$(OBJ_EXT) :
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
 	$(MV) $*.xsc $*.c
