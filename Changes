@@ -1,3 +1,22 @@
+7.05_06
+    Enhancements:
+    - Refactored XS handling
+    - XSMULTI
+
+    Bug fixes:
+    - dist_ci target fixed for nmake
+    - ?
+
+    Test fixes:
+    - ?
+
+    Doc fixes:
+    - FAQ updated for XSMULTI
+    - ?
+
+    Dist fixes:
+    - ?
+
 7.05_05 Wed Dec 31 22:42:17 GMT 2014
     Enhancements:
     - Metadata is now represented internally as Meta Spec 2.0
