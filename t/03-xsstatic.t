@@ -14,8 +14,7 @@ use Test::More;
 plan skip_all => "ExtUtils::CBuilder not installed or couldn't find a compiler"
   unless have_compiler();
 plan skip_all => 'Shared perl library' if $Config{useshrplib} eq 'define';
-plan skip_all => 'MSWin32' if $^O eq 'MSWin32';
-plan skip_all => 'Cygwin' if $^O eq 'cygwin';
+plan skip_all => $^O if $^O =~ m!^(MSWin32|cygwin|haiku)!;
 my @tests = list_static();
 plan skip_all => "No tests" unless @tests;
 plan tests => 6 * @tests;
