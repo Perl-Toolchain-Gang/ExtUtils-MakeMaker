@@ -2367,7 +2367,6 @@ realclean ::
     push @m, map "\t$_\n", $self->split_command('$(RM_F)', @to);
     push @m, "\n";
 
-
     # A target for each exe file.
     my @froms = sort keys %fromto;
     for my $from (@froms) {
@@ -3207,40 +3206,40 @@ sub processPL {
     foreach my $plfile (sort keys %$pl_files) {
         my $list = ref($pl_files->{$plfile})
                      ?  $pl_files->{$plfile}
-		     : [$pl_files->{$plfile}];
+                     : [$pl_files->{$plfile}];
 
-	foreach my $target (@$list) {
+        foreach my $target (@$list) {
             if( $Is{VMS} ) {
                 $plfile = vmsify($self->eliminate_macros($plfile));
                 $target = vmsify($self->eliminate_macros($target));
             }
 
-	    # Normally a .PL file runs AFTER pm_to_blib so it can have
-	    # blib in its @INC and load the just built modules.  BUT if
-	    # the generated module is something in $(TO_INST_PM) which
-	    # pm_to_blib depends on then it can't depend on pm_to_blib
-	    # else we have a dependency loop.
-	    my $pm_dep;
-	    my $perlrun;
-	    if( defined $self->{PM}{$target} ) {
-		$pm_dep  = '';
-		$perlrun = 'PERLRUN';
-	    }
-	    else {
-		$pm_dep  = 'pm_to_blib';
-		$perlrun = 'PERLRUNINST';
-	    }
+            # Normally a .PL file runs AFTER pm_to_blib so it can have
+            # blib in its @INC and load the just built modules.  BUT if
+            # the generated module is something in $(TO_INST_PM) which
+            # pm_to_blib depends on then it can't depend on pm_to_blib
+            # else we have a dependency loop.
+            my $pm_dep;
+            my $perlrun;
+            if( defined $self->{PM}{$target} ) {
+                $pm_dep  = '';
+                $perlrun = 'PERLRUN';
+            }
+            else {
+                $pm_dep  = 'pm_to_blib';
+                $perlrun = 'PERLRUNINST';
+            }
 
             $m .= <<MAKE_FRAG;
 
-all :: $target
+pure_nolink :: $target
 	\$(NOECHO) \$(NOOP)
 
 $target :: $plfile $pm_dep
 	\$($perlrun) $plfile $target
 MAKE_FRAG
 
-	}
+        }
     }
 
     return $m;
@@ -3402,7 +3401,7 @@ sub static {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
-static :: $(FIRST_MAKEFILE) $(INST_STATIC) subdirs_static
+static :: $(FIRST_MAKEFILE) $(INST_STATIC) subdirs_static pure_nolink
 	$(NOECHO) $(NOOP)
 
 # define this here not top_targets in case someone overrides that
