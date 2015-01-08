@@ -22,7 +22,7 @@ the semantics.
 use ExtUtils::MakeMaker::Config;
 use File::Basename;
 use File::Spec;
-use ExtUtils::MakeMaker qw( neatvalue );
+use ExtUtils::MakeMaker qw(neatvalue _sprintf562);
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
@@ -307,8 +307,8 @@ sub xs_make_dynamic_lib {
     if ($GCC) {
       # per https://rt.cpan.org/Ticket/Display.html?id=78395 no longer
       # uses dlltool - relies on post 2002 MinGW
-      #                         1            2
-      push @m, sprintf <<'EOF', $exportlist, $ldfrom;
+      #                             1            2
+      push @m, _sprintf562 <<'EOF', $exportlist, $ldfrom;
 	$(LD) %1$s -o $@ $(LDDLFLAGS) %2$s $(OTHERLDFLAGS) $(MYEXTLIB) "$(PERL_ARCHIVE)" $(LDLOADLIBS) -Wl,--enable-auto-image-base
 EOF
     } elsif ($BORLAND) {

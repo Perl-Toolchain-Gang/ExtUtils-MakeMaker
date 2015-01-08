@@ -21,7 +21,7 @@ require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
 our @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
 
-use ExtUtils::MakeMaker qw($Verbose neatvalue);
+use ExtUtils::MakeMaker qw($Verbose neatvalue _sprintf562);
 our $Revision = $ExtUtils::MakeMaker::Revision;
 
 
@@ -934,8 +934,8 @@ sub xs_o {
 	    $cccmd = $1;
 	    $cccmd =~ s/\b(VERSION=)[^,\)]*/$1\\"$version\\"/;
 	    $cccmd =~ s/\b(XS_VERSION=)[^,\)]*/$1\\"$version\\"/;
-	    #                         1     2
-	    $frag .= sprintf <<'EOF', $ext, $cccmd;
+	    #                             1     2
+	    $frag .= _sprintf562 <<'EOF', $ext, $cccmd;
 
 %1$s$(OBJ_EXT) : %1$s.xs
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs > $(MMS$TARGET_NAME).xsc
@@ -1078,8 +1078,8 @@ sub xs_make_dynamic_lib {
     my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
     my $shr = $Config{'dbgprefix'} . 'PerlShr';
     $exportlist =~ s/.def$/.opt/;  # it's a linker options file
-    #                1    2       3            4     5
-    sprintf <<'EOF', $to, $todir, $exportlist, $shr, "$shr Sys\$Share:$shr.$Config{'dlext'}";
+    #                    1    2       3            4     5
+    _sprintf562 <<'EOF', $to, $todir, $exportlist, $shr, "$shr Sys\$Share:$shr.$Config{'dlext'}";
 %1$s : $(INST_STATIC) $(PERL_INC)perlshr_attr.opt %2$s$(DFSEP).exists %3$s $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 	If F$TrnLNm("%4$s").eqs."" Then Define/NoLog/User %5$s
 	Link $(LDFLAGS) /Shareable=$(MMS$TARGET)$(OTHERLDFLAGS) %3$s/Option,$(PERL_INC)perlshr_attr.opt/Option

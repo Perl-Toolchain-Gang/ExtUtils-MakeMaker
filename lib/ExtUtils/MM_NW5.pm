@@ -27,7 +27,7 @@ our $VERSION = '7.05_05';
 require ExtUtils::MM_Win32;
 our @ISA = qw(ExtUtils::MM_Win32);
 
-use ExtUtils::MakeMaker qw( &neatvalue );
+use ExtUtils::MakeMaker qw(&neatvalue &_sprintf562);
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
@@ -182,8 +182,8 @@ sub xs_make_dynamic_lib {
         $to = $newto;
     }
     # bits below should be in dlsyms, not here
-    #                               1    2      3       4
-    push @m, sprintf <<'MAKE_FRAG', $to, $from, $todir, $exportlist;
+    #                                   1    2      3       4
+    push @m, _sprintf562 <<'MAKE_FRAG', $to, $from, $todir, $exportlist;
 # Create xdc data for an MT safe NLM in case of mpk build
 %1$s: %2$s $(MYEXTLIB) $(BOOTSTRAP) %3$s$(DFSEP).exists
 	$(NOECHO) $(ECHO) Export boot_$(BOOT_SYMBOL) > %4$s

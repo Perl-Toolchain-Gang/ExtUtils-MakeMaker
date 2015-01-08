@@ -36,7 +36,8 @@ our $Filename = __FILE__;   # referenced outside MakeMaker
 our @ISA = qw(Exporter);
 our @EXPORT    = qw(&WriteMakefile $Verbose &prompt);
 our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
-                    &WriteEmptyMakefile &open_for_writing &write_file_via_tmp);
+                    &WriteEmptyMakefile &open_for_writing &write_file_via_tmp
+                    &_sprintf562);
 
 # These will go away once the last of the Win32 & VMS specific code is
 # purged.
@@ -53,6 +54,15 @@ require ExtUtils::MY;  # XXX pre-5.8 versions of ExtUtils::Embed expect
                        # loading ExtUtils::MakeMaker will give them MY.
                        # This will go when Embed is its own CPAN module.
 
+
+# 5.6.2 can't do sprintf "%1$s" - this can only do %s
+sub _sprintf562 {
+    my ($format, @args) = @_;
+    for (my $i = 1; $i <= @args; $i++) {
+        $format =~ s#%$i\$s#$args[$i-1]#g;
+    }
+    $format;
+}
 
 sub WriteMakefile {
     croak "WriteMakefile: Need even number of args" if @_ % 2;

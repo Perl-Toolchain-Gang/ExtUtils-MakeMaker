@@ -11,7 +11,7 @@ use DirHandle;
 
 our %Config_Override;
 
-use ExtUtils::MakeMaker qw($Verbose neatvalue);
+use ExtUtils::MakeMaker qw($Verbose neatvalue _sprintf562);
 
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);
@@ -901,8 +901,8 @@ sub _xs_make_bs {
     $instdir = '$(INST_ARCHAUTODIR)' if $basename eq '$(BASEEXT)';
     my $instfile = File::Spec->catfile($instdir, "$f.bs");
     my $exists = "$instdir\$(DFSEP).exists"; # match blibdirs_target
-    #                             1          2          3
-    return sprintf <<'MAKE_FRAG', $basename, $instfile, $exists;
+    #                                 1          2          3
+    return _sprintf562 <<'MAKE_FRAG', $basename, $instfile, $exists;
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
@@ -2366,8 +2366,8 @@ realclean ::
     # A target for each exe file.
     my @froms = sort keys %fromto;
     for my $from (@froms) {
-        #                          1      2
-        push @m, sprintf <<'MAKE', $from, $fromto{$from};
+        #                              1      2
+        push @m, _sprintf562 <<'MAKE', $from, $fromto{$from};
 %2$s : %1$s $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
 	$(NOECHO) $(RM_F) %2$s
 	$(CP) %1$s %2$s
@@ -2380,7 +2380,6 @@ MAKE
 
     join "", @m;
 }
-
 
 =item linkext (o)
 
@@ -2633,8 +2632,8 @@ $(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" 
     }
 
     my $ldfrom = $self->{XSMULTI} ? '' : '$(LDFROM)';
-    #                         1     2                        3        4
-    push @m, sprintf <<'EOF', $tmp, $self->xs_obj_opt('$@'), $ldfrom, $makefilename;
+    #                             1     2                        3        4
+    push @m, _sprintf562 <<'EOF', $tmp, $self->xs_obj_opt('$@'), $ldfrom, $makefilename;
 $(MAP_TARGET) :: %1$s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(INST_ARCHAUTODIR)/extralibs.all
 	$(MAP_LINKCMD) %2$s $(OPTIMIZE) %1$s/perlmain$(OBJ_EXT) %3$s $(MAP_STATIC) "$(LLIBPERL)" `cat $(INST_ARCHAUTODIR)/extralibs.all` $(MAP_PRELIBS)
 	$(NOECHO) $(ECHO) "To install the new '$(MAP_TARGET)' binary, call"
@@ -3927,8 +3926,8 @@ EOF
 	    $cccmd =~ s/^\s*CCCMD\s*=\s*//;
 	    $cccmd =~ s/\$\(DEFINE_VERSION\)/-DVERSION=\\"$version\\"/;
 	    $cccmd =~ s/\$\(XS_DEFINE_VERSION\)/-DXS_VERSION=\\"$version\\"/;
-	    #                         1     2       3
-	    $frag .= sprintf <<'EOF', $ext, $cccmd, $minus_o;
+	    #                             1     2       3
+	    $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $minus_o;
 
 %1$s$(OBJ_EXT): %1$s.xs
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
