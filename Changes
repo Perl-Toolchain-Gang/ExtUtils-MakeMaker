@@ -1,4 +1,4 @@
-7.05_06
+7.05_06 Thu Jan  8 19:03:48 GMT 2015
     Enhancements:
     - Refactored XS handling
     - XSMULTI=>1 - put multiple *.xs under lib, it "just works"
