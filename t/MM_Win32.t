@@ -346,8 +346,8 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
         },
         {
             config => { cc => 'C:/Borland/bin/bcc.exe' },
-            key => 'BORLAND', expect => 0,
-            desc => 'fully qualified borland cc is not recognized',
+            key => 'BORLAND', expect => 1,
+            desc => 'fully qualified borland cc is recognized',
         },
         {
             config => { cc => 'bcc-1.exe' },
