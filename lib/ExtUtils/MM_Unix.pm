@@ -3645,14 +3645,14 @@ END
 	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 
-    push(@m, "test_dynamic :: pure_nolink dynamic\n");
+    push(@m, "test_dynamic :: dynamic\n");
     push(@m, $self->test_via_harness('$(FULLPERLRUN)', '$(TEST_FILES)'))
       if $tests;
     push(@m, $self->test_via_script('$(FULLPERLRUN)', '$(TEST_FILE)'))
       if -f "test.pl";
     push(@m, "\n");
 
-    push(@m, "testdb_dynamic :: pure_nolink dynamic\n");
+    push(@m, "testdb_dynamic :: dynamic\n");
     push(@m, $self->test_via_script('$(FULLPERLRUN) $(TESTDB_SW)',
                                     '$(TEST_FILE)'));
     push(@m, "\n");
@@ -3661,13 +3661,13 @@ END
     push @m, "test_ : test_dynamic\n\n";
 
     if ($self->needs_linking()) {
-	push(@m, "test_static :: pure_nolink static \$(MAP_TARGET)\n");
+	push(@m, "test_static :: static \$(MAP_TARGET)\n");
 	my $target = File::Spec->rel2abs('$(MAP_TARGET)');
 	my $command = qq{"$target" \$(MAP_PERLINC)};
 	push(@m, $self->test_via_harness($command, '$(TEST_FILES)')) if $tests;
 	push(@m, $self->test_via_script($command, '$(TEST_FILE)')) if -f "test.pl";
 	push(@m, "\n");
-	push(@m, "testdb_static :: pure_nolink static \$(MAP_TARGET)\n");
+	push(@m, "testdb_static :: static \$(MAP_TARGET)\n");
 	push(@m, $self->test_via_script("$command \$(TESTDB_SW)", '$(TEST_FILE)'));
 	push(@m, "\n");
     } else {
@@ -3810,7 +3810,7 @@ sub top_targets {
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
     push @m, '
-pure_all :: pure_nolink linkext
+pure_all :: linkext
 	$(NOECHO) $(NOOP)
 
 pure_nolink :: config pm_to_blib subdirs_pure_nolink
