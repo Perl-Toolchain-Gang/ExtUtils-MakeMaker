@@ -3619,14 +3619,20 @@ TEST_FILES = $tests
 TESTDB_SW = -d
 
 testdb :: testdb_\$(LINKTYPE)
+	\$(NOECHO) \$(NOOP)
 
 test :: \$(TEST_TYPE) subdirs-test
+	\$(NOECHO) \$(NOOP)
 
 subdirs-test ::
 	\$(NOECHO) \$(NOOP)
 
 # defined here as well as top_targets in case someone overrides that
 pure_nolink ::
+	\$(NOECHO) \$(NOOP)
+
+# Occasionally we may face this degenerate target:
+test_ : test_dynamic
 	\$(NOECHO) \$(NOOP)
 
 ");
@@ -3641,15 +3647,13 @@ subdirs-test ::
 END
     }
 
-    push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
-	unless $tests or -f "test.pl" or @{$self->{DIR}};
-    push(@m, "\n");
-
     push(@m, "test_dynamic :: dynamic\n");
     push(@m, $self->test_via_harness('$(FULLPERLRUN)', '$(TEST_FILES)'))
       if $tests;
     push(@m, $self->test_via_script('$(FULLPERLRUN)', '$(TEST_FILE)'))
       if -f "test.pl";
+    push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
+	unless $tests or -f "test.pl" or @{$self->{DIR}};
     push(@m, "\n");
 
     push(@m, "testdb_dynamic :: dynamic\n");
@@ -3657,10 +3661,7 @@ END
                                     '$(TEST_FILE)'));
     push(@m, "\n");
 
-    # Occasionally we may face this degenerate target:
-    push @m, "test_ : test_dynamic\n\n";
-
-    if ($self->needs_linking()) {
+    if ($self->needs_linking and ($tests or -f "test.pl")) {
 	push(@m, "test_static :: static \$(MAP_TARGET)\n");
 	my $target = File::Spec->rel2abs('$(MAP_TARGET)');
 	my $command = qq{"$target" \$(MAP_PERLINC)};
