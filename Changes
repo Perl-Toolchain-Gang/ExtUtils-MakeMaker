@@ -1,3 +1,12 @@
+7.05_07 Fri Jan  9 15:58:49 GMT 2015
+    Bug fixes:
+    - Dynamic and static targets now depend from pure_nolink
+
+    Test fixes:
+    - Skip XS static on Haiku as well
+    - Correctly skip static linking test on shrplib perls
+    - Handle an occasional race condition in pm_to_blib.t
+
 7.05_06 Thu Jan  8 19:03:48 GMT 2015
     Enhancements:
     - Refactored XS handling
