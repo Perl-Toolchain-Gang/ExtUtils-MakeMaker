@@ -933,19 +933,19 @@ sub dynamic_lib {
     my @m = $self->xs_dynamic_lib_macros(\%attribs);
     my @libs;
     if ($self->{XSMULTI}) {
-	my @exts = $self->_xs_list_basenames;
-	for my $ext (@exts) {
-	    my ($v, $d, $f) = File::Spec->splitpath($ext);
-	    my @d = File::Spec->splitdir($d);
-	    shift @d if $d[0] eq 'lib';
-	    my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
-	    my $instfile = File::Spec->catfile($instdir, "$f.\$(DLEXT)");
-	    my $objfile = "$ext\$(OBJ_EXT)";
-	    my $exportlist = "$ext.def";
-	    push @libs, [ $objfile, $instfile, $instdir, $objfile, $exportlist ];
-	}
+        my @exts = $self->_xs_list_basenames;
+        for my $ext (@exts) {
+            my ($v, $d, $f) = File::Spec->splitpath($ext);
+            my @d = File::Spec->splitdir($d);
+            shift @d if $d[0] eq 'lib';
+            my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+            my $instfile = File::Spec->catfile($instdir, "$f.\$(DLEXT)");
+            my $objfile = "$ext\$(OBJ_EXT)";
+            my $exportlist = "$ext.def";
+            push @libs, [ $objfile, $instfile, $instdir, $objfile, $exportlist ];
+        }
     } else {
-	@libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
+        @libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
     }
     push @m, map { $self->xs_make_dynamic_lib(\%attribs, @$_); } @libs;
 
@@ -992,7 +992,7 @@ sub xs_make_dynamic_lib {
     my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
     $exportlist = '' if $exportlist ne '$(EXPORT_LIST)';
     my $armaybe = $self->_xs_armaybe($attribs);
-    my @m = sprintf '%s: %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
+    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
     if ($armaybe ne ':'){
         $ldfrom = 'tmp$(LIB_EXT)';
         push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
@@ -3839,7 +3839,7 @@ config :: $(FIRST_MAKEFILE) blibdirs
 ';
 
     push @m, '
-$(O_FILES): $(H_FILES)
+$(O_FILES) : $(H_FILES)
 ' if @{$self->{O_FILES} || []} && @{$self->{H} || []};
 
     push @m, q{
