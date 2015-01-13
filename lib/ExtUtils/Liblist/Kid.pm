@@ -78,7 +78,7 @@ sub _unix_os2_ext {
             }
             unless ( File::Spec->file_name_is_absolute( $thislib ) ) {
                 warn "Warning: $ptype$thislib changed to $ptype$pwd/$thislib\n";
-                $thislib = $self->catdir( $pwd, $thislib );
+                $thislib = File::Spec->catdir( $pwd, $thislib );
             }
             push( @searchpath, $thislib );
             push( @extralibs,  "$ptype$thislib" );
@@ -318,7 +318,7 @@ sub _win32_ext {
         elsif ( -d ) {
             unless ( File::Spec->file_name_is_absolute( $_ ) ) {
                 warn "Warning: '$thislib' changed to '-L$pwd/$_'\n";
-                $_ = $self->catdir( $pwd, $_ );
+                $_ = File::Spec->catdir( $pwd, $_ );
             }
             push( @searchpath, $_ );
             next;
@@ -475,7 +475,7 @@ sub _vms_ext {
                 if    ( lc $type eq '/share' )   { $locspec .= $Config{'exe_ext'}; }
                 elsif ( lc $type eq '/library' ) { $locspec .= $Config{'lib_ext'}; }
                 else                             { $locspec .= $Config{'obj_ext'}; }
-                $locspec = $self->catfile( $self->{PERL_SRC}, $locspec );
+                $locspec = File::Spec->catfile( $self->{PERL_SRC}, $locspec );
                 $lib = "$locspec$type" if -e $locspec;
             }
         }
@@ -539,7 +539,7 @@ sub _vms_ext {
             $dir = VMS::Filespec::vmspath( $dir );
         }
         else {
-            $dir = $self->catdir( $cwd, $dir );
+            $dir = File::Spec->catdir( $cwd, $dir );
         }
     }
     @dirs = grep { length( $_ ) } @dirs;

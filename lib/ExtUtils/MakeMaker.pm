@@ -235,7 +235,7 @@ sub eval_in_subdirs {
     push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir (@{$self->{DIR}}){
-        my($abs) = $self->catdir($pwd,$dir);
+        my($abs) = File::Spec->catdir($pwd,$dir);
         eval { $self->eval_in_x($abs); };
         last if $@;
     }
@@ -657,15 +657,15 @@ END
                 # into a filespec, but do add a level to the path of
                 # the argument if not already absolute.
                 my @cmd = split /\s+/, $self->{$key};
-                $cmd[1] = $self->catfile('[-]',$cmd[1])
-                  unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
+                $cmd[1] = File::Spec->catfile('[-]',$cmd[1])
+                  unless (@cmd < 2) || File::Spec->file_name_is_absolute($cmd[1]);
                 $self->{$key} = join(' ', @cmd);
             } else {
                 my $value = $self->{$key};
                 # not going to test in FS so only stripping start
                 $value =~ s/^"// if $key =~ /PERL$/;
-                $value = $self->catdir("..", $value)
-                  unless $self->file_name_is_absolute($value);
+                $value = File::Spec->catdir("..", $value)
+                  unless File::Spec->file_name_is_absolute($value);
                 $value = qq{"$value} if $key =~ /PERL$/;
                 $self->{$key} = $value;
             }
@@ -725,7 +725,7 @@ END
 
     $self->arch_check(
         $INC{'Config.pm'},
-        $self->catfile($Config{'archlibexp'}, "Config.pm")
+        File::Spec->catfile($Config{'archlibexp'}, "Config.pm")
     );
 
     $self->init_tools();

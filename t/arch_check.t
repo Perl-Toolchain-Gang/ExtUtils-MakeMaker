@@ -8,6 +8,7 @@ use Test::More 'no_plan';
 
 use Config;
 use ExtUtils::MakeMaker;
+use File::Spec;
 
 ok( my $stdout = tie *STDOUT, 'TieOut' );
 
@@ -16,7 +17,7 @@ my $mm = bless {}, "MM";
 $mm->{PERL_SRC} = 0;
 $mm->{UNINSTALLED_PERL} = 0;
 
-my $rel2abs = sub { $mm->rel2abs($mm->catfile(@_)) };
+my $rel2abs = sub { File::Spec->rel2abs(File::Spec->catfile(@_)) };
 
 ok $mm->arch_check(
     $rel2abs->(qw(. t testdata reallylongdirectoryname arch1 Config.pm)),
