@@ -194,61 +194,6 @@ $label2files{staticmulti} = +{
   ),
 };
 
-# mimic scheme in Archive::Unzip::Burst:
-#   MYEXTLIB is res/lib*.a
-#   top-level postamble deps res/unzip/Makefile off MYEXTLIB and builds res/unzip/*.o
-# res/M.PL overrides top_targets with:
-#   "all : static"
-#   "static : lib*.a"
-#   "lib*.a : unzip/*.o -> ar makes lib*.a"
-# this scheme depends on top level subdirs (specifically res's "static")
-# being built before it tries its MYEXTLIB target
-$label2files{subdirsoverride} = +{
-  %{ $label2files{'basic'} }, # make copy
-
-  'Makefile.PL' => sprintf(
-    $MAKEFILEPL, 'Test', 'Test.pm', qq{'$typemap'},
-    q{DEFINE => '-DINVAR=input', MYEXTLIB => 'Other/libover$(LIB_EXT)'},
-  ) . <<'EOF',
-package MY;
-sub postamble {
-  my ($self) = @_;
-  sprintf <<'MAKEFRAG', $self->cd($self->catdir(qw(Other sub)), '$(MAKE)');
-$(MYEXTLIB) :
-	%s
-MAKEFRAG
-}
-EOF
-
-  'Other/Makefile.PL' => sprintf($MAKEFILEPL, 'Other', '../Test.pm', qq{}, '') . <<'EOF',
-package MY;
-sub top_targets {
-  <<'MAKEFRAG';
-all :: static
-static :: libover$(LIB_EXT)
-libover$(LIB_EXT) : sub/notmuch$(OBJ_EXT)
-	$(AR) cr "$@" "$<"
-	$(RANLIB) "$@"
-MAKEFRAG
-}
-EOF
-
-  'Other/sub/Makefile.PL' => sprintf(
-    $MAKEFILEPL, 'Third', '../../Test.pm', qq{}, 'OBJECT => q{$(O_FILES)}'
-  ) . <<'EOF',
-package MY;
-sub top_targets {
-  <<'MAKEFRAG';
-all :: $(O_FILES)
-MAKEFRAG
-}
-EOF
-
-  'Other/sub/notmuch.c' => '',
-
-};
-virtual_rename('subdirsoverride', 'lib/XS/Test.pm', 'Test.pm');
-
 sub virtual_rename {
   my ($label, $oldfile, $newfile) = @_;
   $label2files{$label}->{$newfile} = delete $label2files{$label}->{$oldfile};
@@ -289,7 +234,6 @@ sub list_dynamic {
     [ 'multi', '', '' ],
     [ 'staticmulti', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'staticmulti', ' dynamic', '_dynamic' ],
-    [ 'subdirsoverride', '', '' ],
   );
 }
 

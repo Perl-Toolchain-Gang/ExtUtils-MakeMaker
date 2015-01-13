@@ -992,14 +992,7 @@ sub xs_make_dynamic_lib {
     my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
     $exportlist = '' if $exportlist ne '$(EXPORT_LIST)';
     my $armaybe = $self->_xs_armaybe($attribs);
-    # if there are subdirs and MYEXTLIB looks relative ie in a subdir and
-    # looks like a static library, heuristic to ensure MYEXTLIB gets built
-    my $subdirs_static = '';
-    $subdirs_static = 'subdirs_static'
-        if $self->{MYEXTLIB} &&
-        (File::Spec->rel2abs($self->{MYEXTLIB}) ne $self->{MYEXTLIB}) &&
-        $self->{MYEXTLIB} =~ /\Q$self->{LIB_EXT}\E|\$\(LIB_EXT\)\z/;
-    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP) %s'."\n", $to, $from, $todir, $exportlist, $subdirs_static;
+    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
     if ($armaybe ne ':'){
         $ldfrom = 'tmp$(LIB_EXT)';
         push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
@@ -3586,12 +3579,11 @@ sub subdirs {
 ####	print "Including $dir subdirectory\n";
     }
     if (@m){
-	unshift @m, <<'EOF';
-
+	unshift(@m, "
 # The default clean, realclean and test targets in this Makefile
 # have automatically been given entries for each subdir.
 
-EOF
+");
     } else {
 	push(@m, "\n# none")
     }
