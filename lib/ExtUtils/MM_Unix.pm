@@ -8,6 +8,7 @@ use Carp;
 use ExtUtils::MakeMaker::Config;
 use File::Basename qw(basename dirname);
 use DirHandle;
+use File::Spec;
 
 our %Config_Override;
 
@@ -97,9 +98,9 @@ something that used to be in here, look in MM_Any.
 
 # So we don't have to keep calling the methods over and over again,
 # we have these globals to cache the values.  Faster and shrtr.
-my $Curdir  = __PACKAGE__->curdir;
-my $Rootdir = __PACKAGE__->rootdir;
-my $Updir   = __PACKAGE__->updir;
+my $Curdir  = File::Spec->curdir;
+my $Rootdir = File::Spec->rootdir;
+my $Updir   = File::Spec->updir;
 
 
 =head2 Methods
@@ -1106,10 +1107,10 @@ WARNING
         foreach my $dir (@$dirs){
             next unless defined $dir; # $self->{PERL_SRC} may be undefined
             my ($abs, $val);
-            if ($self->file_name_is_absolute($name)) {     # /foo/bar
+            if (File::Spec->file_name_is_absolute($name)) {     # /foo/bar
                 $abs = $name;
-            } elsif ($self->canonpath($name) eq
-                     $self->canonpath(basename($name))) {  # foo
+            } elsif (File::Spec->canonpath($name) eq
+                     File::Spec->canonpath(basename($name))) {  # foo
                 $abs = File::Spec->catfile($dir, $name);
             } else {                                            # foo/bar
                 $abs = File::Spec->catfile($Curdir, $name);
@@ -1241,7 +1242,7 @@ sub _fixin_replace_shebang {
     }
     else {
         my (@absdirs)
-            = reverse grep { $self->file_name_is_absolute($_) } $self->path;
+            = reverse grep { File::Spec->file_name_is_absolute($_) } File::Spec->path;
         $interpreter = '';
 
         foreach my $dir (@absdirs) {
@@ -1962,21 +1963,21 @@ sub init_PERL {
     my($self) = shift;
 
     my @defpath = ();
-    foreach my $component ($self->{PERL_SRC}, $self->path(),
+    foreach my $component ($self->{PERL_SRC}, File::Spec->path(),
                            $Config{binexp})
     {
 	push @defpath, $component if defined $component;
     }
 
     # Build up a set of file names (not command names).
-    my $thisperl = $self->canonpath($^X);
+    my $thisperl = File::Spec->canonpath($^X);
     $thisperl .= $Config{exe_ext} unless
                 # VMS might have a file version # at the end
       $Is{VMS} ? $thisperl =~ m/$Config{exe_ext}(;\d+)?$/i
               : $thisperl =~ m/$Config{exe_ext}$/i;
 
     # We need a relative path to perl when in the core.
-    $thisperl = $self->abs2rel($thisperl) if $self->{PERL_CORE};
+    $thisperl = File::Spec->abs2rel($thisperl) if $self->{PERL_CORE};
 
     my @perls = ($thisperl);
     push @perls, map { "$_$Config{exe_ext}" }
@@ -2029,11 +2030,11 @@ sub init_PERL {
     # sometimes.
     $self->{ABSPERL} = $self->{PERL};
     $has_mcr = $self->{ABSPERL} =~ s/^MCR\s*//;
-    if( $self->file_name_is_absolute($self->{ABSPERL}) ) {
+    if( File::Spec->file_name_is_absolute($self->{ABSPERL}) ) {
         $self->{ABSPERL} = '$(PERL)';
     }
     else {
-        $self->{ABSPERL} = $self->rel2abs($self->{ABSPERL});
+        $self->{ABSPERL} = File::Spec->rel2abs($self->{ABSPERL});
 
         # Quote the perl command if it contains whitespace
         $self->{ABSPERL} = $self->quote_literal($self->{ABSPERL})
@@ -3429,8 +3430,8 @@ sub static_lib {
 	    my ($v, $d, $f) = File::Spec->splitpath($ext);
 	    my @d = File::Spec->splitdir($d);
 	    shift @d if $d[0] eq 'lib';
-	    my $instdir = $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
-	    my $instfile = $self->catfile($instdir, "$f\$(LIB_EXT)");
+	    my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+	    my $instfile = File::Spec->catfile($instdir, "$f\$(LIB_EXT)");
 	    my $objfile = "$ext\$(OBJ_EXT)";
 	    push @libs, [ $objfile, $instfile, $instdir ];
 	}

@@ -6,7 +6,7 @@ our $VERSION = '7.05_07';
 
 use File::Spec;
 require ExtUtils::Liblist::Kid;
-our @ISA = qw(ExtUtils::Liblist::Kid File::Spec);
+our @ISA = qw(ExtUtils::Liblist::Kid);
 
 # Backwards compatibility with old interface.
 sub ext {

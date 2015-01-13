@@ -13,12 +13,11 @@ use ExtUtils::MakeMaker qw($Verbose write_file_via_tmp neatvalue);
 
 use ExtUtils::MakeMaker::Config;
 
-
 # So we don't have to keep calling the methods over and over again,
 # we have these globals to cache the values.  Faster and shrtr.
-my $Curdir  = __PACKAGE__->curdir;
-my $Rootdir = __PACKAGE__->rootdir;
-my $Updir   = __PACKAGE__->updir;
+my $Curdir  = File::Spec->curdir;
+my $Rootdir = File::Spec->rootdir;
+my $Updir   = File::Spec->updir;
 
 my $METASPEC_URL = 'https://metacpan.org/pod/CPAN::Meta::Spec';
 my $METASPEC_V = 2;
@@ -212,7 +211,7 @@ sub _clear_maketype_cache { %maketype2true = () }
 sub is_make_type {
     my($self, $type) = @_;
     return $maketype2true{$type} if defined $maketype2true{$type};
-    (undef, undef, my $make_basename) = $self->splitpath($self->make);
+    (undef, undef, my $make_basename) = File::Spec->splitpath($self->make);
     return $maketype2true{$type} = 1
         if $make_basename =~ /\b$type\b/i; # executable's filename
     return $maketype2true{$type} = 0
@@ -678,7 +677,7 @@ sub blibdirs_target {
             my ($v, $d, $f) = File::Spec->splitpath($ext);
             my @d = File::Spec->splitdir($d);
             shift @d if $d[0] eq 'lib';
-            push @dirs, $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+            push @dirs, File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
 	}
     }
 
@@ -755,8 +754,8 @@ clean :: clean_subdirs
                     $(BASEEXT).exp $(BASEEXT).x
                    ]);
 
-    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
-    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
+    push(@files, File::Spec->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
+    push(@files, File::Spec->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
 
     # core files
     if ($^O eq 'vos') {
@@ -1922,8 +1921,8 @@ to XS code.  Those are handled in init_xs.
 sub init_INST {
     my($self) = shift;
 
-    $self->{INST_ARCHLIB} ||= $self->catdir($Curdir,"blib","arch");
-    $self->{INST_BIN}     ||= $self->catdir($Curdir,'blib','bin');
+    $self->{INST_ARCHLIB} ||= File::Spec->catdir($Curdir,"blib","arch");
+    $self->{INST_BIN}     ||= File::Spec->catdir($Curdir,'blib','bin');
 
     # INST_LIB typically pre-set if building an extension after
     # perl has been built and installed. Setting INST_LIB allows
@@ -1932,22 +1931,22 @@ sub init_INST {
         if ($self->{PERL_CORE}) {
             $self->{INST_LIB} = $self->{INST_ARCHLIB} = $self->{PERL_LIB};
         } else {
-            $self->{INST_LIB} = $self->catdir($Curdir,"blib","lib");
+            $self->{INST_LIB} = File::Spec->catdir($Curdir,"blib","lib");
         }
     }
 
     my @parentdir = split(/::/, $self->{PARENT_NAME});
-    $self->{INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     @parentdir);
-    $self->{INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', @parentdir);
-    $self->{INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto',
+    $self->{INST_LIBDIR}      = File::Spec->catdir('$(INST_LIB)',     @parentdir);
+    $self->{INST_ARCHLIBDIR}  = File::Spec->catdir('$(INST_ARCHLIB)', @parentdir);
+    $self->{INST_AUTODIR}     = File::Spec->catdir('$(INST_LIB)', 'auto',
                                               '$(FULLEXT)');
-    $self->{INST_ARCHAUTODIR} = $self->catdir('$(INST_ARCHLIB)', 'auto',
+    $self->{INST_ARCHAUTODIR} = File::Spec->catdir('$(INST_ARCHLIB)', 'auto',
                                               '$(FULLEXT)');
 
-    $self->{INST_SCRIPT}  ||= $self->catdir($Curdir,'blib','script');
+    $self->{INST_SCRIPT}  ||= File::Spec->catdir($Curdir,'blib','script');
 
-    $self->{INST_MAN1DIR} ||= $self->catdir($Curdir,'blib','man1');
-    $self->{INST_MAN3DIR} ||= $self->catdir($Curdir,'blib','man3');
+    $self->{INST_MAN1DIR} ||= File::Spec->catdir($Curdir,'blib','man1');
+    $self->{INST_MAN3DIR} ||= File::Spec->catdir($Curdir,'blib','man3');
 
     return 1;
 }
@@ -2157,7 +2156,7 @@ sub init_INSTALL_from_PREFIX {
 
             if( $var =~ /arch/ ) {
                 $self->{$Installvar} ||=
-                  $self->catdir($self->{LIB}, $Config{archname});
+                  File::Spec->catdir($self->{LIB}, $Config{archname});
             }
             else {
                 $self->{$Installvar} ||= $self->{LIB};
@@ -2224,7 +2223,7 @@ sub init_INSTALL_from_INSTALL_BASE {
             my $key = "INSTALL".$dir.$uc_thing;
 
             $install{$key} ||=
-              $self->catdir('$(INSTALL_BASE)', @{$map{$thing}});
+              File::Spec->catdir('$(INSTALL_BASE)', @{$map{$thing}});
         }
     }
 
@@ -2745,11 +2744,11 @@ sub arch_check {
 
     return 1 if $self->{PERL_SRC};
 
-    my($pvol, $pthinks) = $self->splitpath($pconfig);
-    my($cvol, $cthinks) = $self->splitpath($cconfig);
+    my($pvol, $pthinks) = File::Spec->splitpath($pconfig);
+    my($cvol, $cthinks) = File::Spec->splitpath($cconfig);
 
-    $pthinks = $self->canonpath($pthinks);
-    $cthinks = $self->canonpath($cthinks);
+    $pthinks = File::Spec->canonpath($pthinks);
+    $cthinks = File::Spec->canonpath($cthinks);
 
     my $ret = 1;
     if ($pthinks ne $cthinks) {
@@ -2758,7 +2757,7 @@ sub arch_check {
 
         $ret = 0;
 
-        my $arch = (grep length, $self->splitdir($pthinks))[-1];
+        my $arch = (grep length, File::Spec->splitdir($pthinks))[-1];
 
         print <<END unless $self->{UNINSTALLED_PERL};
 Your perl and your Config.pm seem to have different ideas about the
@@ -2904,9 +2903,9 @@ installation.
 
 sub libscan {
     my($self,$path) = @_;
-    my($dirs,$file) = ($self->splitpath($path))[1,2];
+    my($dirs,$file) = (File::Spec->splitpath($path))[1,2];
     return '' if grep /^(?:RCS|CVS|SCCS|\.svn|_darcs)$/,
-                     $self->splitdir($dirs), $file;
+                     File::Spec->splitdir($dirs), $file;
 
     return $path;
 }
@@ -3034,7 +3033,7 @@ Used by perldepend() in MM_Unix and MM_VMS via _perl_header_files_fragment()
 sub _perl_header_files {
     my $self = shift;
 
-    my $header_dir = $self->{PERL_SRC} || $ENV{PERL_SRC} || $self->catdir($Config{archlibexp}, 'CORE');
+    my $header_dir = $self->{PERL_SRC} || $ENV{PERL_SRC} || File::Spec->catdir($Config{archlibexp}, 'CORE');
     opendir my $dh, $header_dir
         or die "Failed to opendir '$header_dir' to find header files: $!";
 
