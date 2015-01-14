@@ -212,6 +212,7 @@ sub setup_xs {
 
 sub list_static {
   (
+    [ 'basic', '', '' ], # still needs testing even on static perl
     [ 'static', '', '' ],
     [ 'basic', ' static', '_static' ],
     [ 'multi', ' static', '_static' ],
