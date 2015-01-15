@@ -995,8 +995,8 @@ sub xs_make_dynamic_lib {
     my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
     if ($armaybe ne ':'){
         $ldfrom = 'tmp$(LIB_EXT)';
-        push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
-        push(@m,'	$(RANLIB) '."$ldfrom\n");
+        push(@m,"	\$(ARMAYBE) cr $ldfrom $from\n");
+        push(@m,"	\$(RANLIB) $ldfrom\n");
     }
     $ldfrom = "-all $ldfrom -none" if $Is{OSF};
 
