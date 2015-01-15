@@ -122,23 +122,6 @@ sub platform_constants {
     return $make_frag;
 }
 
-
-=item const_cccmd
-
-=cut
-
-sub const_cccmd {
-    my($self,$libperl)=@_;
-    return $self->{CONST_CCCMD} if $self->{CONST_CCCMD};
-    return '' unless $self->needs_linking();
-    return $self->{CONST_CCCMD} = <<'MAKE_FRAG';
-CCCMD = $(CC) $(CCFLAGS) $(INC) $(OPTIMIZE) \
-	$(PERLTYPE) $(MPOLLUTE) -o $@ \
-	-DVERSION=\"$(VERSION)\" -DXS_VERSION=\"$(XS_VERSION)\"
-MAKE_FRAG
-
-}
-
 =item static_lib_pure_cmd
 
 Defines how to run the archive utility
