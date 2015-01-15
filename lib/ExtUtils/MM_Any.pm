@@ -2443,7 +2443,7 @@ sub init_others {
     if ( $self->{OBJECT} ) {
         $self->{OBJECT} = join(" ", @{$self->{OBJECT}}) if ref $self->{OBJECT};
         $self->{OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
-    } elsif ( $self->{MAGICXS} && @{$self->{O_FILES}||[]} ) {
+    } elsif ( ($self->{MAGICXS} || $self->{XSMULTI}) && @{$self->{O_FILES}||[]} ) {
         $self->{OBJECT} = join(" ", @{$self->{O_FILES}});
         $self->{OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
     } else {
