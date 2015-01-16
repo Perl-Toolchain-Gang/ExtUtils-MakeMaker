@@ -989,13 +989,13 @@ Defines the recipes for the C<dynamic_lib> section.
 =cut
 
 sub xs_make_dynamic_lib {
-    my ($self, $attribs, $from, $to, $todir, $ldfrom, $exportlist) = @_;
+    my ($self, $attribs, $object, $to, $todir, $ldfrom, $exportlist) = @_;
     $exportlist = '' if $exportlist ne '$(EXPORT_LIST)';
     my $armaybe = $self->_xs_armaybe($attribs);
-    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $from, $todir, $exportlist;
+    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $object, $todir, $exportlist;
     if ($armaybe ne ':'){
         $ldfrom = 'tmp$(LIB_EXT)';
-        push(@m,"	\$(ARMAYBE) cr $ldfrom $from\n");
+        push(@m,"	\$(ARMAYBE) cr $ldfrom $object\n");
         push(@m,"	\$(RANLIB) $ldfrom\n");
     }
     $ldfrom = "-all $ldfrom -none" if $Is{OSF};
@@ -3579,11 +3579,12 @@ sub subdirs {
 ####	print "Including $dir subdirectory\n";
     }
     if (@m){
-	unshift(@m, "
+	unshift @m, <<'EOF';
+
 # The default clean, realclean and test targets in this Makefile
 # have automatically been given entries for each subdir.
 
-");
+EOF
     } else {
 	push(@m, "\n# none")
     }
