@@ -116,6 +116,7 @@ my %Special_Sigs = (
  SKIP               => 'ARRAY',
  TYPEMAPS           => 'ARRAY',
  XS                 => 'HASH',
+ XSBUILD            => 'HASH',
  VERSION            => ['version',''],
  _KEEP_AFTER_FLUSH  => '',
 
@@ -312,8 +313,8 @@ sub full_setup {
     PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE
     PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
     SIGN SKIP TEST_REQUIRES TYPEMAPS UNINST VERSION VERSION_FROM XS
-    XSMULTI XSOPT XSPROTOARG XS_VERSION clean depend dist dynamic_lib
-    linkext macro realclean tool_autosplit
+    XSBUILD XSMULTI XSOPT XSPROTOARG XS_VERSION
+    clean depend dist dynamic_lib linkext macro realclean tool_autosplit
 
     MAN1EXT MAN3EXT
 
@@ -2794,6 +2795,40 @@ Hashref of .xs files. MakeMaker will default this.  e.g.
 
 The .c files will automatically be included in the list of files
 deleted by a make clean.
+
+=item XSBUILD
+
+Hashref with options controlling the operation of C<XSMULTI>:
+
+  {
+    xs => {
+        all => {
+            # options applying to all .xs files for this distribution
+        },
+        'lib/Class/Name/File' => { # specifically for this file
+            DEFINE => '-Dfunktastic', # defines for only this file
+            INC => "-I$funkyliblocation", # include flags for only this file
+            # OBJECT => 'lib/Class/Name/File$(OBJ_EXT)', # default
+            LDFROM => "lib/Class/Name/File\$(OBJ_EXT) $otherfile\$(OBJ_EXT)", # what's linked
+        },
+    },
+  }
+
+Note C<xs> is the file-extension. More possibilities may arise in the
+future. Note that object names are specified without their XS extension -
+it is axiomatic that no extension will exist that has more than one type
+of XSUB code.
+
+C<LDFROM> defaults to the same as C<OBJECT>. C<OBJECT> defaults to,
+for C<XSMULTI>, just the XS filename with the extension replaced with
+the compiler-specific object-file extension.
+
+The distinction between C<OBJECT> and C<LDFROM>: C<OBJECT> is the make
+target, so make will try to build it. However, C<LDFROM> is what will
+actually be linked together to make the shared object or static library
+(SO/SL), so if you override it, make sure it includes what you want to
+make the final SO/SL, almost certainly including the XS basename with
+C<$(OBJ_EXT)> appended.
 
 =item XSMULTI
 

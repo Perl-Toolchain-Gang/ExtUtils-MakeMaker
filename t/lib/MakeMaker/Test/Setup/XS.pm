@@ -169,11 +169,7 @@ $label2files{multi} = +{
   'lib/XS/Other.pm' => $PM_OTHER,
   'lib/XS/Other.xs' => $XS_MULTI,
   't/is_odd.t' => $T_OTHER,
-
-  'lib/XS/header.h'              => <<'END',
-#define INVAR input
-END
-
+  'lib/XS/header.h' => "#define INVAR input\n",
 };
 virtual_rename('multi', $typemap, "lib/XS/$typemap");
 virtual_rename('multi', 'Test.xs', 'lib/XS/Test.xs');
@@ -192,6 +188,42 @@ $label2files{staticmulti} = +{
     $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
     q{LINKTYPE => 'static', XSMULTI => 1,},
   ),
+};
+
+$label2files{xsbuild} = +{
+  %{ $label2files{'multi'} }, # make copy
+  'Makefile.PL' => sprintf(
+    $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
+    q{
+      XSMULTI => 1,
+      XSBUILD => {
+        xs => {
+          'lib/XS/Other' => {
+            DEFINE => '-DINVAR=input',
+            OBJECT => 'lib/XS/Other$(OBJ_EXT) lib/XS/plus1$(OBJ_EXT)'
+          }
+        },
+      },
+    },
+  ),
+  'lib/XS/Other.xs' => $XS_OTHER . <<EOF,
+\nint
+plus1(input)
+       int     input
+   CODE:
+       RETVAL = plus1(INVAR);
+   OUTPUT:
+       RETVAL
+EOF
+  'lib/XS/plus1.c' => 'int plus1(i) int i; { return i + 1; }',
+  't/is_odd.t' => <<'END',
+#!/usr/bin/perl -w
+use Test::More tests => 4;
+use_ok "XS::Other";
+ok is_odd(1);
+ok !is_odd(2);
+is XS::Other::plus1(3), 4;
+END
 };
 
 sub virtual_rename {
@@ -235,6 +267,7 @@ sub list_dynamic {
     [ 'multi', '', '' ],
     [ 'staticmulti', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'staticmulti', ' dynamic', '_dynamic' ],
+    [ 'xsbuild', '', '' ],
   );
 }
 
@@ -263,7 +296,7 @@ sub run_tests {
 
     my $test_cmd = "$make test" . (defined $add_testtarget ? $add_testtarget : '');
     my $test_out = run($test_cmd);
-    is( $?, 0, "$test_cmd exited normally" ) || diag $test_out;
+    is( $?, 0, "$test_cmd exited normally" ) || diag "$make_out\n$test_out";
   }
 
   chdir File::Spec->updir or die;

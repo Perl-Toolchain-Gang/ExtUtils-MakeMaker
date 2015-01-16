@@ -940,9 +940,12 @@ sub dynamic_lib {
             shift @d if $d[0] eq 'lib';
             my $instdir = File::Spec->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
             my $instfile = File::Spec->catfile($instdir, "$f.\$(DLEXT)");
-            my $objfile = "$ext\$(OBJ_EXT)";
+            my $objfile = $self->_xsbuild_value('xs', $ext, 'OBJECT');
+            $objfile = "$ext\$(OBJ_EXT)" unless defined $objfile;
+            my $ldfrom = $self->_xsbuild_value('xs', $ext, 'LDFROM');
+            $ldfrom = $objfile unless defined $ldfrom;
             my $exportlist = "$ext.def";
-            push @libs, [ $objfile, $instfile, $instdir, $objfile, $exportlist ];
+            push @libs, [ $objfile, $instfile, $instdir, $ldfrom, $exportlist ];
         }
     } else {
         @libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
@@ -1012,7 +1015,6 @@ sub xs_make_dynamic_lib {
     push(@m,"	\$(RM_F) \$\@\n");
 
     my $libs = '$(LDLOADLIBS)';
-
     if (($Is{NetBSD} || $Is{Interix} || $Is{Android}) && $Config{'useshrplib'} eq 'true') {
         # Use nothing on static perl platforms, and to the flags needed
         # to link against the shared libperl library on shared perl
@@ -3928,19 +3930,38 @@ EOF
 	    $cccmd =~ s/^\s*CCCMD\s*=\s*//;
 	    $cccmd =~ s/\$\(DEFINE_VERSION\)/-DVERSION=\\"$version\\"/;
 	    $cccmd =~ s/\$\(XS_DEFINE_VERSION\)/-DXS_VERSION=\\"$version\\"/;
-	    #                             1     2       3
-	    $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $minus_o;
+            $self->_xsbuild_replace_macro($cccmd, 'xs', $ext, 'INC');
+            my $define = '$(DEFINE)';
+            $self->_xsbuild_replace_macro($define, 'xs', $ext, 'DEFINE');
+            #                             1     2       3         4
+            $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $minus_o, $define;
 
 %1$s$(OBJ_EXT): %1$s.xs
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
 	$(MV) $*.xsc $*.c
-	%2$s $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c %3$s
+	%2$s $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) %4$s $*.c %3$s
 EOF
 	}
     }
     $frag;
 }
 
+# param gets modified
+sub _xsbuild_replace_macro {
+    my ($self, undef, $xstype, $ext, $varname) = @_;
+    my $value = $self->_xsbuild_value($xstype, $ext, $varname);
+    return unless defined $value;
+    $_[1] =~ s/\$\($varname\)/$value/;
+}
+
+sub _xsbuild_value {
+    my ($self, $xstype, $ext, $varname) = @_;
+    return $self->{XSBUILD}{$xstype}{$ext}{$varname}
+        if $self->{XSBUILD}{$xstype}{$ext}{$varname};
+    return $self->{XSBUILD}{$xstype}{all}{$varname}
+        if $self->{XSBUILD}{$xstype}{all}{$varname};
+    ();
+}
 
 1;
 
