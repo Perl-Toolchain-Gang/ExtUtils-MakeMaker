@@ -832,6 +832,12 @@ sub WriteEmptyMakefile {
     print $mfh <<'EOP';
 all :
 
+pure_nolink :
+
+dynamic :
+
+static :
+
 clean :
 
 install :
