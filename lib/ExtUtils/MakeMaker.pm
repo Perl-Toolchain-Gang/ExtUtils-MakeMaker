@@ -1237,8 +1237,7 @@ sub write_file_via_tmp {
 # This is a rename for OS's where the target must be unlinked first.
 sub _rename {
     my($src, $dest) = @_;
-    chmod 0666, $dest;
-    unlink $dest;
+    _unlink($dest);
     return rename $src, $dest;
 }
 
