@@ -244,7 +244,7 @@ sub setup_xs {
 
 sub list_static {
   (
-    ($Config{usedl} ne 'define' ? [ 'basic', '', '' ] : ()), # still needs testing on static perl
+    ( !$Config{usedl} ? [ 'basic', '', '' ] : ()), # still needs testing on static perl
     [ 'static', '', '' ],
     [ 'basic', ' static', '_static' ],
     [ 'multi', ' static', '_static' ],
