@@ -818,7 +818,10 @@ sub WriteEmptyMakefile {
     croak "WriteEmptyMakefile: Need an even number of args" if @_ % 2;
 
     my %att = @_;
+    $att{NAME} = 'Dummy' unless $att{NAME}; # eliminate pointless warnings
     my $self = MM->new(\%att);
+    require File::Path;
+    File::Path::rmtree '_eumm'; # because MM->new does too much stuff
 
     my $new = $self->{MAKEFILE};
     my $old = $self->{MAKEFILE_OLD};
@@ -829,7 +832,7 @@ sub WriteEmptyMakefile {
         _rename($new, $old) or warn "rename $new => $old: $!"
     }
     open my $mfh, '>', $new or die "open $new for write: $!";
-    print $mfh <<'EOP';
+    printf $mfh <<'EOP', $self->{RM_F}, $self->{MAKEFILE};
 all :
 
 pure_nolink :
@@ -838,7 +841,10 @@ dynamic :
 
 static :
 
+realclean : clean
+
 clean :
+	%s %s
 
 install :
 
