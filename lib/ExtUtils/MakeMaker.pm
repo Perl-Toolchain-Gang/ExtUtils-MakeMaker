@@ -819,6 +819,7 @@ sub WriteEmptyMakefile {
 
     my %att = @_;
     $att{NAME} = 'Dummy' unless $att{NAME}; # eliminate pointless warnings
+    $att{DIR} = [] unless $att{DIR}; # don't recurse by default
     my $self = MM->new(\%att);
     require File::Path;
     File::Path::rmtree '_eumm'; # because MM->new does too much stuff
