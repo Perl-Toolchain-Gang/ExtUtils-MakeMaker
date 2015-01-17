@@ -13,7 +13,7 @@ use Test::More;
 
 plan skip_all => "Disabled as broken perl installs give false negative"
   # if not static perl, and not author
-  unless !$Config{usedl} and $ENV{AUTHOR_TESTING};
+  unless !$Config{usedl} or $ENV{AUTHOR_TESTING};
 plan skip_all => "ExtUtils::CBuilder not installed or couldn't find a compiler"
   unless have_compiler();
 plan skip_all => 'Shared perl library' if $Config{useshrplib} eq 'true';
