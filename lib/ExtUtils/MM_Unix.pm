@@ -2389,13 +2389,20 @@ Defines the linkext target which in turn defines the LINKTYPE.
 
 =cut
 
+# LINKTYPE => static or dynamic or ''
 sub linkext {
     my($self, %attribs) = @_;
-    # LINKTYPE => static or dynamic or ''
-    my($linktype) = defined $attribs{LINKTYPE} ?
-      $attribs{LINKTYPE} : '$(LINKTYPE)';
+    my $extra = ''; # so if LINKTYPE eq '' and there are DIR
+                    # we can bring in subdirs_(perl-linktype) for back-compat
+    my $linktype = $attribs{LINKTYPE};
+    $linktype = $self->{LINKTYPE} unless defined $linktype;
+    if (defined $linktype and $linktype eq '' and @{ $self->{DIR} || [] }) {
+        warn "Warning: LINKTYPE set to '', no longer necessary\n";
+        $extra = 'subdirs_' . $Config{usedl} ? 'dynamic' : 'static';
+    }
+    $linktype = '$(LINKTYPE)' unless defined $linktype;
     "
-linkext :: $linktype
+linkext :: $linktype $extra
 	\$(NOECHO) \$(NOOP)
 ";
 }
