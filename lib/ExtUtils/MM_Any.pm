@@ -1077,7 +1077,7 @@ sub manifypods_target {
     }
 
     my $manify = <<END;
-manifypods : pure_all $dependencies
+manifypods : pure_all config $dependencies
 END
 
     my @man_cmds;
