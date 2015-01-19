@@ -1,11 +1,28 @@
 7.05_08
     Enhancements:
+    - Add XSBUILD option: control XSMULTI per XS type and per-object
+    - Cache is_make_type results for performance (196 in normal WriteMakefile)
 
     Bug fixes:
+    - Eliminate non-error STDERR
+    - Use $from (rename to $object) param not $(OBJECT) in xs_make_dynamic_lib
+    - Set $(OBJECT) if XSMULTI
+    - Eliminate unnecessary MM_NW5 const_cccmd override
+    - Make WriteEmptyMakefile Makefile functional when called in subdir
+    - WriteEmptyMakefile rmtree _eumm, clean target removes Makefile
+    - WriteEmptyMakefile not recurse by default
+    - Make manifypods dep on blibdirs as needs it to function
+    - Back-compat linkext -> subdirs_(perl-linktype) if LINKTYPE= and some DIR
+    - Eliminate leak of dirhandles in ExtUtils::Liblist::lsdir
+    - perllocal.pod generation "Perl in Space" fix
+    - quote_literal PASTHRU_* as can have "" in
 
     Test fixes:
+    - Introduce use of $ENV{AUTHOR_TESTING} - don't skip some if true
+    - Skip static tests if not static perl and not author - false negatives
 
     Doc fixes:
+    - PL_FILES better documented
 
     Dist fixes:
     - The bundled Encode::Locale has been updated to 1.04
