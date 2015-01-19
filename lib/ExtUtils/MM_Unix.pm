@@ -2938,9 +2938,14 @@ sub pasthru {
     }
 
     foreach my $key (qw(DEFINE INC)) {
-        # unconditionally pass through even if not defined in Makefile.PL
-        # in case given on make command-line
-        push @pasthru, qq{PASTHRU_$key="\$($key) \$(PASTHRU_$key)"};
+        # default to the make var
+        my $val = qq{\$($key)};
+        # expand within perl if given since need to use quote_literal
+        # since INC might include space-protecting ""!
+        $val = $self->{$key} if defined $self->{$key};
+        $val .= " \$(PASTHRU_$key)";
+        my $quoted = $self->quote_literal($val);
+        push @pasthru, qq{PASTHRU_$key=$quoted};
     }
 
     push @m, "\nPASTHRU = ", join ($sep, @pasthru), "\n";
