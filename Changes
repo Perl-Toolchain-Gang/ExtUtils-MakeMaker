@@ -1,3 +1,15 @@
+7.05_08
+    Enhancements:
+
+    Bug fixes:
+
+    Test fixes:
+
+    Doc fixes:
+
+    Dist fixes:
+    - The bundled Encode::Locale has been updated to 1.04
+
 7.05_07 Fri Jan  9 15:58:49 GMT 2015
     Bug fixes:
     - Dynamic and static targets now depend from pure_nolink
