@@ -2494,7 +2494,9 @@ Desired permission for executable files. Defaults to C<755>.
 MakeMaker can run programs to generate files for you at build time.
 By default any file named *.PL (except Makefile.PL and Build.PL) in
 the top level directory will be assumed to be a Perl program and run
-passing its own basename in as an argument.  For example...
+passing its own basename in as an argument.  This basename is actually a build
+target, and there is an intention, but not a requirement, that the *.PL file
+make the file passed to to as an argument. For example...
 
     perl foo.PL foo
 
@@ -2503,6 +2505,8 @@ search.  PL_FILES accepts a hash ref, the key being the file to run
 and the value is passed in as the first argument when the PL file is run.
 
     PL_FILES => {'bin/foobar.PL' => 'bin/foobar'}
+
+    PL_FILES => {'foo.PL' => 'foo.c'}
 
 Would run bin/foobar.PL like this:
 
@@ -2522,7 +2526,14 @@ INST_ARCH in their C<@INC>, so the just built modules can be
 accessed... unless the PL file is making a module (or anything else in
 PM) in which case it is run B<before> pm_to_blib and does not include
 INST_LIB and INST_ARCH in its C<@INC>.  This apparently odd behavior
-is there for backwards compatibility (and it's somewhat DWIM).
+is there for backwards compatibility (and it's somewhat DWIM).  The argument
+passed to the .PL is set up as a target to build in the makefile.  In other
+sections such as C<postamble> you can specifiy a dependency on the
+filename/argument that the .PL is supposed (or will have to, now that that is
+is a dependency) to generate.  Note the file to be generate will still be
+generated and the .PL will still run even without an explicit dependency created
+by you, since the C<all> target still depends on running all eligible to run.PL
+files.
 
 =item PM
 
