@@ -2527,10 +2527,10 @@ accessed... unless the PL file is making a module (or anything else in
 PM) in which case it is run B<before> pm_to_blib and does not include
 INST_LIB and INST_ARCH in its C<@INC>.  This apparently odd behavior
 is there for backwards compatibility (and it's somewhat DWIM).  The argument
-passed to the .PL is set up as a target to build in the makefile.  In other
-sections such as C<postamble> you can specifiy a dependency on the
-filename/argument that the .PL is supposed (or will have to, now that that is
-is a dependency) to generate.  Note the file to be generate will still be
+passed to the .PL is set up as a target to build in the Makefile.  In other
+sections such as C<postamble> you can specify a dependency on the
+filename/argument that the .PL is supposed (or will have, now that that is
+is a dependency) to generate.  Note the file to be generated will still be
 generated and the .PL will still run even without an explicit dependency created
 by you, since the C<all> target still depends on running all eligible to run.PL
 files.
