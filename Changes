@@ -1,4 +1,4 @@
-7.05_08
+7.05_08 Tue Jan 20 10:00:01 GMT 2015
     Enhancements:
     - Add XSBUILD option: control XSMULTI per XS type and per-object
     - Cache is_make_type results for performance (196 in normal WriteMakefile)
