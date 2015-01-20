@@ -16,6 +16,7 @@
     - Eliminate leak of dirhandles in ExtUtils::Liblist::lsdir
     - perllocal.pod generation "Perl in Space" fix
     - quote_literal PASTHRU_* as can have "" in
+    - Switch to using version->stringify, never ->normal
 
     Test fixes:
     - Introduce use of $ENV{AUTHOR_TESTING} - don't skip some if true
