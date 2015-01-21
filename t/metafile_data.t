@@ -7,27 +7,11 @@ use Test::More tests => 31;
 use Data::Dumper;
 use File::Temp;
 use Cwd;
+use MakeMaker::Test::Utils;
 
 require ExtUtils::MM_Any;
 my $PCM = eval { require Parse::CPAN::Meta; };
 my $CM = eval { require CPAN::Meta; };
-
-sub in_dir(&;$) {
-    my $code = shift;
-    my $dir = shift || File::Temp->newdir;
-    # chdir to the new directory
-    my $orig_dir = cwd();
-    chdir $dir or die "Can't chdir to $dir: $!";
-    # Run the code, but trap the error so we can chdir back
-    my $return;
-    my $ok = eval { $return = $code->(); 1; };
-    my $err = $@;
-    # chdir back
-    chdir $orig_dir or die "Can't chdir to $orig_dir: $!";
-    # rethrow if necessary
-    die $err unless $ok;
-    return $return;
-}
 
 sub mymeta_ok {
     my($have, $want, $name) = @_;

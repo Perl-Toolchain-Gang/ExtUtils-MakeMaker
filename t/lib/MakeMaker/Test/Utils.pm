@@ -21,6 +21,7 @@ our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
                  $Is_VMS $Is_MacOS
                  run_ok
                  hash2files
+                 in_dir
                 );
 
 
@@ -405,6 +406,42 @@ sub hash2files {
         print FILE $text;
         close FILE;
     }
+}
+
+=item in_dir
+
+  $retval = in_dir(\&coderef);
+  $retval = in_dir(\&coderef, $specified_dir);
+  $retval = in_dir { somecode(); };
+  $retval = in_dir { somecode(); } $specified_dir;
+
+Does a C<chdir> to either a directory. If none is specified, one is
+created with L<File::Temp> and then automatically deleted after. It ends
+by C<chdir>ing back to where it started.
+
+If the given code throws an exception, it will be re-thrown after the
+re-C<chdir>.
+
+Returns the return value of the given code.
+
+=cut
+
+sub in_dir(&;$) {
+    my $code = shift;
+    require File::Temp;
+    my $dir = shift || File::Temp->newdir;
+    # chdir to the new directory
+    my $orig_dir = getcwd();
+    chdir $dir or die "Can't chdir to $dir: $!";
+    # Run the code, but trap the error so we can chdir back
+    my $return;
+    my $ok = eval { $return = $code->(); 1; };
+    my $err = $@;
+    # chdir back
+    chdir $orig_dir or die "Can't chdir to $orig_dir: $!";
+    # rethrow if necessary
+    die $err unless $ok;
+    return $return;
 }
 
 =back
