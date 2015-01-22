@@ -507,8 +507,9 @@ Same as macro for the depend attribute.
 sub depend {
     my($self,%attribs) = @_;
     my(@m,$key,$val);
-    while (($key,$val) = each %attribs){
-	last unless defined $key;
+    for my $key (sort keys %attribs){
+	my $val = $attribs{$key};
+	next unless defined $key and defined $val;
 	push @m, "$key : $val\n";
     }
     join "", @m;
