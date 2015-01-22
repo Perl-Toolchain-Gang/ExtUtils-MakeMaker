@@ -3852,6 +3852,13 @@ subdirs_static :: $(MYEXTLIB)
 
 config :: $(FIRST_MAKEFILE) blibdirs
 	$(NOECHO) $(NOOP)
+
+# back-compat in case of override of static or dynamic
+static :: pure_nolink
+	$(NOECHO) $(NOOP)
+
+dynamic :: pure_nolink
+	$(NOECHO) $(NOOP)
 ';
 
     push @m, '
