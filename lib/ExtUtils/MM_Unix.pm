@@ -2654,14 +2654,16 @@ $(MAP_TARGET) :: %1$s/perlmain$(OBJ_EXT) $(MAP_LIBPERLDEP) $(MAP_STATICDEP) $(IN
 EOF
     push @m, "\t".$self->cd($tmp, qq[$cccmd "-I\$(PERL_INC)" perlmain.c])."\n";
 
-    push @m, qq{
-$tmp/perlmain.c: $makefilename}, q{
+    my $maybe_DynaLoader = $Config{usedl} ? 'q(DynaLoader)' : '';
+    push @m, _sprintf562 <<'EOF', $tmp, $makefilename, $maybe_DynaLoader;
+
+%1$s/perlmain.c: %2$s
 	$(NOECHO) $(ECHO) Writing $@
-	$(NOECHO) $(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
-		-e "writemain(grep(s#.*/auto/##s, @ARGV), q{DynaLoader})" $(MAP_STATIC) > $@t
+	$(NOECHO) $(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \
+		-e "writemain(grep(s#.*/auto/##s, @ARGV), %3$s)" $(MAP_STATIC) > $@t
 	$(MV) $@t $@
 
-};
+EOF
     push @m, "\t", q{$(NOECHO) $(PERL) "$(INSTALLSCRIPT)/fixpmain"
 } if (defined (&Dos::UseLFN) && Dos::UseLFN()==0);
 
