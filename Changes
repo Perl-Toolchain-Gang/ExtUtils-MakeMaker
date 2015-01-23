@@ -1,3 +1,9 @@
+7.05_09 Fri Jan 23 10:15:47 GMT 2015
+    Bug fixes:
+    - pure_nolink as dep of dynamic/static in top_targets in case override
+      ( fixes a build issue in core)
+    - Only add DynaLoader to makeaperl if -Dusedl
+
 7.05_08 Tue Jan 20 10:00:01 GMT 2015
     Enhancements:
     - Add XSBUILD option: control XSMULTI per XS type and per-object
