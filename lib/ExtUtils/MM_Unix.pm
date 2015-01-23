@@ -3615,8 +3615,6 @@ Defines the test targets.
 =cut
 
 sub test {
-# --- Test and Installation Sections ---
-
     my($self, %attribs) = @_;
     my $tests = $attribs{TESTS} || '';
     if (!$tests && -d 't' && defined $attribs{RECURSIVE_TEST_FILES}) {
@@ -3628,8 +3626,9 @@ sub test {
     # have to do this because nmake is broken
     $tests =~ s!/!\\!g if $self->is_make_type('nmake');
     # note: 'test.pl' name is also hardcoded in init_dirscan()
-    my(@m);
-    push(@m,"
+    my @m;
+    my $default_testtype = $Config{usedl} ? 'dynamic' : 'static';
+    push @m, <<EOF;
 TEST_VERBOSE=0
 TEST_TYPE=test_\$(LINKTYPE)
 TEST_FILE = test.pl
@@ -3639,61 +3638,51 @@ TESTDB_SW = -d
 testdb :: testdb_\$(LINKTYPE)
 	\$(NOECHO) \$(NOOP)
 
-test :: \$(TEST_TYPE) subdirs-test
-	\$(NOECHO) \$(NOOP)
-
-subdirs-test ::
-	\$(NOECHO) \$(NOOP)
-
-# defined here as well as top_targets in case someone overrides that
-pure_nolink ::
+test :: \$(TEST_TYPE)
 	\$(NOECHO) \$(NOOP)
 
 # Occasionally we may face this degenerate target:
-test_ : test_dynamic
+test_ : test_$default_testtype
 	\$(NOECHO) \$(NOOP)
 
-");
+EOF
 
-    foreach my $dir (@{ $self->{DIR} }) {
-        my $test = $self->cd($dir, '$(MAKE) test $(PASTHRU)');
+    for my $linktype (qw(dynamic static)) {
+        push @m, "subdirs-test_$linktype :: $linktype\n";
+        foreach my $dir (@{ $self->{DIR} }) {
+            my $test = $self->cd($dir, "\$(MAKE) test_$linktype \$(PASTHRU)");
+            push @m, "\t\$(NOECHO) $test\n";
+        }
+        push @m, "\n";
+        if ($tests or -f "test.pl") {
+            for my $testspec ([ '', '' ], [ 'db', ' $(TESTDB_SW)' ]) {
+                my ($db, $switch) = @$testspec;
+                my ($command, $deps);
+                $deps = "$linktype subdirs-test_$linktype";
+                if ($linktype eq 'static' and $self->needs_linking) {
+                    my $target = File::Spec->rel2abs('$(MAP_TARGET)');
+                    $command = qq{"$target" \$(MAP_PERLINC)};
+                    $deps .= ' $(MAP_TARGET)';
+                } else {
+                    $command = '$(FULLPERLRUN)' . $switch;
+                }
+                push @m, "test${db}_$linktype :: $deps\n";
+                push @m, $self->test_via_harness($command, '$(TEST_FILES)')
+                  if $tests;
+                push @m, $self->test_via_script($command, '$(TEST_FILE)')
+                  if -f "test.pl";
+                push @m, "\n";
+            }
+        } else {
+            push @m, _sprintf562 <<'EOF', $linktype;
+testdb_%1$s test_%1$s :: %1$s subdirs-test_%1$s
+	$(NOECHO) $(ECHO) 'No tests defined for $(NAME) extension.'
 
-        push @m, <<END
-subdirs-test ::
-	\$(NOECHO) $test
-
-END
+EOF
+        }
     }
 
-    push(@m, "test_dynamic :: dynamic\n");
-    push(@m, $self->test_via_harness('$(FULLPERLRUN)', '$(TEST_FILES)'))
-      if $tests;
-    push(@m, $self->test_via_script('$(FULLPERLRUN)', '$(TEST_FILE)'))
-      if -f "test.pl";
-    push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
-	unless $tests or -f "test.pl" or @{$self->{DIR}};
-    push(@m, "\n");
-
-    push(@m, "testdb_dynamic :: dynamic\n");
-    push(@m, $self->test_via_script('$(FULLPERLRUN) $(TESTDB_SW)',
-                                    '$(TEST_FILE)'));
-    push(@m, "\n");
-
-    if ($self->needs_linking and ($tests or -f "test.pl")) {
-	push(@m, "test_static :: static \$(MAP_TARGET)\n");
-	my $target = File::Spec->rel2abs('$(MAP_TARGET)');
-	my $command = qq{"$target" \$(MAP_PERLINC)};
-	push(@m, $self->test_via_harness($command, '$(TEST_FILES)')) if $tests;
-	push(@m, $self->test_via_script($command, '$(TEST_FILE)')) if -f "test.pl";
-	push(@m, "\n");
-	push(@m, "testdb_static :: static \$(MAP_TARGET)\n");
-	push(@m, $self->test_via_script("$command \$(TESTDB_SW)", '$(TEST_FILE)'));
-	push(@m, "\n");
-    } else {
-	push @m, "test_static :: test_dynamic\n";
-	push @m, "testdb_static :: testdb_dynamic\n";
-    }
-    join("", @m);
+    join "", @m;
 }
 
 =item test_via_harness (override)
@@ -3828,7 +3817,7 @@ sub top_targets {
 
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
-    push @m, '
+    push @m, sprintf <<'EOF', $Config{usedl} ? 'dynamic' : 'static';
 pure_all :: linkext
 	$(NOECHO) $(NOOP)
 
@@ -3840,7 +3829,7 @@ subdirs :: subdirs_$(LINKTYPE)
 	$(NOECHO) $(NOOP)
 
 # in case LINKTYPE not set
-subdirs_ :: subdirs_dynamic
+subdirs_ :: subdirs_%s
 	$(NOECHO) $(NOOP)
 
 subdirs_pure_nolink ::
@@ -3861,7 +3850,7 @@ static :: pure_nolink
 
 dynamic :: pure_nolink
 	$(NOECHO) $(NOOP)
-';
+EOF
 
     push @m, '
 $(O_FILES) : $(H_FILES)
