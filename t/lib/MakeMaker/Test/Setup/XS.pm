@@ -206,8 +206,13 @@ $label2files{xsbuild} = +{
       },
     },
   ),
-  'lib/XS/Other.xs' => $XS_OTHER . <<EOF,
-\nint
+
+  'lib/XS/Other.xs' => <<EOF,
+#ifdef __cplusplus
+extern "C" { int plus1(int); }
+#endif
+$XS_OTHER
+int
 plus1(input)
        int     input
    CODE:
@@ -215,7 +220,21 @@ plus1(input)
    OUTPUT:
        RETVAL
 EOF
-  'lib/XS/plus1.c' => 'int plus1(i) int i; { return i + 1; }',
+
+  'lib/XS/plus1.c' => <<'EOF',
+#ifdef __cplusplus
+extern "C" {
+int plus1(int i)
+#else
+int plus1(i)
+int i;
+#endif
+{ return i + 1; }
+#ifdef __cplusplus
+}
+#endif
+EOF
+
   't/is_odd.t' => <<'END',
 #!/usr/bin/perl -w
 use Test::More tests => 4;
@@ -224,6 +243,7 @@ ok is_odd(1);
 ok !is_odd(2);
 is XS::Other::plus1(3), 4;
 END
+
 };
 
 sub virtual_rename {
