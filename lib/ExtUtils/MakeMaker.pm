@@ -2838,9 +2838,7 @@ Hashref with options controlling the operation of C<XSMULTI>:
   }
 
 Note C<xs> is the file-extension. More possibilities may arise in the
-future. Note that object names are specified without their XS extension -
-it is axiomatic that no extension will exist that has more than one type
-of XSUB code.
+future. Note that object names are specified without their XS extension.
 
 C<LDFROM> defaults to the same as C<OBJECT>. C<OBJECT> defaults to,
 for C<XSMULTI>, just the XS filename with the extension replaced with
