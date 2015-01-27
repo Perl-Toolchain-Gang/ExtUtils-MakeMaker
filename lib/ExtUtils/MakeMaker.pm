@@ -853,6 +853,10 @@ makemakerdflt :
 
 test :
 
+test_dynamic :
+
+test_static :
+
 EOP
     close $mfh or die "close $new for write: $!";
 }
