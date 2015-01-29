@@ -2473,10 +2473,10 @@ MAP_PERLINC   = @{$perlinc || []}
 
     unless ($self->{MAKEAPERL}) {
 	push @m, q{
-$(MAP_TARGET) :: static $(MAKE_APERL_FILE)
+$(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
 
-$(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
+$(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR="}, $dir, q{" \
