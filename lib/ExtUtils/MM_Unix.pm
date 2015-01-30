@@ -2399,7 +2399,7 @@ sub linkext {
     $linktype = $self->{LINKTYPE} unless defined $linktype;
     if (defined $linktype and $linktype eq '' and @{ $self->{DIR} || [] }) {
         warn "Warning: LINKTYPE set to '', no longer necessary\n";
-        $extra = 'subdirs_' . $Config{usedl} ? 'dynamic' : 'static';
+        $extra = 'subdirs_' . ($Config{usedl} ? 'dynamic' : 'static');
     }
     $linktype = '$(LINKTYPE)' unless defined $linktype;
     "
