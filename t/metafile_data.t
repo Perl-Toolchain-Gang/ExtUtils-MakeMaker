@@ -358,6 +358,7 @@ SKIP: {
     skip 'Loading Parse::CPAN::Meta failed', 5 unless $PCM;
     my $meta = $mm->mymeta("t/META_for_testing_tricky_version.yml");
     is $meta->{'meta-spec'}{version}, 2, "internally, our MYMETA struct is v2";
+    skip 'Loading CPAN::Meta failed', 4 unless $CM;
     in_dir {
         $mm->write_mymeta($meta);
         ok -e "MYMETA.yml";
@@ -372,6 +373,7 @@ SKIP: {
 note "A bad license string";
 SKIP: {
     skip 'Loading Parse::CPAN::Meta failed', 2 unless $PCM;
+    skip 'Loading CPAN::Meta failed', 2 unless $CM;
     my $mm = $new_mm->(
         @GENERIC_IN,
         LICENSE   => 'death and retribution',

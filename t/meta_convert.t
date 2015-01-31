@@ -4,9 +4,8 @@ use strict;
 use warnings;
 
 BEGIN { unshift @INC, 't/lib'; }
-use Test::More;
-eval { require CPAN::Meta; };
-plan skip_all => 'Failed to load CPAN::Meta' if $@;
+use Test::More eval { require CPAN::Meta; } ? ()
+  : (skip_all => 'Failed to load CPAN::Meta');
 use File::Temp qw[tempdir];
 require ExtUtils::MM_Any;
 
