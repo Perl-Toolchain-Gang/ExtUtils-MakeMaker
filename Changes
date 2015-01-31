@@ -1,3 +1,16 @@
+7.05_11 Sat Jan 31 16:11:06 GMT 2015
+    Bug fixes:
+    - Don't make Makefile.aperl until static done so find *.a in blib
+    - Fixed precedence issue in linkext
+    - Make WriteEmptyMakefile produce Makefile compat with subdirs-test_*
+    - Relaxed the requirements for v5.6.1 in bundled version
+
+    Test fixes:
+    - Support v5.6.1 in various tests
+
+    Doc fixes:
+    - Clarified XSBUILD documentation slightly
+
 7.05_10 Mon Jan 26 15:06:37 GMT 2015
     Test fixes:
     - Update XSBUILD test to work when compiling under C++
