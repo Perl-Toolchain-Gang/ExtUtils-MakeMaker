@@ -429,7 +429,7 @@ Returns the return value of the given code.
 sub in_dir(&;$) {
     my $code = shift;
     require File::Temp;
-    my $dir = shift || File::Temp->newdir;
+    my $dir = shift || File::Temp::tempdir(TMPDIR => 1, CLEANUP => 1);
     # chdir to the new directory
     my $orig_dir = getcwd();
     chdir $dir or die "Can't chdir to $dir: $!";
