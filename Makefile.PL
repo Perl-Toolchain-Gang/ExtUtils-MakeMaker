@@ -53,15 +53,14 @@ if( $BUILDING_AS_PACKAGE ) {
     %Extra_Prereqs = (
         'CPAN::Meta'               => '2.143240', # compat with CMR 2.130
         'CPAN::Meta::YAML'         => '0.011', # CM 2.143240 needs
-        'ExtUtils::Command'        => '1.16',
         'ExtUtils::Install'        => '1.52',
-        'ExtUtils::Manifest'       => '1.65',
+        'ExtUtils::Manifest'       => '1.70',
         'File::Temp'               => '0.22',
         'JSON::PP'                 => '2.27103',
         'Parse::CPAN::Meta'        => '1.4414', # required by above CPAN::Meta
         'Scalar::Util'             => '1.13',
         'version'                  => '0',
-        'CPAN::Meta::Requirements' => '2.130', # updates to hooks et al
+        'CPAN::Meta::Requirements' => '2.131', # updates to hooks et al
     );
 
     $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
