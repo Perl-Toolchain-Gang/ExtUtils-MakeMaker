@@ -9,7 +9,7 @@ use File::Basename;
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
-use ExtUtils::MakeMaker qw($Verbose write_file_via_tmp neatvalue);
+use ExtUtils::MakeMaker qw($Verbose write_file_via_tmp neatvalue _sprintf562);
 
 use ExtUtils::MakeMaker::Config;
 
@@ -1745,7 +1745,7 @@ sub realclean {
 
     my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;
 # Delete temporary files (via clean) and also delete dist files
-realclean purge ::  clean realclean_subdirs
+realclean purge :: realclean_subdirs
 	%s
 	%s
 MAKE
@@ -1767,28 +1767,20 @@ target to call realclean on any subdirectories which contain Makefiles.
 
 sub realclean_subdirs_target {
     my $self = shift;
-
-    return <<'NOOP_FRAG' unless @{$self->{DIR}};
-realclean_subdirs :
-	$(NOECHO) $(NOOP)
-NOOP_FRAG
-
-    my $rclean = "realclean_subdirs :\n";
-
+    my @m = <<'EOF';
+# so clean is forced to complete before realclean_subdirs runs
+realclean_subdirs : clean
+EOF
+    return join '', @m, "\t\$(NOECHO) \$(NOOP)\n" unless @{$self->{DIR}};
     foreach my $dir (@{$self->{DIR}}) {
         foreach my $makefile ('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)' ) {
-            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
-chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
+            my $subrclean .= $self->oneliner(_sprintf562 <<'CODE', $dir, $makefile);
+chdir '%1$s';  system '$(MAKE) $(USEMAKEFILE) %2$s realclean' if -f '%2$s';
 CODE
-
-            $rclean .= sprintf <<'RCLEAN', $subrclean;
-	- %s
-RCLEAN
-
+            push @m, "\t- $subrclean\n";
         }
     }
-
-    return $rclean;
+    return join '', @m;
 }
 
 
