@@ -3658,7 +3658,7 @@ EOF
             for my $testspec ([ '', '' ], [ 'db', ' $(TESTDB_SW)' ]) {
                 my ($db, $switch) = @$testspec;
                 my ($command, $deps);
-                $deps = "$linktype subdirs-test_$linktype";
+                $deps = "subdirs-test_$linktype";
                 if ($linktype eq 'static' and $self->needs_linking) {
                     my $target = File::Spec->rel2abs('$(MAP_TARGET)');
                     $command = qq{"$target" \$(MAP_PERLINC)};
@@ -3675,7 +3675,7 @@ EOF
             }
         } else {
             push @m, _sprintf562 <<'EOF', $linktype;
-testdb_%1$s test_%1$s :: %1$s subdirs-test_%1$s
+testdb_%1$s test_%1$s :: subdirs-test_%1$s
 	$(NOECHO) $(ECHO) 'No tests defined for $(NAME) extension.'
 
 EOF
