@@ -3413,11 +3413,11 @@ sub static {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
-static :: $(FIRST_MAKEFILE) $(INST_STATIC) subdirs_static pure_nolink
+static :: $(FIRST_MAKEFILE) $(INST_STATIC) subdirs_static
 	$(NOECHO) $(NOOP)
 
 # define this here not top_targets in case someone overrides that
-subdirs_static ::
+subdirs_static :: pure_nolink
 	$(NOECHO) $(NOOP)
 ';
 }
