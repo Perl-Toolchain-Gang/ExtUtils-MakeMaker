@@ -1,3 +1,12 @@
+7.05_12 Sat Feb  7 15:00:09 GMT 2015
+    Bug fixes:
+    - Fixed race condition in realclean
+    - Fixed race condition with subdirs_$linktype
+
+    Dist fixes:
+    - Made %ExtraPrereqs match bundled prereqs
+    - Included MANIFEST.SKIP from ExtUtils::Manifest
+
 7.05_11 Sat Jan 31 16:11:06 GMT 2015
     Bug fixes:
     - Don't make Makefile.aperl until static done so find *.a in blib
