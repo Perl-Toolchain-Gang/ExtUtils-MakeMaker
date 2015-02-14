@@ -112,10 +112,10 @@ my @GENERIC_OUT = (
         },
         no_index        => {
             directory           => [qw(t inc)],
-            package             => 'Thing',
+            package             => ['Thing'],
         },
-        wibble  => 23,
-        wobble  => 42,
+        x_wibble  => 23,
+        x_wobble  => 42,
     }, '_add vs _merge';
 }
 

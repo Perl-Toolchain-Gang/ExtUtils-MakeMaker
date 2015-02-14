@@ -1295,8 +1295,8 @@ sub metafile_data {
     my $self = shift;
     my($meta_add, $meta_merge) = @_;
 
-    $meta_add = {} unless $meta_add;
-    $meta_merge = {} unless $meta_merge;
+    $meta_add ||= {};
+    $meta_merge ||= {};
 
     my $version = _normalize_version($self->{VERSION});
     my $release_status = ($version =~ /_/) ? 'unstable' : 'stable';
@@ -1320,26 +1320,20 @@ sub metafile_data {
     );
     $self->_add_requirements_to_meta(\%meta);
 
-    # upgrade $meta_add and $meta_merge to 2.0 if needed, using
-    # our own function, which only knows about prereqs;
-    # CPAN::Meta::Converter adds all the mandatory fields like author,
-    # which we don't want.
+    if (!eval { require CPAN::Meta::Converter; CPAN::Meta::Converter->VERSION(2.141170) }) {
+      return \%meta;
+    }
+
+    # needs to be based on the original version
+    my $v1_add = _metaspec_version($meta_add) !~ /^2/;
+
     for my $frag ($meta_add, $meta_merge) {
-        if (_metaspec_version($frag) !~ /^2/) {
-            # 1.x, do our best to upgrade
-            $frag->{prereqs}{configure}{requires} = delete $frag->{configure_requires}
-                if $frag->{configure_requires};
-            $frag->{prereqs}{build}{requires} = delete $frag->{build_requires}
-                if $frag->{build_requires};
-            $frag->{prereqs}{runtime}{requires} = delete $frag->{requires}
-                if $frag->{requires};
-        }
+        $frag = CPAN::Meta::Converter->new($frag, default_version => "1.4")->upgrade_fragment;
     }
 
     # if we upgraded a 1.x _ADD fragment, we gave it a prereqs key that
     # will override all prereqs, which is more than the user asked for;
     # instead, we'll go inside the prereqs and override all those
-    my $v1_add = _metaspec_version($meta_add) !~ /^2/;
     while( my($key, $val) = each %$meta_add ) {
         if ($v1_add and $key eq 'prereqs') {
             $meta{$key}{$_} = $val->{$_} for keys %$val;
