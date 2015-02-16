@@ -402,9 +402,14 @@ sub hash2files {
         $file = File::Spec->catfile(File::Spec->curdir, $prefix, split m{\/}, $file);
         my $dir = dirname($file);
         mkpath $dir;
-        open FILE, ">$file" or die "Can't create $file: $!";
+        my $utf8 = ($] < 5.008 or !$Config{useperlio}) ? "" : ":utf8";
+        open(FILE, ">$utf8", $file) || die "Can't create $file: $!";
         print FILE $text;
         close FILE;
+        # ensure file at least 1 second old for makes that assume
+        # files with the same time are out of date.
+        my $time = calibrate_mtime();
+        utime $time, $time - 1, $file;
     }
 }
 
