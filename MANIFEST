@@ -95,7 +95,6 @@ t/lib/MakeMaker/Test/Setup/MPV.pm
 t/lib/MakeMaker/Test/Setup/PL_FILES.pm
 t/lib/MakeMaker/Test/Setup/Problem.pm
 t/lib/MakeMaker/Test/Setup/SAS.pm
-t/lib/MakeMaker/Test/Setup/Unicode.pm
 t/lib/MakeMaker/Test/Setup/XS.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
