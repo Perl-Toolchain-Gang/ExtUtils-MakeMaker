@@ -7,22 +7,40 @@ BEGIN {
 }
 
 use strict;
-use Config;
-
-use File::Temp qw[tempdir];
-
+use warnings;
 use MakeMaker::Test::Utils;
-use MakeMaker::Test::Setup::Recurs;
 use Config;
 use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 26);
+    : (tests => 23);
+use File::Temp qw[tempdir];
+use File::Path;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
 delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
+
+my $DIRNAME = 'Recurs';
+my %FILES = (
+    'Makefile.PL'          => <<'END',
+use ExtUtils::MakeMaker;
+WriteMakefile(NAME => 'Recurs', VERSION => 1.00);
+END
+
+    'prj2/Makefile.PL'     => <<'END',
+use ExtUtils::MakeMaker;
+WriteMakefile(NAME => 'Recurs::prj2', VERSION => 1.00);
+END
+
+    # Check if a test failure in a subdir causes make test to fail
+    'prj2/t/fail.t'         => <<'END',
+#!/usr/bin/perl -w
+print "1..1\n";
+print "not ok 1\n";
+END
+);
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
@@ -38,13 +56,13 @@ my $Touch_Time = calibrate_mtime();
 
 $| = 1;
 
-ok( setup_recurs(), 'setup' );
+hash2files($DIRNAME, \%FILES);
 END {
     ok( chdir File::Spec->updir );
-    ok( teardown_recurs(), 'teardown' );
+    ok( rmtree($DIRNAME), 'teardown' );
 }
 
-ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
+ok( chdir($DIRNAME), q{chdir'd to Recurs} ) ||
     diag("chdir failed: $!");
 
 
@@ -65,9 +83,9 @@ my $make_out = run("$make");
 is( $?, 0, 'recursive make exited normally' ) || diag $make_out;
 
 ok( chdir File::Spec->updir );
-ok( teardown_recurs(), 'cleaning out recurs' );
-ok( setup_recurs(),    '  setting up fresh copy' );
-ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
+ok( rmtree($DIRNAME), 'cleaning out recurs' );
+hash2files($DIRNAME, \%FILES);
+ok( chdir($DIRNAME), q{chdir'd to Recurs} ) ||
     diag("chdir failed: $!");
 
 
@@ -89,9 +107,9 @@ is( $?, 0, 'recursive make exited normally' );
 
 
 ok( chdir File::Spec->updir );
-ok( teardown_recurs(), 'cleaning out recurs' );
-ok( setup_recurs(),    '  setting up fresh copy' );
-ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
+ok( rmtree($DIRNAME), 'cleaning out recurs' );
+hash2files($DIRNAME, \%FILES);
+ok( chdir($DIRNAME), q{chdir'd to Recurs} ) ||
     diag("chdir failed: $!");
 
 
