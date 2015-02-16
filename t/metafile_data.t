@@ -5,8 +5,8 @@ BEGIN {
 use strict;
 use Test::More;
 BEGIN {
-  eval { require CPAN::Meta; }
-    or plan skip_all => 'CPAN::Meta required for this test';
+  eval { require CPAN::Meta; CPAN::Meta->VERSION(2.143240) }
+    or plan skip_all => 'CPAN::Meta 2.143240 required for this test';
   eval { require CPAN::Meta::Converter; }
     or plan skip_all => 'CPAN::Meta::Converter required for this test';
   eval { require Parse::CPAN::Meta; }
