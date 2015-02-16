@@ -1337,6 +1337,13 @@ sub selfdocument {
             push @m, "# $key => $v";
         }
     }
+    # added here as selfdocument is not overridable
+    push @m, <<'EOF';
+
+# here so even if top_targets is overridden, this will still be defined
+pure_nolink ::
+	$(NOECHO) $(NOOP)
+EOF
     join "\n", @m;
 }
 
