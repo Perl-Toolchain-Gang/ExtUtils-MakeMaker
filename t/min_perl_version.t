@@ -8,20 +8,48 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 
 use TieOut;
 use MakeMaker::Test::Utils;
-use MakeMaker::Test::Setup::MPV;
 use Config;
 use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 36);
+    : (tests => 35);
 use File::Path;
 
 use ExtUtils::MakeMaker;
 my $CM = eval { require CPAN::Meta; };
+
+my $DIRNAME = 'Min-PerlVers';
+my %FILES = (
+    'Makefile.PL'   => <<'END',
+use ExtUtils::MakeMaker;
+WriteMakefile(
+    NAME             => 'Min::PerlVers',
+    AUTHOR           => 'John Doe <jd@example.com>',
+    VERSION_FROM     => 'lib/Min/PerlVers.pm',
+    PREREQ_PM        => { strict => 0 },
+    MIN_PERL_VERSION => '5.005',
+);
+END
+
+    'lib/Min/PerlVers.pm'    => <<'END',
+package Min::PerlVers;
+$VERSION = 0.05;
+
+=head1 NAME
+
+Min::PerlVers - being picky about perl versions
+
+=cut
+
+1;
+END
+
+);
 
 # avoid environment variables interfering with our make runs
 delete @ENV{qw(LIB MAKEFLAGS)};
@@ -34,10 +62,10 @@ chdir 't';
 
 perl_lib();
 
-ok( setup_recurs(), 'setup' );
+hash2files($DIRNAME, \%FILES);
 END {
     ok( chdir(File::Spec->updir), 'leaving dir' );
-    ok( teardown_recurs(), 'teardown' );
+    ok( rmtree($DIRNAME), 'teardown' );
 }
 
 ok( chdir 'Min-PerlVers', 'entering dir Min-PerlVers' ) ||
@@ -223,4 +251,3 @@ note "META.yml output"; SKIP: {
         );
     }
 }
-
