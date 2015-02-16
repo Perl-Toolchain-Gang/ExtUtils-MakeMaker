@@ -92,7 +92,6 @@ t/is_of_type.t
 t/lib/MakeMaker/Test/NoXS.pm
 t/lib/MakeMaker/Test/Setup/BFD.pm
 t/lib/MakeMaker/Test/Setup/PL_FILES.pm
-t/lib/MakeMaker/Test/Setup/SAS.pm
 t/lib/MakeMaker/Test/Setup/XS.pm
 t/lib/MakeMaker/Test/Utils.pm
 t/lib/Test/Builder.pm
