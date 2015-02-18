@@ -1,3 +1,14 @@
+7.05_13 Wed Feb 18 22:17:53 GMT 2015
+    Enhancements:
+    - do proper conversion to 2.x for META_ADD/MERGE
+
+    Bug fixes:
+    - Resolved [RT#102009] subdir override of top_target lacking pure_nolink
+
+    Test fixes:
+    - Various tests no longer require a separate .pm file for testing
+    - Handle unicode correctly in hash2files() function
+
 7.05_12 Sat Feb  7 15:00:09 GMT 2015
     Bug fixes:
     - Fixed race condition in realclean
