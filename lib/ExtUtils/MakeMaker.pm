@@ -1340,8 +1340,15 @@ sub selfdocument {
     # added here as selfdocument is not overridable
     push @m, <<'EOF';
 
-# here so even if top_targets is overridden, this will still be defined
+# here so even if top_targets is overridden, these will still be defined
+# gmake will silently not fail if any are .PHONY-ed but nmake won't
 pure_nolink ::
+	$(NOECHO) $(NOOP)
+
+static ::
+	$(NOECHO) $(NOOP)
+
+dynamic ::
 	$(NOECHO) $(NOOP)
 EOF
     join "\n", @m;
