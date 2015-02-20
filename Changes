@@ -1,3 +1,10 @@
+7.05_14 Fri Feb 20 16:43:30 GMT 2015
+    Bug fixes:
+    - Add static/dynamic no-ops - needed by nmake and others
+
+    Test fixes:
+    - PL_FILES of a "module" was untested 
+
 7.05_13 Wed Feb 18 22:17:53 GMT 2015
     Enhancements:
     - do proper conversion to 2.x for META_ADD/MERGE
