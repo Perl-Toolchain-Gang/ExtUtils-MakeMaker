@@ -13,7 +13,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 9);
+    : (tests => 10);
 use File::Spec;
 use File::Temp qw[tempdir];
 use File::Path;
@@ -27,23 +27,32 @@ my $tmpdir = tempdir( DIR => '../t', CLEANUP => 1 );
 use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir;
 
-my $DIRNAME = 'PL_FILES-Module';
+my $DIRNAME = 'PL-Module';
 my %FILES = (
     'Makefile.PL'   => <<'END',
 use ExtUtils::MakeMaker;
 # A module for testing PL_FILES
 WriteMakefile(
-    NAME     => 'PL_FILES::Module',
+    NAME     => 'PL::Module',
     PL_FILES => { 'single.PL' => 'single.out',
                   'multi.PL'  => [qw(1.out 2.out)],
                   'Bar_pm.PL' => '$(INST_LIB)/PL/Bar.pm',
-    }
+                  'Bar2.pm.PL' => 'Bar2.pm',
+    },
 );
+
+package MY;
+sub init_PM {
+  my ($self) = @_;
+  $self->SUPER::init_PM;
+  $self->{PM}{'Bar2.pm'} = '$(INST_LIBDIR)/Bar2.pm'; # PDL does this in WM args
+}
 END
 
     'single.PL'        => _gen_pl_files(),
     'multi.PL'         => _gen_pl_files(),
     'Bar_pm.PL'        => _gen_pm_files(),
+    'Bar2.pm.PL'       => _gen_pm_files(),
     'lib/PL/Foo.pm' => <<'END',
 # Module to load to ensure PL_FILES have blib in @INC.
 package PL::Foo;
@@ -67,7 +76,7 @@ cmp_ok( $?, '==', 0 );
 my $make_out = run("$make");
 is( $?, 0 ) || diag $make_out;
 
-foreach my $file (qw(single.out 1.out 2.out blib/lib/PL/Bar.pm)) {
+foreach my $file (qw(single.out 1.out 2.out blib/lib/PL/Bar.pm blib/lib/PL/Bar2.pm)) {
     ok( -e $file, "$file was created" );
 }
 
