@@ -836,6 +836,8 @@ sub WriteEmptyMakefile {
     printf $mfh <<'EOP', $self->{RM_F}, $self->{MAKEFILE};
 all :
 
+manifypods :
+
 pure_nolink :
 
 dynamic :
@@ -1349,6 +1351,10 @@ static ::
 	$(NOECHO) $(NOOP)
 
 dynamic ::
+	$(NOECHO) $(NOOP)
+
+# so manifypods won't puke if no subdirs
+subdirs_pure_nolink ::
 	$(NOECHO) $(NOOP)
 EOF
     join "\n", @m;

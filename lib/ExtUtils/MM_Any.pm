@@ -1085,10 +1085,18 @@ sub manifypods_target {
         $dependencies .= " \\\n\t$name";
     }
 
-    my $manify = <<END;
-manifypods : pure_all config $dependencies
-END
+    my @m;
+    push @m, <<END;
 
+subdirs_manifypods :: subdirs_pure_nolink config $dependencies
+END
+    foreach my $dir (@{$self->{DIR}}){
+        push @m, $self->subdir_x($dir, 'manifypods');
+    }
+    push @m, <<END;
+
+manifypods : subdirs_manifypods
+END
     my @man_cmds;
     foreach my $section (qw(1 3)) {
         my $pods = $self->{"MAN${section}PODS"};
@@ -1098,10 +1106,10 @@ CMD
         push @man_cmds, $self->split_command($p2m, map {($_,$pods->{$_})} sort keys %$pods);
     }
 
-    $manify .= "\t\$(NOECHO) \$(NOOP)\n" unless @man_cmds;
-    $manify .= join '', map { "$_\n" } @man_cmds;
+    push @m, "\t\$(NOECHO) \$(NOOP)\n" unless @man_cmds;
+    push @m, map { "$_\n" } @man_cmds;
 
-    return $manify;
+    return join '', @m;
 }
 
 sub _has_cpan_meta {
