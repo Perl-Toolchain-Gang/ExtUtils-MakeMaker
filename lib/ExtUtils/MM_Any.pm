@@ -1328,7 +1328,7 @@ sub metafile_data {
     );
     $self->_add_requirements_to_meta(\%meta);
 
-    if (!eval { require CPAN::Meta::Converter; CPAN::Meta::Converter->VERSION(2.141170) }) {
+    if (!eval { require JSON::PP; require CPAN::Meta::Converter; CPAN::Meta::Converter->VERSION(2.141170) }) {
       return \%meta;
     }
 
