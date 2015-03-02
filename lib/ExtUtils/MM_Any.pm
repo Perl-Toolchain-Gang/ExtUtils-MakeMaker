@@ -1855,7 +1855,7 @@ sub special_targets {
     my $make_frag = <<'MAKE_FRAG';
 .SUFFIXES : .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
 
-.PHONY: all config static dynamic test linkext manifest blibdirs clean realclean disttest distdir pure_all subdirs
+.PHONY: all config static dynamic test linkext manifest blibdirs clean realclean disttest distdir pure_all subdirs clean_subdirs makemakerdflt manifypods realclean_subdirs subdirs_dynamic subdirs_pure_nolink subdirs_static subdirs-test_dynamic subdirs-test_static test_dynamic test_static
 
 MAKE_FRAG
 
