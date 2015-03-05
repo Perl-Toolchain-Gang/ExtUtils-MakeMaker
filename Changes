@@ -1,3 +1,9 @@
+7.05_15 Thu Mar  5 19:22:51 GMT 2015
+    Bug fixes:
+    - Resolve core integration regression with META handling
+    - Make "manifypods" go into subdirs
+    - Add various targets to .PHONY to avoid disk IO with dmake
+
 7.05_14 Fri Feb 20 16:43:30 GMT 2015
     Bug fixes:
     - Add static/dynamic no-ops - needed by nmake and others

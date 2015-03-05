@@ -2,7 +2,7 @@ package ExtUtils::MM_Win95;
 
 use strict;
 
-our $VERSION = '7.05_14';
+our $VERSION = '7.05_15';
 
 require ExtUtils::MM_Win32;
 our @ISA = qw(ExtUtils::MM_Win32);
