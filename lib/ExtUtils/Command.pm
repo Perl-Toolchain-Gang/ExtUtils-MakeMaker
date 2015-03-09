@@ -7,7 +7,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
 @ISA       = qw(Exporter);
 @EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
                 dos2unix);
-$VERSION = '7.05_15';
+$VERSION = '7.05_16';
 
 my $Is_VMS   = $^O eq 'VMS';
 my $Is_VMS_mode = $Is_VMS;
