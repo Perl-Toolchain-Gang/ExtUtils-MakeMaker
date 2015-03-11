@@ -9,7 +9,7 @@ BEGIN {
 
 use strict;
 use Config;
-use Test::More tests => 19;
+use Test::More tests => 18;
 use File::Temp qw[tempdir];
 
 use TieOut;
@@ -163,8 +163,7 @@ MakeMaker FATAL: prerequisites not found.
 Please install these modules first and rerun 'perl Makefile.PL'.
 END
 
-
-    $warnings = '';
+    # don't care about warnings here, only the die()
     @ARGV = 'PREREQ_FATAL=1';
     eval {
         WriteMakefile(
@@ -172,8 +171,6 @@ END
             PREREQ_PM => { "I::Do::Not::Exist" => 0, },
         );
     };
-    is $warnings, "Warning: prerequisite I::Do::Not::Exist 0 not found.\n",
-      'CLI PREREQ_FATAL warns';
     isnt $@, '', "CLI PREREQ_FATAL works";
 
 }
