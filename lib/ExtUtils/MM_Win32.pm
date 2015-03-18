@@ -141,6 +141,9 @@ sub init_tools {
 
     $self->{NOOP}     ||= 'rem';
     $self->{DEV_NULL} ||= '> NUL';
+    $self->{FIRST_MAKEFILE} ||=
+	$self->{MAKEFILE}
+	|| ($self->is_make_type('dmake') ? 'makefile.mk' : 'Makefile');
 
     $self->{FIXIN}    ||= $self->{PERL_CORE} ?
       "\$(PERLRUN) $self->{PERL_SRC}\\win32\\bin\\pl2bat.pl" :
