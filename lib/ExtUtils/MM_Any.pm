@@ -1599,12 +1599,12 @@ sub distmeta_target {
       $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']),
 exit unless -e q{META.yml};
 eval { maniadd({q{META.yml} => q{Module YAML meta-data (added by MakeMaker)}}) }
-    or die "Could not add META.yml to MANIFEST: $${'@'}\n"
+    or die "Could not add META.yml to MANIFEST: ${'@'}"
 CODE
       $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd'])
 exit unless -f q{META.json};
 eval { maniadd({q{META.json} => q{Module JSON meta-data (added by MakeMaker)}}) }
-    or die "Could not add META.json to MANIFEST: $${'@'}\n"
+    or die "Could not add META.json to MANIFEST: ${'@'}"
 CODE
     );
 
@@ -1821,7 +1821,7 @@ sub distsignature_target {
 
     my $add_sign = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
 eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }
-    or die "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
+    or die "Could not add SIGNATURE to MANIFEST: ${'@'}"
 CODE
 
     my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s');
