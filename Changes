@@ -1,3 +1,11 @@
+7.05_18 Fri Mar 27 12:16:05 GMT 2015
+    Bug fixes:
+    - Fix LINKTYPE => '' backwards compatibility
+    - Have Makefile starting comments reflect decoded @ARGV, not raw
+
+    Test fixes:
+    - Restore t/basic.t unicode test, except on BSD
+
 7.05_17 Tue Mar 24 12:11:47 GMT 2015
     Bug fixes:
     - Fix RT#103042 - maniadd failure needs "die" to stop make
