@@ -24,7 +24,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 169);
+    : (tests => 179);
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -162,7 +162,7 @@ is( $?, 0, 'install' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
 
 sub check_dummy_inst {
-    my $loc = shift;
+    my ($loc, $skipsubdir) = @_;
     my %files = ();
     find( sub {
 	# do it case-insensitive for non-case preserving OSs
@@ -172,7 +172,7 @@ sub check_dummy_inst {
 	$files{$file} = $File::Find::name;
     }, $loc );
     ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'liar.pm'},      '  Liar.pm installed'  );
+    ok( $files{'liar.pm'},      '  Liar.pm installed'  ) unless $skipsubdir;
     ok( $files{'program'},      '  program installed'  );
     ok( $files{'.packlist'},    '  packlist created'   );
     ok( $files{'perllocal.pod'},'  perllocal.pod created' );
@@ -432,6 +432,27 @@ is( $?, 0, 'realclean' ) || diag($realclean_out);
 
 open(STDERR, ">&SAVERR") or die $!;
 close SAVERR;
+
+# test linkext=>{LINKTYPE=>''} still installs a pure-perl installation
+# warning, edits the Makefile.PL so either rewrite after this or do this last
+my $file = 'Makefile.PL';
+my $text = slurp $file;
+ok(($text =~ s#\);#    linkext=>{LINKTYPE=>''},\n$&#), 'successful M.PL edit');
+open $fh, '>', $file or die "$file: $!";
+print $fh $text;
+close $fh;
+# now do with "Liar" subdir still there
+rmtree $DUMMYINST; # so no false positive from before
+@mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
+$install_out = run("$make install");
+check_dummy_inst($DUMMYINST);
+# now clean, delete "Liar" subdir, do again
+$realclean_out = run("$make realclean");
+rmtree 'Liar';
+rmtree $DUMMYINST; # so no false positive from before
+@mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
+$install_out = run("$make install");
+check_dummy_inst($DUMMYINST, 1);
 
 sub _normalize {
     my $hash = shift;

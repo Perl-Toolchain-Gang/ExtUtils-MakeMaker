@@ -2397,7 +2397,8 @@ sub linkext {
                     # we can bring in subdirs_(perl-linktype) for back-compat
     my $linktype = $attribs{LINKTYPE};
     $linktype = $self->{LINKTYPE} unless defined $linktype;
-    if (defined $linktype and $linktype eq '' and @{ $self->{DIR} || [] }) {
+    if (defined $linktype and $linktype eq '') {
+        # bring in subdirs even if none exist as brings in pure_nolink
         warn "Warning: LINKTYPE set to '', no longer necessary\n";
         $extra = 'subdirs_' . ($Config{usedl} ? 'dynamic' : 'static');
     }
