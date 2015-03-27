@@ -732,7 +732,9 @@ END
     $self->init_others();
     $self->init_platform();
     $self->init_PERM();
-    my($argv) = neatvalue(\@ARGV);
+    my @args = @ARGV;
+    @args = map { Encode::decode(locale => $_) } @args if $CAN_DECODE;
+    my($argv) = neatvalue(\@args);
     $argv =~ s/^\[/(/;
     $argv =~ s/\]$/)/;
 
