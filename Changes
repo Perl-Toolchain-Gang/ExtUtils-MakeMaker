@@ -1,3 +1,7 @@
+7.05_19 Fri Mar 27 16:48:15 GMT 2015
+    Test fixes:
+    - Also skip t/basic.t unicode test on Win32
+
 7.05_18 Fri Mar 27 12:16:05 GMT 2015
     Bug fixes:
     - Fix LINKTYPE => '' backwards compatibility
