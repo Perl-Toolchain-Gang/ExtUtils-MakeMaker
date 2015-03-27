@@ -72,7 +72,9 @@ ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
 sub extrachar {
-  return 's' if $] <= 5.008 || $ENV{PERL_CORE} || $^O =~ /bsd|dragonfly/i;
+  return 's'
+    if $] <= 5.008 || $ENV{PERL_CORE}
+      || $^O =~ /bsd|dragonfly|mswin32/i;
   'š';
 }
 my $DUMMYINST = '../dummy-in'.extrachar().'tall';
