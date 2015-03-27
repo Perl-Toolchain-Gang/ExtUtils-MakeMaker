@@ -71,7 +71,10 @@ ok( setup_recurs(), 'setup' );
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-sub extrachar { $] > 5.008 && !$ENV{PERL_CORE} ? utf8::decode(my $c='š') : 's' }
+sub extrachar {
+  return 's' if $] <= 5.008 || $ENV{PERL_CORE} || $^O =~ /bsd|dragonfly/i;
+  'š';
+}
 my $DUMMYINST = '../dummy-in'.extrachar().'tall';
 my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
 
