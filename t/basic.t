@@ -24,7 +24,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 171);
+    : (tests => 169);
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -67,10 +67,6 @@ my $Touch_Time = calibrate_mtime();
 $| = 1;
 
 ok( setup_recurs(), 'setup' );
-END {
-    ok chdir File::Spec->updir or die;
-    ok teardown_recurs, "teardown";
-}
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
@@ -78,7 +74,6 @@ ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
 sub extrachar { $] > 5.008 && !$ENV{PERL_CORE} ? utf8::decode(my $c='š') : 's' }
 my $DUMMYINST = '../dummy-in'.extrachar().'tall';
 my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
-END { rmtree $DUMMYINST; }
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
@@ -98,8 +93,6 @@ ok( -e $makefile,       'Makefile exists' );
 my $mtime = (stat($makefile))[9];
 cmp_ok( $Touch_Time, '<=', $mtime,  '  been touched' );
 
-END { unlink makefile_name(), makefile_backup() }
-
 my $make = make_run();
 
 {
@@ -109,8 +102,6 @@ my $make = make_run();
     ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
     ok( -s 'MANIFEST',      '  not empty' );
 }
-
-END { unlink 'MANIFEST'; }
 
 my $ppd_out = run("$make ppd");
 is( $?, 0,                      '  exited normally' ) || diag $ppd_out;
@@ -140,8 +131,6 @@ like( $ppd_html, qr{^\s*<ARCHITECTURE NAME="$archname" />}m,
 like( $ppd_html, qr{^\s*<CODEBASE HREF="" />}m,            '  <CODEBASE>');
 like( $ppd_html, qr{^\s*</IMPLEMENTATION>}m,           '  </IMPLEMENTATION>');
 like( $ppd_html, qr{^\s*</SOFTPKG>}m,                      '  </SOFTPKG>');
-END { unlink 'Big-Dummy.ppd' }
-
 
 my $test_out = run("$make test");
 like( $test_out, qr/All tests successful/, 'make test' );
