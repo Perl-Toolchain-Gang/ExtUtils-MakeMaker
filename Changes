@@ -1,3 +1,7 @@
+7.05_20 Sat Apr  4 16:20:54 BST 2015
+    Test fixes:
+    - Disable the unicode filename tests for now
+
 7.05_19 Fri Mar 27 16:48:15 GMT 2015
     Test fixes:
     - Also skip t/basic.t unicode test on Win32
