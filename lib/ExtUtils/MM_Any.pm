@@ -1935,6 +1935,8 @@ sub init_INST {
     $self->{INST_ARCHAUTODIR} = $self->catdir('$(INST_ARCHLIB)', 'auto',
                                               '$(FULLEXT)');
 
+    $self->{INST_SHARE}   ||= $self->catdir('$(INST_LIB)', 'auto', 'share');
+
     $self->{INST_SCRIPT}  ||= $self->catdir($Curdir,'blib','script');
 
     $self->{INST_MAN1DIR} ||= $self->catdir($Curdir,'blib','man1');
@@ -2974,9 +2976,9 @@ sub sharedir {
 	return '' unless %share;
 
 	my %files;
-	$self->_sharedir_find_files(\%files, $share{dist}, File::Spec->catdir('$(INST_LIB)', qw(auto share dist), '$(DISTNAME)'), \%share) if $share{dist};
+	$self->_sharedir_find_files(\%files, $share{dist}, [qw/ $(INST_SHARE) dist $(DISTNAME) /], \%share) if $share{dist};
 	for my $module (keys %{ $share{module} || {} }) {
-		my $destination = File::Spec->catdir('$(INST_LIB)', qw(auto share module), $module);
+		my $destination = [ qw/$(INST_SHARE) module/, $module ];
 		$self->_sharedir_find_files(\%files, $share{module}{$module}, $destination, \%share);
 	}
 	my $pm_to_blib = $self->oneliner(q{pm_to_blib({@ARGV}, '$(INST_LIB)')}, ['-MExtUtils::Install']);
@@ -2992,7 +2994,8 @@ sub _sharedir_find_files {
 				return;
 			}
 			return if $options->{skip_dotfile} && /^\./;
-			$files->{$_} = $self->catfile($sink, $_);
+			my $file = $self->abs2rel($_, $source);
+			$files->{$_} = $self->catfile(@{$sink}, $file);
 		},
 		no_chdir => 1,
 	}, $source);

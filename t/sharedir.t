@@ -84,7 +84,7 @@ SKIP: {
     run_ok('make');
     run_ok('make', 'install');
 
-	my $dir = catdir($install, qw/lib perl5 auto share dist TestDist share/);
+	my $dir = catdir($install, qw/lib perl5 auto share dist TestDist/);
 	ok(-d $dir, 'Sharedir has been created');
 	ok(-e catfile($dir, 'normalfile'), 'File in sharedir has been created');
     ok(-e catfile($dir, qw/dots .dotdir .dotfile/), 'A dotfile in a dotdir installed');
