@@ -24,7 +24,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 179);
+    : (tests => 185);
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -179,6 +179,7 @@ sub check_dummy_inst {
     ok( $files{'program'},      '  program installed'  );
     ok( $files{'.packlist'},    '  packlist created'   );
     ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    ok( !$files{'_eumm'},        '  should not be an _eumm' );
     \%files;
 }
 
