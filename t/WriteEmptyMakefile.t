@@ -33,5 +33,5 @@ like $@, qr/Need an even number of args/, 'correct exception';
         FIRST_MAKEFILE  => "wibble",
     );
     ok -e 'wibble', 'yes wibble';
-    ok !-d '_eumm', 'no _eumm lying around';
+    ok !-d 'blib/_eumm', 'no _eumm lying around';
 }

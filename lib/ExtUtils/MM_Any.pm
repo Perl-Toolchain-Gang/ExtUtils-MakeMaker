@@ -22,7 +22,7 @@ my $Updir   = __PACKAGE__->updir;
 
 my $METASPEC_URL = 'https://metacpan.org/pod/CPAN::Meta::Spec';
 my $METASPEC_V = 2;
-my $STASHDIR = '_eumm';
+my $STASHDIR = File::Spec->catdir('blib', '_eumm');
 
 =head1 NAME
 
@@ -375,7 +375,8 @@ at build-time.
 
 sub stashmeta {
     my($self, $text, $file) = @_;
-    -d $STASHDIR or die "$STASHDIR: $!" unless mkdir $STASHDIR;
+    require File::Path;
+    -d $STASHDIR or die "$STASHDIR: $!" unless File::Path::mkpath($STASHDIR,0,0777);
     my $stashfile = File::Spec->catfile($STASHDIR, $file);
     write_file_via_tmp($stashfile, [ $text ]);
     my $qlfile = $self->quote_literal($file);

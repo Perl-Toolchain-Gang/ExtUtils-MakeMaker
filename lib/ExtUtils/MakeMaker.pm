@@ -824,7 +824,8 @@ sub WriteEmptyMakefile {
     $att{DIR} = [] unless $att{DIR}; # don't recurse by default
     my $self = MM->new(\%att);
     require File::Path;
-    File::Path::rmtree '_eumm'; # because MM->new does too much stuff
+    require File::Spec;
+    File::Path::rmtree( File::Spec->catdir(qw[blib _eumm]) ); # because MM->new does too much stuff
 
     my $new = $self->{MAKEFILE};
     my $old = $self->{MAKEFILE_OLD};
