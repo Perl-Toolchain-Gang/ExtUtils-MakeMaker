@@ -1,3 +1,10 @@
+7.05_21 Sat Jun 13 14:57:44 BST 2015
+    Enhancements:
+    - Intermediate META.* and *.ppd files now stored under blib/
+
+    Test fixes:
+    - fixed an executable bit on one of the tests
+
 7.05_20 Sat Apr  4 16:20:54 BST 2015
     Test fixes:
     - Disable the unicode filename tests for now
