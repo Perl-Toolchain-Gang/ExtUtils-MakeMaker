@@ -14,12 +14,11 @@ use 5.006001;
 use strict;
 use warnings;
 
-use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
-
-$VERSION = '7.05_22';
+our $VERSION = '7.05_22';
 $VERSION = eval $VERSION;
-$CLASS = 'version';
+our $CLASS = 'version';
 
+our ($STRICT, $LAX);
 {
     local $SIG{'__DIE__'};
     eval "use version";

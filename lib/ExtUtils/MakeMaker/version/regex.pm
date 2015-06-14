@@ -9,9 +9,9 @@ package ExtUtils::MakeMaker::version::regex;
 use strict;
 use warnings;
 
-use vars qw($VERSION $CLASS $STRICT $LAX);
+our $CLASS;
 
-$VERSION = '7.05_22';
+our $VERSION = '7.05_22';
 $VERSION = eval $VERSION;
 
 #--------------------------------------------------------------------------#
@@ -77,7 +77,7 @@ my $STRICT_DOTTED_DECIMAL_VERSION =
 # Complete strict version number syntax -- should generally be used
 # anchored: qr/ \A $STRICT \z /x
 
-$STRICT =
+our $STRICT =
     qr/ $STRICT_DECIMAL_VERSION | $STRICT_DOTTED_DECIMAL_VERSION /x;
 
 #--------------------------------------------------------------------------#
@@ -113,7 +113,7 @@ my $LAX_DOTTED_DECIMAL_VERSION =
 # The string 'undef' is a special case to make for easier handling
 # of return values from ExtUtils::MM->parse_version
 
-$LAX =
+our $LAX =
     qr/ undef | $LAX_DECIMAL_VERSION | $LAX_DOTTED_DECIMAL_VERSION /x;
 
 #--------------------------------------------------------------------------#

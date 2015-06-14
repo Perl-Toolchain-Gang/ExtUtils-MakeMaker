@@ -161,27 +161,21 @@ use Carp;
 use File::Copy;
 use File::Spec; #not really needed because File::Copy already gets it, but for good measure :)
 
-use vars qw(
-    @ISA      @EXPORT_OK $VERSION  $MaxDepth $KeepMode $CPRFComp $CopyLink
-    $PFSCheck $RemvBase $NoFtlPth  $ForcePth $CopyLoop $RMTrgFil $RMTrgDir 
-    $CondCopy $BdTrgWrn $SkipFlop  $DirPerms
-);
-
-$MaxDepth = 0;
-$KeepMode = 1;
-$CPRFComp = 0; 
-$CopyLink = eval { local $SIG{'__DIE__'};symlink '',''; 1 } || 0;
-$PFSCheck = 1;
-$RemvBase = 0;
-$NoFtlPth = 0;
-$ForcePth = 0;
-$CopyLoop = 0;
-$RMTrgFil = 0;
-$RMTrgDir = 0;
-$CondCopy = {};
-$BdTrgWrn = 0;
-$SkipFlop = 0;
-$DirPerms = 0777; 
+our $MaxDepth = 0;
+our $KeepMode = 1;
+our $CPRFComp = 0; 
+our $CopyLink = eval { local $SIG{'__DIE__'};symlink '',''; 1 } || 0;
+our $PFSCheck = 1;
+our $RemvBase = 0;
+our $NoFtlPth = 0;
+our $ForcePth = 0;
+our $CopyLoop = 0;
+our $RMTrgFil = 0;
+our $RMTrgDir = 0;
+our $CondCopy = {};
+our $BdTrgWrn = 0;
+our $SkipFlop = 0;
+our $DirPerms = 0777; 
 
 my $samecheck = sub {
    return 1 if $^O eq 'MSWin32'; # need better way to check for this on winders...

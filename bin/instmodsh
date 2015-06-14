@@ -7,7 +7,7 @@ use IO::File;
 use ExtUtils::Packlist;
 use ExtUtils::Installed;
 
-use vars qw($Inst @Modules);
+our ($Inst, @Modules);
 
 
 =head1 NAME

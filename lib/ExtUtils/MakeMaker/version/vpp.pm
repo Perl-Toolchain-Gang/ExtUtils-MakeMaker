@@ -131,16 +131,15 @@ use strict;
 use warnings;
 
 use Config;
-use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
-$VERSION = '7.05_22';
+our $VERSION = '7.05_22';
 $VERSION = eval $VERSION;
-$CLASS = 'ExtUtils::MakeMaker::version::vpp';
+our $CLASS = 'ExtUtils::MakeMaker::version::vpp';
 
 require ExtUtils::MakeMaker::version::regex;
 *ExtUtils::MakeMaker::version::vpp::is_strict = \&ExtUtils::MakeMaker::version::regex::is_strict;
 *ExtUtils::MakeMaker::version::vpp::is_lax = \&ExtUtils::MakeMaker::version::regex::is_lax;
-*LAX = \$ExtUtils::MakeMaker::version::regex::LAX;
-*STRICT = \$ExtUtils::MakeMaker::version::regex::STRICT;
+our $LAX; *LAX = \$ExtUtils::MakeMaker::version::regex::LAX;
+our $STRICT; *STRICT = \$ExtUtils::MakeMaker::version::regex::STRICT;
 
 use overload (
     '""'       => \&stringify,
