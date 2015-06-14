@@ -8,6 +8,8 @@ package ExtUtils::MakeMaker::charstar;
 # a little helper class to emulate C char* semantics in Perl
 # so that prescan_version can use the same code as in C
 
+use strict;
+
 use overload (
     '""'	=> \&thischar,
     '0+'	=> \&thischar,
