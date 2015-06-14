@@ -4,6 +4,7 @@ use strict;
 use ExtUtils::MakeMaker::Config;
 
 our $VERSION = '7.05_21';
+$VERSION = eval $VERSION;
 
 require ExtUtils::Liblist;
 require ExtUtils::MakeMaker;

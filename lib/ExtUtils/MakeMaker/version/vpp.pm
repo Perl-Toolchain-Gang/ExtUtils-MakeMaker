@@ -129,6 +129,7 @@ use strict;
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
 $VERSION = '7.05_21';
+$VERSION = eval $VERSION;
 $CLASS = 'ExtUtils::MakeMaker::version::vpp';
 
 require ExtUtils::MakeMaker::version::regex;

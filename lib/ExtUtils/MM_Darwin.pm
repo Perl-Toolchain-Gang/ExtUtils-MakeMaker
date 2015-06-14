@@ -8,6 +8,7 @@ BEGIN {
 }
 
 our $VERSION = '7.05_21';
+$VERSION = eval $VERSION;
 
 
 =head1 NAME
