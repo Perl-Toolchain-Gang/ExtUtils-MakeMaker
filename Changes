@@ -1,3 +1,7 @@
+7.05_22 Sun Jun 14 14:06:36 BST 2015
+    Dist fixes:
+    - eval $VERSION in all modules
+
 7.05_21 Sat Jun 13 14:57:44 BST 2015
     Enhancements:
     - Intermediate META.* and *.ppd files now stored under blib/
