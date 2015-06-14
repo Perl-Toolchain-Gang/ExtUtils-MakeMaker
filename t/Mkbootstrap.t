@@ -1,11 +1,6 @@
 use strict;
 use warnings;
 
-BEGIN {
-    unshift @INC, 't/lib/';
-}
-chdir 't';
-
 our $required;
 use Test::More tests => 18;
 
@@ -39,6 +34,7 @@ SKIP: {
 Mkbootstrap('fakeboot');
 ok( !( -f 'fakeboot.bso' ), 'Mkbootstrap should not backup an empty file' );
 
+use lib 't/lib';
 use TieOut;
 my $out = tie *STDOUT, 'TieOut';
 

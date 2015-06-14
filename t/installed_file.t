@@ -8,7 +8,6 @@ use strict;
 use warnings;
 use less;
 
-use lib './lib';
 use ExtUtils::MakeMaker;
 use Test::More tests => 4;
 use File::Spec;

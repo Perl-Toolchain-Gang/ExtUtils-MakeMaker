@@ -1,16 +1,13 @@
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 
 use Carp;
 use Config;
 use ExtUtils::MM;
-use MakeMaker::Test::Utils;
 use File::Temp;
 use Cwd 'abs_path';
+use lib 't/lib';
+use MakeMaker::Test::Utils;
 
 use ExtUtils::MM;
 use Test::More

@@ -1,14 +1,10 @@
 # Test problems in Makefile.PL's and hint files.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-chdir 't';
-
 use strict;
 use warnings;
 use Test::More tests => 5;
 use ExtUtils::MM;
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use File::Path;
 use TieOut;

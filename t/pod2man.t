@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use lib 't/lib';
 
 use ExtUtils::Command::MM;
 

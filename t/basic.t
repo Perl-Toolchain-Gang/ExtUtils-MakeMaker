@@ -6,16 +6,13 @@
 # This test includes adding ' -Iinc' to $(PERL), and checking 'make install'
 # after that works. Done here as back-compat is considered basic.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Config;
 use ExtUtils::MakeMaker;
 use utf8;
 
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use Config;

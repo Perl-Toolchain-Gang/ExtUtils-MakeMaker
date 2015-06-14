@@ -1,7 +1,3 @@
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Test::More;
@@ -16,6 +12,7 @@ BEGIN {
 use Data::Dumper;
 use File::Temp;
 use Cwd;
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 
 plan tests => 31;

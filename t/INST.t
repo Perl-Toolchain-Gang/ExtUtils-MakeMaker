@@ -3,13 +3,10 @@
 #
 # Essentially, this test is a Makefile.PL.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Test::More tests => 26;
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use ExtUtils::MakeMaker;

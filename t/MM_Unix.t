@@ -1,6 +1,3 @@
-BEGIN {
-    unshift @INC, 't/lib';
-}
 chdir 't';
 
 BEGIN {

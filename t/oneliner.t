@@ -1,13 +1,8 @@
 use strict;
 use warnings;
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
-chdir 't';
-
 use Config;
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use Test::More tests => 16;
 use File::Spec;

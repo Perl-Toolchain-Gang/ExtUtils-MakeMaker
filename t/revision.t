@@ -1,10 +1,6 @@
 use strict;
 use warnings;
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use Test::More tests => 4;
 
 BEGIN {

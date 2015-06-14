@@ -1,10 +1,6 @@
 # This is a test of the fake YAML dumper implemented by EUMM:
 #   ExtUtils::MM_Any::metafile_file
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Test::More tests => 16;

@@ -1,9 +1,5 @@
 # This is a test of WriteEmptyMakefile.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use File::Temp qw[tempdir];
 my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
 use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
@@ -14,6 +10,7 @@ use warnings;
 use Test::More tests => 6;
 
 use ExtUtils::MakeMaker qw(WriteEmptyMakefile);
+use lib 't/lib';
 use TieOut;
 
 can_ok __PACKAGE__, 'WriteEmptyMakefile';

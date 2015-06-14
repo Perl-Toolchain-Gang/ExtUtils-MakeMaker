@@ -8,7 +8,6 @@ BEGIN {
 }
 
 # Use things from t/lib/
-use lib './lib';
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;

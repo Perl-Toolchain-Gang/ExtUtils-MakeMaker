@@ -1,15 +1,12 @@
 # Test if MakeMaker declines to build man pages under the right conditions.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Test::More tests => 10;
 
 use File::Spec;
 use File::Temp qw[tempdir];
+use lib 't/lib';
 use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;

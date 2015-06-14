@@ -1,16 +1,13 @@
 # This is a test of the verification of the arguments to
 # WriteMakefile.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Config;
 use Test::More tests => 19;
 use File::Temp qw[tempdir];
 
+use lib 't/lib';
 use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;

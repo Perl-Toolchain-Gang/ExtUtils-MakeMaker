@@ -1,11 +1,8 @@
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Test::More tests => 11;
 use ExtUtils::MakeMaker;
+use lib 't/lib';
 use TieOut;
 use TieIn;
 

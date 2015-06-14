@@ -1,13 +1,10 @@
 # Wherein we ensure that postamble works ok.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Config;
 use Test::More tests => 8;
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use ExtUtils::MakeMaker;

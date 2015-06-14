@@ -1,11 +1,6 @@
 use strict;
 use warnings;
 
-BEGIN {
-    unshift @INC, 't/lib/';
-}
-chdir 't';
-
 my $Testfile;
 BEGIN {
     $Testfile = 'testfile.foo';
@@ -28,6 +23,7 @@ BEGIN {
     use_ok( 'ExtUtils::Command' );
 }
 
+use lib 't/lib';
 {
     # concatenate this file with itself
     # be extra careful the regex doesn't match itself

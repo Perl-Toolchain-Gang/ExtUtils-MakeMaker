@@ -1,9 +1,6 @@
 use strict;
 use warnings;
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
 chdir 't';
 
 use Test::More;

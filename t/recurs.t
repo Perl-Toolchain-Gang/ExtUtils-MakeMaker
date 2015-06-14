@@ -1,11 +1,8 @@
 # This tests MakeMaker against recursive builds
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use Config;
 use ExtUtils::MM;

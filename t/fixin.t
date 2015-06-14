@@ -4,15 +4,12 @@ use warnings;
 # Try to test fixin.  I say "try" because what fixin will actually do
 # is highly variable from system to system.
 
-BEGIN {
-    unshift @INC, 't/lib/';
-}
-
 use File::Spec;
 
 use Test::More tests => 22;
 
 use Config;
+use lib 't/lib';
 use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;

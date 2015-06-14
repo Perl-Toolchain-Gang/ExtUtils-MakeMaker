@@ -1,7 +1,3 @@
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Config;
@@ -16,6 +12,7 @@ unless( eval { require Data::Dumper } ) {
 plan tests => 11;
 
 
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 

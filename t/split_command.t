@@ -1,14 +1,9 @@
 use strict;
 use warnings;
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
-chdir 't';
-
 use Config;
 use ExtUtils::MM;
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 
 my $Is_VMS   = $^O eq 'VMS';

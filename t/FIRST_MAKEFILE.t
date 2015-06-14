@@ -1,10 +1,8 @@
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use Test::More tests => 7;
+
+use lib 't/lib';
 
 use MakeMaker::Test::Setup::BFD;
 use MakeMaker::Test::Utils;

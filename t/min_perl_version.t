@@ -1,13 +1,10 @@
 # This is a test checking various aspects of the optional argument
 # MIN_PERL_VERSION to WriteMakefile.
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 
+use lib 't/lib';
 use TieOut;
 use MakeMaker::Test::Utils;
 use Config;

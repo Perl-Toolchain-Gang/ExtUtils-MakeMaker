@@ -1,9 +1,5 @@
 # Tests INSTALL_BASE to a directory without AND with a space in the name
 
-BEGIN {
-    unshift @INC, 't/lib';
-}
-
 use strict;
 use warnings;
 use File::Path;
@@ -12,6 +8,7 @@ my @INSTDIRS = ('../dummy-install', '../dummy  install');
 my $CLEANUP = 1;
 $CLEANUP &&= 1; # so always 1 or numerically 0
 
+use lib 't/lib';
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use Config;
