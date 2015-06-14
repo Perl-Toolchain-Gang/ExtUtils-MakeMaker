@@ -3,6 +3,7 @@ package ExtUtils::MM_Unix;
 require 5.006;
 
 use strict;
+use warnings;
 
 use Carp;
 use ExtUtils::MakeMaker::Config;

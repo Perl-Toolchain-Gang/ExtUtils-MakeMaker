@@ -1,7 +1,8 @@
 package ExtUtils::Command;
 
-use 5.00503;
+use 5.006;
 use strict;
+use warnings;
 require Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
 @ISA       = qw(Exporter);

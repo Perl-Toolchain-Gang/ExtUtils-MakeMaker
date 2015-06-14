@@ -1,6 +1,7 @@
 package ExtUtils::MY;
 
 use strict;
+use warnings;
 require ExtUtils::MM;
 
 our $VERSION = '7.05_22';

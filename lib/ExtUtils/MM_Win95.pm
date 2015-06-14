@@ -1,6 +1,7 @@
 package ExtUtils::MM_Win95;
 
 use strict;
+use warnings;
 
 our $VERSION = '7.05_22';
 $VERSION = eval $VERSION;

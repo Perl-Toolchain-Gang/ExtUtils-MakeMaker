@@ -324,6 +324,7 @@ do that.  Use at your own risk.  Have fun blowing holes in your foot.
     #!/usr/bin/perl -w
 
     use strict;
+    use warnings;
 
     use File::Spec;
     use File::Find;

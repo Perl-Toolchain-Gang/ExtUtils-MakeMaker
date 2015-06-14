@@ -1,6 +1,7 @@
 package ExtUtils::MM;
 
 use strict;
+use warnings;
 use ExtUtils::MakeMaker::Config;
 
 our $VERSION = '7.05_22';

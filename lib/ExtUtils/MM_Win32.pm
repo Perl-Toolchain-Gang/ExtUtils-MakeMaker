@@ -1,6 +1,7 @@
 package ExtUtils::MM_Win32;
 
 use strict;
+use warnings;
 
 
 =head1 NAME

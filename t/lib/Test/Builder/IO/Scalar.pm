@@ -32,10 +32,11 @@ modify it under the same terms as Perl itself.
 
 use Carp;
 use strict;
+use warnings;
 use vars qw($VERSION @ISA);
 use IO::Handle;
 
-use 5.005;
+use 5.006;
 
 ### The package version, both in 1.23 style *and* usable by MakeMaker:
 $VERSION = "2.110";

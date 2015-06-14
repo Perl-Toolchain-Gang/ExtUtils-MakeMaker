@@ -1,6 +1,7 @@
 package ExtUtils::MM_Darwin;
 
 use strict;
+use warnings;
 
 BEGIN {
     require ExtUtils::MM_Unix;

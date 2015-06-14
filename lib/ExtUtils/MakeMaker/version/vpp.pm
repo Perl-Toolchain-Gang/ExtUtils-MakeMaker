@@ -9,6 +9,7 @@ package ExtUtils::MakeMaker::charstar;
 # so that prescan_version can use the same code as in C
 
 use strict;
+use warnings;
 
 use overload (
     '""'	=> \&thischar,
@@ -127,6 +128,7 @@ package ExtUtils::MakeMaker::version::vpp;
 
 use 5.006001;
 use strict;
+use warnings;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT);

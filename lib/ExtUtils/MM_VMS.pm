@@ -1,6 +1,7 @@
 package ExtUtils::MM_VMS;
 
 use strict;
+use warnings;
 
 use ExtUtils::MakeMaker::Config;
 require Exporter;
