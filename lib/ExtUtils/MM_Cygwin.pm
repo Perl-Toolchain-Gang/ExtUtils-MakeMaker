@@ -10,6 +10,7 @@ require ExtUtils::MM_Win32;
 our @ISA = qw( ExtUtils::MM_Unix );
 
 our $VERSION = '7.05_21';
+$VERSION = eval $VERSION;
 
 
 =head1 NAME

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION = '7.05_21';
+$VERSION = eval $VERSION;
 
 use Cwd;
 use File::Spec;

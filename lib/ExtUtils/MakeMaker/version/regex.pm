@@ -11,6 +11,7 @@ use strict;
 use vars qw($VERSION $CLASS $STRICT $LAX);
 
 $VERSION = '7.05_21';
+$VERSION = eval $VERSION;
 
 #--------------------------------------------------------------------------#
 # Version regexp components

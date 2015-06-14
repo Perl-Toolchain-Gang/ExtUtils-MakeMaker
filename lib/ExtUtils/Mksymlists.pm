@@ -11,6 +11,7 @@ use Config;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&Mksymlists);
 our $VERSION = '7.05_21';
+$VERSION = eval $VERSION;
 
 sub Mksymlists {
     my(%spec) = @_;
