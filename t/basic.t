@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # This test puts MakeMaker through the paces of a basic perl module
 # build, test and installation of the Big::Fat::Dummy module.
 

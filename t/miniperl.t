@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Test that we can build modules as miniperl.
 # This mostly means no XS modules.
 

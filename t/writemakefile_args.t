@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # This is a test of the verification of the arguments to
 # WriteMakefile.
 

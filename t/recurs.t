@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # This tests MakeMaker against recursive builds
 
 BEGIN {

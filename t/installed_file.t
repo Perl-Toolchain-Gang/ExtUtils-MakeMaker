@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Test MM->_installed_file_for_module()
 
 BEGIN {

@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # This is a test for all the odd little backwards compatible things
 # MakeMaker has to support.  And we do mean backwards.
 

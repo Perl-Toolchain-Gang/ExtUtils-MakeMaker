@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # This is a test checking various aspects of the optional argument
 # MIN_PERL_VERSION to WriteMakefile.
 

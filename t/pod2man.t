@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Test our simulation of pod2man
 
 use strict;

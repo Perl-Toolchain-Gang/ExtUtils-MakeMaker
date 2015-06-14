@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # This is a test of WriteEmptyMakefile.
 
 BEGIN {

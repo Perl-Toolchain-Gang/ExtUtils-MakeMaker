@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Wherein we ensure the INST_* and INSTALL* variables are set correctly
 # in a default Makefile.PL run
 #

@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Test if MakeMaker declines to build man pages under the right conditions.
 
 BEGIN {

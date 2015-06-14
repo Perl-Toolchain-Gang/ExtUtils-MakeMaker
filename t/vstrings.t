@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # test support for various forms of vstring versions in PREREQ_PM
 
 # Magic for core

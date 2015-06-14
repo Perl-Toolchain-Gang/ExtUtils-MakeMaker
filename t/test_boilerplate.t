@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # <<<Fill in with what this test does.>>>
 # Copy this when writing new tests to avoid forgetting the core boilerplate
 

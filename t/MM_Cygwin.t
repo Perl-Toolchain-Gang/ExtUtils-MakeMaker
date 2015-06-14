@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 BEGIN {
     unshift @INC, 't/lib';
 }

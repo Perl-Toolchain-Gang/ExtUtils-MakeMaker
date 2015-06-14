@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 # Inform the user early and clearly that their Perl is broken beyond redemption
 
 use strict;

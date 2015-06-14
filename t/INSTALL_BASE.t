@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Tests INSTALL_BASE to a directory without AND with a space in the name
 
 BEGIN {

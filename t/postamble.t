@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Wherein we ensure that postamble works ok.
 
 BEGIN {

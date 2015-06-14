@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Wherein we ensure the INST_* and INSTALL* variables are set correctly
 # when various PREFIX variables are set.
 #

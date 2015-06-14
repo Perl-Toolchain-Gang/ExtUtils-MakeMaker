@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Unit test the code which fixes up $self->{LIBS}
 
 BEGIN {

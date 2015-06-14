@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Test _is_of_type()
 
 BEGIN {

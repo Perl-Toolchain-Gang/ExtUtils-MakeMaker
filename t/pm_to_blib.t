@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Ensure pm_to_blib runs at the right times.
 
 use strict;

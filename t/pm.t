@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Test that MakeMaker honors user's PM override.
 
 BEGIN {
