@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+use strict;
+
 BEGIN {
     unshift @INC, 't/lib';
 }

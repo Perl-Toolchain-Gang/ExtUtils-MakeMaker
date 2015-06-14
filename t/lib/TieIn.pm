@@ -1,3 +1,4 @@
+use strict;
 package TieIn;
 
 sub TIEHANDLE {

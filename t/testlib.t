@@ -1,5 +1,7 @@
 #!/usr/bin/perl -Tw
 
+use strict;
+
 BEGIN {
     # ./lib is there so t/lib can be seen even after we chdir.
     unshift @INC, 't/lib', './lib';

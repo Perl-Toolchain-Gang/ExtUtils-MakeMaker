@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+use strict;
+
 # Try to test fixin.  I say "try" because what fixin will actually do
 # is highly variable from system to system.
 

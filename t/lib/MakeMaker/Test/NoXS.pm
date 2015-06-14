@@ -1,3 +1,4 @@
+use strict;
 package MakeMaker::Test::NoXS;
 
 # Disable all XS loading.

@@ -1,10 +1,13 @@
 #!/usr/bin/perl -w
 
+use strict;
+
 BEGIN {
     unshift @INC, 't/lib/';
 }
 chdir 't';
 
+my $Testfile;
 BEGIN {
     $Testfile = 'testfile.foo';
 }
