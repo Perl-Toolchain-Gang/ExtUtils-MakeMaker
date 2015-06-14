@@ -1,9 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use lib 't/lib';
 chdir 't';
 
 use strict;
+use warnings;
 use Test::More tests => 6;
 
 

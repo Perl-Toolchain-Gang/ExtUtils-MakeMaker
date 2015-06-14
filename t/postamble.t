@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Wherein we ensure that postamble works ok.
 
@@ -7,6 +7,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Config;
 use Test::More tests => 8;
 use MakeMaker::Test::Utils;

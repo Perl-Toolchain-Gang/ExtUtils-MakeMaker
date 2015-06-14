@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # This is a test checking various aspects of the optional argument
 # MIN_PERL_VERSION to WriteMakefile.
@@ -8,6 +8,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 
 use TieOut;
 use MakeMaker::Test::Utils;

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Tests INSTALL_BASE to a directory without AND with a space in the name
 
@@ -7,6 +7,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use File::Path;
 use Config;
 my @INSTDIRS = ('../dummy-install', '../dummy  install');

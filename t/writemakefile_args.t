@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # This is a test of the verification of the arguments to
 # WriteMakefile.
@@ -8,6 +8,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Config;
 use Test::More tests => 43;
 

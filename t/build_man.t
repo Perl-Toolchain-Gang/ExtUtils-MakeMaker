@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Test if MakeMaker declines to build man pages under the right conditions.
 
@@ -7,6 +7,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Test::More tests => 10;
 
 use File::Spec;

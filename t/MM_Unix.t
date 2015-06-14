@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 BEGIN {
     unshift @INC, 't/lib';
@@ -19,6 +19,7 @@ BEGIN {
 BEGIN { use_ok( 'ExtUtils::MM_Unix' ); }
 
 use strict;
+use warnings;
 use File::Spec;
 
 my $class = 'ExtUtils::MM_Unix';

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 BEGIN {
     unshift @INC, 't/lib';
@@ -6,6 +6,7 @@ BEGIN {
 chdir 't';
 
 use strict;
+use warnings;
 use Test::More;
 if ($^O =~ /os2/i) {
 	plan( tests => 32 );

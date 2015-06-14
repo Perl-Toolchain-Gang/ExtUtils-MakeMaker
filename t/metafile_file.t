@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # This is a test of the fake YAML dumper implemented by EUMM:
 #   ExtUtils::MM_Any::metafile_file
@@ -8,6 +8,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Test::More tests => 16;
 
 require ExtUtils::MM_Any;

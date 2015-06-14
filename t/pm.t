@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Test that MakeMaker honors user's PM override.
 
@@ -7,6 +7,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Test::More tests => 6;
 
 use TieOut;

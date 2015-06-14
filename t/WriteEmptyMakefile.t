@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # This is a test of WriteEmptyMakefile.
 
@@ -12,6 +12,7 @@ use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir;
 
 use strict;
+use warnings;
 use Test::More tests => 6;
 
 use ExtUtils::MakeMaker qw(WriteEmptyMakefile);

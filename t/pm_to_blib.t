@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Ensure pm_to_blib runs at the right times.
 
 use strict;
+use warnings;
 use lib 't/lib';
 
 use File::Temp qw[tempdir];

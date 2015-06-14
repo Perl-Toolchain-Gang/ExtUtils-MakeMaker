@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 BEGIN {
     unshift @INC, 't/lib';
 }
 
 use strict;
+use warnings;
 use Test::More tests => 7;
 
 use MakeMaker::Test::Setup::BFD;

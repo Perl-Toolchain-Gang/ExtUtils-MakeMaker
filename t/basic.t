@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # This test puts MakeMaker through the paces of a basic perl module
 # build, test and installation of the Big::Fat::Dummy module.
@@ -13,6 +13,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Config;
 use ExtUtils::MakeMaker;
 use utf8;

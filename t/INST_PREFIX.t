@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Wherein we ensure the INST_* and INSTALL* variables are set correctly
 # when various PREFIX variables are set.
@@ -10,6 +10,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Test::More tests => 52;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;

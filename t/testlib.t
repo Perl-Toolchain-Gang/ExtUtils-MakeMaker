@@ -1,6 +1,7 @@
-#!/usr/bin/perl -Tw
+#!/usr/bin/perl -T
 
 use strict;
+use warnings;
 
 BEGIN {
     # ./lib is there so t/lib can be seen even after we chdir.

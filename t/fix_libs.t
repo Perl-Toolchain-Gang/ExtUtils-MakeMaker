@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Unit test the code which fixes up $self->{LIBS}
 
@@ -7,6 +7,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use lib './lib';
 use Test::More 'no_plan';
 

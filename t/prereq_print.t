@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 BEGIN {
     unshift @INC, 't/lib';
 }
 
 use strict;
+use warnings;
 use Config;
 
 use Test::More;

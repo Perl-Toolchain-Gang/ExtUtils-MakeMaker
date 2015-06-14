@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Wherein we ensure the INST_* and INSTALL* variables are set correctly
 # in a default Makefile.PL run
@@ -10,6 +10,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Test::More tests => 26;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
