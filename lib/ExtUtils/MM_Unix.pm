@@ -2421,7 +2421,7 @@ sub lsdir {
     my($self) = shift;
     my($dir, $regex) = @_;
     my(@ls);
-    my $dh = new DirHandle;
+    my $dh = DirHandle->new;
     $dh->open($dir || ".") or return ();
     @ls = $dh->read;
     $dh->close;

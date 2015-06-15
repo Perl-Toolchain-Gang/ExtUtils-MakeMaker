@@ -174,7 +174,7 @@ sub _write_vms {
     require ExtUtils::XSSymSet;
 
     my($isvax) = $Config::Config{'archname'} =~ /VAX/i;
-    my($set) = new ExtUtils::XSSymSet;
+    my($set) = ExtUtils::XSSymSet->new;
 
     rename "$data->{FILE}.opt", "$data->{FILE}.opt_old";
 

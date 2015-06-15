@@ -476,7 +476,7 @@ sub scan_version {
     my $vinf = FALSE;
     my @av;
 
-    $s = new ExtUtils::MakeMaker::charstar $s;
+    $s = ExtUtils::MakeMaker::charstar->new($s);
 
     while (isSPACE($s)) { # leading whitespace is OK
 	$s++;
@@ -922,7 +922,7 @@ sub _verify {
 
 sub _is_non_alphanumeric {
     my $s = shift;
-    $s = new ExtUtils::MakeMaker::charstar $s;
+    $s = ExtUtils::MakeMaker::charstar->new($s);
     while ($s) {
 	return 0 if isSPACE($s); # early out
 	return 1 unless (isALPHA($s) || isDIGIT($s) || $s =~ /[.-]/);
