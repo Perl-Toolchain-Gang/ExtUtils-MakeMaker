@@ -1,3 +1,8 @@
+7.05_23 Wed Jun 24 20:17:09 BST 2015
+    Bug fixes:
+    - Sanitise make_type on Win32
+    - Cygwin: do not mess with the image base and do an ephemeral rebase on i686
+
 7.05_22 Sun Jun 14 14:06:36 BST 2015
     Dist fixes:
     - eval $VERSION in all modules
