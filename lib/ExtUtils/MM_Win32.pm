@@ -635,6 +635,9 @@ sub make_type {
     my $make = $self->make;
     $make = +( File::Spec->splitpath( $make ) )[-1];
     $make =~ s!\.exe$!!i;
+    if ( $make =~ m![^A-Z0-9]!i ) {
+      ($make) = grep { m!make!i } split m![^A-Z0-9]!i, $make;
+    }
     return "$make-style";
 }
 
