@@ -1,3 +1,7 @@
+7.05_24 Wed Jul  1 19:18:11 BST 2015
+    Bug fixes:
+    - Fix missing pipe in Cygwin rebase command
+
 7.05_23 Wed Jun 24 20:17:09 BST 2015
     Bug fixes:
     - Sanitise make_type on Win32
