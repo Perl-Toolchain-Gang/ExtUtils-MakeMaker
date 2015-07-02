@@ -44,6 +44,7 @@ check_environment();
 
 my %Extra_Params  = ();
 my %Extra_Prereqs = ();
+my %Extra_Test_Prereqs = ();
 
 # Special case for MakeMaker being built as a vendor package
 if( $BUILDING_AS_PACKAGE ) {
@@ -52,23 +53,20 @@ if( $BUILDING_AS_PACKAGE ) {
     # burden vendors with having to update everything.
     %Extra_Prereqs = (
         'CPAN::Meta'               => '2.143240', # compat with CMR 2.130
-        'CPAN::Meta::YAML'         => '0.011', # CM 2.143240 needs
         'ExtUtils::Install'        => '1.52',
         'ExtUtils::Manifest'       => '1.70',
-        'File::Temp'               => '0.22',
-        'JSON::PP'                 => '2.27103',
-        'Parse::CPAN::Meta'        => '1.4414', # required by above CPAN::Meta
-        'Scalar::Util'             => '1.13',
         'version'                  => '0',
-        'CPAN::Meta::Requirements' => '2.131', # updates to hooks et al
     );
-
     $Extra_Prereqs{'JSON::PP::Compat5006'} = '1.09' if $] < 5.008;
+
+    %Extra_Test_Prereqs = (
+        'File::Temp'               => '0.22',
+        'Scalar::Util'             => '1.13',
+    );
 }
 else {
    eval {
       require ExtUtils::Manifest;
-      require ExtUtils::Command;
       require ExtUtils::Install;
    };
    if ( $@ ) {
@@ -93,8 +91,10 @@ my $MM = WriteMakefile(
         'Pod::Man'       => 0,                 # manifypods needs Pod::Man
         'File::Basename' => 0,
         DirHandle        => 0,
+        'Data::Dumper'   => 0,
         ($] > 5.008 ? (Encode => 0) : ()),
     },
+    TEST_REQUIRES    => \%Extra_Test_Prereqs,
 
     MIN_PERL_VERSION => '5.006',
     PMLIBDIRS        => [qw(lib inc)],
@@ -118,7 +118,6 @@ my $MM = WriteMakefile(
     },
 
     CONFIGURE_REQUIRES => {},                  # We don't need ourself to install ourself.
-    BUILD_REQUIRES     => { 'Data::Dumper' => 0, },
     INSTALLDIRS        => ( $] < 5.012 ? 'perl' : 'site' ),
     LICENSE            => 'perl',
     ABSTRACT_FROM      => "lib/$PACKAGE_FILE.pm",
