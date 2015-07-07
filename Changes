@@ -1,3 +1,8 @@
+7.05_25 Tue Jul  7 18:13:13 BST 2015
+
+    No changes since 7.05_24
+    Testing dist build
+
 7.05_24 Wed Jul  1 19:18:11 BST 2015
     Bug fixes:
     - Fix missing pipe in Cygwin rebase command
