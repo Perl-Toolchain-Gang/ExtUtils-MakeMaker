@@ -541,14 +541,14 @@ END
     my $cmr;
     if (_has_cpan_meta_requirements) {
         $cmr = CPAN::Meta::Requirements->new;
-        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+        for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
             $cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
         }
         foreach my $prereq ($cmr->required_modules) {
             $prereq2version{$prereq} = $cmr->requirements_for_module($prereq);
         }
     } else {
-        for my $key (qw(PREREQ_PM BUILD_REQUIRES)) {
+        for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
             next unless my $module2version = $self->{$key};
             $prereq2version{$_} = $module2version->{$_} for keys %$module2version;
         }
