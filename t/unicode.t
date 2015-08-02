@@ -108,8 +108,8 @@ if ($] >= 5.008) {
 }
 
 my $make = make_run();
-my $make_out = run("$make");
-is $? >> 8, 0, 'Exit code of make == 0';
+my $make_out = run($make);
+diag $make_out unless is $? >> 8, 0, 'Exit code of make == 0';
 
 my $manfile = File::Spec->catfile(qw(blib man1 probscript.1));
 SKIP: {
@@ -128,7 +128,7 @@ SKIP: {
 }
 
 $make_out = run("$make realclean");
-is $? >> 8, 0, 'Exit code of make == 0';
+diag $make_out unless is $? >> 8, 0, 'Exit code of make == 0';
 
 sub makefile_content {
   open my $fh, '<', makefile_name or die;
