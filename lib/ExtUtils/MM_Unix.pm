@@ -3641,7 +3641,7 @@ test_ : test_$default_testtype
 EOF
 
     for my $linktype (qw(dynamic static)) {
-        push @m, "subdirs-test_$linktype :: $linktype\n";
+        push @m, "subdirs-test_$linktype :: $linktype pure_all\n";
         foreach my $dir (@{ $self->{DIR} }) {
             my $test = $self->cd($dir, "\$(MAKE) test_$linktype \$(PASTHRU)");
             push @m, "\t\$(NOECHO) $test\n";
