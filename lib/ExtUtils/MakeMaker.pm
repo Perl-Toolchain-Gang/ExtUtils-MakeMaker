@@ -841,7 +841,7 @@ all :
 
 manifypods :
 
-pure_nolink :
+subdirs :
 
 dynamic :
 
@@ -1346,11 +1346,16 @@ sub selfdocument {
     push @m, <<'EOF';
 
 # here so even if top_targets is overridden, these will still be defined
-# gmake will silently not fail if any are .PHONY-ed but nmake won't
+# gmake will silently still work if any are .PHONY-ed but nmake won't
+static ::
+	$(NOECHO) $(NOOP)
+
+dynamic ::
+	$(NOECHO) $(NOOP)
 EOF
     push @m, join "\n", map "$_ ::\n\t\$(NOECHO) \$(NOOP)\n",
-        # last two are so manifypods won't puke if no subdirs
-        qw(pure_nolink static dynamic subdirs_pure_nolink config);
+        # config is so manifypods won't puke if no subdirs
+        qw(static dynamic config);
     join "\n", @m;
 }
 

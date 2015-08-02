@@ -1036,11 +1036,7 @@ sub dynamic {
 
     my($self) = shift;
     '
-dynamic :: $(FIRST_MAKEFILE) $(INST_BOOT) $(INST_DYNAMIC) subdirs_dynamic
-	$(NOECHO) $(NOOP)
-
-# define this here not top_targets in case someone overrides that
-subdirs_dynamic :: pure_nolink
+dynamic :: $(FIRST_MAKEFILE) $(INST_BOOT) $(INST_DYNAMIC)
 	$(NOECHO) $(NOOP)
 ';
 }
@@ -1087,18 +1083,10 @@ sub manifypods_target {
         $dependencies .= " \\\n\t$name";
     }
 
-    my @m;
-    push @m, <<END;
-
-subdirs_manifypods :: subdirs_pure_nolink config $dependencies
+    my $manify = <<END;
+manifypods : pure_all config $dependencies
 END
-    foreach my $dir (@{$self->{DIR}}){
-        push @m, $self->subdir_x($dir, 'manifypods');
-    }
-    push @m, <<END;
 
-manifypods : subdirs_manifypods
-END
     my @man_cmds;
     foreach my $section (qw(1 3)) {
         my $pods = $self->{"MAN${section}PODS"};
@@ -1108,10 +1096,10 @@ CMD
         push @man_cmds, $self->split_command($p2m, map {($_,$pods->{$_})} sort keys %$pods);
     }
 
-    push @m, "\t\$(NOECHO) \$(NOOP)\n" unless @man_cmds;
-    push @m, map { "$_\n" } @man_cmds;
+    $manify .= "\t\$(NOECHO) \$(NOOP)\n" unless @man_cmds;
+    $manify .= join '', map { "$_\n" } @man_cmds;
 
-    return join '', @m;
+    return $manify;
 }
 
 sub _has_cpan_meta {
