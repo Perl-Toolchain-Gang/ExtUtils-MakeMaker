@@ -3810,7 +3810,7 @@ sub top_targets {
 
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
-    push @m, sprintf <<'EOF', $Config{usedl} ? 'dynamic' : 'static';
+    push @m, sprintf <<'EOF';
 pure_all :: config pm_to_blib subdirs linkext
 	$(NOECHO) $(NOOP)
 
