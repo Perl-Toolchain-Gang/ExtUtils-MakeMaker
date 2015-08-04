@@ -2356,7 +2356,7 @@ sub installbin {
     push(@m, qq{
 EXE_FILES = @exefiles
 
-pure_nolink :: @to
+pure_all :: @to
 	\$(NOECHO) \$(NOOP)
 
 realclean ::
@@ -2393,18 +2393,14 @@ Defines the linkext target which in turn defines the LINKTYPE.
 # LINKTYPE => static or dynamic or ''
 sub linkext {
     my($self, %attribs) = @_;
-    my $extra = ''; # so if LINKTYPE eq '' and there are DIR
-                    # we can bring in subdirs_(perl-linktype) for back-compat
     my $linktype = $attribs{LINKTYPE};
     $linktype = $self->{LINKTYPE} unless defined $linktype;
     if (defined $linktype and $linktype eq '') {
-        # bring in subdirs even if none exist as brings in pure_nolink
         warn "Warning: LINKTYPE set to '', no longer necessary\n";
-        $extra = 'subdirs_' . ($Config{usedl} ? 'dynamic' : 'static');
     }
     $linktype = '$(LINKTYPE)' unless defined $linktype;
     "
-linkext :: $linktype $extra
+linkext :: $linktype
 	\$(NOECHO) \$(NOOP)
 ";
 }
@@ -3245,7 +3241,7 @@ sub processPL {
 
             $m .= <<MAKE_FRAG;
 
-pure_nolink :: $target
+all :: $target
 	\$(NOECHO) \$(NOOP)
 
 $target :: $plfile $pm_dep
@@ -3414,11 +3410,7 @@ sub static {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
-static :: $(FIRST_MAKEFILE) $(INST_STATIC) subdirs_static
-	$(NOECHO) $(NOOP)
-
-# define this here not top_targets in case someone overrides that
-subdirs_static :: pure_nolink
+static :: $(FIRST_MAKEFILE) $(INST_STATIC)
 	$(NOECHO) $(NOOP)
 ';
 }
@@ -3566,14 +3558,14 @@ Helper subroutine for subdirs
 =cut
 
 sub subdir_x {
-    my($self, $subdir, $target) = @_;
+    my($self, $subdir) = @_;
 
     my $subdir_cmd = $self->cd($subdir,
-      sprintf '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) %s $(PASTHRU)', $target
+      '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) all $(PASTHRU)'
     );
-    return sprintf <<'EOT', "subdirs_$target", $subdir_cmd;
+    return sprintf <<'EOT', $subdir_cmd;
 
-%s ::
+subdirs ::
 	$(NOECHO) %s
 EOT
 
@@ -3593,7 +3585,7 @@ sub subdirs {
     # subdirectories containing further Makefile.PL scripts.
     # It calls the subdir_x() method for each subdirectory.
     foreach my $dir (@{$self->{DIR}}){
-	push @m, map $self->subdir_x($dir, $_), qw(pure_nolink static dynamic);
+	push @m, $self->subdir_x($dir);
 ####	print "Including $dir subdirectory\n";
     }
     if (@m){
@@ -3649,7 +3641,7 @@ test_ : test_$default_testtype
 EOF
 
     for my $linktype (qw(dynamic static)) {
-        push @m, "subdirs-test_$linktype :: $linktype\n";
+        push @m, "subdirs-test_$linktype :: $linktype pure_all\n";
         foreach my $dir (@{ $self->{DIR} }) {
             my $test = $self->cd($dir, "\$(MAKE) test_$linktype \$(PASTHRU)");
             push @m, "\t\$(NOECHO) $test\n";
@@ -3818,38 +3810,16 @@ sub top_targets {
 
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
-    push @m, sprintf <<'EOF', $Config{usedl} ? 'dynamic' : 'static';
-pure_all :: linkext
+    push @m, sprintf <<'EOF';
+pure_all :: config pm_to_blib subdirs linkext
 	$(NOECHO) $(NOOP)
 
-pure_nolink :: config pm_to_blib subdirs_pure_nolink
 	$(NOECHO) $(NOOP)
 
-# this is in case of overrides, no longer used by EUMM natively
-subdirs :: subdirs_$(LINKTYPE)
-	$(NOECHO) $(NOOP)
-
-# in case LINKTYPE not set
-subdirs_ :: subdirs_%s
-	$(NOECHO) $(NOOP)
-
-subdirs_pure_nolink ::
-	$(NOECHO) $(NOOP)
-
-subdirs_dynamic :: $(MYEXTLIB)
-	$(NOECHO) $(NOOP)
-
-subdirs_static :: $(MYEXTLIB)
+subdirs :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
 config :: $(FIRST_MAKEFILE) blibdirs
-	$(NOECHO) $(NOOP)
-
-# back-compat in case of override of static or dynamic
-static :: pure_nolink
-	$(NOECHO) $(NOOP)
-
-dynamic :: pure_nolink
 	$(NOECHO) $(NOOP)
 EOF
 
