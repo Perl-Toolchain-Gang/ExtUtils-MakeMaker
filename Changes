@@ -1,3 +1,8 @@
+7.05_27 Wed Aug  5 10:31:56 BST 2015
+
+    No changes since 7.05_26
+    Testing dist build
+
 7.05_26 Tue Aug  4 20:36:18 BST 2015
     Bug fixes:
     - Reverted pure_all changes due to bug in gmake and
