@@ -18,7 +18,7 @@ use lib qw(lib);    # build ourself with ourself
 use File::Spec;
 use ExtUtils::MakeMaker 6.50;
 
-my $BUILDING_AS_PACKAGE = $ENV{BUILDING_AS_PACKAGE};
+my $BUILDING_AS_PACKAGE = $ENV{BUILDING_AS_PACKAGE} || ( grep { m!^\-\-release$! } @ARGV );
 
 my $PACKAGE = 'ExtUtils::MakeMaker';
 my $version = do { no strict 'refs'; ${ $PACKAGE . '::VERSION' }; };
