@@ -9,7 +9,7 @@ BEGIN {
 
 use strict;
 use Config;
-use Test::More tests => 19;
+use Test::More tests => 21;
 use File::Temp qw[tempdir];
 
 use TieOut;
@@ -89,6 +89,26 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     );
     is $warnings,
     "Warning: prerequisite I::Do::Not::Exist 0 not found.\n", 'non-exist prereq';
+
+    $warnings = '';
+    WriteMakefile(
+        NAME            => 'Big::Dummy',
+        CONFIGURE_REQUIRES => {
+            "I::Do::Not::Configure" => 0,
+        }
+    );
+    is $warnings,
+    "Warning: prerequisite I::Do::Not::Configure 0 not found.\n", 'non-exist prereq';
+
+    $warnings = '';
+    WriteMakefile(
+        NAME            => 'Big::Dummy',
+        TEST_REQUIRES => {
+            "I::Do::Not::Test" => 0,
+        }
+    );
+    is $warnings,
+    "Warning: prerequisite I::Do::Not::Test 0 not found.\n", 'non-exist prereq';
 
 
     $warnings = '';
