@@ -1,4 +1,3 @@
-.perlcriticrc
 bin/instmodsh
 bundled/CPAN-Meta-Requirements/CPAN/Meta/Requirements.pm
 bundled/CPAN-Meta-YAML/CPAN/Meta/YAML.pm
