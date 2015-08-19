@@ -1,3 +1,11 @@
+7.05_28 Wed Aug 19 18:56:25 BST 2015
+    Bug fixes:
+    - Warning on missing TEST_REQUIRES and CONFIGURE_REQUIRES
+
+    Dist fixes:
+    - Removed .perlcriticrc
+    - Cleaned up Makefile.PL
+
 7.05_27 Wed Aug  5 10:31:56 BST 2015
 
     No changes since 7.05_26
