@@ -73,7 +73,7 @@ sub copy_bundles {
     # So we can use them to copy them.
     add_bundles_to_inc();
 
-    rmtree $dest;
+    rmtree $dest if -e $dest;
     mkpath $dest;
 
     opendir my $bundle_dh, $src or die $!;
