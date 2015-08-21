@@ -3056,7 +3056,7 @@ sub ppd {
     $abstract =~ s/</&lt;/g;
     $abstract =~ s/>/&gt;/g;
 
-    my $author = join(', ',@{$self->{AUTHOR} || []});
+    my $author = join(', ',@{ ref $self->{AUTHOR} eq 'ARRAY' ? $self->{AUTHOR} : [ $self->{AUTHOR} ]});
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 
