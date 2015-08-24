@@ -1,3 +1,8 @@
+7.05_29 Mon Aug 24 16:00:14 BST 2015
+    Bug fixes:
+    - Handle new warnings from File::Path
+    - Resolve RT#106572 specifying AUTHOR via command-line is broken
+
 7.05_28 Wed Aug 19 18:56:25 BST 2015
     Bug fixes:
     - Warning on missing TEST_REQUIRES and CONFIGURE_REQUIRES
