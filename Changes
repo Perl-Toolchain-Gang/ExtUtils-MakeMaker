@@ -1,3 +1,13 @@
+7.06
+    Enhancements:
+    - version ranges are now supported for PREREQS, etc.
+    - Metadata is now represented internally as Meta Spec 2.0
+    - Use intermediate files to store META.* and *.ppd files
+    - ExtUtils::Command has been re-incorporated at 1.19 of that module
+    - Refactored XS handling
+    - XSMULTI=>1 - put multiple *.xs under lib, it "just works" and XSBUILD
+      for refined control of XSMULTI
+
 7.05_29 Mon Aug 24 16:00:14 BST 2015
     Bug fixes:
     - Handle new warnings from File::Path
