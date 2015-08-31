@@ -8,6 +8,41 @@
     - XSMULTI=>1 - put multiple *.xs under lib, it "just works" and XSBUILD
       for refined control of XSMULTI
 
+    Bug fixes:
+    - Handle new warnings from File::Path
+    - Resolve RT#106572 specifying AUTHOR via command-line is broken
+    - Warning on missing TEST_REQUIRES and CONFIGURE_REQUIRES
+    - Sanitise make_type on Win32
+    - Cygwin rebase fixes
+    - Makefile starting comments reflect decoded @ARGV, not raw
+    - Add various targets to .PHONY to avoid disk IO with dmake
+    - Fixed race condition in realclean
+    - improve static-build lib detection
+    - Eliminate non-error STDERR
+    - Make WriteEmptyMakefile Makefile functional when called in subdir
+    - manifypods fixes
+    - perllocal.pod generation "Perl in Space" fix
+    - PASTHRU fixes
+    - Fix distsignature dependencies for parallel make
+    - Check exit status for commands in "make ci" target
+
+    Dist fixes:
+    - Made %ExtraPrereqs match bundled prereqs
+    - Included MANIFEST.SKIP from ExtUtils::Manifest
+    - The bundled Encode::Locale has been updated to 1.04
+
+    Test fixes:
+    - test PL_FILES of a "module"
+    - Various tests no longer require a separate .pm file for testing
+    - Support v5.6.1 in various tests
+    - test static build if $ENV{AUTHOR_TESTING}
+    - XS tests now pluggable
+    - test for "Perl in Space"
+
+    Doc fixes:
+    - better document for PL_FILES, oneliner method
+    - FAQ updated
+
 7.05_29 Mon Aug 24 16:00:14 BST 2015
     Bug fixes:
     - Handle new warnings from File::Path
