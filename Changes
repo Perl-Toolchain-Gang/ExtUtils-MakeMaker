@@ -7,6 +7,7 @@
     - Refactored XS handling
     - XSMULTI=>1 - put multiple *.xs under lib, it "just works" and XSBUILD
       for refined control of XSMULTI
+    - can do "make test" without first doing "make"
 
     Bug fixes:
     - Handle new warnings from File::Path
