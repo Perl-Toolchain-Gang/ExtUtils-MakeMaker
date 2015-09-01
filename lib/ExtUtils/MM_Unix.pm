@@ -2942,7 +2942,7 @@ sub pasthru {
         my $val = qq{\$($key)};
         # expand within perl if given since need to use quote_literal
         # since INC might include space-protecting ""!
-        $val = $self->{$key} if defined $self->{$key};
+        chomp($val = $self->{$key}) if defined $self->{$key};
         $val .= " \$(PASTHRU_$key)";
         my $quoted = $self->quote_literal($val);
         push @pasthru, qq{PASTHRU_$key=$quoted};
