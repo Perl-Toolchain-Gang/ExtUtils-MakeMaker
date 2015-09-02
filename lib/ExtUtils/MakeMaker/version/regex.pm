@@ -10,7 +10,7 @@ use strict;
 
 use vars qw($VERSION $CLASS $STRICT $LAX);
 
-$VERSION = '7.06';
+$VERSION = '7.07_01';
 $VERSION = eval $VERSION;
 
 #--------------------------------------------------------------------------#

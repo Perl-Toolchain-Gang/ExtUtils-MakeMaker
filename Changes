@@ -1,3 +1,7 @@
+7.07_01 Wed Sep  2 12:38:09 BST 2015
+    Bug fixes:
+    - Fix a regression with PASSTHRU RT#106808
+
 7.06 Mon Aug 31 18:54:14 BST 2015
     Enhancements:
     - version ranges are now supported for PREREQS, etc.
