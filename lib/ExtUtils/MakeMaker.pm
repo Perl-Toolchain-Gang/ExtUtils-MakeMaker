@@ -152,7 +152,8 @@ sub _convert_compat_attrs { #result of running several times should be same
 sub _verify_att {
     my($att) = @_;
 
-    while( my($key, $val) = each %$att ) {
+    foreach my $key (sort keys %$att) {
+        my $val = $att->{$key};
         my $sig = $Att_Sigs{$key};
         unless( defined $sig ) {
             warn "WARNING: $key is not a known parameter.\n";

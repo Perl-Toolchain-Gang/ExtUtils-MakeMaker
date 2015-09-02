@@ -54,7 +54,8 @@ sub dlsyms {
 	# Make import files (needed for static build)
 	-d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp";
 	open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp";
-	while (my($name, $exp) = each %{$self->{IMPORTS}}) {
+	foreach my $name (sort keys %{$self->{IMPORTS}}) {
+	    my $exp = $self->{IMPORTS}->{$name};
 	    my ($lib, $id) = ($exp =~ /(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
 	    print $imp "$name $lib $id ?\n";
 	}

@@ -676,7 +676,7 @@ Defines a check in target for RCS.
 sub dist_ci {
     my($self) = shift;
     return sprintf "ci :\n\t%s\n", $self->oneliner(<<'EOF', [qw(-MExtUtils::Manifest=maniread)]);
-@all = keys %{ maniread() };
+@all = sort keys %{ maniread() };
 print(qq{Executing $(CI) @all\n});
 system(qq{$(CI) @all}) == 0 or die $!;
 print(qq{Executing $(RCS_LABEL) ...\n});
@@ -2433,9 +2433,9 @@ into the Makefile.
 
 sub macro {
     my($self,%attribs) = @_;
-    my(@m,$key,$val);
-    while (($key,$val) = each %attribs){
-	last unless defined $key;
+    my @m;
+    foreach my $key (sort keys %attribs) {
+	my $val = $attribs{$key};
 	push @m, "$key = $val\n";
     }
     join "", @m;
