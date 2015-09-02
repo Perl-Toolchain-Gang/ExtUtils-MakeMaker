@@ -140,7 +140,7 @@ $label2files{subdirs} = +{
   %{ $label2files{'basic'} }, # make copy
   'Makefile.PL' => sprintf(
     $MAKEFILEPL, 'Test', 'Test.pm', qq{'$typemap'},
-    q{DEFINE => '-DINVAR=input',},
+    q{DEFINE => '-DINVAR=input', INC => "-Inewline\n", LIBS => "-Lnewline\n",},
   ),
   'Other/Makefile.PL' => sprintf($MAKEFILEPL, 'Other', 'Other.pm', qq{}, ''),
   'Other/Other.pm' => $PM_OTHER,
