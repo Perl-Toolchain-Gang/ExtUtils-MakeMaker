@@ -3205,13 +3205,13 @@ part of the 'distdir' target (and thus the 'dist' target).  This is intended to
 seamlessly and rapidly populate CPAN with module meta-data.  If you wish to
 shut this feature off, set the C<NO_META> C<WriteMakefile()> flag to true.
 
-At the 2008 QA Hackathon in Oslo, Perl module toolchain maintainers agrees
+At the 2008 QA Hackathon in Oslo, Perl module toolchain maintainers agreed
 to use the CPAN Meta format to communicate post-configuration requirements
 between toolchain components.  These files, F<MYMETA.json> and F<MYMETA.yml>,
 are generated when F<Makefile.PL> generates a F<Makefile> (if L<CPAN::Meta>
-is installed).  Clients like L<CPAN> or L<CPANPLUS> will read this
+is installed).  Clients like L<CPAN> or L<CPANPLUS> will read these
 files to see what prerequisites must be fulfilled before building or testing
-the distribution.  If you with to shut this feature off, set the C<NO_MYMETA>
+the distribution.  If you wish to shut this feature off, set the C<NO_MYMETA>
 C<WriteMakeFile()> flag to true.
 
 =head2 Disabling an extension
