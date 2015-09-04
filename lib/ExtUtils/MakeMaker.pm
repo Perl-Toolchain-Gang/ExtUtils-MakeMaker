@@ -451,8 +451,11 @@ sub new {
                 $self->{$key},
                 {
                   bad_version_hook => sub {
-                    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as 0";
-                    version->new(0);
+                    #no warnings 'numeric'; # module doesn't use warnings
+                    my ($fallback) = $_[0] ? ($_[0] =~ /^([0-9.]+)/) : 0;
+                    $fallback += 0;
+                    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as $fallback";
+                    version->new($fallback);
                   },
                 },
             );
@@ -461,13 +464,19 @@ sub new {
         } else {
             for my $module (sort keys %{ $self->{$key} }) {
                 my $version = $self->{$key}->{$module};
+                my $fallback = 0;
                 if (!defined($version) or !length($version)) {
                     carp "Undefined requirement for $module treated as '0' (CPAN::Meta::Requirements not available)";
-                } else {
-                    next if $version =~ /^\d+(?:\.\d+(?:_\d+)*)?$/;
-                    carp "Unparsable version '$version' for prerequisite $module treated as 0 (CPAN::Meta::Requirements not available)";
                 }
-                $self->{$key}->{$module} = 0;
+                elsif ($version =~ /^\d+(?:\.\d+(?:_\d+)*)?$/) {
+                    next;
+                }
+                else {
+                    my ($fallback) = $_[0] ? ($_[0] =~ /^([0-9.]+)/) : 0;
+                    $fallback += 0;
+                    carp "Unparsable version '$version' for prerequisite $module treated as $fallback (CPAN::Meta::Requirements not available)";
+                }
+                $self->{$key}->{$module} = $fallback;
             }
         }
     }
@@ -574,6 +583,13 @@ END
           $installed_file = MM->_installed_file_for_module($prereq);
           $pr_version = MM->parse_version($installed_file) if $installed_file;
           $pr_version = 0 if $pr_version eq 'undef';
+          if ( !eval { version->new( $pr_version ); 1 } ) {
+            #no warnings 'numeric'; # module doesn't use warnings
+            my ($fallback) = $pr_version ? ($pr_version =~ /^([0-9.]+)/) : 0;
+            $fallback += 0;
+            carp "Unparsable version '$pr_version' for installed prerequisite $prereq treated as $fallback";
+            $pr_version = $fallback;
+          }
         }
 
         # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
