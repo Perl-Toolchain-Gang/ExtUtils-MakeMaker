@@ -491,7 +491,7 @@ sub new {
    }
 
     print "MakeMaker (v$VERSION)\n" if $Verbose;
-    if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}){
+    if (-f "MANIFEST" && ! -f "Makefile" && ! $UNDER_CORE){
         check_manifest();
     }
 
@@ -599,7 +599,7 @@ END
             warn sprintf "Warning: prerequisite %s %s not found.\n",
               $prereq, $required_version
                    unless $self->{PREREQ_FATAL}
-                       or $ENV{PERL_CORE};
+                       or $UNDER_CORE;
 
             $unsatisfied{$prereq} = 'not installed';
         }
@@ -611,7 +611,7 @@ END
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $required_version, ($pr_version || 'unknown version')
                   unless $self->{PREREQ_FATAL}
-                       or $ENV{PERL_CORE};
+                       or $UNDER_CORE;
 
             $unsatisfied{$prereq} = $required_version || 'unknown version' ;
         }
@@ -1192,6 +1192,7 @@ sub mv_all_methods {
 sub skipcheck {
     my($self) = shift;
     my($section) = @_;
+    return 'skipped' if $section eq 'metafile' && $UNDER_CORE;
     if ($section eq 'dynamic') {
         print "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_bs'\n"
