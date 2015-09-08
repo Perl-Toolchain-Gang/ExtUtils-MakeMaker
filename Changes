@@ -1,3 +1,309 @@
+7.06 Mon Aug 31 18:54:14 BST 2015
+    Enhancements:
+    - version ranges are now supported for PREREQS, etc.
+    - Metadata is now represented internally as Meta Spec 2.0
+    - Use intermediate files to store META.* and *.ppd files
+    - ExtUtils::Command has been re-incorporated at 1.19 of that module
+    - Refactored XS handling
+    - XSMULTI=>1 - put multiple *.xs under lib, it "just works" and XSBUILD
+      for refined control of XSMULTI
+    - can do "make test" without first doing "make"
+
+    Bug fixes:
+    - Handle new warnings from File::Path
+    - Resolve RT#106572 specifying AUTHOR via command-line is broken
+    - Warning on missing TEST_REQUIRES and CONFIGURE_REQUIRES
+    - Sanitise make_type on Win32
+    - Cygwin rebase fixes
+    - Makefile starting comments reflect decoded @ARGV, not raw
+    - Add various targets to .PHONY to avoid disk IO with dmake
+    - Fixed race condition in realclean
+    - improve static-build lib detection
+    - Eliminate non-error STDERR
+    - Make WriteEmptyMakefile Makefile functional when called in subdir
+    - manifypods fixes
+    - perllocal.pod generation "Perl in Space" fix
+    - PASTHRU fixes
+    - Fix distsignature dependencies for parallel make
+    - Check exit status for commands in "make ci" target
+
+    Dist fixes:
+    - Made %ExtraPrereqs match bundled prereqs
+    - Included MANIFEST.SKIP from ExtUtils::Manifest
+    - The bundled Encode::Locale has been updated to 1.04
+
+    Test fixes:
+    - test PL_FILES of a "module"
+    - Various tests no longer require a separate .pm file for testing
+    - Support v5.6.1 in various tests
+    - test static build if $ENV{AUTHOR_TESTING}
+    - XS tests now pluggable
+    - test for "Perl in Space"
+
+    Doc fixes:
+    - better document for PL_FILES, oneliner method
+    - FAQ updated
+
+7.05_29 Mon Aug 24 16:00:14 BST 2015
+    Bug fixes:
+    - Handle new warnings from File::Path
+    - Resolve RT#106572 specifying AUTHOR via command-line is broken
+
+7.05_28 Wed Aug 19 18:56:25 BST 2015
+    Bug fixes:
+    - Warning on missing TEST_REQUIRES and CONFIGURE_REQUIRES
+
+    Dist fixes:
+    - Removed .perlcriticrc
+    - Cleaned up Makefile.PL
+
+7.05_27 Wed Aug  5 10:31:56 BST 2015
+
+    No changes since 7.05_26
+    Testing dist build
+
+7.05_26 Tue Aug  4 20:36:18 BST 2015
+    Bug fixes:
+    - Reverted pure_all changes due to bug in gmake and
+      parallel building perl core
+
+7.05_25 Tue Jul  7 18:13:13 BST 2015
+
+    No changes since 7.05_24
+    Testing dist build
+
+7.05_24 Wed Jul  1 19:18:11 BST 2015
+    Bug fixes:
+    - Fix missing pipe in Cygwin rebase command
+
+7.05_23 Wed Jun 24 20:17:09 BST 2015
+    Bug fixes:
+    - Sanitise make_type on Win32
+    - Cygwin: do not mess with the image base and do an ephemeral rebase on i686
+
+7.05_22 Sun Jun 14 14:06:36 BST 2015
+    Dist fixes:
+    - eval $VERSION in all modules
+
+7.05_21 Sat Jun 13 14:57:44 BST 2015
+    Enhancements:
+    - Intermediate META.* and *.ppd files now stored under blib/
+
+    Test fixes:
+    - fixed an executable bit on one of the tests
+
+7.05_20 Sat Apr  4 16:20:54 BST 2015
+    Test fixes:
+    - Disable the unicode filename tests for now
+
+7.05_19 Fri Mar 27 16:48:15 GMT 2015
+    Test fixes:
+    - Also skip t/basic.t unicode test on Win32
+
+7.05_18 Fri Mar 27 12:16:05 GMT 2015
+    Bug fixes:
+    - Fix LINKTYPE => '' backwards compatibility
+    - Have Makefile starting comments reflect decoded @ARGV, not raw
+
+    Test fixes:
+    - Restore t/basic.t unicode test, except on BSD
+
+7.05_17 Tue Mar 24 12:11:47 GMT 2015
+    Bug fixes:
+    - Fix RT#103042 - maniadd failure needs "die" to stop make
+
+7.05_16 Mon Mar  9 11:17:40 GMT 2015
+    Bug fixes:
+    - Add non-overridable "config" target for subdirs_manifypod's benefit
+
+    Test fixes:
+    - Fix Cygwin tests for manifypods() changes
+    - Skip a Mkbootstrap test on Cygwin
+
+7.05_15 Thu Mar  5 19:22:51 GMT 2015
+    Bug fixes:
+    - Resolve core integration regression with META handling
+    - Make "manifypods" go into subdirs
+    - Add various targets to .PHONY to avoid disk IO with dmake
+
+7.05_14 Fri Feb 20 16:43:30 GMT 2015
+    Bug fixes:
+    - Add static/dynamic no-ops - needed by nmake and others
+
+    Test fixes:
+    - PL_FILES of a "module" was untested 
+
+7.05_13 Wed Feb 18 22:17:53 GMT 2015
+    Enhancements:
+    - do proper conversion to 2.x for META_ADD/MERGE
+
+    Bug fixes:
+    - Resolved [RT#102009] subdir override of top_target lacking pure_nolink
+
+    Test fixes:
+    - Various tests no longer require a separate .pm file for testing
+    - Handle unicode correctly in hash2files() function
+
+7.05_12 Sat Feb  7 15:00:09 GMT 2015
+    Bug fixes:
+    - Fixed race condition in realclean
+    - Fixed race condition with subdirs_$linktype
+
+    Dist fixes:
+    - Made %ExtraPrereqs match bundled prereqs
+    - Included MANIFEST.SKIP from ExtUtils::Manifest
+
+7.05_11 Sat Jan 31 16:11:06 GMT 2015
+    Bug fixes:
+    - Don't make Makefile.aperl until static done so find *.a in blib
+    - Fixed precedence issue in linkext
+    - Make WriteEmptyMakefile produce Makefile compat with subdirs-test_*
+    - Relaxed the requirements for v5.6.1 in bundled version
+
+    Test fixes:
+    - Support v5.6.1 in various tests
+
+    Doc fixes:
+    - Clarified XSBUILD documentation slightly
+
+7.05_10 Mon Jan 26 15:06:37 GMT 2015
+    Test fixes:
+    - Update XSBUILD test to work when compiling under C++
+
+7.05_09 Fri Jan 23 10:15:47 GMT 2015
+    Bug fixes:
+    - pure_nolink as dep of dynamic/static in top_targets in case override
+      ( fixes a build issue in core)
+    - Only add DynaLoader to makeaperl if -Dusedl
+
+7.05_08 Tue Jan 20 10:00:01 GMT 2015
+    Enhancements:
+    - Add XSBUILD option: control XSMULTI per XS type and per-object
+    - Cache is_make_type results for performance (196 in normal WriteMakefile)
+
+    Bug fixes:
+    - Eliminate non-error STDERR
+    - Use $from (rename to $object) param not $(OBJECT) in xs_make_dynamic_lib
+    - Set $(OBJECT) if XSMULTI
+    - Eliminate unnecessary MM_NW5 const_cccmd override
+    - Make WriteEmptyMakefile Makefile functional when called in subdir
+    - WriteEmptyMakefile rmtree _eumm, clean target removes Makefile
+    - WriteEmptyMakefile not recurse by default
+    - Make manifypods dep on blibdirs as needs it to function
+    - Back-compat linkext -> subdirs_(perl-linktype) if LINKTYPE= and some DIR
+    - Eliminate leak of dirhandles in ExtUtils::Liblist::lsdir
+    - perllocal.pod generation "Perl in Space" fix
+    - quote_literal PASTHRU_* as can have "" in
+    - Switch to using version->stringify, never ->normal
+
+    Test fixes:
+    - Introduce use of $ENV{AUTHOR_TESTING} - don't skip some if true
+    - Skip static tests if not static perl and not author - false negatives
+
+    Doc fixes:
+    - PL_FILES better documented
+
+    Dist fixes:
+    - The bundled Encode::Locale has been updated to 1.04
+
+7.05_07 Fri Jan  9 15:58:49 GMT 2015
+    Bug fixes:
+    - Dynamic and static targets now depend from pure_nolink
+
+    Test fixes:
+    - Skip XS static on Haiku as well
+    - Correctly skip static linking test on shrplib perls
+    - Handle an occasional race condition in pm_to_blib.t
+
+7.05_06 Thu Jan  8 19:03:48 GMT 2015
+    Enhancements:
+    - Refactored XS handling
+    - XSMULTI=>1 - put multiple *.xs under lib, it "just works"
+    - pure_all target split so can do "make dynamic" and "make static"
+
+    Bug fixes:
+    - dist_ci target fixed for nmake
+    - Avoid dmake warning with XS
+    - Borland and GNU compiler can be specified with full path
+    - Fix parallel-build problems with split of pure_all target
+    - Make Win32 miniperl tests pass if no chcp
+    - Fix metadata extraction problem with *.pm with CRLF
+
+    Test fixes:
+    - Now tested: XS builds of static, bootstrap code system
+    - XS tests now pluggable
+    - Win32 t/basic.t now tries Win32 module before chcp
+
+    Doc fixes:
+    - FAQ updated for XSMULTI
+    - Improve doc for oneliner method
+
+7.05_05 Wed Dec 31 22:42:17 GMT 2014
+    Enhancements:
+    - Metadata is now represented internally as Meta Spec 2.0
+    - Use intermediate files to store META.* and *.ppd files
+    - ExtUtils::Command has been re-incorporated at 1.19 of that module
+
+    Bug fixes:
+    - the SHELL env var needs to be set if gmake is used on Win32
+    - No longer manify top-level README.pod document
+    - Some "dubious code" in the shebang fixin has been fixed
+    - Lots of XS-handling code tidyups
+
+    Test fixes:
+    - Ensure that tempdirs get tidied up after tests
+    - ExtUtils::Command tests have been added
+
+    Doc fixes:
+    - Lots of changes to the FAQ document
+
+    Dist fixes:
+    - Bundled CPAN::Meta, CPAN::Meta::Requirements and Parse::CPAN::Meta
+      updated to latest versions
+    - No longer bundle CPAN::Meta and prereqs on perls < 5.008001
+    - 'version' added to the no_index declaration
+
+7.05_04 Wed Dec 24 14:31:17 GMT 2014
+    Core fixes:
+    - Fix for lack of B module at build time when in core
+
+7.05_03 Wed Dec 24 11:45:58 GMT 2014
+    Bug fixes:
+    - Revert LibList to a previous working state
+    - Fix distsignature dependencies for parallel make
+    - Check exit status for commands in "make ci" target
+    - RT#100268 fix wrong variable being used
+    - Make open_for_writing() exportable for utf8 encoding
+    - Made prereqs work minus version-range if no CPAN::Meta::Requirements
+
+    Test fixes:
+    - vstrings test was recfactored
+    - prereqs test acquired labels for all tests
+
+    QA fixes:
+    - use containerised travis builds for extra speed
+    - blead build has been prioritised as it takes the longest
+
+7.05_02 Mon Dec 15 20:06:12 GMT 2014
+    VMS fixes:
+    - Unixify path in t/INSTALL_BASE.t
+
+    Test fixes:
+    - perl_lib calls fixed in tests
+    - t/Liblist_Kid.t fixed for Win32 and others
+
+7.05_01 Sat Dec  6 15:44:55 GMT 2014
+    Enhancements:
+    - version ranges are now supported for PREREQS, etc.
+
+    Bug fixes:
+    - Also quote linker paths to handle spaces
+    - Avoid cmdline duplication if ARCHLIB and LIB are identical
+
+    Test fixes:
+    - Removed done_testing from a number of test files
+    - Added a subdir with a space test
+
 7.04 Tue Dec  2 12:43:48 GMT 2014
 
     No changes from 7.03_06
