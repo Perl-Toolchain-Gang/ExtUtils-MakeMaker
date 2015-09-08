@@ -439,7 +439,7 @@ sub new {
    }
 
     print "MakeMaker (v$VERSION)\n" if $Verbose;
-    if (-f "MANIFEST" && ! -f "Makefile" && ! $ENV{PERL_CORE}){
+    if (-f "MANIFEST" && ! -f "Makefile" && ! $UNDER_CORE){
         check_manifest();
     }
 
@@ -525,7 +525,7 @@ END
             warn sprintf "Warning: prerequisite %s %s not found.\n",
               $prereq, $required_version
                    unless $self->{PREREQ_FATAL}
-                       or $ENV{PERL_CORE};
+                       or $UNDER_CORE;
 
             $unsatisfied{$prereq} = 'not installed';
         }
@@ -533,7 +533,7 @@ END
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $required_version, ($pr_version || 'unknown version')
                   unless $self->{PREREQ_FATAL}
-                       or $ENV{PERL_CORE};
+                       or $UNDER_CORE;
 
             $unsatisfied{$prereq} = $required_version ? $required_version : 'unknown version' ;
         }
