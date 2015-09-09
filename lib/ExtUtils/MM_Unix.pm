@@ -143,7 +143,8 @@ sub c_o {
 };
     }
 
-    push @m, sprintf <<'EOF', $command, $flags, $self->xs_obj_opt('$*.s');
+    my $m_o = $self->{XSMULTI} ? $self->xs_obj_opt('$*.s') : '';
+    push @m, sprintf <<'EOF', $command, $flags, $m_o;
 
 .c.s :
 	%s -S %s $*.c %s
@@ -151,9 +152,9 @@ EOF
 
     my @exts = qw(c cpp cxx cc);
     push @exts, 'C' if !$Is{OS2} and !$Is{Win32} and !$Is{Dos}; #Case-specific
-    my $oo = $self->xs_obj_opt('$*$(OBJ_EXT)');
+    $m_o = $self->{XSMULTI} ? $self->xs_obj_opt('$*$(OBJ_EXT)') : '';
     for my $ext (@exts) {
-	push @m, "\n.$ext\$(OBJ_EXT) :\n\t$command $flags \$*.$ext $oo\n";
+	push @m, "\n.$ext\$(OBJ_EXT) :\n\t$command $flags \$*.$ext $m_o\n";
     }
     return join "", @m;
 }
@@ -3894,10 +3895,10 @@ have an individual C<$(VERSION)>.
 sub xs_o {
     my ($self) = @_;
     return '' unless $self->needs_linking();
-    my $minus_o = $self->xs_obj_opt('$*$(OBJ_EXT)');
+    my $m_o = $self->{XSMULTI} ? $self->xs_obj_opt('$*$(OBJ_EXT)') : '';
     my $frag = '';
     # dmake makes noise about ambiguous rule
-    $frag .= sprintf <<'EOF', $minus_o unless $self->is_make_type('dmake');
+    $frag .= sprintf <<'EOF', $m_o unless $self->is_make_type('dmake');
 .xs$(OBJ_EXT) :
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
 	$(MV) $*.xsc $*.c
@@ -3915,8 +3916,8 @@ EOF
             $self->_xsbuild_replace_macro($cccmd, 'xs', $ext, 'INC');
             my $define = '$(DEFINE)';
             $self->_xsbuild_replace_macro($define, 'xs', $ext, 'DEFINE');
-            #                             1     2       3         4
-            $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $minus_o, $define;
+            #                             1     2       3     4
+            $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $m_o, $define;
 
 %1$s$(OBJ_EXT): %1$s.xs
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc

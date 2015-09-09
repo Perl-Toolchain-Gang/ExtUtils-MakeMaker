@@ -111,6 +111,20 @@ ok is_odd(1);
 ok !is_odd(2);
 END
 
+my $PLUS1_C = <<'EOF';
+#ifdef __cplusplus
+extern "C" {
+int plus1(int i)
+#else
+int plus1(i)
+int i;
+#endif
+{ return i + 1; }
+#ifdef __cplusplus
+}
+#endif
+EOF
+
 my %Files = (
   'lib/XS/Test.pm' => $PM_TEST,
   $typemap => '',
@@ -148,6 +162,46 @@ $label2files{subdirs} = +{
   't/is_odd.t' => $T_OTHER,
 };
 virtual_rename('subdirs', 'lib/XS/Test.pm', 'Test.pm');
+
+# to mimic behaviour of Unicode-LineBreak version 2015.07.16
+$label2files{subdirscomplex} = +{
+  %{ $label2files{'subdirs'} }, # make copy
+  'Other/Makefile.PL' => sprintf(
+    $MAKEFILEPL,
+    'Other', 'Other.pm', qq{},
+    <<'EOF',
+C => [qw(lib$(DIRFILESEP)file.c)],
+OBJECT => 'lib$(DIRFILESEP)file$(OBJ_EXT)',
+EOF
+  ) . <<'EOF',
+sub MY::c_o {
+  package MY;
+  my $self = shift;
+  my $inherited = $self->SUPER::c_o(@_);
+  $inherited =~ s{(:\n\t)(.*(?:\n\t.*)*)}
+      { $1 . $self->cd('lib', split /(?<!\\)\n\t/, $2) }eg;
+  $inherited =~ s{(\s)(\$\*\.c\s)}
+      { "$1..\$(DIRFILESEP)$2" }eg;
+  $inherited;
+}
+
+sub MY::top_targets {
+  <<'SNIP';
+all :: lib$(DIRFILESEP)file$(OBJ_EXT)
+	$(NOECHO) $(NOOP)
+
+config ::
+	$(NOECHO) $(NOOP)
+
+pure_all ::
+	$(NOECHO) $(NOOP)
+SNIP
+}
+EOF
+  'Other/lib/file.c' => $PLUS1_C,
+};
+delete $label2files{subdirscomplex}{'Other/Other.xs'};
+delete $label2files{subdirscomplex}{'t/is_odd.t'};
 
 $label2files{subdirsstatic} = +{
   %{ $label2files{'subdirs'} }, # make copy
@@ -221,19 +275,7 @@ plus1(input)
        RETVAL
 EOF
 
-  'lib/XS/plus1.c' => <<'EOF',
-#ifdef __cplusplus
-extern "C" {
-int plus1(int i)
-#else
-int plus1(i)
-int i;
-#endif
-{ return i + 1; }
-#ifdef __cplusplus
-}
-#endif
-EOF
+  'lib/XS/plus1.c' => $PLUS1_C,
 
   't/is_odd.t' => <<'END',
 #!/usr/bin/perl -w
@@ -282,6 +324,7 @@ sub list_dynamic {
         [ 'bscodemulti', '', '' ],
     ) : (), # DynaLoader different
     [ 'subdirs', '', '' ],
+    [ 'subdirscomplex', '', '' ],
     [ 'subdirsstatic', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'subdirsstatic', ' dynamic', '_dynamic' ],
     [ 'multi', '', '' ],
