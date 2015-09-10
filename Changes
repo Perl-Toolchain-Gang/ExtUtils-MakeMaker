@@ -1,3 +1,8 @@
+7.10 Thu Sep 10 19:38:55 BST 2015
+
+    Bug fixes:
+    - Fix an issue with quoting of dist_ci target on Win32
+
 7.08 Tue Sep  8 20:24:15 BST 2015
 
     This release reverts all the changes since v7.04 until such time
