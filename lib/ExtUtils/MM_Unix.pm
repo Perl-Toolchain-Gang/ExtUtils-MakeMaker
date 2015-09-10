@@ -676,13 +676,13 @@ Defines a check in target for RCS.
 
 sub dist_ci {
     my($self) = shift;
-    return q{
-ci :
-	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
-	  -e "@all = keys %{ maniread() };" \\
-	  -e "print(qq{Executing $(CI) @all\n}); system(qq{$(CI) @all}) == 0 or die qq{$!};" \\
-	  -e "print(qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all}) == 0 or die qq{$!};"
-};
+    return sprintf "ci :\n\t%s\n", $self->oneliner(<<'EOF', [qw(-MExtUtils::Manifest=maniread)]);
+@all = sort keys %{ maniread() };
+print(qq{Executing $(CI) @all\n});
+system(qq{$(CI) @all}) == 0 or die $!;
+print(qq{Executing $(RCS_LABEL) ...\n});
+system(qq{$(RCS_LABEL) @all}) == 0 or die $!;
+EOF
 }
 
 =item dist_core (o)
