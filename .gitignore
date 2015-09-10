@@ -11,4 +11,4 @@ MYMETA.*
 ExtUtils-MakeMaker-*
 inc/
 .*.swp
-/_eumm
+/_build

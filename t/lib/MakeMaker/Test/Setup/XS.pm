@@ -15,7 +15,7 @@ use File::Spec;
 use File::Temp qw[tempdir];
 use Cwd;
 use ExtUtils::MM;
-# this is to avoid MM->new overwriting _eumm in top dir
+# this is to avoid MM->new overwriting _build in top dir
 my $tempdir = tempdir(DIR => getcwd, CLEANUP => 1);
 chdir $tempdir;
 my $typemap = 'type map';

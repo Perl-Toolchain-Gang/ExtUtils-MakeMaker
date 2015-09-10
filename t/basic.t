@@ -179,7 +179,7 @@ sub check_dummy_inst {
     ok( $files{'program'},      '  program installed'  );
     ok( $files{'.packlist'},    '  packlist created'   );
     ok( $files{'perllocal.pod'},'  perllocal.pod created' );
-    ok( !$files{'_eumm'},        '  should not be an _eumm' );
+    ok( !$files{'_build'},      '  should not be an _build' );
     \%files;
 }
 
