@@ -842,7 +842,7 @@ sub WriteEmptyMakefile {
     my $self = MM->new(\%att);
     require File::Path;
     require File::Spec;
-    File::Path::rmtree( File::Spec->catdir(qw[blib _eumm]) ); # because MM->new does too much stuff
+    File::Path::rmtree( File::Spec->catdir(qw[_build]) ); # because MM->new does too much stuff
 
     my $new = $self->{MAKEFILE};
     my $old = $self->{MAKEFILE_OLD};

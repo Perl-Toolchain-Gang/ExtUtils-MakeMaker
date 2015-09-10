@@ -23,7 +23,7 @@ my $Updir   = __PACKAGE__->updir;
 
 my $METASPEC_URL = 'https://metacpan.org/pod/CPAN::Meta::Spec';
 my $METASPEC_V = 2;
-my $STASHDIR = File::Spec->catdir('blib', '_eumm');
+my $STASHDIR = '_build';
 
 =head1 NAME
 
@@ -725,7 +725,7 @@ clean :: clean_subdirs
 	my $file = $_;
 	map { $file.$_ } $self->{OBJ_EXT}, qw(.def _def.old .bs .bso .exp .base);
     } $self->_xs_list_basenames;
-    my @dirs  = qw(blib _eumm);
+    my @dirs  = qw(_build);
 
     # Normally these are all under blib but they might have been
     # redefined.
