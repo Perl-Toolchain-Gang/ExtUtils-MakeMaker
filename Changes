@@ -1,3 +1,23 @@
+7.10 Thu Sep 10 19:38:55 BST 2015
+
+    Bug fixes:
+    - Fix an issue with quoting of dist_ci target on Win32
+
+7.08 Tue Sep  8 20:24:15 BST 2015
+
+    This release reverts all the changes since v7.04 until such time
+    as the regressions we have found in the "wild" of CPAN can be
+    tamed
+
+    ExtUtils::Command has been included in this release as it was
+    reincorporated in v7.06
+
+    The following bug fixes have also been included:
+    - RT#100268 fix wrong variable being used
+    - Check exit status for commands in "make ci" target
+    - Fix distsignature dependencies for parallel make
+    - The bundled Encode::Locale has been updated to 1.04
+
 7.07_01 Wed Sep  2 12:38:09 BST 2015
     Bug fixes:
     - Fix a regression with PASSTHRU RT#106808
