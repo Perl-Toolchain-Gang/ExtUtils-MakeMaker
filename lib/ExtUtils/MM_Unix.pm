@@ -3642,7 +3642,8 @@ test_ : test_$default_testtype
 EOF
 
     for my $linktype (qw(dynamic static)) {
-        push @m, "subdirs-test_$linktype :: $linktype pure_all\n";
+        my $directdeps = "$linktype pure_all";
+        push @m, "subdirs-test_$linktype :: $directdeps\n";
         foreach my $dir (@{ $self->{DIR} }) {
             my $test = $self->cd($dir, "\$(MAKE) test_$linktype \$(PASTHRU)");
             push @m, "\t\$(NOECHO) $test\n";
@@ -3652,7 +3653,8 @@ EOF
             for my $testspec ([ '', '' ], [ 'db', ' $(TESTDB_SW)' ]) {
                 my ($db, $switch) = @$testspec;
                 my ($command, $deps);
-                $deps = "subdirs-test_$linktype";
+                # if testdb, build all but don't test all
+                $deps = $db eq 'db' ? $directdeps : "subdirs-test_$linktype";
                 if ($linktype eq 'static' and $self->needs_linking) {
                     my $target = File::Spec->rel2abs('$(MAP_TARGET)');
                     $command = qq{"$target" \$(MAP_PERLINC)};
@@ -3661,10 +3663,11 @@ EOF
                     $command = '$(FULLPERLRUN)' . $switch;
                 }
                 push @m, "test${db}_$linktype :: $deps\n";
-                push @m, $self->test_via_harness($command, '$(TEST_FILES)')
-                  if $tests;
-                push @m, $self->test_via_script($command, '$(TEST_FILE)')
-                  if -f "test.pl";
+                if (-f "test.pl" or $db eq 'db') {
+                    push @m, $self->test_via_script($command, '$(TEST_FILE)')
+                } elsif ($tests) {
+                    push @m, $self->test_via_harness($command, '$(TEST_FILES)')
+                }
                 push @m, "\n";
             }
         } else {

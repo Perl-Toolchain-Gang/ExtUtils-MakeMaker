@@ -24,7 +24,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 185);
+    : (tests => 190);
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -148,6 +148,22 @@ my $make_test_verbose = make_macro($make, 'test', TEST_VERBOSE => 1);
 $test_out = run("$make_test_verbose");
 like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
 like( $test_out, qr/All tests successful/,  '  successful' );
+is( $?, 0,                                  '  exited normally' ) ||
+    diag $test_out;
+
+# Test 'make testdb TEST_FILE=t/compile.t'
+# TESTDB_SW override is because perl -d is too clever for me to outwit
+my $make_testdb_file = make_macro(
+    $make,
+    'testdb',
+    TEST_FILE => 't/compile.t',
+    TESTDB_SW => '-Ixyzzy',
+);
+$test_out = run($make_testdb_file);
+unlike( $test_out, qr/harness/, 'no harness' );
+unlike( $test_out, qr/sanity\.t/, 'no wrong test' );
+like( $test_out, qr/compile\.t/, 'get right test' );
+like( $test_out, qr/xyzzy/, 'signs of TESTDB_SW' );
 is( $?, 0,                                  '  exited normally' ) ||
     diag $test_out;
 
