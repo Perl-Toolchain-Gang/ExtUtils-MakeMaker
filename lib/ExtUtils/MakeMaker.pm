@@ -43,7 +43,7 @@ our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
 # purged.
 my $Is_VMS     = $^O eq 'VMS';
 my $Is_Win32   = $^O eq 'MSWin32';
-my $UNDER_CORE = $ENV{PERL_CORE};
+our $UNDER_CORE = $ENV{PERL_CORE}; # needs to be our
 
 full_setup();
 
