@@ -222,13 +222,10 @@ foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
     like( $t->{CCFLAGS}, qr/\-DMY_THING/,    'cflags retains CCFLAGS' );
 }
 
-#
 {
-    my @orig = @ARGV;
     my @targv = ("var=val with spaces");
-    @ARGV = @targv;
+    local @ARGV = @targv;
     my $t = bless { NAME => "Foo", FULLPERL => $0, DIR => [] }, $class;
     $t->makeaperl( TARGET => "Tgt" );
     is_deeply( \@ARGV, \@targv, 'ARGV is not polluted by makeaperl' );
-    @ARGV = @orig;
 }
