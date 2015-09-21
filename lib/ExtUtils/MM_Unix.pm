@@ -2483,8 +2483,8 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 
 	foreach (@ARGV){
 		my $arg = $_; # avoid lvalue aliasing
-		if ( $arg =~ /\s/ ) {
-			$arg =~ s/=(.*)/='$1'/;
+		if ( $arg =~ /(^.*?=)(.*['\s].*)/ ) {
+			$arg = $1 . $self->quote_literal($2);
 		}
 		push @m, " \\\n\t\t$arg";
 	}

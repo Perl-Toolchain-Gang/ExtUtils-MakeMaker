@@ -223,7 +223,7 @@ foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
 }
 
 {
-    my @targv = ("var=val with spaces");
+    my @targv = ("var=don't forget about spaces and single quotes");
     local @ARGV = @targv;
     my $t = bless { NAME => "Foo", FULLPERL => $0, DIR => [] }, $class;
     $t->makeaperl( TARGET => "Tgt" );
