@@ -13,7 +13,7 @@ my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
 use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir or die "chdir $tmpdir: $!";
 
-my $METAJSON = File::Spec->catfile('blib', '_eumm', 'META_new.json');
+my $METAJSON = File::Spec->catfile('_eumm', 'META_new.json');
 my $EMPTY = qr/['"]?version['"]?\s*:\s*['"]['"]/;
 my @DATA = (
     [
