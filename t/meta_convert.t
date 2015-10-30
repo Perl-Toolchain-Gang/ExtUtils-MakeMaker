@@ -13,7 +13,6 @@ my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
 use Cwd; my $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
 chdir $tmpdir or die "chdir $tmpdir: $!";
 
-my $METAJSON = File::Spec->catfile('_eumm', 'META_new.json');
 my $EMPTY = qr/['"]?version['"]?\s*:\s*['"]['"]/;
 my @DATA = (
     [
@@ -104,8 +103,6 @@ sub run_test {
         }
         ok 1, "$label metafile_target";
         like join("", @warnings), $expected, "$label right warning";
-        skip "no $METAJSON", 1 unless -r $METAJSON;
-        my $content = do { open my $fh, '<', $METAJSON or skip "$METAJSON: $!", 1; local $/; <$fh>; };
-        like $content, $metadata_re, "$label metadata";
+        like $ret, $metadata_re, "$label metadata";
     }
 }
