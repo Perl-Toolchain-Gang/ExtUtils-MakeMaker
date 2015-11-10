@@ -837,12 +837,8 @@ sub WriteEmptyMakefile {
     croak "WriteEmptyMakefile: Need an even number of args" if @_ % 2;
 
     my %att = @_;
-    $att{NAME} = 'Dummy' unless $att{NAME}; # eliminate pointless warnings
     $att{DIR} = [] unless $att{DIR}; # don't recurse by default
     my $self = MM->new(\%att);
-    require File::Path;
-    require File::Spec;
-    File::Path::rmtree( File::Spec->catdir(qw[blib _eumm]) ); # because MM->new does too much stuff
 
     my $new = $self->{MAKEFILE};
     my $old = $self->{MAKEFILE_OLD};
@@ -853,7 +849,7 @@ sub WriteEmptyMakefile {
         _rename($new, $old) or warn "rename $new => $old: $!"
     }
     open my $mfh, '>', $new or die "open $new for write: $!";
-    printf $mfh <<'EOP', $self->{RM_F}, $self->{MAKEFILE};
+    print $mfh <<'EOP';
 all :
 
 manifypods :
@@ -864,10 +860,7 @@ dynamic :
 
 static :
 
-realclean : clean
-
 clean :
-	%s %s
 
 install :
 
