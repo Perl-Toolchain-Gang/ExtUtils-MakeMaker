@@ -1092,12 +1092,16 @@ CMD
     return $manify;
 }
 
-sub _has_cpan_meta {
-    return eval {
-      require CPAN::Meta;
-      CPAN::Meta->VERSION(2.112150);
-      1;
-    };
+{
+    my $has_cpan_meta;
+    sub _has_cpan_meta {
+        return $has_cpan_meta if defined $has_cpan_meta;
+        return $has_cpan_meta = !!eval {
+            require CPAN::Meta;
+            CPAN::Meta->VERSION(2.112150);
+            1;
+        };
+    }
 }
 
 =head3 metafile_target
