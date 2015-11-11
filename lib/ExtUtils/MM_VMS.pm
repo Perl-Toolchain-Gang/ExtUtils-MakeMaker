@@ -3,6 +3,7 @@ package ExtUtils::MM_VMS;
 use strict;
 
 use ExtUtils::MakeMaker::Config;
+use File::Spec;
 require Exporter;
 
 BEGIN {
@@ -165,8 +166,8 @@ sub find_perl {
     if( $self->{PERL_CORE} ) {
         # Check in relative directories first, so we pick up the current
         # version of Perl if we're running MakeMaker as part of the main build.
-        @sdirs = sort { my($absa) = $self->file_name_is_absolute($a);
-                        my($absb) = $self->file_name_is_absolute($b);
+        @sdirs = sort { my($absa) = File::Spec->file_name_is_absolute($a);
+                        my($absb) = File::Spec->file_name_is_absolute($b);
                         if ($absa && $absb) { return $a cmp $b }
                         else { return $absa ? 1 : ($absb ? -1 : ($a cmp $b)); }
                       } @$dirs;
@@ -198,7 +199,7 @@ sub find_perl {
     }
     foreach my $dir (@sdirs){
         next unless defined $dir; # $self->{PERL_SRC} may be undefined
-        $inabs++ if $self->file_name_is_absolute($dir);
+        $inabs++ if File::Spec->file_name_is_absolute($dir);
         if ($inabs == 1) {
             # We've covered relative dirs; everything else is an absolute
             # dir (probably an installed location).  First, we'll try
@@ -210,7 +211,7 @@ sub find_perl {
             $inabs++; # Should happen above in next $dir, but just in case...
         }
         foreach my $name (@snames){
-            push @cand, ($name !~ m![/:>\]]!) ? $self->catfile($dir,$name)
+            push @cand, ($name !~ m![/:>\]]!) ? File::Spec->catfile($dir,$name)
                                               : $self->fixpath($name,0);
         }
     }
@@ -522,7 +523,7 @@ sub init_platform {
 
     $self->{MM_VMS_REVISION} = $Revision;
     $self->{MM_VMS_VERSION}  = $VERSION;
-    $self->{PERL_VMS} = $self->catdir($self->{PERL_SRC}, 'VMS')
+    $self->{PERL_VMS} = File::Spec->catdir($self->{PERL_SRC}, 'VMS')
       if $self->{PERL_SRC};
 }
 
@@ -974,7 +975,7 @@ sub xs_make_dlsyms {
 	my ($v, $d, $f) = File::Spec->splitpath($target);
 	my @d = File::Spec->splitdir($d);
 	shift @d if $d[0] eq 'lib';
-	my $instloc = $self->catfile('$(INST_ARCHLIB)', 'auto', @d, $f);
+	my $instloc = File::Spec->catfile('$(INST_ARCHLIB)', 'auto', @d, $f);
 	push @m,"\ndynamic :: $instloc\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'dynamic'};
 	push @m,"\nstatic :: $instloc\n\t\$(NOECHO) \$(NOOP)\n"
@@ -1252,7 +1253,7 @@ q[	$(NOECHO) $(ECHO_N) "$(INST_LIB)|$(DESTINSTALLPRIVLIB)|" >>.MM_tmp
 	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR)|$(DESTINSTALLMAN3DIR)" >>.MM_tmp
 	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
-	$(NOECHO) $(WARN_IF_OLD_PACKLIST) "].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q["
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) "].File::Spec->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q["
 
 # Likewise
 pure_site_install ::
@@ -1271,7 +1272,7 @@ q[	$(NOECHO) $(ECHO_N) "$(INST_LIB)|$(DESTINSTALLSITELIB)|" >>.MM_tmp
 	$(NOECHO) $(ECHO_N) "$(INST_MAN3DIR)|$(DESTINSTALLSITEMAN3DIR)" >>.MM_tmp
 	$(NOECHO) $(MOD_INSTALL) <.MM_tmp
 	$(NOECHO) $(RM_F) .MM_tmp
-	$(NOECHO) $(WARN_IF_OLD_PACKLIST) "].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q["
+	$(NOECHO) $(WARN_IF_OLD_PACKLIST) "].File::Spec->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q["
 
 pure_vendor_install ::
 ];
@@ -1309,28 +1310,28 @@ doc_vendor_install ::
     push @m, q[
 # Ditto
 doc_perl_install ::
-	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{DESTINSTALLARCHLIB}, 'perllocal.pod').q["
+	$(NOECHO) $(ECHO) "Appending installation info to ].File::Spec->catfile($self->{DESTINSTALLARCHLIB}, 'perllocal.pod').q["
 	$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLPRIVLIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
-	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].File::Spec->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 
 # And again
 doc_site_install ::
-	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{DESTINSTALLARCHLIB}, 'perllocal.pod').q["
+	$(NOECHO) $(ECHO) "Appending installation info to ].File::Spec->catfile($self->{DESTINSTALLARCHLIB}, 'perllocal.pod').q["
 	$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLSITELIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
-	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].File::Spec->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 
 doc_vendor_install ::
-	$(NOECHO) $(ECHO) "Appending installation info to ].$self->catfile($self->{DESTINSTALLARCHLIB}, 'perllocal.pod').q["
+	$(NOECHO) $(ECHO) "Appending installation info to ].File::Spec->catfile($self->{DESTINSTALLARCHLIB}, 'perllocal.pod').q["
 	$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	$(NOECHO) $(ECHO_N) "installed into|$(INSTALLVENDORLIB)|" >.MM_tmp
 	$(NOECHO) $(ECHO_N) "LINKTYPE|$(LINKTYPE)|VERSION|$(VERSION)|EXE_FILES|$(EXE_FILES) " >>.MM_tmp
-	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].$self->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
+	$(NOECHO) $(DOC_INSTALL) "Module" "$(NAME)" <.MM_tmp >>].File::Spec->catfile($self->{DESTINSTALLARCHLIB},'perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 
 ] unless $self->{NO_PERLLOCAL};
@@ -1340,13 +1341,13 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
+	$(NOECHO) $(UNINSTALL) ].File::Spec->catfile($self->{PERL_ARCHLIB},'auto',$self->{FULLEXT},'.packlist').q[
 
 uninstall_from_sitedirs ::
-	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
+	$(NOECHO) $(UNINSTALL) ].File::Spec->catfile($self->{SITEARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
 
 uninstall_from_vendordirs ::
-	$(NOECHO) $(UNINSTALL) ].$self->catfile($self->{VENDORARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
+	$(NOECHO) $(UNINSTALL) ].File::Spec->catfile($self->{VENDORARCHEXP},'auto',$self->{FULLEXT},'.packlist').q[
 ];
 
     join('',@m);
@@ -1567,15 +1568,15 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     # that's what we're building here).
     push @optlibs, grep { !/PerlShr/i } split ' ', +($self->ext())[2];
     if ($libperl) {
-	unless (-f $libperl || -f ($libperl = $self->catfile($Config{'installarchlib'},'CORE',$libperl))) {
+	unless (-f $libperl || -f ($libperl = File::Spec->catfile($Config{'installarchlib'},'CORE',$libperl))) {
 	    print "Warning: $libperl not found\n";
 	    undef $libperl;
 	}
     }
     unless ($libperl) {
 	if (defined $self->{PERL_SRC}) {
-	    $libperl = $self->catfile($self->{PERL_SRC},"libperl$self->{LIB_EXT}");
-	} elsif (-f ($libperl = $self->catfile($Config{'installarchlib'},'CORE',"libperl$self->{LIB_EXT}")) ) {
+	    $libperl = File::Spec->catfile($self->{PERL_SRC},"libperl$self->{LIB_EXT}");
+	} elsif (-f ($libperl = File::Spec->catfile($Config{'installarchlib'},'CORE',"libperl$self->{LIB_EXT}")) ) {
 	} else {
 	    print "Warning: $libperl not found
     If you're going to build a static perl binary, make sure perl is installed
@@ -1629,9 +1630,9 @@ doc_inst_perl :
 	$(NOECHO) $(MKPATH) $(DESTINSTALLARCHLIB)
 	$(NOECHO) $(ECHO) "Perl binary $(MAP_TARGET)|" >.MM_tmp
 	$(NOECHO) $(ECHO) "MAP_STATIC|$(MAP_STATIC)|" >>.MM_tmp
-	$(NOECHO) $(PERL) -pl040 -e " " ].$self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'),q[ >>.MM_tmp
+	$(NOECHO) $(PERL) -pl040 -e " " ].File::Spec->catfile('$(INST_ARCHAUTODIR)','extralibs.all'),q[ >>.MM_tmp
 	$(NOECHO) $(ECHO) -e "MAP_LIBPERL|$(MAP_LIBPERL)|" >>.MM_tmp
-	$(NOECHO) $(DOC_INSTALL) <.MM_tmp >>].$self->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q[
+	$(NOECHO) $(DOC_INSTALL) <.MM_tmp >>].File::Spec->catfile('$(DESTINSTALLARCHLIB)','perllocal.pod').q[
 	$(NOECHO) $(RM_F) .MM_tmp
 ];
 
@@ -1709,7 +1710,7 @@ sub prefixify {
         warn "  no Config found for $var.\n" if $Verbose >= 2;
         $path = $self->_prefixify_default($rprefix, $default);
     }
-    elsif( !$self->{ARGS}{PREFIX} || !$self->file_name_is_absolute($path) ) {
+    elsif( !$self->{ARGS}{PREFIX} || !File::Spec->file_name_is_absolute($path) ) {
         # do nothing if there's no prefix or if its relative
     }
     elsif( $sprefix eq $rprefix ) {
@@ -1720,7 +1721,7 @@ sub prefixify {
         warn "  prefixify $var => $path\n"     if $Verbose >= 2;
         warn "    from $sprefix to $rprefix\n" if $Verbose >= 2;
 
-        my($path_vol, $path_dirs) = $self->splitpath( $path );
+        my($path_vol, $path_dirs) = File::Spec->splitpath( $path );
         if( $path_vol eq $Config{vms_prefix}.':' ) {
             warn "  $Config{vms_prefix}: seen\n" if $Verbose >= 2;
 
@@ -1757,15 +1758,15 @@ sub _prefixify_default {
 sub _catprefix {
     my($self, $rprefix, $default) = @_;
 
-    my($rvol, $rdirs) = $self->splitpath($rprefix);
+    my($rvol, $rdirs) = File::Spec->splitpath($rprefix);
     if( $rvol ) {
-        return $self->catpath($rvol,
-                                   $self->catdir($rdirs, $default),
+        return File::Spec->catpath($rvol,
+                                   File::Spec->catdir($rdirs, $default),
                                    ''
                                   )
     }
     else {
-        return $self->catdir($rdirs, $default);
+        return File::Spec->catdir($rdirs, $default);
     }
 }
 
@@ -1931,7 +1932,7 @@ sub init_linker {
     my $shr = $Config{dbgprefix} . 'PERLSHR';
     if ($self->{PERL_SRC}) {
         $self->{PERL_ARCHIVE} ||=
-          $self->catfile($self->{PERL_SRC}, "$shr.$Config{'dlext'}");
+          File::Spec->catfile($self->{PERL_SRC}, "$shr.$Config{'dlext'}");
     }
     else {
         $self->{PERL_ARCHIVE} ||=
@@ -1959,7 +1960,7 @@ sub catdir {
     # Process the macros on VMS MMS/MMK
     my @args = map { m{\$\(} ? $self->eliminate_macros($_) : $_  } @_;
 
-    my $dir = $self->SUPER::catdir(@args);
+    my $dir = File::Spec->catdir(@args);
 
     # Fix up the directory and force it to VMS format.
     $dir = $self->fixpath($dir, 1);
@@ -1973,7 +1974,7 @@ sub catfile {
     # Process the macros on VMS MMS/MMK
     my @args = map { m{\$\(} ? $self->eliminate_macros($_) : $_  } @_;
 
-    my $file = $self->SUPER::catfile(@args);
+    my $file = File::Spec->catfile(@args);
 
     $file = vmsify($file);
 
