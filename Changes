@@ -1,3 +1,12 @@
+7.11_01 Thu Nov 12 11:58:58 GMT 2015
+
+    Includes all the Changes noted for v7.06 and the following:
+
+    Bug fixes:
+    - Use of intermediate files to store META.* and *.ppd files has been reverted
+    - No longer repeatedly attempt to load CPAN::Meta if it is now available
+    - Made MM_VMS::oneline build continuation lines properly
+
 7.10 Thu Sep 10 19:38:55 BST 2015
 
     Bug fixes:
