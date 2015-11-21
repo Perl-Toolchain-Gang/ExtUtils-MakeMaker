@@ -1105,21 +1105,26 @@ WARNING
     }
 
     foreach my $name (@$names){
-        foreach my $dir (@$dirs){
+        my ($abs, $use_dir);
+        if ($self->file_name_is_absolute($name)) {     # /foo/bar
+            $abs = $name;
+        } elsif ($self->canonpath($name) eq
+                 $self->canonpath(basename($name))) {  # foo
+            $use_dir = 1;
+        } else {                                            # foo/bar
+            $abs = $self->catfile($Curdir, $name);
+        }
+        foreach my $dir ($use_dir ? @$dirs : 1){
             next unless defined $dir; # $self->{PERL_SRC} may be undefined
-            my ($abs, $val);
-            if ($self->file_name_is_absolute($name)) {     # /foo/bar
-                $abs = $name;
-            } elsif ($self->canonpath($name) eq
-                     $self->canonpath(basename($name))) {  # foo
-                $abs = File::Spec->catfile($dir, $name);
-            } else {                                            # foo/bar
-                $abs = File::Spec->catfile($Curdir, $name);
-            }
+
+            $abs = $self->catfile($dir, $name)
+                if $use_dir;
+
             print "Checking $abs\n" if ($trace >= 2);
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace >= 2);
 
+            my $val;
             my $version_check = qq{"$abs" -le "require $ver; print qq{VER_OK}"};
 
             # To avoid using the unportable 2>&1 to suppress STDERR,
