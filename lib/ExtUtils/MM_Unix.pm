@@ -2487,12 +2487,12 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=};
 
 	foreach (@ARGV){
-		if( /\s/ ){
-			s/=(.*)/='$1'/;
+		my $arg = $_; # avoid lvalue aliasing
+		if ( $arg =~ /(^.*?=)(.*['\s].*)/ ) {
+			$arg = $1 . $self->quote_literal($2);
 		}
-		push @m, " \\\n\t\t$_";
+		push @m, " \\\n\t\t$arg";
 	}
-#	push @m, map( " \\\n\t\t$_", @ARGV );
 	push @m, "\n";
 
 	return join '', @m;
