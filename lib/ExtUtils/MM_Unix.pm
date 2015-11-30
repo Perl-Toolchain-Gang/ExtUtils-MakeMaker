@@ -2869,7 +2869,7 @@ sub parse_version {
         next if $inpod || /^\s*#/;
         chop;
         next if /^\s*(if|unless|elsif)/;
-        if ( m{^ \s* package \s+ \w[\w\:\']* \s+ (v?[0-9._]+) \s* ;  }x ) {
+        if ( m{^ \s* package \s+ \w[\w\:\']* \s+ (v?[0-9._]+) \s* (;|\{)  }x ) {
             local $^W = 0;
             $result = $1;
         }
