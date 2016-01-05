@@ -4,7 +4,7 @@
         -- Some of Murphy's Laws of Combat
 
 This is a short set of guidelines for those contributing
-ExtUtils::MakeMaker.  Its not an iron-clad set of rules, but just
+ExtUtils::MakeMaker.  It's not an iron-clad set of rules, but just
 things which make life easier when reading and integrating a patch.
 
 Reporting bugs
@@ -34,7 +34,7 @@ Reporting bugs
 
 - If you're testing MakeMaker against a development version of Perl,
   please also check it against the latest stable version.  This makes it
-  easier to figure out if its MakeMaker or Perl at fault.
+  easier to figure out if it's MakeMaker or Perl at fault.
 
 
 Pull Request
@@ -155,7 +155,7 @@ Cross-Platform Compatibility
 - If you find yourself writing "do_this if $^O eq 'That'" (ie. checks on
   the OS type) perhaps your code belongs in one of the non-Unix MM_*
   modules (ie. MM_Win32, MM_VMS, etc...).  If one does not exist, consider
-  creating one.  Its ok to have an MM_* module with only one method.
+  creating one.  It's ok to have an MM_* module with only one method.
 
 - Some shells have very small buffers.  This means command lines must
   be as small as possible.  If your command is just too long, consider
@@ -201,5 +201,5 @@ Documentation
     sub _foo_bar {
        ...
 
-- If you're overriding a method, document that its an override and
-  *why* its being overridden.  Don't repeat the original documentation.
+- If you're overriding a method, document that it's an override and
+  *why* it's being overridden.  Don't repeat the original documentation.
