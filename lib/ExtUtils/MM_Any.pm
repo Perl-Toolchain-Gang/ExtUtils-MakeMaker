@@ -2798,38 +2798,50 @@ sub find_tests {
   my $tests = $mm->find_tests_recursive;
 
 Returns a string suitable for feeding to the shell to return all
-tests in t/ but recursively.
+tests in t/ but recursively. Equivalent to
+
+  my $tests = $mm->find_tests_recursive_in('t');
 
 =cut
 
 sub find_tests_recursive {
-    my($self) = shift;
-    return '' unless -d 't';
+    my $self = shift;
+    return $self->find_tests_recursive_in('t');
+}
+
+=head3 find_tests_recursive_in
+
+  my $tests = $mm->find_tests_recursive_in($dir);
+
+Returns a string suitable for feeding to the shell to return all
+tests in $dir recursively.
+
+=cut
+
+sub find_tests_recursive_in {
+    my($self, $dir) = @_;
+    return '' unless -d $dir;
 
     require File::Find;
 
-    my %testfiles;
+    my $base_depth = grep { $_ ne '' } File::Spec->splitdir( (File::Spec->splitpath($dir))[1] );
+    my %depths;
 
     my $wanted = sub {
         return unless m!\.t$!;
         my ($volume,$directories,$file) =
             File::Spec->splitpath( $File::Find::name  );
-        my @dirs = File::Spec->splitdir( $directories );
-        for ( @dirs ) {
-          next if $_ eq 't';
-          unless ( $_ ) {
-            $_ = '*.t';
-            next;
-          }
-          $_ = '*';
-        }
-        my $testfile = join '/', @dirs;
-        $testfiles{ $testfile } = 1;
+        my $depth = grep { $_ ne '' } File::Spec->splitdir( $directories );
+        $depth -= $base_depth;
+        $depths{ $depth } = 1;
     };
 
-    File::Find::find( $wanted, 't' );
+    File::Find::find( $wanted, $dir );
 
-    return join ' ', sort keys %testfiles;
+    return join ' ',
+        map { $dir . '/*' x $_ . '.t' }
+        sort { $a <=> $b }
+        keys %depths;
 }
 
 =head3 extra_clean_files
