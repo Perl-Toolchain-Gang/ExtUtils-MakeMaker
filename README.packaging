@@ -15,7 +15,7 @@ them to itself if they're not already installed.
 This can confuse packagers, it makes it look like MakeMaker contains a
 lot more modules than it really does and causes conflicts.
 
-You can tell MakeMaker not to use it's bundles and instead declare the
+You can tell MakeMaker not to use its bundles and instead declare the
 dependencies normally.  This is done either by setting the
 BUILDING_AS_PACKAGE environment variable to true or by patching the
 Makefile.PL and setting $BUILDING_AS_PACKAGE to true.  On the down
