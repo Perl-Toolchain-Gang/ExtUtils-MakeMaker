@@ -264,14 +264,18 @@ sub make_macro {
 
     my $is_mms = $make =~ /^MM(K|S)/i;
 
-    my $cmd = $make;
-    my $macros = '';
+    my @macros;
     while( my($key,$val) = splice(@_, 0, 2) ) {
-        if( $is_mms ) {
-            $macros .= qq{/macro="$key=$val"};
+        push @macros, qq{$key=$val};
+    }
+    my $macros = '';
+    if (scalar(@macros)) {
+        if ($is_mms) {
+            map { $_ = qq{"$_"} } @macros;
+            $macros = '/MACRO=(' . join(',', @macros) . ')';
         }
         else {
-            $macros .= qq{ $key=$val};
+            $macros = join(' ', @macros);
         }
     }
 
