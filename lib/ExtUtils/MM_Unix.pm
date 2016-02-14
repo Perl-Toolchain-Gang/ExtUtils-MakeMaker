@@ -2423,7 +2423,7 @@ sub lsdir {
     my($dir, $regex) = @_;
     my(@ls);
     my $dh = new DirHandle;
-    $dh->open($dir || ".") or return ();
+    $dh->open(defined($dir) ? $dir : '.') or return ();
     @ls = $dh->read;
     $dh->close;
     @ls = grep(/$regex/, @ls) if $regex;
