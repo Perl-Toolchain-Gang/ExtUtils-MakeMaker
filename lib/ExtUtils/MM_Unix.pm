@@ -7,7 +7,6 @@ use strict;
 use Carp;
 use ExtUtils::MakeMaker::Config;
 use File::Basename qw(basename dirname);
-use DirHandle;
 
 our %Config_Override;
 
@@ -2419,13 +2418,12 @@ all entries in the directory that match the regular expression.
 =cut
 
 sub lsdir {
-    my($self) = shift;
-    my($dir, $regex) = @_;
-    my(@ls);
-    my $dh = new DirHandle;
-    $dh->open(defined($dir) ? $dir : '.') or return ();
-    @ls = $dh->read;
-    $dh->close;
+    #  $self
+    my(undef, $dir, $regex) = @_;
+    opendir(my $dh, defined($dir) ? $dir : ".")
+        or return;
+    my @ls = readdir $dh;
+    closedir $dh;
     @ls = grep(/$regex/, @ls) if defined $regex;
     @ls;
 }

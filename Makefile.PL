@@ -64,7 +64,6 @@ my $MM = WriteMakefile(
         'File::Spec'     => 0.8,               # splitpath(), rel2abs()
         'Pod::Man'       => 0,                 # manifypods needs Pod::Man
         'File::Basename' => 0,
-        DirHandle        => 0,
         'Data::Dumper'   => 0,
         ($] > 5.008 ? (Encode => 0) : ()),
     },
