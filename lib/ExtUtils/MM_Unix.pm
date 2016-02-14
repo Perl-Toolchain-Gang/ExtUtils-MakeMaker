@@ -2426,7 +2426,7 @@ sub lsdir {
     $dh->open(defined($dir) ? $dir : '.') or return ();
     @ls = $dh->read;
     $dh->close;
-    @ls = grep(/$regex/, @ls) if $regex;
+    @ls = grep(/$regex/, @ls) if defined $regex;
     @ls;
 }
 
