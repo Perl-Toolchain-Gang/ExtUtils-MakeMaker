@@ -18,8 +18,7 @@ use ExtUtils::MakeMaker::Config;
 # So we don't have to keep calling the methods over and over again,
 # we have these globals to cache the values.  Faster and shrtr.
 my $Curdir  = __PACKAGE__->curdir;
-my $Rootdir = __PACKAGE__->rootdir;
-my $Updir   = __PACKAGE__->updir;
+#my $Updir   = __PACKAGE__->updir;
 
 my $METASPEC_URL = 'https://metacpan.org/pod/CPAN::Meta::Spec';
 my $METASPEC_V = 2;

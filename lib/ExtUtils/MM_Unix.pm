@@ -98,7 +98,6 @@ something that used to be in here, look in MM_Any.
 # So we don't have to keep calling the methods over and over again,
 # we have these globals to cache the values.  Faster and shrtr.
 my $Curdir  = __PACKAGE__->curdir;
-my $Rootdir = __PACKAGE__->rootdir;
 my $Updir   = __PACKAGE__->updir;
 
 
