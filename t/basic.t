@@ -24,7 +24,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 184);
+    : (tests => 186);
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -147,6 +147,8 @@ is( $?, 0,                                 '  exited normally' ) ||
 my $make_test_verbose = make_macro($make, 'test', TEST_VERBOSE => 1);
 $test_out = run("$make_test_verbose");
 like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
+like( $test_out, qr/ok \d+ - testing test.pl/, 'test.pl' ); # in test.pl
+like( $test_out, qr/ok \d+ - testing t\/\*.t/, 't/*.t' ); # in *.t
 like( $test_out, qr/All tests successful/,  '  successful' );
 is( $?, 0,                                  '  exited normally' ) ||
     diag $test_out;

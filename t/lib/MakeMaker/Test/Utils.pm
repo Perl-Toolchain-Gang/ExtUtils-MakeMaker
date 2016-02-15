@@ -293,11 +293,12 @@ touched.
 =cut
 
 sub calibrate_mtime {
-    open(FILE, ">calibrate_mtime.tmp") || die $!;
+    my $file = "calibrate_mtime-$$.tmp";
+    open(FILE, ">$file") || die $!;
     print FILE "foo";
     close FILE;
-    my($mtime) = (stat('calibrate_mtime.tmp'))[9];
-    unlink 'calibrate_mtime.tmp';
+    my($mtime) = (stat($file))[9];
+    unlink $file;
     return $mtime;
 }
 

@@ -3668,10 +3668,13 @@ EOF
                     $command = '$(FULLPERLRUN)' . $switch;
                 }
                 push @m, "test${db}_$linktype :: $deps\n";
-                if (-f "test.pl" or $db eq 'db') {
+                if ($db eq 'db') {
                     push @m, $self->test_via_script($command, '$(TEST_FILE)')
-                } elsif ($tests) {
+                } else {
+                    push @m, $self->test_via_script($command, '$(TEST_FILE)')
+                        if -f "test.pl";
                     push @m, $self->test_via_harness($command, '$(TEST_FILES)')
+                        if $tests;
                 }
                 push @m, "\n";
             }
