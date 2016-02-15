@@ -1,3 +1,19 @@
+7.11_04 Mon Feb 15 11:20:14 GMT 2016
+
+    Enhancements:
+    - Added find_tests_recursive_in() method
+
+    Bug fixes:
+    - Fix regression when both test.pl and t/*.t are present
+    - Refactored internals to remove DirHandle usage
+
+    VMS fixes:
+    - make_macro should handle multiple macros
+    - Fix regression with File::Spec changes in previous release
+
+    Win32 fixes:
+    - t/echo.t needs SHELL env for Win32 gmake
+
 7.11_03 Wed Nov 25 15:23:25 GMT 2015
 
     Bug fixes:

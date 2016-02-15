@@ -7,7 +7,7 @@ BEGIN {
     our @ISA = qw( ExtUtils::MM_Unix );
 }
 
-our $VERSION = '7.11_03';
+our $VERSION = '7.11_04';
 $VERSION = eval $VERSION;
 
 
