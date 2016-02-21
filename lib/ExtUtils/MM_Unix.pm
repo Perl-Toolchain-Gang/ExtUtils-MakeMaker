@@ -1512,7 +1512,7 @@ sub init_MAN3PODS {
     foreach my $name (keys %manifypods) {
 	if (
             ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) or
-            ( $name eq 'README.pod') # don't manify top-level README.pod
+            ( $name =~ m/^README\.pod$/i ) # don't manify top-level README.pod
         ) {
 	    delete $manifypods{$name};
 	    next;
