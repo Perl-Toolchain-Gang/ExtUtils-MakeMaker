@@ -50,7 +50,8 @@ ok((my $stdout = tie *STDOUT, 'TieOut'), 'tie stdout');
     );
     my %got = %{ $mm->{MAN3PODS} };
     # because value too OS-specific
-    ok delete($got{'lib/Big/Dummy.pm'}), 'normal man3pod';
+    my $delete_key = $^O eq 'VMS' ? '[.lib.Big]Dummy.pm' : 'lib/Big/Dummy.pm';
+    ok delete($got{$delete_key}), 'normal man3pod';
     is_deeply \%got, {}, 'no extra man3pod';
 }
 
