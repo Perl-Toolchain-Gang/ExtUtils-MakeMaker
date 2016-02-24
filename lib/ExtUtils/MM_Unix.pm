@@ -3745,6 +3745,7 @@ sub tool_xsubpp {
                 warn "Typemap $typemap not found.\n";
             }
             else {
+                $typemap = vmsify($typemap) if $Is{VMS};
                 push(@tmdeps, $typemap);
             }
         }
