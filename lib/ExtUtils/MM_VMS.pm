@@ -979,16 +979,17 @@ sub xs_make_dlsyms {
 	  unless $self->{SKIPHASH}{'dynamic'};
 	push @m,"\nstatic :: $instloc\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'static'};
-	push @m, sprintf <<'EOF', $instloc, $target;
+	push @m, "\n", sprintf <<'EOF', $instloc, $target;
 %s : %s
 	$(CP) $(MMS$SOURCE) $(MMS$TARGET)
 EOF
-    } else {
+    }
+    else {
 	push @m,"\ndynamic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'dynamic'};
 	push @m,"\nstatic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'static'};
-	push @m, sprintf <<'EOF', $target;
+	push @m, "\n", sprintf <<'EOF', $target;
 $(INST_ARCHAUTODIR)$(BASEEXT).opt : %s
 	$(CP) $(MMS$SOURCE) $(MMS$TARGET)
 EOF
@@ -1003,14 +1004,16 @@ EOF
      q!, 'DL_VARS' => !, neatvalue($vars);
     push @m, $extra if defined $extra;
     push @m, qq!);"\n\t!;
-    push @m, '	$(PERL) -e "print ""$(INST_STATIC)/Include=';
+    push @m, qq!\$(PERL) -e "print ""\$(INST_ARCHAUTODIR)$dlbase\$(LIB_EXT)/Include=!;
     if ($self->{XSMULTI}) {
-        push @m, uc($dlbase); # the "DLBASE" - is this right?
-    } elsif ($self->{OBJECT} =~ /\bBASEEXT\b/ or
+        push @m, ($Config{d_vms_case_sensitive_symbols} ? uc($dlbase) : $dlbase);
+    }
+    elsif ($self->{OBJECT} =~ /\bBASEEXT\b/ or
         $self->{OBJECT} =~ /\b$self->{BASEEXT}\b/i) {
         push @m, ($Config{d_vms_case_sensitive_symbols}
 	           ? uc($self->{BASEEXT}) :'$(BASEEXT)');
-    } else {  # We don't have a "main" object file, so pull 'em all in
+    }
+    else {  # We don't have a "main" object file, so pull 'em all in
         # Upcase module names if linker is being case-sensitive
         my($upcase) = $Config{d_vms_case_sensitive_symbols};
         my(@omods) = split ' ', $self->eliminate_macros($self->{OBJECT});
@@ -1029,7 +1032,7 @@ EOF
         push @lines, $tmp;
         push @m, '(', join( qq[, -\\n\\t"";" >>\$(MMS\$TARGET)\n\t\$(PERL) -e "print ""], @lines),')';
     }
-    push @m, '\n$(INST_STATIC)/Library\n"";" >>$(MMS$TARGET)',"\n";
+    push @m, '\n\$(INST_ARCHAUTODIR)' . $dlbase . '$(LIB_EXT)/Library\n"";" >>$(MMS$TARGET)',"\n";
     if (length $self->{LDLOADLIBS}) {
         my($line) = '';
         foreach my $lib (split ' ', $self->{LDLOADLIBS}) {
