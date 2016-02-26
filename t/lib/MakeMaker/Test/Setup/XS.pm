@@ -350,14 +350,38 @@ sub run_tests {
     }
 
     my $make = make_run();
-    my $make_cmd = $make . (defined $add_target ? $add_target : '');
+    my $target = '';
+    my %macros = ();
+    if (defined($add_target)) {
+        if ($add_target =~ m/(\S+)=(\S+)/) {
+            $macros{$1} = $2;
+        }
+        else {
+            $target = $add_target;
+        }
+    }
+    my $make_cmd = make_macro($make, $target, %macros);
     my $make_out = run($make_cmd);
     unless (is( $?, 0, "$make_cmd exited normally" )) {
         diag $make_out;
         skip 'Make failed - skipping test', 1;
     }
 
-    my $test_cmd = "$make test" . (defined $add_testtarget ? $add_testtarget : '');
+    $target = 'test';
+    %macros = ();
+    if (defined($add_testtarget) && length($add_testtarget)) {
+        if ($add_testtarget =~ m/(\S+)=(\S+)/) {
+            $macros{$1} = $2;
+        }
+        else {
+            # an underscore prefix means combine, e.g. 'test' + '_dynamic'
+            unless ($add_testtarget =~ m/^_/) {
+                $target .= ($make =~ m/^MM(K|S)/i) ? ',' : ' ';
+            }
+            $target .= $add_testtarget;
+        }
+    }
+    my $test_cmd = make_macro($make, $target, %macros);
     my $test_out = run($test_cmd);
     is( $?, 0, "$test_cmd exited normally" ) || diag "$make_out\n$test_out";
   }
