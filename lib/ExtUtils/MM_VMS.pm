@@ -956,7 +956,7 @@ sub xs_dlsyms_ext {
 =item dlsyms (override)
 
 Create VMS linker options files specifying universal symbols for this
-extension's shareable image, and listing other shareable images or
+extension's shareable image(s), and listing other shareable images or
 libraries to which it should be linked.
 
 =cut
@@ -970,25 +970,27 @@ sub dlsyms {
 sub xs_make_dlsyms {
     my ($self, $attribs, $target, $dep, $name, $dlbase, $funcs, $funclist, $imports, $vars, $extra) = @_;
     my @m;
+    my $instloc;
     if ($self->{XSMULTI}) {
 	my ($v, $d, $f) = File::Spec->splitpath($target);
 	my @d = File::Spec->splitdir($d);
 	shift @d if $d[0] eq 'lib';
-	my $instloc = $self->catfile('$(INST_ARCHLIB)', 'auto', @d, $f);
+	$instloc = $self->catfile('$(INST_ARCHLIB)', 'auto', @d, $f);
 	push @m,"\ndynamic :: $instloc\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'dynamic'};
 	push @m,"\nstatic :: $instloc\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'static'};
-	push @m, sprintf <<'EOF', $instloc, $target;
+	push @m, "\n", sprintf <<'EOF', $instloc, $target;
 %s : %s
 	$(CP) $(MMS$SOURCE) $(MMS$TARGET)
 EOF
-    } else {
+    }
+    else {
 	push @m,"\ndynamic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'dynamic'};
 	push @m,"\nstatic :: \$(INST_ARCHAUTODIR)$self->{BASEEXT}.opt\n\t\$(NOECHO) \$(NOOP)\n"
 	  unless $self->{SKIPHASH}{'static'};
-	push @m, sprintf <<'EOF', $target;
+	push @m, "\n", sprintf <<'EOF', $target;
 $(INST_ARCHAUTODIR)$(BASEEXT).opt : %s
 	$(CP) $(MMS$SOURCE) $(MMS$TARGET)
 EOF
@@ -1003,33 +1005,45 @@ EOF
      q!, 'DL_VARS' => !, neatvalue($vars);
     push @m, $extra if defined $extra;
     push @m, qq!);"\n\t!;
-    push @m, '	$(PERL) -e "print ""$(INST_STATIC)/Include=';
+    # Can't use dlbase as it's been through mod2fname.
+    my $olb_base = basename($target, '.opt');
     if ($self->{XSMULTI}) {
-        push @m, uc($dlbase); # the "DLBASE" - is this right?
-    } elsif ($self->{OBJECT} =~ /\bBASEEXT\b/ or
-        $self->{OBJECT} =~ /\b$self->{BASEEXT}\b/i) {
-        push @m, ($Config{d_vms_case_sensitive_symbols}
-	           ? uc($self->{BASEEXT}) :'$(BASEEXT)');
-    } else {  # We don't have a "main" object file, so pull 'em all in
-        # Upcase module names if linker is being case-sensitive
-        my($upcase) = $Config{d_vms_case_sensitive_symbols};
-        my(@omods) = split ' ', $self->eliminate_macros($self->{OBJECT});
-        for (@omods) {
-            s/\.[^.]*$//;         # Trim off file type
-            s[\$\(\w+_EXT\)][];   # even as a macro
-            s/.*[:>\/\]]//;       # Trim off dir spec
-            $_ = uc if $upcase;
-        };
-        my(@lines);
-        my $tmp = shift @omods;
-        foreach my $elt (@omods) {
-            $tmp .= ",$elt";
-            if (length($tmp) > 80) { push @lines, $tmp;  $tmp = ''; }
-        }
-        push @lines, $tmp;
-        push @m, '(', join( qq[, -\\n\\t"";" >>\$(MMS\$TARGET)\n\t\$(PERL) -e "print ""], @lines),')';
+        # We've been passed everything but the kitchen sink -- and the location of the
+        # static library we're using to build the dynamic library -- so concoct that
+        # location from what we do have.
+        my $olb_dir = $self->catdir(dirname($instloc), $olb_base);
+        push @m, qq!\$(PERL) -e "print ""${olb_dir}${olb_base}\$(LIB_EXT)/Include=!;
+        push @m, ($Config{d_vms_case_sensitive_symbols} ? uc($olb_base) : $olb_base);
+        push @m, '\n' . $olb_dir . $olb_base . '$(LIB_EXT)/Library\n"";" >>$(MMS$TARGET)',"\n";
     }
-    push @m, '\n$(INST_STATIC)/Library\n"";" >>$(MMS$TARGET)',"\n";
+    else {
+        push @m, qq!\$(PERL) -e "print ""\$(INST_ARCHAUTODIR)${olb_base}\$(LIB_EXT)/Include=!;
+        if ($self->{OBJECT} =~ /\bBASEEXT\b/ or
+            $self->{OBJECT} =~ /\b$self->{BASEEXT}\b/i) {
+            push @m, ($Config{d_vms_case_sensitive_symbols}
+	              ? uc($self->{BASEEXT}) :'$(BASEEXT)');
+        }
+        else {  # We don't have a "main" object file, so pull 'em all in
+            # Upcase module names if linker is being case-sensitive
+            my($upcase) = $Config{d_vms_case_sensitive_symbols};
+            my(@omods) = split ' ', $self->eliminate_macros($self->{OBJECT});
+            for (@omods) {
+                s/\.[^.]*$//;         # Trim off file type
+                s[\$\(\w+_EXT\)][];   # even as a macro
+                s/.*[:>\/\]]//;       # Trim off dir spec
+                $_ = uc if $upcase;
+            };
+            my(@lines);
+            my $tmp = shift @omods;
+            foreach my $elt (@omods) {
+                $tmp .= ",$elt";
+                if (length($tmp) > 80) { push @lines, $tmp;  $tmp = ''; }
+            }
+            push @lines, $tmp;
+            push @m, '(', join( qq[, -\\n\\t"";" >>\$(MMS\$TARGET)\n\t\$(PERL) -e "print ""], @lines),')';
+        }
+        push @m, '\n$(INST_ARCHAUTODIR)' . $olb_base . '$(LIB_EXT)/Library\n"";" >>$(MMS$TARGET)',"\n";
+    }
     if (length $self->{LDLOADLIBS}) {
         my($line) = '';
         foreach my $lib (split ' ', $self->{LDLOADLIBS}) {
@@ -1087,29 +1101,17 @@ sub xs_make_dynamic_lib {
 EOF
 }
 
-
-=item static_lib (override)
+=item xs_make_static_lib (override)
 
 Use VMS commands to manipulate object library.
 
 =cut
 
-sub static_lib {
-    my($self) = @_;
-    return '' unless $self->needs_linking();
+sub xs_make_static_lib {
+    my ($self, $from, $to, $todir) = @_;
+    my @m = sprintf "\n%s : %s\$(DFSEP).exists\n\n%s : %s \$(MYEXTLIB)\n",
+                    $from, $todir, $to, $from;
 
-    return '
-$(INST_STATIC) :
-	$(NOECHO) $(NOOP)
-' unless ($self->{OBJECT} or @{$self->{C} || []} or $self->{MYEXTLIB});
-
-    my(@m);
-    push @m,'
-# Rely on suffix rule for update action
-$(OBJECT) : $(INST_ARCHAUTODIR)$(DFSEP).exists
-
-$(INST_STATIC) : $(OBJECT) $(MYEXTLIB)
-';
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
     push(@m, "\t",'$(CP) $(MYEXTLIB) $(MMS$TARGET)',"\n") if $self->{MYEXTLIB};
