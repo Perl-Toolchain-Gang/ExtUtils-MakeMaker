@@ -939,6 +939,13 @@ sub dynamic_lib {
             my @d = File::Spec->splitdir($d);
             shift @d if $d[0] eq 'lib';
             my $instdir = $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
+
+            # Dynamic library names may need special handling.
+            eval { require DynaLoader };
+            if (defined &DynaLoader::mod2fname) {
+                $f = &DynaLoader::mod2fname([@d, $f]);
+            }
+
             my $instfile = $self->catfile($instdir, "$f.\$(DLEXT)");
             my $objfile = $self->_xsbuild_value('xs', $ext, 'OBJECT');
             $objfile = "$ext\$(OBJ_EXT)" unless defined $objfile;
@@ -2158,7 +2165,15 @@ sub init_xs {
 		my $instdir = $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
 		my $instfile = $self->catfile($instdir, $f);
 		push @statics, "$instfile\$(LIB_EXT)";
-		push @dynamics, "$instfile.\$(DLEXT)";
+
+                # Dynamic library names may need special handling.
+                my $dynfile = $instfile;
+                eval { require DynaLoader };
+                if (defined &DynaLoader::mod2fname) {
+                    $dynfile = $self->catfile($instdir, &DynaLoader::mod2fname([@d, $f]));
+                }
+
+		push @dynamics, "$dynfile.\$(DLEXT)";
 		push @boots, "$instfile.bs";
 	    }
 	    $self->{INST_STATIC} = join ' ', @statics;
