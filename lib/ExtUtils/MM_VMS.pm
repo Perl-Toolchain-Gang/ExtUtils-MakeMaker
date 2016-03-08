@@ -2029,7 +2029,12 @@ sub eliminate_macros {
                     $complex = 1;
                 }
             }
-            else { ($macro = unixify($self->{$macro})) =~ s#/\Z(?!\n)##; }
+            else {
+                $macro = $self->{$macro};
+                # Don't unixify if there is unescaped whitespace
+                $macro = unixify($macro) unless ($macro =~ /(?<!\^)\s/);
+                $macro =~ s#/\Z(?!\n)##;
+            }
             $npath = "$head$macro$tail";
         }
     }
