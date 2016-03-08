@@ -303,15 +303,22 @@ sub maybe_command {
 
 =item pasthru (override)
 
-VMS has $(MMSQUALIFIERS) which is a listing of all the original command line
-options.  This is used in every invocation of make in the VMS Makefile so
-PASTHRU should not be necessary.  Using PASTHRU tends to blow commands past
-the 256 character limit.
+The list of macro definitions to be passed through must be specified using
+the /MACRO qualifier and must not add another /DEFINE qualifier.  We prepend
+our own comma here to the contents of $(PASTHRU_DEFINE) because it is often
+empty and a comma always present in CCFLAGS would generate a missing
+qualifier value error.
 
 =cut
 
 sub pasthru {
-    return "PASTHRU=\n";
+    my($self) = shift;
+    my $pasthru = $self->SUPER::pasthru;
+    $pasthru =~ s|(PASTHRU\s*=\s*)|$1/MACRO=(|;
+    $pasthru =~ s|\n\z|)\n|m;
+    $pasthru =~ s|/defi?n?e?=\(?([^\),]+)\)?|,$1|ig;
+
+    return $pasthru;
 }
 
 
@@ -726,13 +733,14 @@ sub cflags {
 		my $term = $1;
 		$term =~ s:^\((.+)\)$:$1:;
 		push @terms, $term;
-	    }
+	}
 	if ($type eq 'Def') {
 	    push @terms, qw[ $(DEFINE_VERSION) $(XS_DEFINE_VERSION) ];
 	}
 	if (@terms) {
 	    $quals =~ s:/${type}i?n?e?=[^/]+::ig;
-	    $quals .= "/${type}ine=(" . join(',',@terms) . ')';
+            # PASTHRU_DEFINE will have its own comma
+	    $quals .= "/${type}ine=(" . join(',',@terms) . ($type eq 'Def' ? '$(PASTHRU_DEFINE)' : '') . ')';
 	}
     }
 
