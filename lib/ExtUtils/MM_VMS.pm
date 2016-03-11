@@ -938,22 +938,101 @@ sub xs_o {
     if ($self->{XSMULTI}) {
 	for my $ext ($self->_xs_list_basenames) {
 	    my $version = $self->parse_version("$ext.pm");
-	    my $cccmd = $self->{CONST_CCCMD};
-	    $cccmd =~ m/^\s*CCCMD\s*=\s*(.*)\n/m;
-	    $cccmd = $1;
-	    $cccmd =~ s/\b(VERSION=)[^,\)]*/$1\\"$version\\"/;
-	    $cccmd =~ s/\b(XS_VERSION=)[^,\)]*/$1\\"$version\\"/;
-	    #                             1     2
-	    $frag .= _sprintf562 <<'EOF', $ext, $cccmd;
+	    my $ccflags = $self->{CCFLAGS};
+	    $ccflags =~ s/\$\(DEFINE_VERSION\)/\"VERSION_MACRO=\\"\"$version\\"\"/;
+	    $ccflags =~ s/\$\(XS_DEFINE_VERSION\)/\"XS_VERSION_MACRO=\\"\"$version\\"\"/;
+	    $self->_xsbuild_replace_macro($ccflags, 'xs', $ext, 'INC');
+	    $self->_xsbuild_replace_macro($ccflags, 'xs', $ext, 'DEFINE');
+
+	    $frag .= _sprintf562 <<'EOF', $ext, $ccflags;
 
 %1$s$(OBJ_EXT) : %1$s.xs
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(MMS$TARGET_NAME).xs > $(MMS$TARGET_NAME).xsc
 	$(MV) $(MMS$TARGET_NAME).xsc $(MMS$TARGET_NAME).c
-	%2$s $(CCCDLFLAGS) $(MMS$TARGET_NAME).c /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
+	$(CC)%2$s$(OPTIMIZE) $(CCCDLFLAGS) $(MMS$TARGET_NAME).c /OBJECT=$(MMS$TARGET_NAME)$(OBJ_EXT)
 EOF
 	}
     }
     $frag;
+}
+
+=item _xsbuild_replace_macro (override)
+
+There is no simple replacement possible since a qualifier and all its
+subqualifiers must be considered together, so we use our own utility
+routine for the replacement.
+
+=cut
+
+sub _xsbuild_replace_macro {
+    my ($self, undef, $xstype, $ext, $varname) = @_;
+    my $value = $self->_xsbuild_value($xstype, $ext, $varname);
+    return unless defined $value;
+    $_[1] = _vms_replace_qualifier($self, $_[1], $value, $varname);
+}
+
+=item _xsbuild_value (override)
+
+Convert the extension spec to Unix format, as that's what will
+match what's in the XSBUILD data structure.
+
+=cut
+
+sub _xsbuild_value {
+    my ($self, $xstype, $ext, $varname) = @_;
+    $ext = unixify($ext);
+    return $self->SUPER::_xsbuild_value($xstype, $ext, $varname);
+}
+
+sub _vms_replace_qualifier {
+    my ($self, $flags, $newflag, $macro) = @_;
+    my $qual_type;
+    my $type_suffix;
+    my $quote_subquals = 0;
+    my @subquals_new = split /\s+/, $newflag;
+
+    if ($macro eq 'DEFINE') {
+        $qual_type = 'Def';
+        $type_suffix = 'ine';
+        map { $_ =~ s/^-D// } @subquals_new;
+        $quote_subquals = 1;
+    }
+    elsif ($macro eq 'INC') {
+        $qual_type = 'Inc';
+        $type_suffix = 'lude';
+        map { $_ =~ s/^-I//; $_ = $self->fixpath($_) } @subquals_new;
+    }
+
+    my @subquals = ();
+    while ($flags =~ m:/${qual_type}\S{0,4}=([^/]+):ig) {
+        my $term = $1;
+        $term =~ s/\"//g;
+        $term =~ s:^\((.+)\)$:$1:;
+        push @subquals, split /,/, $term;
+    }
+    for my $new (@subquals_new) {
+        my ($sq_new, $sqval_new) = split /=/, $new;
+        my $replaced_old = 0;
+        for my $old (@subquals) {
+            my ($sq, $sqval) = split /=/, $old;
+            if ($sq_new eq $sq) {
+                $old = $sq_new;
+                $old .= '=' . $sqval_new if defined($sqval_new) and length($sqval_new);
+                $replaced_old = 1;
+                last;
+            }
+        }
+        push @subquals, $new unless $replaced_old;
+    }
+
+    if (@subquals) {
+        $flags =~ s:/${qual_type}\S{0,4}=[^/]+::ig;
+        # add quotes if requested but not for unexpanded macros
+        map { $_ = qq/"$_"/ if $_ !~ m/^\$\(/ } @subquals if $quote_subquals;
+        $flags .= "/${qual_type}$type_suffix=(" . join(',',@subquals) . ')';
+    }
+
+    return $flags;
 }
 
 
