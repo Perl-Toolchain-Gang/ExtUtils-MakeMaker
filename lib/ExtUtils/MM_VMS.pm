@@ -1195,9 +1195,26 @@ Use VMS commands to manipulate object library.
 =cut
 
 sub xs_make_static_lib {
-    my ($self, $from, $to, $todir) = @_;
-    my @m = sprintf "\n%s : %s\$(DFSEP).exists\n\n%s : %s \$(MYEXTLIB)\n",
-                    $from, $todir, $to, $from;
+    my ($self, $object, $to, $todir) = @_;
+
+    my @objects;
+    if ($self->{XSMULTI}) {
+        # The extension name should be the main object file name minus file type.
+        my $lib = $object;
+        $lib =~ s/\$\(OBJ_EXT\)\z//;
+        my $override = $self->_xsbuild_value('xs', $lib, 'OBJECT');
+        $object = $override if defined $override;
+        @objects = map { $self->fixpath($_,0) } split /(?<!\^)\s+/, $object;
+    }
+    else {
+        push @objects, $object;
+    }
+
+    my @m;
+    for my $obj (@objects) {
+        push(@m, sprintf "\n%s : %s\$(DFSEP).exists", $obj, $todir);
+    }
+    push(@m, sprintf "\n\n%s : %s \$(MYEXTLIB)\n", $to, (join ' ', @objects));
 
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
@@ -1209,8 +1226,11 @@ sub xs_make_static_lib {
     # 'cause it's a library and you can't stick them in other libraries.
     # In that case, we use $OBJECT instead and hope for the best
     if ($self->{MYEXTLIB}) {
-      push(@m,"\t",'Library/Object/Replace $(MMS$TARGET) $(OBJECT)',"\n");
-    } else {
+        for my $obj (@objects) {
+            push(@m,"\t",'Library/Object/Replace $(MMS$TARGET) ' . $obj,"\n");
+        }
+    }
+    else {
       push(@m,"\t",'Library/Object/Replace $(MMS$TARGET) $(MMS$SOURCE_LIST)',"\n");
     }
 
