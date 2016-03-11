@@ -263,7 +263,11 @@ $label2files{xsbuild} = +{
 
   'lib/XS/Other.xs' => <<EOF,
 #ifdef __cplusplus
-extern "C" { int plus1(int); }
+extern "C" {
+#endif
+int plus1(int);
+#ifdef __cplusplus
+}
 #endif
 $XS_OTHER
 int
