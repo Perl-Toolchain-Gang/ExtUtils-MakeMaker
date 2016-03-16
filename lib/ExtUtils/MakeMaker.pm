@@ -1222,8 +1222,8 @@ sub flush {
     my $self = shift;
 
     my $finalname = $self->{MAKEFILE};
-    printf "Generating a %s %s\n", $self->make_type, $finalname;
-    print "Writing $finalname for $self->{NAME}\n";
+    printf "Generating a %s %s\n", $self->make_type, $finalname if $Verbose || !$self->{PARENT};;
+    print "Writing $finalname for $self->{NAME}\n" if $Verbose || !$self->{PARENT};;
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
 
