@@ -39,6 +39,8 @@ our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
                     &WriteEmptyMakefile &open_for_writing &write_file_via_tmp
                     &_sprintf562);
 
+my @PREREQ_KEYS = qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES);
+
 # These will go away once the last of the Win32 & VMS specific code is
 # purged.
 my $Is_VMS     = $^O eq 'VMS';
@@ -444,7 +446,7 @@ sub new {
 
     # Cleanup all the module requirement bits
     my %key2cmr;
-    for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
+    for my $key (@PREREQ_KEYS) {
         $self->{$key}      ||= {};
         if (_has_cpan_meta_requirements) {
             my $cmr = CPAN::Meta::Requirements->from_string_hash(
@@ -551,14 +553,14 @@ END
     my $cmr;
     if (_has_cpan_meta_requirements) {
         $cmr = CPAN::Meta::Requirements->new;
-        for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
+        for my $key (@PREREQ_KEYS) {
             $cmr->add_requirements($key2cmr{$key}) if $key2cmr{$key};
         }
         foreach my $prereq ($cmr->required_modules) {
             $prereq2version{$prereq} = $cmr->requirements_for_module($prereq);
         }
     } else {
-        for my $key (qw(PREREQ_PM BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES)) {
+        for my $key (@PREREQ_KEYS) {
             next unless my $module2version = $self->{$key};
             $prereq2version{$_} = $module2version->{$_} for keys %$module2version;
         }
