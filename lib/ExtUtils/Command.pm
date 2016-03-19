@@ -347,6 +347,7 @@ sub dos2unix {
 	open ORIG, $_ or do { warn "dos2unix can't open $_: $!"; return };
 	open TEMP, ">$temp" or
 	    do { warn "dos2unix can't create .dos2unix_tmp: $!"; return };
+        binmode ORIG; binmode TEMP;
         while (my $line = <ORIG>) {
             $line =~ s/\015\012/\012/g;
             print TEMP $line;
