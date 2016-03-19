@@ -1,3 +1,13 @@
+7.11_05 Sat Mar 19 09:41:02 GMT 2016
+
+    Bug fixes:
+    - Less noisey output during building sub-modules
+    - Fix dos2unix() on Windows
+
+    VMS fixes:
+    - Implemented XSMULTI and XSBUILD
+    - Resurrect PASTHRU on VMS
+
 7.11_04 Mon Feb 15 11:20:14 GMT 2016
 
     Enhancements:
