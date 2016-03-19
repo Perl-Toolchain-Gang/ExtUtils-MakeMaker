@@ -9,7 +9,7 @@ BEGIN {
 
 use strict;
 use Config;
-use Test::More tests => 21;
+use Test::More tests => 24;
 use File::Temp qw[tempdir];
 
 use TieOut;
@@ -57,7 +57,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     is $warnings, '', 'basic prereq';
 
     SKIP: {
-	skip 'No CMR, no version ranges', 1
+	skip 'No CMR, no version ranges', 4
 	    unless ExtUtils::MakeMaker::_has_cpan_meta_requirements;
 	$warnings = '';
 	WriteMakefile(
@@ -66,7 +66,47 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 		strict  =>  '>= 0, <= 99999',
 	    }
 	);
-	is $warnings, '', 'version range';
+	isnt $warnings, '', 'version range, no min EUMM specified';
+
+	$warnings = '';
+	WriteMakefile(
+	    NAME            => 'Big::Dummy',
+	    PREREQ_PM       => {
+		strict  =>  '>= 0, <= 99999',
+	    },
+	    CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => '7.04',
+	    },
+	);
+	isnt $warnings, '', 'version range and insufficient EUMM specified';
+
+	$warnings = '';
+	WriteMakefile(
+	    NAME            => 'Big::Dummy',
+	    PREREQ_PM       => {
+		strict  =>  '>= 0, <= 99999',
+	    },
+	    CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 7.11_01,
+	    },
+	);
+	is $warnings, '', 'version range and sufficient EUMM specified';
+
+	$warnings = '';
+	WriteMakefile(
+	    NAME            => 'Big::Dummy',
+	    PREREQ_PM       => {
+		strict  =>  '>= 0, <= 99999',
+	    },
+	    META_MERGE => {
+		prereqs => {
+		    configure => {
+			requires => { 'ExtUtils::MakeMaker' => 7.1101 },
+		    },
+		},
+	    },
+	);
+	is $warnings, '', 'version range and sufficient EUMM specified meta';
     }
 
     $warnings = '';
@@ -74,7 +114,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
         NAME            => 'Big::Dummy',
         PREREQ_PM       => {
             strict  => 99999
-        }
+        },
     );
     is $warnings,
     sprintf("Warning: prerequisite strict 99999 not found. We have %s.\n",

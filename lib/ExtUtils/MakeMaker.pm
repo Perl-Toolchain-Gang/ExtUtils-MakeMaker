@@ -427,6 +427,28 @@ sub _has_cpan_meta_requirements {
     };
 }
 
+sub _min_EUMM {
+    my ($self) = @_;
+    my $cr = ($self->{CONFIGURE_REQUIRES} && $self->{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'});
+    return $cr if $cr;
+    my @meta_versions = sort grep defined, map {
+        (exists $_->{prereqs} and
+         exists $_->{prereqs}{configure} and
+         exists $_->{prereqs}{configure}{requires})
+            ? $_->{prereqs}{configure}{requires}{'ExtUtils::MakeMaker'}
+            : ()
+    } grep $_, @{$self}{qw(META_ADD META_MERGE)};
+    return 0 unless @meta_versions;
+    $meta_versions[0] || 0;
+}
+
+sub _got_version_ranges {
+    my ($self) = @_;
+    my @all_versions = map values %$_, grep defined, @{$self}{@PREREQ_KEYS};
+    return 0 unless @all_versions;
+    grep /[^v\d\._]/, @all_versions;
+}
+
 sub new {
     my($class,$self) = @_;
     my($key);
@@ -447,6 +469,9 @@ sub new {
     # Cleanup all the module requirement bits
     my %key2cmr;
     my $has_cpan_meta_requirements = _has_cpan_meta_requirements;
+    warn "Warning: version range without prerequisite of EUMM >= 7.11_01"
+        if $has_cpan_meta_requirements and $self->_min_EUMM < 7.1101
+        and $self->_got_version_ranges;
     for my $key (@PREREQ_KEYS) {
         $self->{$key}      ||= {};
         if ($has_cpan_meta_requirements) {
@@ -2684,7 +2709,8 @@ A hash of modules that are needed to run your module.  The keys are
 the module names ie. Test::More, and the minimum version is the
 value. If the required version number is 0 any version will do.
 The versions given may be a Perl v-string (see L<version>) or a range
-(see L<CPAN::Meta::Requirements>).
+(see L<CPAN::Meta::Requirements>). If you give a range, you need to
+specify a minimum EUMM of at least C<7.11_01> in C<CONFIGURE_REQUIRES>.
 
 This will go into the C<requires> field of your F<META.yml> and the
 C<runtime> of the C<prereqs> field of your F<META.json>.
