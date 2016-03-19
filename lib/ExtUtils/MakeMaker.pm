@@ -446,9 +446,10 @@ sub new {
 
     # Cleanup all the module requirement bits
     my %key2cmr;
+    my $has_cpan_meta_requirements = _has_cpan_meta_requirements;
     for my $key (@PREREQ_KEYS) {
         $self->{$key}      ||= {};
-        if (_has_cpan_meta_requirements) {
+        if ($has_cpan_meta_requirements) {
             my $cmr = CPAN::Meta::Requirements->from_string_hash(
                 $self->{$key},
                 {
