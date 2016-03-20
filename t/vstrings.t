@@ -75,7 +75,8 @@ sub capture_make {
 
     WriteMakefile(
         NAME      => 'VString::Test',
-        PREREQ_PM => { $package , $version }
+        PREREQ_PM => { $package , $version },
+        CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 7.1101 },
     );
 
     return $warnings;
