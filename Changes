@@ -1,3 +1,66 @@
+7.12 Tue Apr 19 12:24:41 BST 2016
+
+    Enhancements:
+    - version ranges are now supported for PREREQS, etc.
+    - Metadata is now represented internally as Meta Spec 2.0
+    - ExtUtils::Command has been re-incorporated at 1.19 of that module
+    - Refactored XS handling
+    - XSMULTI=>1 - put multiple *.xs under lib, it "just works" and XSBUILD
+      for refined control of XSMULTI
+    - can do "make test" without first doing "make"
+
+    Bug fixes:
+    - Handle new warnings from File::Path
+    - Resolve RT#106572 specifying AUTHOR via command-line is broken
+    - Warning on missing TEST_REQUIRES and CONFIGURE_REQUIRES
+    - Sanitise make_type on Win32
+    - Cygwin rebase fixes
+    - Makefile starting comments reflect decoded @ARGV, not raw
+    - Add various targets to .PHONY to avoid disk IO with dmake
+    - Fixed race condition in realclean
+    - improve static-build lib detection
+    - Eliminate non-error STDERR
+    - Make WriteEmptyMakefile Makefile functional when called in subdir
+    - manifypods fixes
+    - perllocal.pod generation "Perl in Space" fix
+    - PASTHRU fixes
+    - Fix distsignature dependencies for parallel make
+    - Check exit status for commands in "make ci" target
+    - Less noisey output during building sub-modules
+    - Fix dos2unix() on Windows
+    - stop makeaperl from polluting @ARGV in cases where ARGV contains args with spaces
+    - Fix regression when both test.pl and t/*.t are present
+    - Refactored internals to remove DirHandle usage
+    - MM_Unix::find_perl() dont repeatedly stat the same path in a loop
+    - No longer repeatedly attempt to load CPAN::Meta if it is now available
+
+    VMS fixes:
+    - Made MM_VMS::oneline build continuation lines properly
+    - Implemented XSMULTI and XSBUILD
+    - Resurrect PASTHRU on VMS
+    - make_macro should handle multiple macros
+    - Fix regression with File::Spec changes in previous release
+
+    Win32 fixes:
+    - t/echo.t needs SHELL env for Win32 gmake
+
+    Dist fixes:
+    - Made %ExtraPrereqs match bundled prereqs
+    - Included MANIFEST.SKIP from ExtUtils::Manifest
+    - The bundled Encode::Locale has been updated to 1.04
+
+    Test fixes:
+    - test PL_FILES of a "module"
+    - Various tests no longer require a separate .pm file for testing
+    - Support v5.6.1 in various tests
+    - test static build if $ENV{AUTHOR_TESTING}
+    - XS tests now pluggable
+    - test for "Perl in Space"
+
+    Doc fixes:
+    - better document for PL_FILES, oneliner method
+    - FAQ updated
+
 7.11_06 Tue Mar 29 19:22:38 BST 2016
 
     Bug fixes:

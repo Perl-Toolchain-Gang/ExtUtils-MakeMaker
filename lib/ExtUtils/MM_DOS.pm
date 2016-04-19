@@ -2,7 +2,7 @@ package ExtUtils::MM_DOS;
 
 use strict;
 
-our $VERSION = '7.11_06';
+our $VERSION = '7.12';
 $VERSION = eval $VERSION;
 
 require ExtUtils::MM_Any;
