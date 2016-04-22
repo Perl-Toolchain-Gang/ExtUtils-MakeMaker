@@ -214,8 +214,8 @@ sub perllocal_install {
                            : @ARGV;
 
     my $pod;
-    $pod = sprintf <<'POD', scalar(localtime), $type, $name;
- =head2 %s: C<%s> L<%3$s|%3$s>
+    $pod = sprintf <<'POD', scalar(localtime), $type, $name, $name;
+ =head2 %s: C<%s> L<%s|%s>
 
  =over 4
 
