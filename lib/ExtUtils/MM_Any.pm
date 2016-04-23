@@ -1025,7 +1025,7 @@ sub dynamic {
 
     my($self) = shift;
     '
-dynamic :: $(FIRST_MAKEFILE) $(INST_BOOT) $(INST_DYNAMIC)
+dynamic :: $(FIRST_MAKEFILE) config $(INST_BOOT) $(INST_DYNAMIC)
 	$(NOECHO) $(NOOP)
 ';
 }
