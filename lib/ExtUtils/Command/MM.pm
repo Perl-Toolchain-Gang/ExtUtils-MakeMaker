@@ -15,10 +15,14 @@ $VERSION = eval $VERSION;
 
 my $Is_VMS = $^O eq 'VMS';
 
-eval {  require Time::HiRes; die unless Time::HiRes->can("stat"); };
-*mtime = $@ ?
- sub { [             stat($_[0])]->[9] } :
- sub { [Time::HiRes::stat($_[0])]->[9] } ;
+sub mtime {
+  no warnings 'redefine';
+  *mtime = (eval { require Time::HiRes } && defined &Time::HiRes::stat)
+    ? sub { (Time::HiRes::stat($_[0]))[9] }
+    : sub { (             stat($_[0]))[9] }
+  ;
+  goto &mtime;
+}
 
 =head1 NAME
 
