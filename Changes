@@ -1,3 +1,8 @@
+7.13_01 Sat Apr 23 16:41:20 BST 2016
+
+    Bug fixes:
+    - Make dynamic depend on config again, fixes issues with Inline
+
 7.12 Tue Apr 19 12:24:41 BST 2016
 
     Enhancements:
