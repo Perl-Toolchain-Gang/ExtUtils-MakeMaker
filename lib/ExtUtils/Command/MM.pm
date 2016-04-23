@@ -17,6 +17,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 sub mtime {
   no warnings 'redefine';
+  local $@;
   *mtime = (eval { require Time::HiRes } && defined &Time::HiRes::stat)
     ? sub { (Time::HiRes::stat($_[0]))[9] }
     : sub { (             stat($_[0]))[9] }
