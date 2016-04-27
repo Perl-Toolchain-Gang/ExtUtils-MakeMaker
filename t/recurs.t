@@ -163,6 +163,9 @@ static :: libfcrypt$(LIB_EXT)
 
 libfcrypt$(LIB_EXT) :
 	$(TOUCH) libfcrypt$(LIB_EXT)
+
+dynamic :
+	$(NOOP)
 ';
 }
 EOF

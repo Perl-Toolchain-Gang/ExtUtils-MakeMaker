@@ -1358,14 +1358,10 @@ sub selfdocument {
 
 # here so even if top_targets is overridden, these will still be defined
 # gmake will silently still work if any are .PHONY-ed but nmake won't
-static ::
-	$(NOECHO) $(NOOP)
-
-dynamic ::
-	$(NOECHO) $(NOOP)
 EOF
     push @m, join "\n", map "$_ ::\n\t\$(NOECHO) \$(NOOP)\n",
         # config is so manifypods won't puke if no subdirs
+        grep !$self->{SKIPHASH}{$_},
         qw(static dynamic config);
     join "\n", @m;
 }
