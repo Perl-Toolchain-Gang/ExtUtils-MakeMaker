@@ -1,3 +1,8 @@
+7.15_01 Wed Apr 27 19:13:46 BST 2016
+
+    Bug fixes:
+    - Fix regression with SKIP and dynamic and static targets
+
 7.14  Sun Apr 24 13:53:33 BST 2016
 
   No changes since 7.13_01
