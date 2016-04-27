@@ -41,6 +41,7 @@ my @DATA = (
   [ V2DecimalString => 'v1.2', qr/^$/, '2-part v-decimal string', $UNPARSABLERE ],
   [ V3DecimalString => 'v1.2.3', qr/^$/, '3-part v-Decimal String', $UNPARSABLERE ],
   [ RangeString => '>= 5.0, <= 6.0', qr/^$/, 'Version range', $UNPARSABLERE ],
+  [ Scientific => 0.000005, qr/^$/, 'Scientific Notation' ],
 );
 
 plan tests => (1 + (@DATA * 4));

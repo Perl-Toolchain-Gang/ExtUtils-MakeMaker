@@ -452,9 +452,14 @@ sub new {
                 {
                   bad_version_hook => sub {
                     #no warnings 'numeric'; # module doesn't use warnings
-                    my ($fallback) = $_[0] ? ($_[0] =~ /^([0-9.]+)/) : 0;
-                    $fallback += 0;
-                    carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as $fallback";
+                    my $fallback;
+                    if ( $_[0] =~ m!^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$! ) {
+                      $fallback = sprintf "%f", $_[0];
+                    } else {
+                      ($fallback) = $_[0] ? ($_[0] =~ /^([0-9.]+)/) : 0;
+                      $fallback += 0;
+                      carp "Unparsable version '$_[0]' for prerequisite $_[1] treated as $fallback";
+                    }
                     version->new($fallback);
                   },
                 },
@@ -472,9 +477,13 @@ sub new {
                     next;
                 }
                 else {
-                    my ($fallback) = $_[0] ? ($_[0] =~ /^([0-9.]+)/) : 0;
-                    $fallback += 0;
-                    carp "Unparsable version '$version' for prerequisite $module treated as $fallback (CPAN::Meta::Requirements not available)";
+                    if ( $version =~ m!^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$! ) {
+                      $fallback = sprintf "%f", $version;
+                    } else {
+                      ($fallback) = $version ? ($version =~ /^([0-9.]+)/) : 0;
+                      $fallback += 0;
+                      carp "Unparsable version '$version' for prerequisite $module treated as $fallback (CPAN::Meta::Requirements not available)";
+                    }
                 }
                 $self->{$key}->{$module} = $fallback;
             }
@@ -585,9 +594,14 @@ END
           $pr_version = 0 if $pr_version eq 'undef';
           if ( !eval { version->new( $pr_version ); 1 } ) {
             #no warnings 'numeric'; # module doesn't use warnings
-            my ($fallback) = $pr_version ? ($pr_version =~ /^([0-9.]+)/) : 0;
-            $fallback += 0;
-            carp "Unparsable version '$pr_version' for installed prerequisite $prereq treated as $fallback";
+            my $fallback;
+            if ( $pr_version =~ m!^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$! ) {
+              $fallback = sprintf '%f', $pr_version;
+            } else {
+              ($fallback) = $pr_version ? ($pr_version =~ /^([0-9.]+)/) : 0;
+              $fallback += 0;
+              carp "Unparsable version '$pr_version' for installed prerequisite $prereq treated as $fallback";
+            }
             $pr_version = $fallback;
           }
         }
