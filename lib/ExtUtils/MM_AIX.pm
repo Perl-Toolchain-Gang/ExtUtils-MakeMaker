@@ -1,7 +1,7 @@
 package ExtUtils::MM_AIX;
 
 use strict;
-our $VERSION = '7.15_02';
+our $VERSION = '7.15_03';
 $VERSION = eval $VERSION;
 
 require ExtUtils::MM_Unix;

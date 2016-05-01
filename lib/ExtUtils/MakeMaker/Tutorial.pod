@@ -1,6 +1,6 @@
 package ExtUtils::MakeMaker::Tutorial;
 
-our $VERSION = '7.15_02';
+our $VERSION = '7.15_03';
 $VERSION = eval $VERSION;
 
 
