@@ -52,7 +52,7 @@ END
 );
 
 # avoid environment variables interfering with our make runs
-delete @ENV{qw(LIB MAKEFLAGS)};
+delete @ENV{qw(LIB MAKEFLAGS PERL_CORE)};
 
 my $perl     = which_perl();
 my $make     = make_run();

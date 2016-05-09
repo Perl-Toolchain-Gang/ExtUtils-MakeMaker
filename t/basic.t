@@ -66,6 +66,8 @@ my $Touch_Time = calibrate_mtime();
 
 $| = 1;
 
+delete @ENV{qw(PERL_CORE)};
+
 ok( setup_recurs(), 'setup' );
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
