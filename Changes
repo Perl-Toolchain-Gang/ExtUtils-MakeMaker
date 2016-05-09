@@ -1,3 +1,8 @@
+7.17_02 Mon May  9 23:55:09 BST 2016
+
+    Bug fixes:
+    - Resolve a regression in c_o with trailing spaces
+
 7.17_01 Mon May  9 20:02:02 BST 2016
 
     Test fixes:
