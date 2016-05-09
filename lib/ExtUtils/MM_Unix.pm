@@ -152,7 +152,7 @@ EOF
     push @exts, 'C' if !$Is{OS2} and !$Is{Win32} and !$Is{Dos}; #Case-specific
     $m_o = $self->{XSMULTI} ? $self->xs_obj_opt('$*$(OBJ_EXT)') : '';
     for my $ext (@exts) {
-	push @m, "\n.$ext\$(OBJ_EXT) :\n\t$command $flags \$*.$ext $m_o\n";
+	push @m, "\n.$ext\$(OBJ_EXT) :\n\t$command $flags \$*.$ext" . ( $m_o ? " $m_o" : '' ) . "\n";
     }
     return join "", @m;
 }
