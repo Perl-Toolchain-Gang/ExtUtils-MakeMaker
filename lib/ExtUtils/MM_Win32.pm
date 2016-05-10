@@ -32,7 +32,7 @@ $VERSION = eval $VERSION;
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my ( $BORLAND, $GCC, $MSVC, $DLLTOOL ) = _identify_compiler_environment( \%Config );
+my ( $BORLAND, $GCC, $MSVC ) = _identify_compiler_environment( \%Config );
 
 sub _identify_compiler_environment {
 	my ( $config ) = @_;
@@ -40,9 +40,8 @@ sub _identify_compiler_environment {
 	my $BORLAND = $config->{cc} =~ /\bbcc/i ? 1 : 0;
 	my $GCC     = $config->{cc} =~ /\bgcc\b/i ? 1 : 0;
 	my $MSVC    = $config->{cc} =~ /\b(?:cl|icl)/i ? 1 : 0; # MSVC can come as clarm.exe, icl=Intel C
-	my $DLLTOOL = $config->{dlltool} || 'dlltool';
 
-	return ( $BORLAND, $GCC, $MSVC, $DLLTOOL );
+	return ( $BORLAND, $GCC, $MSVC );
 }
 
 
