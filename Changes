@@ -1,3 +1,8 @@
+7.17_03 Wed May 11 18:22:06 BST 2016
+
+    Dist fixes:
+    - remove build_requires on ourselves
+
 7.17_02 Mon May  9 23:55:09 BST 2016
 
     Bug fixes:
