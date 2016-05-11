@@ -91,6 +91,7 @@ my $MM = WriteMakefile(
     },
 
     CONFIGURE_REQUIRES => {},                  # We don't need ourself to install ourself.
+    BUILD_REQUIRES     => {},                  # We don't need ourself to build ourself.
     INSTALLDIRS        => ( $] < 5.012 ? 'perl' : 'site' ),
     LICENSE            => 'perl',
     AUTHOR             => 'Michael G Schwern <schwern@pobox.com>',
