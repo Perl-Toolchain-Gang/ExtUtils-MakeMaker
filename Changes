@@ -1,3 +1,9 @@
+7.19_01 Thu Jun  2 14:26:20 BST 2016
+
+    Bug fixes:
+    - Cygwin: avoid libperl.dll.dll.a
+    - Fix basic.t tests on Win32 in core
+
 7.18  Mon May 23 15:55:26 BST 2016
 
     No changes since 7.17_03
