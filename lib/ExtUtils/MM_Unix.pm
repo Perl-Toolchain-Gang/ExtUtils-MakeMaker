@@ -2065,7 +2065,7 @@ sub init_PERL {
 
     # Make sure perl can find itself before it's installed.
     my $lib_paths = $self->{UNINSTALLED_PERL} || $self->{PERL_CORE}
-        ? $self->{PERL_ARCHLIB} ne $self->{PERL_LIB} ?
+        ? ( $self->{PERL_ARCHLIB} && $self->{PERL_LIB} && $self->{PERL_ARCHLIB} ne $self->{PERL_LIB} ) ?
             q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"} : q{ "-I$(PERL_LIB)"}
         : undef;
     my $inst_lib_paths = $self->{INST_ARCHLIB} ne $self->{INST_LIB}
