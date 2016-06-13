@@ -1,3 +1,8 @@
+7.19_02 Mon Jun 13 09:57:37 BST 2016
+
+    Bug fixes:
+    - Check for ascii locale using normalized name
+
 7.19_01 Thu Jun  2 14:26:20 BST 2016
 
     Bug fixes:

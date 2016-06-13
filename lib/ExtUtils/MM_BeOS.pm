@@ -26,7 +26,7 @@ require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
 
 our @ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
-our $VERSION = '7.19_01';
+our $VERSION = '7.19_02';
 $VERSION = eval $VERSION;
 
 
