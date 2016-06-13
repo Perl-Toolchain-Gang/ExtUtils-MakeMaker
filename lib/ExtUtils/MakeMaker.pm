@@ -12,7 +12,7 @@ use Carp;
 use File::Path;
 my $CAN_DECODE = eval { require ExtUtils::MakeMaker::Locale; }; # 2 birds, 1 stone
 eval { ExtUtils::MakeMaker::Locale::reinit('UTF-8') }
-  if $CAN_DECODE and $ExtUtils::MakeMaker::Locale::ENCODING_LOCALE eq 'US-ASCII';
+  if $CAN_DECODE and Encode::find_encoding('locale')->name eq 'ascii';
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
