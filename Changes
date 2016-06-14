@@ -1,3 +1,11 @@
+7.19_04 Tue Jun 14 11:16:19 BST 2016
+
+    Bug fixes:
+    - prevent EUMM::Locale from warning with old Win32.pm
+
+    Doc fixes:
+    - added examples for running tests in subdirs
+
 7.19_03 Mon Jun 13 14:22:46 BST 2016
 
     Bug fixes:
