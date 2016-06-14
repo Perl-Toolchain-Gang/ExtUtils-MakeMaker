@@ -1466,6 +1466,23 @@ MakeMaker also checks for any files matching glob("t/*.t"). It will
 execute all matching files in alphabetical order via the
 L<Test::Harness> module with the C<-I> switches set correctly.
 
+You can also organize your tests within subdirectories in the F<t/> directory.
+To do so, use the F<test> directive in your I<Makefile.PL>. For example, if you
+had tests in:
+
+    t/foo
+    t/foo/bar
+
+You could tell make to run tests in both of those directories with the
+following directives:
+
+    test => {TESTS => 't/*/*.t t/*/*/*.t'}
+    test => {TESTS => 't/foo/*.t t/foo/bar/*.t'}
+
+The first will run all test files in all first-level subdirectories and all
+subdirectories they contain. The second will run tests in only the F<t/foo>
+and F<t/foo/bar>.
+
 If you'd like to see the raw output of your tests, set the
 C<TEST_VERBOSE> variable to true.
 

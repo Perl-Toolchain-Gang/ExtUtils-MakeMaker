@@ -131,7 +131,7 @@ Let's take the following test directory structure:
 Now, inside of the C<WriteMakeFile()> function in your F<Makefile.PL>, specify
 where your tests are located with the C<test> directive:
 
-    test => {TESTS => 't/*.t t/*/*.t' t/*/*/*.t'}
+    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
 
 The first entry in the string will run all tests in the top-level F<t/> 
 directory. The second will run all test files located in any subdirectory under
