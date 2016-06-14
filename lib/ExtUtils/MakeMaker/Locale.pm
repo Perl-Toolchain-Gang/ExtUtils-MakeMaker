@@ -59,7 +59,7 @@ sub _init {
                         *GetInputCP = sub { &Win32::Console::InputCP }
                             if defined &Win32::Console::InputCP;
                         *GetOutputCP = sub { &Win32::Console::OutputCP }
-                            unless if defined &Win32::Console::OutputCP;
+                            if defined &Win32::Console::OutputCP;
                     };
                 }
                 unless (defined &GetInputCP) {
