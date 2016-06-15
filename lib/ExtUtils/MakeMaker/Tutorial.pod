@@ -104,7 +104,7 @@ is F<lib/Foo/Bar.pm>.
 =item t/
 
 Tests for your modules go here.  Each test filename ends with a .t.
-So F<t/foo.t>/  'make test' will run these tests.
+So F<t/foo.t>  'make test' will run these tests.
 
 Typically, the F<t/> test directory is flat, with all test files located
 directly within it. However, you can nest tests within subdirectories, for
