@@ -1,3 +1,8 @@
+7.19_05 Mon Jun 20 15:21:52 BST 2016
+
+    Doc fixes:
+    - fix typos and add subdirs text to MakeMaker.pm
+
 7.19_04 Tue Jun 14 11:16:19 BST 2016
 
     Bug fixes:
