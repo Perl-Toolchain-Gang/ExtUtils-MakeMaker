@@ -2,7 +2,7 @@ package ExtUtils::MM_MacOS;
 
 use strict;
 
-our $VERSION = '7.19_06';
+our $VERSION = '7.19_07';
 $VERSION = eval $VERSION;
 
 sub new {

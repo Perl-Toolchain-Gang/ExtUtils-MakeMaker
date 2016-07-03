@@ -1,3 +1,8 @@
+7.19_07 Sun Jul  3 15:11:40 BST 2016
+
+    Bug fixes:
+    - Restore ordering issue involving OTHERLDFLAGS
+
 7.19_06 Mon Jun 27 12:32:06 BST 2016
 
     Test fixes:
