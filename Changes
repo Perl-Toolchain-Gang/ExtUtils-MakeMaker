@@ -1,3 +1,8 @@
+7.19_08 Thu Jul 28 12:31:13 BST 2016
+
+    Bug fixes:
+    - CVE-2016-1238: avoid loading VMS::Feature from the default .
+
 7.19_07 Sun Jul  3 15:11:40 BST 2016
 
     Bug fixes:
