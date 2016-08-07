@@ -1,3 +1,8 @@
+7.21_01 Sun Aug  7 10:37:53 BST 2016
+
+    Bug fixes:
+    - CVE-2016-1238: instmodsh sanitise @INC
+
 7.20  Fri Aug  5 09:39:56 BST 2016
 
     No changes since 7.19_08
