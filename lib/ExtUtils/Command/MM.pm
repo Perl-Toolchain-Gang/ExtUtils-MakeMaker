@@ -219,7 +219,8 @@ sub perllocal_install {
                            : @ARGV;
 
     my $pod;
-    $pod = sprintf <<'POD', scalar(localtime), $type, $name, $name;
+    my $time = gmtime($ENV{SOURCE_DATE_EPOCH} || time);
+    $pod = sprintf <<'POD', scalar($time), $type, $name, $name;
  =head2 %s: C<%s> L<%s|%s>
 
  =over 4
