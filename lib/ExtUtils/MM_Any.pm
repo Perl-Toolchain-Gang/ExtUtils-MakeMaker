@@ -1319,7 +1319,8 @@ sub metafile_data {
     my $v1_add = _metaspec_version($meta_add) !~ /^2/;
 
     for my $frag ($meta_add, $meta_merge) {
-        $frag = CPAN::Meta::Converter->new($frag, default_version => "1.4")->upgrade_fragment;
+        my $def_v = _metaspec_version($frag == $meta_add ? $meta_merge : $meta_add);
+        $frag = CPAN::Meta::Converter->new($frag, default_version => $def_v)->upgrade_fragment;
     }
 
     # if we upgraded a 1.x _ADD fragment, we gave it a prereqs key that
