@@ -2214,7 +2214,9 @@ sub init_INSTALL_from_INSTALL_BASE {
             my $key = "INSTALL".$dir.$uc_thing;
 
             $install{$key} ||=
-              $self->catdir('$(INSTALL_BASE)', @{$map{$thing}});
+                ($thing =~ /^man.dir$/ and not $Config{lc $key})
+                ? 'none'
+                : $self->catdir('$(INSTALL_BASE)', @{$map{$thing}});
         }
     }
 
