@@ -5,6 +5,11 @@ use strict;
 
 BEGIN {require 5.006;}
 
+# Assure anything called from Makefile.PL includes . in @INC.
+BEGIN {
+    $ENV{PERL_USE_UNSAFE_INC} = 1 unless exists $ENV{PERL_USE_UNSAFE_INC};
+}
+
 require Exporter;
 use ExtUtils::MakeMaker::Config;
 use ExtUtils::MakeMaker::version; # ensure we always have our fake version.pm
