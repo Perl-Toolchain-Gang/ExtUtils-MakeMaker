@@ -17,7 +17,7 @@ use File::Temp;
 use Cwd;
 use MakeMaker::Test::Utils;
 
-plan tests => 31;
+plan tests => 33;
 require ExtUtils::MM_Any;
 
 sub mymeta_ok {
@@ -260,6 +260,62 @@ my @GENERIC_OUT = (
         },
         @GENERIC_OUT,
     },'TEST_REQUIRES meta-spec 2.0';
+}
+
+{
+    my $mm = $new_mm->(
+        @GENERIC_IN,
+    );
+    is_deeply $mm->metafile_data(
+        {
+            'configure_requires' => {
+                'Fake::Module1' => 1,
+            },
+            'prereqs' => {
+                @REQ20,
+                'test' => {
+                    'requires' => {
+                        'Fake::Module2' => 2,
+                    },
+                },
+            },
+        },
+        { 'meta-spec' => { 'version' => 2 }, }
+    ), {
+        prereqs => {
+            @REQ20,
+            test => { requires => { "Fake::Module2" => 2, }, },
+        },
+        @GENERIC_OUT,
+    }, 'META_ADD takes meta version from META_MERGE';
+}
+
+{
+    my $mm = $new_mm->(
+        @GENERIC_IN,
+    );
+    is_deeply $mm->metafile_data(
+        { 'meta-spec' => { 'version' => 2 }, },
+        {
+            'configure_requires' => {
+                'Fake::Module1' => 1,
+            },
+            'prereqs' => {
+                @REQ20,
+                'test' => {
+                    'requires' => {
+                        'Fake::Module2' => 2,
+                    },
+                },
+            },
+        },
+    ), {
+        prereqs => {
+            @REQ20,
+            test => { requires => { "Fake::Module2" => 2, }, },
+        },
+        @GENERIC_OUT,
+    }, 'META_MERGE takes meta version from META_ADD';
 }
 
 # Test _REQUIRES key priority over META_ADD
