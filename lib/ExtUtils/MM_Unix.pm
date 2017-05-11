@@ -3032,16 +3032,14 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 sub pm_to_blib {
     my $self = shift;
-    my $autodir =
-      $self->{NO_AUTOSPLIT} ? q{'}.$self->catdir('$(INST_LIB)','auto').q{'}
-                            : q{undef};
+    my($autodir) = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 };
 
     # VMS will swallow '' and PM_FILTER is often empty.  So use q[]
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, $autodir, q[\$(PM_FILTER)], '\$(PERM_DIR)')
+pm_to_blib({\@ARGV}, '$autodir', q[\$(PM_FILTER)], '\$(PERM_DIR)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib,

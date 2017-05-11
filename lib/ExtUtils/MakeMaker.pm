@@ -308,7 +308,7 @@ sub full_setup {
     LINKTYPE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET
     META_ADD META_MERGE MIN_PERL_VERSION BUILD_REQUIRES CONFIGURE_REQUIRES
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NO_MYMETA NO_PACKLIST NO_PERLLOCAL
-    NORECURS NO_VC NO_AUTOSPLIT OBJECT OPTIMIZE PERL_MALLOC_OK PERL PERLMAINCC PERLRUN
+    NORECURS NO_VC OBJECT OPTIMIZE PERL_MALLOC_OK PERL PERLMAINCC PERLRUN
     PERLRUNINST PERL_CORE
     PERM_DIR PERM_RW PERM_RWX MAGICXS
     PL_FILES PM PM_FILTER PMLIBDIRS PMLIBPARENTDIRS POLLUTE
@@ -2428,12 +2428,6 @@ In general, any generated Makefile checks for the current version of
 MakeMaker and the version the Makefile was built under. If NO_VC is
 set, the version check is neglected. Do not write this into your
 Makefile.PL, use it interactively instead.
-
-=item NO_AUTOSPLIT
-
-When true, surpresses the L<AutoSplitting|AutoSplit> of F<.pm> files.
-
-Defaults to false.
 
 =item OBJECT
 
