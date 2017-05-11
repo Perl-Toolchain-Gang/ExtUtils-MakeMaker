@@ -2578,7 +2578,7 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 	return if $File::Find::name =~ m:\Q$installed_version\E\z:;
 	use Cwd 'cwd';
 	$static{cwd() . "/" . $_}++;
-    }, grep( -d $_, @{$searchdirs || []}) );
+    }, grep( -d $_, map { $self->catdir($_, 'auto') } @{$searchdirs || []}) );
 
     # We trust that what has been handed in as argument, will be buildable
     $static = [] unless $static;
