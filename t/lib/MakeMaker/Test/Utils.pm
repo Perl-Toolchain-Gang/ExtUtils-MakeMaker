@@ -195,7 +195,7 @@ should generate.
 =cut
 
 sub makefile_name {
-    return $Is_VMS ? 'Descrip.MMS' : 'Makefile';
+    return $Is_VMS ? 'Descrip.MMS' : (make() =~ /\bdmake\b/) ? 'makefile.mk' : 'Makefile';
 }
 
 =item B<makefile_backup>
