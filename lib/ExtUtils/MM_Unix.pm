@@ -3259,7 +3259,7 @@ sub processPL {
 
             $m .= <<MAKE_FRAG;
 
-all :: $target
+pure_all :: $target
 	\$(NOECHO) \$(NOOP)
 
 $target :: $plfile $pm_dep
