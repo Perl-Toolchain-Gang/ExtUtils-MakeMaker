@@ -1,3 +1,8 @@
+7.25_03 Thu May 11 17:51:23 BST 2017
+
+    Bug fixes:
+    - processPL now depends on 'pure_all' instead of 'all'
+
 7.25_02 Thu May 11 11:54:42 BST 2017
 
     Bug fixes:
