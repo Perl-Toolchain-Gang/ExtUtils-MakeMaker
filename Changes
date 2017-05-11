@@ -1,3 +1,12 @@
+7.25_02 Thu May 11 11:54:42 BST 2017
+
+    Bug fixes:
+    - Only add staticlibs that are installed under auto/
+    - Correct the order of tests of chmod()
+
+    Doc fixes:
+    - Fixed typo in MakeMaker.pm
+
 7.25_01 Fri Feb  3 13:36:25 GMT 2017
 
     Bug fixes:
