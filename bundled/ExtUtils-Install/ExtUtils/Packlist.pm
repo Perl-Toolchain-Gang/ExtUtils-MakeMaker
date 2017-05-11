@@ -5,13 +5,15 @@ use strict;
 use Carp qw();
 use Config;
 use vars qw($VERSION $Relocations);
-$VERSION = '1.43';
+$VERSION = '2.06';
 $VERSION = eval $VERSION;
 
 # Used for generating filehandle globs.  IO::File might not be available!
 my $fhname = "FH1";
 
 =begin _undocumented
+
+=over
 
 =item mkfh()
 
@@ -22,6 +24,7 @@ Make a filehandle. Same kind of idea as Symbol::gensym().
 sub mkfh()
 {
 no strict;
+local $^W;
 my $fh = \*{$fhname++};
 use strict;
 return($fh);
@@ -31,6 +34,8 @@ return($fh);
 
 Works out what absolute paths in the configuration have been located at run
 time relative to $^X, and generates a regexp that matches them
+
+=back
 
 =end _undocumented
 
