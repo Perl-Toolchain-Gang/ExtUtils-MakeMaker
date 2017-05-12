@@ -34,7 +34,7 @@ $Revision = int $Revision * 10000;
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
 our @ISA = qw(Exporter);
-our @EXPORT    = qw(&WriteMakefile $Verbose &prompt);
+our @EXPORT    = qw(&WriteMakefile $Verbose &prompt &os_unsupported);
 our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
                     &WriteEmptyMakefile &open_for_writing &write_file_via_tmp
                     &_sprintf562);
@@ -225,6 +225,10 @@ sub prompt ($;$) {  ## no critic
     }
 
     return (!defined $ans || $ans eq '') ? $def : $ans;
+}
+
+sub os_unsupported {
+    die "OS unsupported\n";
 }
 
 sub eval_in_subdirs {
@@ -3284,6 +3288,15 @@ is set to true, the $default will be used without prompting.  This
 prevents automated processes from blocking on user input.
 
 If no $default is provided an empty string will be used instead.
+
+=item os_unsupported
+
+  os_unsupported();
+  os_unsupported if $^O eq 'MSWin32';
+
+The C<os_unsupported()> function provides a way to correctly exit your
+C<Makefile.PL> before calling C<WriteMakefile>. It is essentially a
+C<die> with the message "OS unsupported".
 
 =back
 
