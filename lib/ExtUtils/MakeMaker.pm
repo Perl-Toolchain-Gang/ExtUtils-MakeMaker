@@ -3013,6 +3013,8 @@ you provide your own C<TESTS> attribute, defaults to false.
 
   {RECURSIVE_TEST_FILES=>1}
 
+This is supported since 6.76
+
 =item tool_autosplit
 
   {MAXLEN => 8}
@@ -3297,6 +3299,8 @@ If no $default is provided an empty string will be used instead.
 The C<os_unsupported()> function provides a way to correctly exit your
 C<Makefile.PL> before calling C<WriteMakefile>. It is essentially a
 C<die> with the message "OS unsupported".
+
+This is supported since 7.26
 
 =back
 
