@@ -4,6 +4,7 @@ use strict;
 our $VERSION = '7.25_04';
 $VERSION = eval $VERSION;
 
+use ExtUtils::MakeMaker::Config;
 require ExtUtils::MM_Unix;
 our @ISA = qw(ExtUtils::MM_Unix);
 
@@ -45,6 +46,21 @@ On AIX, is C<.exp>.
 
 sub xs_dlsyms_ext {
     '.exp';
+}
+
+sub xs_dlsyms_arg {
+    my($self, $file) = @_;
+    return qq{-bE:${file}};
+}
+
+sub init_others {
+    my $self = shift;
+    $self->SUPER::init_others;
+    # perl "hints" add -bE:$(BASEEXT).exp to LDDLFLAGS. strip that out
+    # so right value can be added by xs_make_dynamic_lib to work for XSMULTI
+    $self->{LDDLFLAGS} ||= $Config{lddlflags};
+    $self->{LDDLFLAGS} =~ s#(\s*)\S*\Q$(BASEEXT)\E\S*(\s*)#$1$2#;
+    return;
 }
 
 =head1 AUTHOR

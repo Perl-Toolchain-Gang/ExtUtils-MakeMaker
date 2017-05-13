@@ -1008,6 +1008,7 @@ sub xs_make_dynamic_lib {
     $exportlist = '' if $exportlist ne '$(EXPORT_LIST)';
     my $armaybe = $self->_xs_armaybe($attribs);
     my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP) %s'."\n", $to, $object, $todir, $exportlist, ($dlsyms || '');
+    my $dlsyms_arg = $self->xs_dlsyms_arg($dlsyms);
     if ($armaybe ne ':'){
         $ldfrom = 'tmp$(LIB_EXT)';
         push(@m,"	\$(ARMAYBE) cr $ldfrom $object\n");
@@ -1048,8 +1049,8 @@ sub xs_make_dynamic_lib {
         $ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
     }
 
-    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $ldfrom, $self->xs_obj_opt('$@'), $libs, $exportlist;
-	%s$(LD) %s $(LDDLFLAGS) %s $(OTHERLDFLAGS) %s $(MYEXTLIB) \
+    push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $dlsyms_arg, $ldfrom, $self->xs_obj_opt('$@'), $libs, $exportlist;
+	%s$(LD) %s $(LDDLFLAGS) %s %s $(OTHERLDFLAGS) %s $(MYEXTLIB) \
 	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) %s \
 	  $(INST_DYNAMIC_FIX)
 	$(CHMOD) $(PERM_RWX) $@
