@@ -34,13 +34,7 @@ Define DL_FUNCS and DL_VARS and write the *.exp files.
 sub dlsyms {
     my($self,%attribs) = @_;
     return '' unless $self->needs_linking;
-    my @m;
-    # these will need XSMULTI-fying but maybe that already happens
-    push @m,"\ndynamic :: $self->{BASEEXT}.exp\n\n"
-      unless $self->{SKIPHASH}{'dynamic'}; # dynamic and static are subs, so...
-    push @m,"\nstatic :: $self->{BASEEXT}.exp\n\n"
-      unless $self->{SKIPHASH}{'static'};  # we avoid a warning if we tick them
-    join "\n", @m, $self->xs_dlsyms_iterator(\%attribs);
+    join "\n", $self->xs_dlsyms_iterator(\%attribs);
 }
 
 =head3 xs_dlsyms_ext

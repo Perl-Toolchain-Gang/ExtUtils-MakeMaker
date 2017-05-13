@@ -932,6 +932,7 @@ sub dynamic_lib {
     return '' unless $self->has_link_code;
     my @m = $self->xs_dynamic_lib_macros(\%attribs);
     my @libs;
+    my $dlsyms_ext = eval { $self->xs_dlsyms_ext };
     if ($self->{XSMULTI}) {
         my @exts = $self->_xs_list_basenames;
         for my $ext (@exts) {
@@ -953,10 +954,12 @@ sub dynamic_lib {
             $ldfrom = $objfile unless defined $ldfrom;
             my $exportlist = "$ext.def";
             my @libchunk = ($objfile, $instfile, $instdir, $ldfrom, $exportlist);
+            push @libchunk, $dlsyms_ext ? $ext.$dlsyms_ext : undef;
             push @libs, \@libchunk;
         }
     } else {
         my @libchunk = qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST));
+        push @libchunk, $dlsyms_ext ? '$(BASEEXT)'.$dlsyms_ext : undef;
         @libs = (\@libchunk);
     }
     push @m, map { $self->xs_make_dynamic_lib(\%attribs, @$_); } @libs;
@@ -1001,10 +1004,10 @@ Defines the recipes for the C<dynamic_lib> section.
 =cut
 
 sub xs_make_dynamic_lib {
-    my ($self, $attribs, $object, $to, $todir, $ldfrom, $exportlist) = @_;
+    my ($self, $attribs, $object, $to, $todir, $ldfrom, $exportlist, $dlsyms) = @_;
     $exportlist = '' if $exportlist ne '$(EXPORT_LIST)';
     my $armaybe = $self->_xs_armaybe($attribs);
-    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP)'."\n", $to, $object, $todir, $exportlist;
+    my @m = sprintf '%s : %s $(MYEXTLIB) %s$(DFSEP).exists %s $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP) %s'."\n", $to, $object, $todir, $exportlist, ($dlsyms || '');
     if ($armaybe ne ':'){
         $ldfrom = 'tmp$(LIB_EXT)';
         push(@m,"	\$(ARMAYBE) cr $ldfrom $object\n");
