@@ -952,10 +952,12 @@ sub dynamic_lib {
             my $ldfrom = $self->_xsbuild_value('xs', $ext, 'LDFROM');
             $ldfrom = $objfile unless defined $ldfrom;
             my $exportlist = "$ext.def";
-            push @libs, [ $objfile, $instfile, $instdir, $ldfrom, $exportlist ];
+            my @libchunk = ($objfile, $instfile, $instdir, $ldfrom, $exportlist);
+            push @libs, \@libchunk;
         }
     } else {
-        @libs = ([ qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST)) ]);
+        my @libchunk = qw($(OBJECT) $(INST_DYNAMIC) $(INST_ARCHAUTODIR) $(LDFROM) $(EXPORT_LIST));
+        @libs = (\@libchunk);
     }
     push @m, map { $self->xs_make_dynamic_lib(\%attribs, @$_); } @libs;
 
