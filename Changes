@@ -1,3 +1,9 @@
+7.25_05 Mon May 15 10:18:01 BST 2017
+
+    Bug fixes:
+    - Make MakeMaker pass compilation tests on AIX again
+    - Test, fix test dep on SKIPped linktype
+
 7.25_04 Fri May 12 12:24:09 BST 2017
 
     Enhancements:

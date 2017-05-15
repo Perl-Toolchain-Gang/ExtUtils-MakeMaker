@@ -1,7 +1,7 @@
 package ExtUtils::MM_UWIN;
 
 use strict;
-our $VERSION = '7.25_04';
+our $VERSION = '7.25_05';
 $VERSION = eval $VERSION;
 
 require ExtUtils::MM_Unix;
