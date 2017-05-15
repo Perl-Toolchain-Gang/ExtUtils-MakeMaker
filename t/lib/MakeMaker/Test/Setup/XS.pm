@@ -211,6 +211,69 @@ $label2files{subdirsstatic} = +{
   ),
 };
 
+# to mimic behaviour of CGI-Deurl-XS version 0.08
+$label2files{subdirsskip} = +{
+  %{ $label2files{subdirscomplex} }, # make copy
+  'Makefile.PL' => sprintf(
+    $MAKEFILEPL,
+    'Test', 'Test.pm', qq{},
+    <<'EOF',
+MYEXTLIB => 'Other$(DIRFILESEP)libparser$(LIB_EXT)',
+EOF
+  ) . <<'EOF',
+sub MY::postamble {
+    my ($self) = @_;
+    return '$(MYEXTLIB) : Other$(DIRFILESEP)Makefile'."\n\t".$self->cd('Other', '$(MAKE) $(PASSTHRU)')."\n";
+}
+EOF
+  'Other/Makefile.PL' => sprintf(
+    $MAKEFILEPL,
+    'Other', 'Other.pm', qq{},
+    <<'EOF',
+SKIP   => [qw(all static dynamic )],
+clean  => {'FILES' => 'libparser$(LIB_EXT)'},
+EOF
+  ) . <<'EOF',
+sub MY::top_targets {
+  <<'SNIP';
+all :: static
+
+pure_all :: static
+
+static :: libparser$(LIB_EXT)
+
+libparser$(LIB_EXT): $(O_FILES)
+	$(AR) cr libparser$(LIB_EXT) $(O_FILES)
+	$(RANLIB) libparser$(LIB_EXT)
+SNIP
+}
+EOF
+  't/plus1.t' => <<'END',
+#!/usr/bin/perl -w
+use Test::More tests => 2;
+use_ok "XS::Test";
+is XS::Test::plus1(3), 4;
+END
+  'Test.xs' => <<EOF,
+#ifdef __cplusplus
+extern "C" {
+#endif
+int plus1(int);
+#ifdef __cplusplus
+}
+#endif
+$XS_TEST
+int
+plus1(input)
+       int     input
+   CODE:
+       RETVAL = plus1(input);
+   OUTPUT:
+       RETVAL
+EOF
+};
+virtual_rename('subdirsskip', 'Other/lib/file.c', 'Other/file.c');
+
 my $XS_MULTI = $XS_OTHER;
 # check compiling from top dir still can include local
 $XS_MULTI =~ s:(#include "XSUB.h"):$1\n#include "header.h":;
@@ -335,6 +398,7 @@ sub list_dynamic {
     [ 'staticmulti', ' LINKTYPE=dynamic', ' LINKTYPE=dynamic' ],
     [ 'staticmulti', ' dynamic', '_dynamic' ],
     [ 'xsbuild', '', '' ],
+    [ 'subdirsskip', '', '' ],
   );
 }
 

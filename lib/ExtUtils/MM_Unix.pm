@@ -3659,7 +3659,7 @@ test_ : test_$default_testtype
 EOF
 
     for my $linktype (qw(dynamic static)) {
-        my $directdeps = "$linktype pure_all";
+        my $directdeps = join ' ', grep !$self->{SKIPHASH}{$_}, $linktype, "pure_all"; # no depend on a linktype if SKIPped
         push @m, "subdirs-test_$linktype :: $directdeps\n";
         foreach my $dir (@{ $self->{DIR} }) {
             my $test = $self->cd($dir, "\$(MAKE) test_$linktype \$(PASTHRU)");
