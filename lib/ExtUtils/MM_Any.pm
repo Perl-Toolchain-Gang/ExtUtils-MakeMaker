@@ -910,6 +910,17 @@ MAKE_FRAG
 }
 
 
+=head3 xs_dlsyms_arg
+
+Returns command-line arg(s) to linker for file listing dlsyms to export.
+Defaults to returning empty string, can be overridden by e.g. AIX.
+
+=cut
+
+sub xs_dlsyms_arg {
+    return '';
+}
+
 =head3 xs_dlsyms_ext
 
 Returns file-extension for C<xs_make_dlsyms> method's output file,
