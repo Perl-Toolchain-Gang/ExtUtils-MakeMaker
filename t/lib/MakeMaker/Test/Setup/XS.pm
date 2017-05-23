@@ -235,7 +235,9 @@ clean  => {'FILES' => 'libparser$(LIB_EXT)'},
 EOF
   ) . <<'EOF',
 sub MY::top_targets {
-  <<'SNIP';
+  my ($self) = @_;
+  my $static_lib_pure_cmd = $self->static_lib_pure_cmd('$(O_FILES)');
+  <<'SNIP' . $static_lib_pure_cmd;
 all :: static
 
 pure_all :: static
@@ -243,8 +245,6 @@ pure_all :: static
 static :: libparser$(LIB_EXT)
 
 libparser$(LIB_EXT): $(O_FILES)
-	$(AR) cr libparser$(LIB_EXT) $(O_FILES)
-	$(RANLIB) libparser$(LIB_EXT)
 SNIP
 }
 EOF
