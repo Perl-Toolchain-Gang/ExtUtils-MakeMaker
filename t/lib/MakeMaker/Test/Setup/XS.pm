@@ -149,6 +149,7 @@ $label2files{static} = +{
     $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
     q{LINKTYPE => 'static'},
   ),
+  "blib/arch/auto/share/dist/x-y/libwhatevs$MM->{LIB_EXT}" => 'hi there', # mimic what File::ShareDir can do
 };
 
 $label2files{subdirs} = +{
