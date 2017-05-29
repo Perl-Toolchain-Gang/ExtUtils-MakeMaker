@@ -19,7 +19,8 @@ use ExtUtils::MM;
 my $tempdir = tempdir(DIR => getcwd, CLEANUP => 1);
 chdir $tempdir;
 my $typemap = 'type map';
-$typemap =~ s/ //g unless MM->new({NAME=>'name', NORECURS=>1})->can_dep_space;
+my $MM = MM->new({NAME=>'name', NORECURS=>1});
+$typemap =~ s/ //g unless $MM->can_dep_space;
 chdir File::Spec->updir;
 
 my $PM_TEST = <<'END';
