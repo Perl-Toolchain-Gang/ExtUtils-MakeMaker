@@ -456,7 +456,11 @@ sub run_tests {
   }
 
   chdir File::Spec->updir or die;
-  ok rmtree($dir), "teardown $dir";
+  if ($ENV{EUMM_KEEP_TESTDIRS}) {
+    ok 1, "don't teardown $dir";
+  } else {
+    ok rmtree($dir), "teardown $dir";
+  }
 }
 
 1;
