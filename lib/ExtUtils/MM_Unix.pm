@@ -2547,6 +2547,8 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 
 	return unless m/\Q$self->{LIB_EXT}\E$/;
 
+	return unless -f 'extralibs.ld'; # this checks is a "proper" XS installation
+
         # Skip perl's libraries.
         return if m/^libperl/ or m/^perl\Q$self->{LIB_EXT}\E$/;
 
