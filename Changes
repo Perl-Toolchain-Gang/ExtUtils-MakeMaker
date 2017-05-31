@@ -1,3 +1,8 @@
+7.29_01 Wed May 31 08:34:10 BST 2017
+
+    Bug fixes:
+    - Prune .a without extralibs.ld from search paths
+
 7.28  Tue May 30 22:01:08 BST 2017
 
     No changes since v7.27_02
