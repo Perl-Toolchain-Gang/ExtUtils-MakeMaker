@@ -3,7 +3,7 @@ package ExtUtils::MM;
 use strict;
 use ExtUtils::MakeMaker::Config;
 
-our $VERSION = '7.29_02';
+our $VERSION = '7.30';
 $VERSION = eval $VERSION;
 
 require ExtUtils::Liblist;
