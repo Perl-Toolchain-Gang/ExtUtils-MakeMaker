@@ -1,3 +1,8 @@
+7.31_01 Wed Jun 14 15:57:52 BST 2017
+
+    Test fixes:
+    - Skip static test unless in perl core or in a .git directory
+
 7.30 Mon Jun 12 13:17:29 BST 2017
 
     No changes since v7.29_02
