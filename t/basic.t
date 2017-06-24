@@ -441,6 +441,7 @@ note "META file validity"; SKIP: {
 # Make sure init_dirscan doesn't go into the distdir
 # also with a "messup.PL" that will make a build fail
 open $fh, '>', 'messup.PL' or die "messup.PL: $!";
+print $fh 'print "Extracting messup (with variable substitutions)\n";' . "\n";
 print $fh 'die';
 close $fh;
 @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
