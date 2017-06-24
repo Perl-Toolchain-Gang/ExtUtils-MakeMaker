@@ -215,20 +215,22 @@ $label2files{subdirsstatic} = +{
 };
 
 # to mimic behaviour of CGI-Deurl-XS version 0.08
+my $OTHERMAKEFILE = File::Spec->catfile('Other', makefile_name());
 $label2files{subdirsskip} = +{
   %{ $label2files{subdirscomplex} }, # make copy
   'Makefile.PL' => sprintf(
     $MAKEFILEPL,
     'Test', 'Test.pm', qq{},
-    <<'EOF',
-MYEXTLIB => 'Other$(DIRFILESEP)libparser$(LIB_EXT)',
-EOF
-  ) . <<'EOF',
+    q[
+MYEXTLIB => '] . File::Spec->catfile('Other', 'libparser$(LIB_EXT)') . q[',
+     ]
+  )
+  . q[
 sub MY::postamble {
     my ($self) = @_;
-    return '$(MYEXTLIB) : Other$(DIRFILESEP)Makefile'."\n\t".$self->cd('Other', '$(MAKE) $(PASSTHRU)')."\n";
+    return '$(MYEXTLIB) : ] . $OTHERMAKEFILE . q['."\n\t".$self->cd('Other', '$(MAKE) $(PASSTHRU)')."\n";
 }
-EOF
+     ],
   'Other/Makefile.PL' => sprintf(
     $MAKEFILEPL,
     'Other', 'Other.pm', qq{},
