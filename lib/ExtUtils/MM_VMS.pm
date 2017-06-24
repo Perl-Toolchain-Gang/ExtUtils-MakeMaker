@@ -1242,6 +1242,21 @@ sub xs_make_static_lib {
 }
 
 
+=item static_lib_pure_cmd (override)
+
+Use VMS commands to manipulate object library.
+
+=cut
+
+sub static_lib_pure_cmd {
+    my ($self, $from) = @_;
+
+    sprintf <<'MAKE_FRAG', $from;
+	If F$Search("$(MMS$TARGET)").eqs."" Then Library/Object/Create $(MMS$TARGET)
+	Library/Object/Replace $(MMS$TARGET) %s
+MAKE_FRAG
+}
+
 =item extra_clean_files
 
 Clean up some OS specific files.  Plus the temp file used to shorten
