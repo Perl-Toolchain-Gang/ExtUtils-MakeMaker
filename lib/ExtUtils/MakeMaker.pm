@@ -2105,7 +2105,9 @@ directory if INSTALLDIRS is set to site (default).
 =item INSTALLVENDORARCH
 
 Used by 'make install', which copies files from INST_ARCHLIB to this
-directory if INSTALLDIRS is set to vendor.
+directory if INSTALLDIRS is set to vendor. Note that if you do not set
+this, the value of INSTALLVENDORLIB will be used, which is probably not
+what you want.
 
 =item INSTALLVENDORBIN
 
