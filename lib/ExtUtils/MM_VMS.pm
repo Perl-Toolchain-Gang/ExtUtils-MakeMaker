@@ -1257,6 +1257,14 @@ sub static_lib_pure_cmd {
 MAKE_FRAG
 }
 
+=item xs_static_lib_is_xs
+
+=cut
+
+sub xs_static_lib_is_xs {
+    return 1;
+}
+
 =item extra_clean_files
 
 Clean up some OS specific files.  Plus the temp file used to shorten

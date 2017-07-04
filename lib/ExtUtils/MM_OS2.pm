@@ -131,6 +131,14 @@ sub os_flavor {
     return('OS/2');
 }
 
+=item xs_static_lib_is_xs
+
+=cut
+
+sub xs_static_lib_is_xs {
+    return 1;
+}
+
 =back
 
 =cut

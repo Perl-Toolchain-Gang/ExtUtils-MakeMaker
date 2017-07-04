@@ -51,6 +51,14 @@ sub replace_manpage_separator {
     return $man;
 }
 
+=item xs_static_lib_is_xs
+
+=cut
+
+sub xs_static_lib_is_xs {
+    return 1;
+}
+
 =back
 
 =head1 AUTHOR
