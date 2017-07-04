@@ -2530,7 +2530,7 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
     $linkcmd =~ s,(perl\.exp),\$(PERL_INC)/$1,;
 
     # Which *.a files could we make use of...
-    my %static;
+    my %staticlib21;
     require File::Find;
     # don't use File::Spec here because on Win32 F::F still uses "/"
     my $installed_version = join('/',
@@ -2593,15 +2593,15 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 	# drop it
 	return if $File::Find::name =~ m:\Q$installed_version\E\z:;
 	use Cwd 'cwd';
-	$static{cwd() . "/" . $_}++;
+	$staticlib21{cwd() . "/" . $_}++;
     }, grep( -d $_, map { $self->catdir($_, 'auto') } @{$searchdirs || []}) );
 
     # We trust that what has been handed in as argument, will be buildable
     $static = [] unless $static;
-    @static{@{$static}} = (1) x @{$static};
+    @staticlib21{@{$static}} = (1) x @{$static};
 
     $extra = [] unless $extra && ref $extra eq 'ARRAY';
-    for (sort keys %static) {
+    for (sort keys %staticlib21) {
 	next unless /\Q$self->{LIB_EXT}\E\z/;
 	$_ = dirname($_) . "/extralibs.ld";
 	push @$extra, $_;
@@ -2615,7 +2615,7 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 # MAP_STATIC doesn't look into subdirs yet. Once "all" is made and we
 # regenerate the Makefiles, MAP_STATIC and the dependencies for
 # extralibs.all are computed correctly
-    my @map_static = reverse sort keys %static;
+    my @map_static = reverse sort keys %staticlib21;
     push @m, "
 MAP_LINKCMD   = $linkcmd
 MAP_STATIC    = ", join(" \\\n\t", map { qq{"$_"} } @map_static), "
