@@ -151,6 +151,9 @@ $label2files{static} = +{
   ),
   "blib/arch/auto/share/dist/x-y/libwhatevs$MM->{LIB_EXT}" => 'hi there', # mimic what File::ShareDir can do
   "blib/arch/auto/Alien/ROOT/root/lib/root/root$MM->{LIB_EXT}" => 'hi there', # mimic Alien::ROOT that installs a .a without extralibs.ld
+  # next two mimic dist that installs a .a WITH extralibs.ld but that is still not XS
+  "blib/arch/auto/Dist/File$MM->{LIB_EXT}" => 'hi there',
+  "blib/arch/auto/Dist/extralibs.ld" => '',
 };
 
 $label2files{subdirs} = +{

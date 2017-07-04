@@ -2727,10 +2727,25 @@ sub _find_static_libs {
 	# Once the patch to minimod.PL is in the distribution, I can
 	# drop it
 	return if $File::Find::name =~ m:\Q$installed_version\E\z:;
+	return if !$self->xs_static_lib_is_xs($_);
 	use Cwd 'cwd';
 	$staticlib21{cwd() . "/" . $_}++;
     }, grep( -d $_, map { $self->catdir($_, 'auto') } @{$searchdirs || []}) );
     return \%staticlib21;
+}
+
+=item xs_static_lib_is_xs (o)
+
+Called by a utility method of makeaperl. Checks whether a given file
+is an XS library by seeing whether it defines any symbols starting
+with C<boot_>.
+
+=cut
+
+sub xs_static_lib_is_xs {
+    my ($self, $libfile) = @_;
+    my $devnull = File::Spec->devnull;
+    return `nm $libfile 2>$devnull` =~ /\bboot_/;
 }
 
 =item makefile (o)

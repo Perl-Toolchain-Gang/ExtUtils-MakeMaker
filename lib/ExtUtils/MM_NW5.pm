@@ -137,6 +137,14 @@ sub static_lib_pure_cmd {
                                   : '-type library -o $@ ' . $src));
 }
 
+=item xs_static_lib_is_xs
+
+=cut
+
+sub xs_static_lib_is_xs {
+    return 1;
+}
+
 =item dynamic_lib
 
 Override of utility methods for OS-specific work.
