@@ -1,3 +1,8 @@
+7.31_03 Mon Jul 10 09:34:26 BST 2017
+
+    Bug fixes:
+    - Filter out non-XS .a files for static builds
+
 7.31_02 Mon Jun 26 13:53:15 BST 2017
 
     VMS fixes:
