@@ -706,7 +706,7 @@
     - Resolved regression with TEST_FILES
 
     Win32 fixes:
-    - Targetted fix for nmake bug
+    - Targeted fix for nmake bug
     - miniperl.t core test fixed for Windows
 
 7.01_05 Mon Nov  3 10:14:11 GMT 2014
@@ -2123,7 +2123,7 @@
     - EXTRA_META has been undocumented as I don't like the way the
       interface works but I don't want to hold up 6.31.  It will be
       replaced with something better next version.
-    - Added explaination of distclean behavior and instructions on how to
+    - Added explanation of distclean behavior and instructions on how to
       blow away anything not in the MANIFEST to the FAQ.
     * 6.30_01 broke overrides of PM.  MakeMaker would add to a user
       suplied PM rather than simply accepting it.
@@ -2359,7 +2359,7 @@
       [Ilya Zakharevich]
     - When building Perl, we had a chance of picking up the old installed
       xsubpp from @INC [Andreas Koenig]
-    - makeaperl() now a bit more intellegent about ignoring perl libraries
+    - makeaperl() now a bit more intelligent about ignoring perl libraries
       not called libperl.  [Ilya Zakharevich bleadperl@22032]
     * MacOS Classic (MacPerl) is no longer supported.  Please use
       Module::Build instead.
@@ -2534,7 +2534,7 @@
     - MM_VMS->prefixify() wasn't honoring the %Config_Override causing
       some MakeMaker generated config variables to be ignored.
     - MM_VMS->prefixify() was only VMSifying part of its filepaths causing 
-      internal comparisions to get confused and think it had to prefixify 
+      internal comparisons to get confused and think it had to prefixify 
       when it didn't.
 
 6.10_07 Sat Jul  5 16:12:52 PDT 2003
@@ -2632,7 +2632,7 @@
     - manifypods target was empty if there are no pods to manify.  Put in
       at least $(NOECHO) $(NOOP)
     - Cygwin test to check for finding pod2man when building the perl core
-      removed.  No longer relevent.
+      removed.  No longer relevant.
     - Small fixes for dmake (Mattia Barbon)
     * Added "Reporting bugs" section to the PATCHING doc.
     - Minor bug in compile test missed ExtUtils::Liblist::Kid
@@ -2699,7 +2699,7 @@
     - Fixed ExtUtils::Command::MM::perllocal_install(), uninstall(),
       warn_if_old_packlist().
     * Pulling File::Spec::VMS::fixpath() and eliminate_macros() into MM_VMS
-      as the new cannonical location.  They never should have been in F::S
+      as the new canonical location.  They never should have been in F::S
       in the first place.
     * ExtUtils::Command::eqtime() would truncate the file being equalized!
       Holdover from exclusive .exists usage.
@@ -2772,7 +2772,7 @@
     - Improved DISTNAME docs
     * Documented DISTVNAME and VERSION_SYM
     * Documented dist()
-    - Seperated dist_core() into dist, tardist, uutardist, tarfile,
+    - Separated dist_core() into dist, tardist, uutardist, tarfile,
       zipdist, zipfile and shdist_target methods.  Allows elimination
       of redundant code in MM_VMS.
     - Replaced WARN_IF_OLD_PACKLIST, DOC_INSTALL and UNINSTALL
@@ -2839,7 +2839,7 @@
 
     - Added $(VERSION_FROM) to $(MAKEFILE) dependencies.  Helpful for
       XS builds where the version number is very sensitive.
-    - export_list(), perl_archive() and perl_archive_after() consolodated
+    - export_list(), perl_archive() and perl_archive_after() consolidated
       into init_linker().
     - Added MM_NW5_VERSION, MM_Unix_VERSION, MM_Win32_VERSION, 
       MM_VMS_VERSION.
@@ -2880,7 +2880,7 @@
     - Fixed ExtUtils::Install::install() for relative dirs
     - Added split_command() and max_exec_len() to deal with long
       commands.
-    - Seperated escape_newlines() from quote_literal().  This may
+    - Separated escape_newlines() from quote_literal().  This may
       be pointless.
     - pm_to_blib() now generated with split_command().  3x speedup.
     - added init_dist() to initialize distribution constants
@@ -2927,7 +2927,7 @@
     - Sync bleadperl 16922:  MM_NW5 tests
     - Sync bleadperl 16938 & 16974:  MM_MacOS->macify fixes from pudge.
     - Sync bleadperl 16989 & 16942:  Small test fixes for MacPerl from pudge.
-    - Improved WriteMakefile param verification to differenciate between
+    - Improved WriteMakefile param verification to differentiate between
       parameters which don't exist and those that just take strings/numbers.
       [RT #707]
     * Documented TEST_VERBOSE
@@ -3030,7 +3030,7 @@
     - Moved use of glob out of MM_Unix so MacPerl could build
 
     [[ Test Changes ]]
-    - Shortening directory levels to accomodate old VMS's
+    - Shortening directory levels to accommodate old VMS's
     - was using a slightly wrong prefix for the prefix tests
 
     [[ Doc Fixes ]]
@@ -3117,7 +3117,7 @@
     [[ Internals ]]
     - INST_* constants moved to init_INST
     - INSTALL* constants moved to inst_INSTALL
-    * Internal warning supression removed.
+    * Internal warning suppression removed.
     - Temporarily turning off SelfLoader in MM_Unix so warnings
       have the right line numbers.
 
@@ -3148,7 +3148,7 @@
       Only since 5.51_01  (RT 413)
     * make test TEST_VERBOSE=1 was busted by 5.50_01 (RT 423)
     * Error messages from dying Makefile.PL's and hint files were
-      accidentally supressed in 5.48_04.  Fixed.
+      accidentally suppressed in 5.48_04.  Fixed.
     * Makefile.PL's are supposed to be run in package main.  5.48_04
       broke this.  Fixed.
     * Fixing installing on VMS.
@@ -3174,7 +3174,7 @@
     - Removing ExtUtils::Embed.  Version specific module and should
       not be updated.
     - Removing ExtUtils::Constant.  Not directly tied to MakeMaker.
-      Will be distributed seperately by Nick Clark.
+      Will be distributed separately by Nick Clark.
 
     [[ New Features ]]
     * realclean now deletes 'dist' directory.

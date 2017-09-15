@@ -367,7 +367,7 @@ note "META file validity"; SKIP: {
       "MANIFEST has META.yml"
     );
     is( $manifest->{'meta.json'}, 'Module JSON meta-data (added by MakeMaker)',
-      "MANFIEST has META.json"
+      "MANIFEST has META.json"
     );
 
     # Test NO_META META.yml suppression
