@@ -205,7 +205,7 @@ Key/value pairs are extra information about the module.  Fields include:
     installed into      which directory your module was out into
     LINKTYPE            dynamic or static linking
     VERSION             module version number
-    EXE_FILES           any executables installed in a space seperated
+    EXE_FILES           any executables installed in a space separated
                         list
 
 =cut

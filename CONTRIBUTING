@@ -53,7 +53,7 @@ Code formatting
 
 - 4 character indentation.
 
-- this_style is prefered instead of studlyCaps.
+- this_style is preferred instead of studlyCaps.
 
 - Private subroutine names (ie. those used only in the same package
   they're declared in) should start with an underscore (_sekret_method).
