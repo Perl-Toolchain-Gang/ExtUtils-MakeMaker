@@ -57,6 +57,11 @@ sub _unix_os2_ext {
     my ( $pwd )   = cwd();    # from Cwd.pm
     my ( $found ) = 0;
 
+    if ( $^O eq 'darwin' or $^O eq 'next' )  {
+        # 'escape' Mach-O ld -framework flags, so they aren't dropped later on
+        $potential_libs =~ s/(^|\s)(-(?:weak_|reexport_|lazy_)?framework)\s+(\S+)/$1-Wl,$2 -Wl,$3/g;
+    }
+
     foreach my $thislib ( split ' ', $potential_libs ) {
         my ( $custom_name ) = '';
 
