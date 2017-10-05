@@ -2,7 +2,7 @@ package MakeMaker::Test::Setup::XS;
 
 @ISA = qw(Exporter);
 require Exporter;
-@EXPORT = qw(run_tests list_dynamic list_static);
+@EXPORT = qw(run_tests list_dynamic list_static list_cpp);
 
 use strict;
 use File::Path;
@@ -363,6 +363,80 @@ END
 
 };
 
+$label2files{cppbasic} = +{
+
+  'lib/XSCPP/Test.pm'     => <<'END',
+package XSCPP::Test;
+require Exporter;
+require DynaLoader;
+$VERSION = 1.02;
+@ISA    = qw(Exporter DynaLoader);
+@EXPORT = qw(is_even);
+bootstrap XSCPP::Test $VERSION;
+1;
+END
+
+  'Makefile.PL'          => <<'END',
+use ExtUtils::MakeMaker;
+use ExtUtils::CppGuess;
+my $guess = ExtUtils::CppGuess->new;
+WriteMakefile(
+    NAME          => 'XSCPP::Test',
+    VERSION_FROM  => 'lib/XSCPP/Test.pm',
+    XSMULTI => 1,
+    $guess->makemaker_options,
+);
+END
+
+  'lib/XSCPP/Test.xscc'              => <<END,
+extern "C" {
+#include "EXTERN.h"
+#include "perl.h"
+}
+#include "XSUB.h"
+class CPPTest {
+    public:
+        CPPTest() { }
+        ~CPPTest() { }
+        int is_even(int num) { return (num % 2) == 0; }
+};
+\nMODULE = XSCPP::Test       PACKAGE = XSCPP::Test
+\nPROTOTYPES: DISABLE
+CPPTest*
+CPPTest::new();
+\nint
+CPPTest::is_even(int input);
+\nvoid
+CPPTest::DESTROY();
+END
+
+  'typemap'              => <<'END',
+TYPEMAP
+CPPTest *   O_OBJECT
+OUTPUT
+O_OBJECT
+    sv_setref_pv( $arg, CLASS, (void*)$var );
+INPUT
+O_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+END
+
+  't/is_even.t'          => <<'END',
+#!/usr/bin/perl -w
+use Test::More tests => 3;
+use_ok "XSCPP::Test";
+my $o = XSCPP::Test->new;
+ok !$o->is_even(1);
+ok $o->is_even(2);
+END
+
+};
+
 sub virtual_rename {
   my ($label, $oldfile, $newfile) = @_;
   $label2files{$label}->{$newfile} = delete $label2files{$label}->{$oldfile};
@@ -407,6 +481,12 @@ sub list_dynamic {
     [ 'staticmulti', ' dynamic', '_dynamic' ],
     [ 'xsbuild', '', '' ],
     [ 'subdirsskip', '', '' ],
+  );
+}
+
+sub list_cpp {
+  (
+    [ 'cppbasic', '', '' ],
   );
 }
 

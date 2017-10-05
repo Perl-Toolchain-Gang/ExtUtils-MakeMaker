@@ -9,6 +9,26 @@ use ExtUtils::MakeMaker::Config;
 use File::Basename qw(basename dirname);
 
 our %Config_Override;
+our %XS_ext2src = qw(
+    xs c
+    xscc cpp
+    xsm m
+);
+my $xspat = join '|', keys %XS_ext2src;
+our $XS_extRE = qr/\.($xspat)\z/;
+
+sub _xs_list_basenames {
+    my ($self) = @_;
+    map { (my $b = $_) =~ s/$XS_extRE//; $b } sort keys %{ $self->{XS} };
+}
+
+sub _xs_basename2xstype {
+    my ($self, $ext) = @_;
+    for my $xs_ext (keys %XS_ext2src) {
+        return $xs_ext if exists $self->{XS}{"$ext.$xs_ext"};
+    }
+    Carp::confess "PANIC: shouldn't get here";
+}
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue _sprintf562);
 
@@ -1389,10 +1409,11 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	    next if -l $name; # We do not support symlinks at all
             next if $self->{NORECURS};
 	    $dir{$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
-	} elsif ($name =~ /\.xs\z/){
-	    my($c); ($c = $name) =~ s/\.xs\z/.c/;
-	    $xs{$name} = $c;
-	    $c{$c} = 1;
+        } elsif ($name =~ $XS_extRE){
+            my $xs_ext = $1;
+            (my $src = $name) =~ s/\.$xs_ext\z/.$XS_ext2src{$xs_ext}/;
+            $xs{$name} = $src;
+            $c{$src} = 1;
 	} elsif ($name =~ /\.c(pp|xx|c)?\z/i){  # .c .C .cpp .cxx .cc
 	    $c{$name} = 1
 		unless $name =~ m/perlmain\.c/; # See MAP_TARGET
@@ -1637,11 +1658,13 @@ sub init_PM {
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
 	    return unless $inst;
-	    if ($self->{XSMULTI} and $inst =~ /\.xs\z/) {
-		my($base); ($base = $path) =~ s/\.xs\z//;
-		$self->{XS}{$path} = "$base.c";
-		push @{$self->{C}}, "$base.c";
-		push @{$self->{O_FILES}}, "$base$self->{OBJ_EXT}";
+            if ($self->{XSMULTI} and $inst =~ $XS_extRE) {
+                my $xs_ext = $1;
+                (my $src = $path) =~ s/\.$xs_ext\z/.$XS_ext2src{$xs_ext}/;
+                (my $obj = $path) =~ s/\.$xs_ext\z/$self->{OBJ_EXT}/;
+                $self->{XS}{$path} = $src;
+                push @{$self->{C}}, $src;
+                push @{$self->{O_FILES}}, $obj;
 	    } else {
 		$self->{PM}{$path} = $inst;
 	    }
@@ -3920,28 +3943,18 @@ Defines the suffix rules to compile XS files to C.
 
 sub xs_c {
     my($self) = shift;
-    return '' unless $self->needs_linking();
-    '
-.xs.c:
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc
-	$(MV) $*.xsc $*.c
-';
-}
+    return '' unless $self->needs_linking;
+    my @m;
+    for my $xs_ext (keys %XS_ext2src) {
+        #                             1        2
+        push @m, _sprintf562 <<'EOF', $xs_ext, $XS_ext2src{$xs_ext};
 
-=item xs_cpp (o)
-
-Defines the suffix rules to compile XS files to C++.
-
-=cut
-
-sub xs_cpp {
-    my($self) = shift;
-    return '' unless $self->needs_linking();
-    '
-.xs.cpp:
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
-	$(MV) $*.xsc $*.cpp
-';
+.%1$s.%2$s:
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.%1$s > $*.xsc
+	$(MV) $*.xsc $*.%2$s
+EOF
+    }
+    join '', @m;
 }
 
 =item xs_o (o)
@@ -3955,39 +3968,47 @@ have an individual C<$(VERSION)>.
 
 sub xs_o {
     my ($self) = @_;
-    return '' unless $self->needs_linking();
+    return '' unless $self->needs_linking;
     my $m_o = $self->{XSMULTI} ? $self->xs_obj_opt('$*$(OBJ_EXT)') : '';
-    my $frag = '';
+    my @m;
     # dmake makes noise about ambiguous rule
-    $frag .= sprintf <<'EOF', $m_o unless $self->is_make_type('dmake');
-.xs$(OBJ_EXT) :
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
-	$(MV) $*.xsc $*.c
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c %s
-EOF
-    if ($self->{XSMULTI}) {
-	for my $ext ($self->_xs_list_basenames) {
-	    my $pmfile = "$ext.pm";
-	    croak "$ext.xs has no matching $pmfile: $!" unless -f $pmfile;
-	    my $version = $self->parse_version($pmfile);
-	    my $cccmd = $self->{CONST_CCCMD};
-	    $cccmd =~ s/^\s*CCCMD\s*=\s*//;
-	    $cccmd =~ s/\$\(DEFINE_VERSION\)/-DVERSION=\\"$version\\"/;
-	    $cccmd =~ s/\$\(XS_DEFINE_VERSION\)/-DXS_VERSION=\\"$version\\"/;
-            $self->_xsbuild_replace_macro($cccmd, 'xs', $ext, 'INC');
-            my $define = '$(DEFINE)';
-            $self->_xsbuild_replace_macro($define, 'xs', $ext, 'DEFINE');
-            #                             1     2       3     4
-            $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $m_o, $define;
+    my @xs_keys = $self->is_make_type('dmake') ? () : keys %XS_ext2src;
+    for my $xs_ext (@xs_keys) {
+        #                             1        2                     3
+        push @m, _sprintf562 <<'EOF', $xs_ext, $XS_ext2src{$xs_ext}, $m_o;
 
-%1$s$(OBJ_EXT): %1$s.xs
-	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
-	$(MV) $*.xsc $*.c
-	%2$s $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) %4$s $*.c %3$s
+.%1$s$(OBJ_EXT) :
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.%1$s > $*.xsc
+	$(MV) $*.xsc $*.%2$s
+	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.%2$s %3$s
 EOF
-	}
     }
-    $frag;
+    if ($self->{XSMULTI}) {
+        for my $ext ($self->_xs_list_basenames) {
+            my $pmfile = "$ext.pm";
+            my $xstype = $self->_xs_basename2xstype($ext);
+            my $xs = "$ext.$xstype";
+            croak "$xs has no matching $pmfile: $!" unless -f $pmfile;
+            my $version = $self->parse_version($pmfile);
+            my $cccmd = $self->{CONST_CCCMD};
+            $cccmd =~ s/^\s*CCCMD\s*=\s*//;
+            $cccmd =~ s/\$\(DEFINE_VERSION\)/-DVERSION=\\"$version\\"/;
+            $cccmd =~ s/\$\(XS_DEFINE_VERSION\)/-DXS_VERSION=\\"$version\\"/;
+            my $src = $self->{XS}{$xs};
+            $self->_xsbuild_replace_macro($cccmd, $xstype, $ext, 'INC');
+            my $define = '$(DEFINE)';
+            $self->_xsbuild_replace_macro($define, $xstype, $ext, 'DEFINE');
+            #                             1     2       3    4     5     6
+            push @m, _sprintf562 <<'EOF', $ext, $cccmd, $xs, $src, $m_o, $define;
+
+%1$s$(OBJ_EXT) : %3$s
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) %3$s > $*.xsc
+	$(MV) $*.xsc %4$s
+	%2$s $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) %6$s %4$s %5$s
+EOF
+        }
+    }
+    join '', @m;
 }
 
 # param gets modified

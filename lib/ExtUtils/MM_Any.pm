@@ -651,11 +651,6 @@ The blibdirs.ts target is deprecated.  Depend on blibdirs instead.
 
 =cut
 
-sub _xs_list_basenames {
-    my ($self) = @_;
-    map { (my $b = $_) =~ s/\.xs$//; $b } sort keys %{ $self->{XS} };
-}
-
 sub blibdirs_target {
     my $self = shift;
 

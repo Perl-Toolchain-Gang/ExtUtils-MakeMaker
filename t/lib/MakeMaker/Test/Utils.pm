@@ -17,7 +17,7 @@ our $Is_FreeBSD = $^O eq 'freebsd';
 
 our @EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
                  make make_run run make_macro calibrate_mtime
-                 have_compiler slurp
+                 have_compiler have_cplusplus slurp
                  $Is_VMS $Is_MacOS
                  run_ok
                  hash2files
@@ -357,14 +357,27 @@ Returns true if there is a compiler available for XS builds.
 
 =cut
 
-sub have_compiler {
-    my $have_compiler = 0;
+sub have_compiler { run_cbuilder('have_compiler'); }
+
+=item have_cplusplus
+
+  $have_cplusplus = have_cplusplus;
+
+Returns true if there is a C++ compiler available for XS builds.
+
+=cut
+
+sub have_cplusplus { run_cbuilder('have_cplusplus'); }
+
+sub run_cbuilder {
+    my $method = shift;
+    my $retval = 0;
     eval {
         require ExtUtils::CBuilder;
         my $cb = ExtUtils::CBuilder->new(quiet=>1);
-        $have_compiler = $cb->have_compiler;
+        $retval = $cb->$method;
     };
-    return $have_compiler;
+    return $retval;
 }
 
 =item slurp

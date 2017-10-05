@@ -548,7 +548,17 @@ This tip has been brought to you by Nick Ing-Simmons and Stas Bekman.
 An alternative way to achieve this can be seen in L<Gtk2::CodeGen>
 and L<Glib::CodeGen>.
 
-=back
+=head3 How can I build my XS files as C++
+
+If you want to write XSUBs in C++, put them in a file called (for class
+Foo::Bar) F<lib/Foo/Bar.xscc>, next to F<lib/Foo/Bar.pm>. In your
+F<Makefile.PL>, give C<XSMULTI> as 1. You will make your distribution
+much more portable, with much less effort for yourself, if you use
+L<ExtUtils::CppGuess> for C++ compiler configuration information.
+
+Likewise, if you want XSUBS in Objective C, use the file extension
+F<.xsm>, and they will automatically be converted using C<xsubpp> to a
+F<.m> file. You will have to supply appropriate values for C<CC> etc.
 
 =back
 
