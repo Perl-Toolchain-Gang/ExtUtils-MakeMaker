@@ -37,7 +37,7 @@ our @ISA = qw(Exporter);
 our @EXPORT    = qw(&WriteMakefile $Verbose &prompt &os_unsupported);
 our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
                     &WriteEmptyMakefile &open_for_writing &write_file_via_tmp
-                    &_sprintf562);
+                    &_sprintf562 &supports_param);
 
 # These will go away once the last of the Win32 & VMS specific code is
 # purged.
@@ -1377,6 +1377,10 @@ EOF
         grep !$self->{SKIPHASH}{$_},
         qw(static dynamic config);
     join "\n", @m;
+}
+
+sub supports_param {
+    exists $Recognized_Att_Keys{$_[0]}
 }
 
 1;
@@ -3302,7 +3306,24 @@ The C<os_unsupported()> function provides a way to correctly exit your
 C<Makefile.PL> before calling C<WriteMakefile>. It is essentially a
 C<die> with the message "OS unsupported".
 
-This is supported since 7.26
+This is supported since 7.26.
+
+=item supports_param
+
+  use ExtUtils::MakeMaker 'supports_param'; # not exported by default
+  $supports_it = supports_param($param);
+
+  WriteMakefile(
+      supports_param('MIN_PERL_VERSION')
+        ? (MIN_PERL_VERSION => ...)
+        : (),
+      ...
+  );
+
+The C<supports_param()> function provides a way to probe the parameters
+that C<WriteMakefile> supports, without having to do version checks.
+
+This is supported since 7.32.
 
 =back
 

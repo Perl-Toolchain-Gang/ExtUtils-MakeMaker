@@ -156,6 +156,7 @@ t/recurs.t
 t/revision.t
 t/several_authors.t
 t/split_command.t
+t/supports_param.t
 t/test_boilerplate.t
 t/testdata/reallylongdirectoryname/arch1/Config.pm
 t/testdata/reallylongdirectoryname/arch2/Config.pm
