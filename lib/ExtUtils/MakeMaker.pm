@@ -20,7 +20,7 @@ our @Get_from_Config;   # referenced by MM_Unix
 our @MM_Sections;
 our @Overridable;
 my @Prepend_parent;
-my %Recognized_Att_Keys;
+our %Recognized_Att_Keys;
 our %macro_fsentity; # whether a macro is a filesystem name
 our %macro_dep; # whether a macro is a dependency
 
@@ -1782,6 +1782,11 @@ recommends it (or you know what you're doing).
 The following attributes may be specified as arguments to WriteMakefile()
 or as NAME=VALUE pairs on the command line. Attributes that became
 available with later versions of MakeMaker are indicated.
+
+A computer-readable list of recognized attributes is available as
+C<%ExtUtils::MakeMakers::Recognized_Att_Keys>, supported since 7.32.  You
+can check whether a particular parameter is supported by the current
+version of ExtUtils::MakeMaker by checking whether it exists in the hash.
 
 In order to maintain portability of attributes with older versions of
 MakeMaker you may want to use L<App::EUMM::Upgrade> with your C<Makefile.PL>.
