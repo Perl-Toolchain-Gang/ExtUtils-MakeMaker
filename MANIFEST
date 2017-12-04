@@ -137,6 +137,7 @@ t/prereq.t
 t/prereq_print.t
 t/problems.t
 t/prompt.t
+t/rec_att_keys.t
 t/recurs.t
 t/revision.t
 t/several_authors.t
