@@ -2883,6 +2883,8 @@ deleted by a make clean.
 
 =item XSBUILD
 
+Available in version 7.12 and above.
+
 Hashref with options controlling the operation of C<XSMULTI>:
 
   {
@@ -2914,6 +2916,8 @@ make the final SO/SL, almost certainly including the XS basename with
 C<$(OBJ_EXT)> appended.
 
 =item XSMULTI
+
+Available in version 7.12 and above.
 
 When this is set to C<1>, multiple XS files may be placed under F<lib/>
 next to their corresponding C<*.pm> files (this is essential for compiling
