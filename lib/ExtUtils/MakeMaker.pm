@@ -1817,7 +1817,7 @@ located in the C<x86> directory relative to the PPD itself.
 
 =item BUILD_REQUIRES
 
-Available in version 6.5503 and above.
+Available in version 6.55_03 and above.
 
 A hash of modules that are needed to build your module but not run it.
 
@@ -2069,6 +2069,8 @@ Defaults to $Config{installprivlib}.
 
 =item INSTALLSCRIPT
 
+Available in version 6.30_02 and above.
+
 Used by 'make install' which copies files from INST_SCRIPT to this
 directory if INSTALLDIRS=perl.
 
@@ -2129,6 +2131,8 @@ INSTALLDIRS=vendor.  Defaults to $(VENDORPREFIX)/man/man$(MAN*EXT).
 If set to 'none', no man pages will be installed.
 
 =item INSTALLVENDORSCRIPT
+
+Available in version 6.30_02 and above.
 
 Used by 'make install' which copies files from INST_SCRIPT to this
 directory if INSTALLDIRS is set to vendor.
@@ -2235,10 +2239,14 @@ linkext below).
 
 =item MAGICXS
 
+Available in version 6.8305 and above.
+
 When this is set to C<1>, C<OBJECT> will be automagically derived from
 C<O_FILES>.
 
 =item MAKE
+
+Available in version 6.30_01 and above.
 
 Variant of make you intend to run the generated Makefile with.  This
 parameter lets Makefile.PL know what make quirks to account for when
@@ -2411,6 +2419,8 @@ Defaults to false.
 
 =item NO_MYMETA
 
+Available in version 6.57_02 and above.
+
 When true, suppresses the generation of MYMETA.yml and MYMETA.json module
 meta-data files during 'perl Makefile.PL'.
 
@@ -2418,11 +2428,15 @@ Defaults to false.
 
 =item NO_PACKLIST
 
+Available in version 6.7501 and above.
+
 When true, suppresses the writing of C<packlist> files for installs.
 
 Defaults to false.
 
 =item NO_PERLLOCAL
+
+Available in version 6.7501 and above.
 
 When true, suppresses the appending of installations to C<perllocal>.
 
@@ -2540,6 +2554,8 @@ Directory containing the Perl source code (use of this should be
 avoided, it may be undefined)
 
 =item PERM_DIR
+
+Available in version 6.51_01 and above.
 
 Desired permission for directories. Defaults to C<755>.
 
@@ -2662,9 +2678,13 @@ the installation of a package.
 
 =item PPM_UNINSTALL_EXEC
 
+Available in version 6.8502 and above.
+
 Name of the executable used to run C<PPM_UNINSTALL_SCRIPT> below. (e.g. perl)
 
 =item PPM_UNINSTALL_SCRIPT
+
+Available in version 6.8502 and above.
 
 Name of the script that gets executed by the Perl Package Manager before
 the removal of a package.
@@ -2762,6 +2782,8 @@ $Config{installprefix} will be used.
 Overridable by PREFIX
 
 =item SIGN
+
+Available in version 6.18 and above.
 
 When true, perform the generation and addition to the MANIFEST of the
 SIGNATURE file in the distdir during 'make distdir', via 'cpansign
