@@ -1,3 +1,8 @@
+7.31_07 Tue Jan 16 16:09:04 GMT 2018
+
+    Bug fixes:
+    - Change warning text for libscan() README.pod
+
 7.31_06 Tue Jan 16 10:28:11 GMT 2018
 
     Bug fixes:
