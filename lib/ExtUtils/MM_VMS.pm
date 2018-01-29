@@ -1309,7 +1309,7 @@ sub tarfile_target {
 $(DISTVNAME).tar$(SUFFIX) : distdir
 	$(PREOP)
 	$(TO_UNIX)
-        $(TAR) "$(TARFLAGS)" $(DISTVNAME).tar [.$(DISTVNAME)...]
+	$(TAR) "$(TARFLAGS)" $(DISTVNAME).tar [.$(DISTVNAME)...]
 	$(RM_RF) $(DISTVNAME)
 	$(COMPRESS) $(DISTVNAME).tar
 	$(POSTOP)
@@ -1359,7 +1359,7 @@ pure_install :: pure_$(INSTALLDIRS)_install
 	$(NOECHO) $(NOOP)
 
 doc_install :: doc_$(INSTALLDIRS)_install
-        $(NOECHO) $(NOOP)
+	$(NOECHO) $(NOOP)
 
 pure__install : pure_site_install
 	$(NOECHO) $(ECHO) "INSTALLDIRS not defined, defaulting to INSTALLDIRS=site"
