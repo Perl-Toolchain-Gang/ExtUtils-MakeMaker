@@ -1,3 +1,8 @@
+7.31_08 Mon Feb 12 12:19:11 GMT 2018
+
+    VMS fixes:
+    - Fix 8-space line prefixes in MM_VMS.pm
+
 7.31_07 Tue Jan 16 16:09:04 GMT 2018
 
     Bug fixes:
