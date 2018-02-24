@@ -1,3 +1,8 @@
+7.33_02 Sat Feb 24 13:17:01 GMT 2018
+
+    Core fixes:
+    - Skip xsstatic test on Darwin
+
 7.33_01 Tue Feb 20 10:39:43 GMT 2018
 
     Core fixes:
