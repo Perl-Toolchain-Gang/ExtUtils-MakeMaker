@@ -2,7 +2,7 @@ package ExtUtils::MM_Any;
 
 use strict;
 our $VERSION = '7.34';
-$VERSION = eval $VERSION;
+$VERSION =~ tr/_//d;
 
 use Carp;
 use File::Spec;
