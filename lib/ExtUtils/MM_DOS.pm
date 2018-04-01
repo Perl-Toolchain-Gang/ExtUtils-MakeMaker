@@ -3,7 +3,7 @@ package ExtUtils::MM_DOS;
 use strict;
 
 our $VERSION = '7.34';
-$VERSION = eval $VERSION;
+$VERSION =~ tr/_//d;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
