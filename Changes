@@ -1,3 +1,9 @@
+7.35_01 Thu Apr 19 13:17:35 BST 2018
+
+    Core fixes:
+    - use tr instead of eval on $VERSION
+    - Fix PUREPERL_ONLY warnings
+
 7.34  Mon Mar 19 10:21:12 GMT 2018
 
     No changes since v7.33_03
