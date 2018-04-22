@@ -47,7 +47,10 @@ sub _init {
             unless (defined &GetInputCP) {
                 eval {
                     require Win32;
-                    eval { Win32::GetConsoleCP() };
+                    eval {
+                        local $SIG{__WARN__} = sub {} if ( "$]" < 5.014 ); # suppress deprecation warning for inherited AUTOLOAD of Win32::GetConsoleCP()
+                        Win32::GetConsoleCP();
+                    };
                     # manually "import" it since Win32->import refuses
                     *GetInputCP = sub { &Win32::GetConsoleCP } if defined &Win32::GetConsoleCP;
                     *GetOutputCP = sub { &Win32::GetConsoleOutputCP } if defined &Win32::GetConsoleOutputCP;
