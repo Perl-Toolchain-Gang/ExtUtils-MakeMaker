@@ -506,7 +506,7 @@ sub quote_literal {
     $text =~ s{\\\\"}{\\\\\\\\\\"}g;  # \\" -> \\\\\"
     $text =~ s{(?<!\\)\\"}{\\\\\\"}g; # \"  -> \\\"
     $text =~ s{(?<!\\)"}{\\"}g;       # "   -> \"
-    $text = qq{"$text"} if $text =~ /[ \t]/;
+    $text = qq{"$text"} if $text =~ /[ \t#]/; # hash because gmake 4.2.1
 
     # Apply the Command Prompt parsing rules (cmd.exe)
     my @text = split /("[^"]*")/, $text;
