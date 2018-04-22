@@ -3268,9 +3268,11 @@ sub processPL {
 
     my $m = '';
     foreach my $plfile (sort keys %$pl_files) {
-        my $list = ref($pl_files->{$plfile})
-                     ?  $pl_files->{$plfile}
-                     : [$pl_files->{$plfile}];
+        my $targets = $pl_files->{$plfile};
+        my $list =
+            ref($targets) eq 'HASH'  ? [ sort keys %$targets ] :
+            ref($targets) eq 'ARRAY' ? $pl_files->{$plfile}   :
+            [$pl_files->{$plfile}];
 
         foreach my $target (@$list) {
             if( $Is{VMS} ) {
@@ -3294,13 +3296,27 @@ sub processPL {
                 $perlrun = 'PERLRUNINST';
             }
 
+            my $extra_inputs = '';
+            if( ref($targets) eq 'HASH' ) {
+                my $inputs = ref($targets->{$target})
+                    ? $targets->{$target}
+                    : [$targets->{$target}];
+
+                for my $input (@$inputs) {
+                    if( $Is{VMS} ) {
+                        $input = vmsify($self->eliminate_macros($input));
+                    }
+                    $extra_inputs .= ' '.$input;
+                }
+            }
+
             $m .= <<MAKE_FRAG;
 
 pure_all :: $target
 	\$(NOECHO) \$(NOOP)
 
-$target :: $plfile $pm_dep
-	\$($perlrun) $plfile $target
+$target :: $plfile $pm_dep $extra_inputs
+	\$($perlrun) $plfile $target $extra_inputs
 MAKE_FRAG
 
         }
