@@ -2599,6 +2599,20 @@ In this case the program will be run multiple times using each target file.
     perl bin/foobar.PL bin/foobar1
     perl bin/foobar.PL bin/foobar2
 
+If an output file depends on extra input files beside the script itself,
+a hash ref can be used in version 7.36 and above:
+
+    PL_FILES => { 'foo.PL' => {
+        'foo.out' => 'foo.in',
+        'bar.out' => [qw(bar1.in bar2.in)],
+    }
+
+In this case the extra input files will be passed to the program after
+the target file:
+
+   perl foo.PL foo.out foo.in
+   perl foo.PL bar.out bar1.in bar2.in
+
 PL files are normally run B<after> pm_to_blib and include INST_LIB and
 INST_ARCH in their C<@INC>, so the just built modules can be
 accessed... unless the PL file is making a module (or anything else in
