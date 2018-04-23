@@ -1103,7 +1103,6 @@ Finds the executables PERL and FULLPERL
 
 sub find_perl {
     my($self, $ver, $names, $dirs, $trace) = @_;
-
     if ($trace >= 2){
         print "Looking for perl $ver by these names:
 @$names
@@ -2077,6 +2076,11 @@ sub init_PERL {
     # already escaped spaces.
     $self->{FULLPERL} =~ tr/"//d if $Is{VMS};
 
+    # `dmake` can fail for image (aka, executable) names which start with double-quotes
+    # * push quote inward by at least one character (or the drive prefix, if present)
+    # * including any initial directory separator preserves the `file_name_is_absolute` property
+    $self->{FULLPERL} =~ s/^"(\S(:\\|:)?)/$1"/ if $self->is_make_type('dmake');
+
     # Little hack to get around VMS's find_perl putting "MCR" in front
     # sometimes.
     $self->{ABSPERL} = $self->{PERL};
@@ -2098,6 +2102,11 @@ sub init_PERL {
     # Can't have an image name with quotes, and findperl will have
     # already escaped spaces.
     $self->{PERL} =~ tr/"//d if $Is{VMS};
+
+    # `dmake` can fail for image (aka, executable) names which start with double-quotes
+    # * push quote inward by at least one character (or the drive prefix, if present)
+    # * including any initial directory separator preserves the `file_name_is_absolute` property
+    $self->{PERL} =~ s/^"(\S(:\\|:)?)/$1"/ if $self->is_make_type('dmake');
 
     # Are we building the core?
     $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
