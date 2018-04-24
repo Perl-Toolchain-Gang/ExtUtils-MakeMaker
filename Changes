@@ -1,3 +1,8 @@
+7.35_02 Tue Apr 24 11:38:39 BST 2018
+
+    Core fixes:
+    - Win32 fixes for gmake 4.2.1 in quoting literals
+
 7.35_01 Thu Apr 19 13:17:35 BST 2018
 
     Core fixes:
