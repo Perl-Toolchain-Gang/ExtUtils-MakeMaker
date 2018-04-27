@@ -1,3 +1,8 @@
+7.35_03 Fri Apr 27 14:28:21 BST 2018
+
+    Enhancements:
+    - Allow specifying extra inputs for PL_FILES scripts
+
 7.35_02 Tue Apr 24 11:38:39 BST 2018
 
     Core fixes:
