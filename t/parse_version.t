@@ -110,7 +110,7 @@ our $VERSION = 2.34;
 END
 }
 
-if ( "$]" > 5.009 && "$]" < 5.012 ) {
+if ( "$]" < 5.012 ) {
   delete $versions{'$VERSION = -1.0'};
 }
 
