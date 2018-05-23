@@ -151,8 +151,11 @@ EOF
     my @exts = qw(c cpp cxx cc);
     push @exts, 'C' if !$Is{OS2} and !$Is{Win32} and !$Is{Dos}; #Case-specific
     $m_o = $self->{XSMULTI} ? $self->xs_obj_opt('$*$(OBJ_EXT)') : '';
+    my $dbgout = $self->dbgoutflag;
     for my $ext (@exts) {
-	push @m, "\n.$ext\$(OBJ_EXT) :\n\t$command $flags \$*.$ext" . ( $m_o ? " $m_o" : '' ) . "\n";
+	push @m, "\n.$ext\$(OBJ_EXT) :\n\t$command $flags "
+            .($dbgout?"$dbgout ":'')
+            ."\$*.$ext" . ( $m_o ? " $m_o" : '' ) . "\n";
     }
     return join "", @m;
 }
@@ -170,6 +173,16 @@ sub xs_obj_opt {
     "-o $output_file";
 }
 
+=item dbgoutflag
+
+Returns a CC flag that tells the CC to emit a separate debugging symbol file
+when compiling an object file.
+
+=cut
+
+sub dbgoutflag {
+    '';
+}
 
 =item cflags (o)
 
@@ -3973,13 +3986,15 @@ sub xs_o {
     my ($self) = @_;
     return '' unless $self->needs_linking();
     my $m_o = $self->{XSMULTI} ? $self->xs_obj_opt('$*$(OBJ_EXT)') : '';
+    my $dbgout = $self->dbgoutflag;
+    $dbgout = $dbgout ? "$dbgout " : '';
     my $frag = '';
     # dmake makes noise about ambiguous rule
-    $frag .= sprintf <<'EOF', $m_o unless $self->is_make_type('dmake');
+    $frag .= sprintf <<'EOF', $dbgout, $m_o unless $self->is_make_type('dmake');
 .xs$(OBJ_EXT) :
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
 	$(MV) $*.xsc $*.c
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c %s
+	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) %s$*.c %s
 EOF
     if ($self->{XSMULTI}) {
 	for my $ext ($self->_xs_list_basenames) {
@@ -3993,13 +4008,13 @@ EOF
             $self->_xsbuild_replace_macro($cccmd, 'xs', $ext, 'INC');
             my $define = '$(DEFINE)';
             $self->_xsbuild_replace_macro($define, 'xs', $ext, 'DEFINE');
-            #                             1     2       3     4
-            $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $m_o, $define;
+            #                             1     2       3     4        5
+            $frag .= _sprintf562 <<'EOF', $ext, $cccmd, $m_o, $define, $dbgout;
 
 %1$s$(OBJ_EXT): %1$s.xs
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc
 	$(MV) $*.xsc $*.c
-	%2$s $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) %4$s $*.c %3$s
+	%2$s $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) %4$s %5$s$*.c %3$s
 EOF
 	}
     }

@@ -595,6 +595,16 @@ sub os_flavor {
     return('Win32');
 }
 
+=item dbgoutflag
+
+Returns a CC flag that tells the CC to emit a separate debugging symbol file
+when compiling an object file.
+
+=cut
+
+sub dbgoutflag {
+    $MSVC ? '-Fd$(*).pdb' : '';
+}
 
 =item cflags
 
