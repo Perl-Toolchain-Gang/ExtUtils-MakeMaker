@@ -84,7 +84,8 @@ installation.
 =item How do I keep from installing man pages?
 
 Recent versions of MakeMaker will only install man pages on Unix-like
-operating systems.
+operating systems by default. To generate manpages on non-Unix operating
+systems, make the "manifypods" target.
 
 For an individual module:
 
