@@ -1248,7 +1248,10 @@ sub _fixin_replace_shebang {
 
     # Now look (in reverse) for interpreter in absolute PATH (unless perl).
     my $interpreter;
-    if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
+    if ( defined $ENV{PERL_MM_SHEBANG} && $ENV{PERL_MM_SHEBANG} eq "relocatable" ) {
+        $interpreter = "/usr/bin/env perl";
+    }
+    elsif ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
         if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
             $interpreter = $Config{startperl};
             $interpreter =~ s,^\#!,,;
