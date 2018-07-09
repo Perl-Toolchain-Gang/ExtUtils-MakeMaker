@@ -77,7 +77,7 @@ Changes the path separator with .
 
 sub replace_manpage_separator {
     my($self,$man) = @_;
-    $man =~ s,/+,.,g;
+    $man =~ s,[/\\]+,.,g;
     $man;
 }
 
