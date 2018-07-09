@@ -1,3 +1,12 @@
+7.35_04 Mon Jul  9 10:21:59 BST 2018
+
+    Bug fixes:
+    - Fix manification on MSWin32
+
+    Doc fixes:
+    - Mention manifypods target in FAQ for
+      man creation on non-un*x OS
+
 7.35_03 Fri Apr 27 14:28:21 BST 2018
 
     Enhancements:
