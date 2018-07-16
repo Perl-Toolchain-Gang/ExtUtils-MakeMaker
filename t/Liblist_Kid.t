@@ -32,6 +32,7 @@ sub run {
     use_ok( 'ExtUtils::Liblist::Kid' );
     move_to_os_test_data_dir();
     conf_reset();
+    test_common() if $OS eq 'win32'; # temp, wing-walking
     test_kid_win32() if $OS eq 'win32';
 }
 
@@ -40,6 +41,7 @@ sub run {
 
 sub conf_reset {
     delete $Config{$_} for keys %Config;
+    $Config{installarchlib} = 'lib';
     delete $ENV{LIB};
     delete $ENV{LIBRARY_PATH};
     return;
@@ -68,12 +70,16 @@ sub double { (@_) x 2 }
 
 # tests go here
 
+sub test_common {
+    my @expected = ('','','','');
+    is_deeply( [ _ext() ], \@expected, 'empty input results in empty output' );
+    is_deeply( [ _ext( 'unreal_test' ) ], \@expected, 'non-existent file results in empty output' );
+    push @expected, [];
+    is_deeply( [ _ext( undef, 0, 1 ) ], \@expected, 'asking for real names with empty input results in an empty extra array' );
+    is_deeply( [ _ext( 'unreal_test',     0, 1 ) ], \@expected, 'asking for real names with non-existent file results in an empty extra array' );
+}
+
 sub test_kid_win32 {
-
-    $Config{installarchlib} = 'lib';
-
-    is_deeply( [ _ext() ], [ ('') x 4 ], 'empty input results in empty output' );
-    is_deeply( [ _ext( 'unreal_test' ) ], [ ('') x 4 ], 'non-existent file results in empty output' );
     is_deeply( [ _ext( 'test' ) ], [ double(quote('test.lib'), '') ], 'existent file results in a path to the file. .lib is default extension with empty %Config' );
     is_deeply( [ _ext( 'c_test' ) ], [ double(quote('lib\CORE\c_test.lib'), '') ], '$Config{installarchlib}/CORE is the default search dir aside from cwd' );
     is_deeply( [ _ext( 'double' ) ], [ double(quote('double.lib'), '') ], 'once an instance of a lib is found, the search stops' );
@@ -90,8 +96,6 @@ sub test_kid_win32 {
 
     is_deeply( [ scalar _ext( 'test' ) ], [quote('test.lib')], 'asking for a scalar gives a single string' );
 
-    is_deeply( [ _ext( undef, 0, 1 ) ], [ ('') x 4, [] ], 'asking for real names with empty input results in an empty extra array' );
-    is_deeply( [ _ext( 'unreal_test',     0, 1 ) ], [ ('') x 4, [] ], 'asking for real names with non-existent file results in an empty extra array' );
     is_deeply( [ _ext( 'c_test', 0, 1 ) ], [ double(quote('lib\CORE\c_test.lib'), ''), [quote('lib/CORE\c_test.lib')] ], 'asking for real names with an existent file in search dir results in an extra array with a mixed-os file path?!' );
     is_deeply( [ _ext( 'test c_test',     0, 1 ) ], [ double(quote(qw(test.lib lib\CORE\c_test.lib)), ''), [quote('lib/CORE\c_test.lib')] ], 'files in cwd do not appear in the real name list?!' );
     is_deeply( [ _ext( '-lc_test c_test', 0, 1 ) ], [ double(quote(qw(lib\CORE\c_test.lib lib\CORE\c_test.lib)), ''), [quote('lib/CORE\c_test.lib')] ], 'finding the same lib in a search dir both with and without -l results in a single listing in the array' );
