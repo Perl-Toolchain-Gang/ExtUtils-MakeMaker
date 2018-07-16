@@ -19,6 +19,10 @@ package liblist_kid_test;
 use Test::More 'no_plan';
 use ExtUtils::MakeMaker::Config;
 use File::Spec;
+use Cwd;
+
+# similar to dispatching in EU::LL::Kid
+my $OS = $^O eq 'MSWin32' ? 'win32' : ($^O eq 'VMS' ? 'vms' : 'unix_os2');
 
 run();
 
@@ -28,8 +32,7 @@ sub run {
     use_ok( 'ExtUtils::Liblist::Kid' );
     move_to_os_test_data_dir();
     conf_reset();
-    return test_kid_win32() if $^O eq 'MSWin32';
-    return;
+    test_kid_win32() if $OS eq 'win32';
 }
 
 # This allows us to get a clean playing field and ensure that the current
@@ -39,19 +42,22 @@ sub conf_reset {
     delete $Config{$_} for keys %Config;
     delete $ENV{LIB};
     delete $ENV{LIBRARY_PATH};
-
     return;
 }
 
 # This keeps the directory paths in the tests short and allows easy
 # separation of OS-specific files.
 
+my $cwd;
 sub move_to_os_test_data_dir {
-    my %os_test_dirs = ( MSWin32 => 't/liblist/win32', );
-    return if !$os_test_dirs{$^O};
-
-    chdir $os_test_dirs{$^O} or die "Could not change to liblist test dir '$os_test_dirs{$^O}': $!";
-    return;
+    my %os_test_dirs = (
+        win32 => 't/liblist/win32',
+    );
+    $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
+    return if !$os_test_dirs{$OS};
+    my $new_dir;
+    $new_dir = $os_test_dirs{$OS};
+    chdir $new_dir or die "Could not change to liblist test dir '$new_dir': $!";
 }
 
 # Since liblist is object-based, we need to provide a mock object.
