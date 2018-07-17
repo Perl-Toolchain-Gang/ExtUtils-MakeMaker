@@ -30,18 +30,12 @@ BEGIN {
 # similar to dispatching in EU::LL::Kid
 my $OS = $^O eq 'MSWin32' ? 'win32' : ($^O eq 'VMS' ? 'vms' : 'unix_os2');
 
-run();
-
-exit;
-
-sub run {
-    use_ok( 'ExtUtils::Liblist::Kid' );
-    move_to_os_test_data_dir();
-    conf_reset();
-    test_common();
-    test_kid_unix_os2() if $OS eq 'unix_os2';
-    test_kid_win32() if $OS eq 'win32';
-}
+use_ok( 'ExtUtils::Liblist::Kid' );
+move_to_os_test_data_dir();
+conf_reset();
+test_common();
+test_kid_unix_os2() if $OS eq 'unix_os2';
+test_kid_win32() if $OS eq 'win32';
 
 # This allows us to get a clean playing field and ensure that the current
 # system configuration does not affect the test results.
