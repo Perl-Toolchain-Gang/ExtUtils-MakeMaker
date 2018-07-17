@@ -58,6 +58,19 @@ sub conf_reset {
     delete $Config{$_} for keys %Config;
     %Config = %save_config;
     $Config{installarchlib} = 'lib';
+    # The following are all used and always are defined in the real world.
+    # Define them to something here to avoid spewing uninitialized value warnings.
+    if ($^O eq 'VMS') {
+        $Config{ldflags}     = '';
+        $Config{dbgprefix}   = '';
+        $Config{libc}        = '';
+        $Config{ext_ext}     = '';
+        $Config{lib_ext}     = '';
+        $Config{obj_ext}     = '';
+        $Config{so}          = '';
+        $Config{vms_cc_type} = '';
+        $Config{libpth}      = '';
+    }
     delete $ENV{LIB};
     delete $ENV{LIBRARY_PATH};
     return;
