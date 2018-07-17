@@ -20,6 +20,7 @@ use Test::More 'no_plan';
 use ExtUtils::MakeMaker::Config;
 use File::Spec;
 use Cwd;
+use File::Temp qw[tempdir];
 
 # similar to dispatching in EU::LL::Kid
 my $OS = $^O eq 'MSWin32' ? 'win32' : ($^O eq 'VMS' ? 'vms' : 'unix_os2');
@@ -54,11 +55,18 @@ my $cwd;
 sub move_to_os_test_data_dir {
     my %os_test_dirs = (
         win32 => 't/liblist/win32',
+        unix_os2 => \'',
     );
     $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
     return if !$os_test_dirs{$OS};
     my $new_dir;
-    $new_dir = $os_test_dirs{$OS};
+    if (ref $os_test_dirs{$OS}) {
+        $new_dir = tempdir( DIR => 't', CLEANUP => 1 );
+        my $lib = File::Spec->catfile($new_dir, "libfoo.$Config{so}");
+        open my $fh, '>', $lib;
+    } else {
+        $new_dir = $os_test_dirs{$OS};
+    }
     chdir $new_dir or die "Could not change to liblist test dir '$new_dir': $!";
 }
 
