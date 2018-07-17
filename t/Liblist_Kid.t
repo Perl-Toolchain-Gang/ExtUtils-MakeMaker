@@ -42,14 +42,15 @@ test_kid_win32() if $OS eq 'win32';
 # system configuration does not affect the test results.
 
 sub conf_reset {
-    my @save_keys = qw{ so dlsrc osname perllibs };
+    my @save_keys = qw{ so dlsrc osname };
     my %save_config;
     @save_config{ @save_keys } = @Config{ @save_keys };
     delete $Config{$_} for keys %Config;
     %Config = %save_config;
-    $Config{installarchlib} = 'lib';
     # The following are all used and always are defined in the real world.
     # Define them to something here to avoid spewing uninitialized value warnings.
+    $Config{installarchlib} = 'lib';
+    $Config{perllibs} = ''; # else on Windows :nosearch gives long extra list
     if ($^O eq 'VMS') {
         $Config{ldflags}     = '';
         $Config{dbgprefix}   = '';
