@@ -1,7 +1,10 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
+use Test::More 'no_plan';
+use ExtUtils::MakeMaker::Config;
+use File::Spec;
+use Cwd;
+use File::Temp qw[tempdir];
 
 use lib 't/lib';
 
@@ -23,14 +26,6 @@ BEGIN {
         @ls;
     }
 }
-
-package liblist_kid_test;
-
-use Test::More 'no_plan';
-use ExtUtils::MakeMaker::Config;
-use File::Spec;
-use Cwd;
-use File::Temp qw[tempdir];
 
 # similar to dispatching in EU::LL::Kid
 my $OS = $^O eq 'MSWin32' ? 'win32' : ($^O eq 'VMS' ? 'vms' : 'unix_os2');
