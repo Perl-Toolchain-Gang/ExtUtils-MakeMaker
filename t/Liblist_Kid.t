@@ -12,6 +12,16 @@ BEGIN {
     package MockEUMM;
     use base 'File::Spec';    # what.
     sub new { return bless {}, 'MockEUMM'; }
+    sub lsdir { # cut'n'paste from MM_Unix
+        #  $self
+        my(undef, $dir, $regex) = @_;
+        opendir(my $dh, defined($dir) ? $dir : ".")
+            or return;
+        my @ls = readdir $dh;
+        closedir $dh;
+        @ls = grep(/$regex/, @ls) if defined $regex;
+        @ls;
+    }
 }
 
 package liblist_kid_test;
@@ -33,7 +43,8 @@ sub run {
     use_ok( 'ExtUtils::Liblist::Kid' );
     move_to_os_test_data_dir();
     conf_reset();
-    test_common() if $OS eq 'win32'; # temp, wing-walking
+    test_common();
+    test_kid_unix_os2() if $OS eq 'unix_os2';
     test_kid_win32() if $OS eq 'win32';
 }
 
@@ -41,7 +52,11 @@ sub run {
 # system configuration does not affect the test results.
 
 sub conf_reset {
+    my @save_keys = qw{ so dlsrc osname perllibs };
+    my %save_config;
+    @save_config{ @save_keys } = @Config{ @save_keys };
     delete $Config{$_} for keys %Config;
+    %Config = %save_config;
     $Config{installarchlib} = 'lib';
     delete $ENV{LIB};
     delete $ENV{LIBRARY_PATH};
@@ -80,6 +95,9 @@ sub double { (@_) x 2 }
 
 sub test_common {
     my @expected = ('','','','');
+    $expected[2] = 'PerlShr/Share' if $^O eq 'VMS';
+    my $warnings = "";
+    local $SIG{__WARN__} = sub { $warnings .= "@_\n"; };
     is_deeply( [ _ext() ], \@expected, 'empty input results in empty output' );
     is_deeply( [ _ext( 'unreal_test' ) ], \@expected, 'non-existent file results in empty output' );
     push @expected, [];
@@ -87,7 +105,18 @@ sub test_common {
     is_deeply( [ _ext( 'unreal_test',     0, 1 ) ], \@expected, 'asking for real names with non-existent file results in an empty extra array' );
 }
 
+sub test_kid_unix_os2 {
+    my $warnings = "";
+    local $SIG{__WARN__} = sub { $warnings .= "@_\n"; };
+    my @out = _ext( '-L. -lfoo' );
+    my $qlibre = qr/-L[^"]+\s+-lfoo/;
+    like( $out[0], $qlibre, 'existing file results in quoted extralibs' );
+    like( $out[2], $qlibre, 'existing file results in quotes ldloadlibs' );
+}
+
 sub test_kid_win32 {
+    my $warnings = "";
+    local $SIG{__WARN__} = sub { $warnings .= "@_\n"; };
     is_deeply( [ _ext( 'test' ) ], [ double(quote('test.lib'), '') ], 'existent file results in a path to the file. .lib is default extension with empty %Config' );
     is_deeply( [ _ext( 'c_test' ) ], [ double(quote('lib\CORE\c_test.lib'), '') ], '$Config{installarchlib}/CORE is the default search dir aside from cwd' );
     is_deeply( [ _ext( 'double' ) ], [ double(quote('double.lib'), '') ], 'once an instance of a lib is found, the search stops' );
