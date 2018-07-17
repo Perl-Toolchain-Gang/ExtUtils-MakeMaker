@@ -93,6 +93,7 @@ sub move_to_os_test_data_dir {
         },
         unix_os2 => {
             "libfoo.$Config{so}" => '',
+            "di r/libdir_test.$Config{so}" => '',
         },
     );
     $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
@@ -131,6 +132,9 @@ sub test_kid_unix_os2 {
     like( $out[2], $qlibre, 'existing file results in quotes ldloadlibs' );
     ok $out[3], 'existing file results in true LD_RUN_PATH';
     is_deeply [ _ext( '-L. -lnotthere' ) ], [ ('') x 4 ], 'non-present lib = empty';
+    my $curr_dirspace = File::Spec->rel2abs( 'di r' );
+    my $cmd_frag = '-L'.quote($curr_dirspace) . ' -ldir_test';
+    is_deeply [ _ext( '-L"di r" -ldir_test' ) ], [ $cmd_frag, '', $cmd_frag, $curr_dirspace ], '-L directories with spaces work';
 }
 
 sub test_kid_win32 {
