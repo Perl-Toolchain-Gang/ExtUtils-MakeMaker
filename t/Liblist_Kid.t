@@ -130,6 +130,7 @@ sub test_kid_unix_os2 {
     like( $out[0], $qlibre, 'existing file results in quoted extralibs' );
     like( $out[2], $qlibre, 'existing file results in quotes ldloadlibs' );
     ok $out[3], 'existing file results in true LD_RUN_PATH';
+    is_deeply [ _ext( '-L. -lnotthere' ) ], [ ('') x 4 ], 'non-present lib = empty';
 }
 
 sub test_kid_win32 {
