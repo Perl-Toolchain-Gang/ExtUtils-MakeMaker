@@ -7,6 +7,7 @@ use Cwd;
 use File::Temp qw[tempdir];
 
 use lib 't/lib';
+use MakeMaker::Test::Utils;
 
 # Liblist wants to be an object which has File::Spec capabilities, so we
 # mock one.
@@ -71,19 +72,33 @@ sub conf_reset {
 my $cwd;
 sub move_to_os_test_data_dir {
     my %os_test_dirs = (
-        win32 => 't/liblist/win32',
-        unix_os2 => \'',
+        win32 => {
+            '__test.lib' => '',
+            'di r/dir_test.lib' => '',
+            'dir/dir_test.lib' => '',
+            'double.lib' => '',
+            'imp.dll.a' => '',
+            'lib/CORE/c_test.lib' => '',
+            'lib/CORE/double.lib' => '',
+            'lib__test.lib' => '',
+            'lib_test.lib' => '',
+            'libpath/lp_test.lib' => '',
+            'pl.lib' => '',
+            'space lib.lib' => '',
+            'test.a.lib' => '',
+            'test.lib' => '',
+            'test.meep' => '',
+            'test2.lib' => '',
+            'vc/vctest.lib' => '',
+        },
+        unix_os2 => {
+            "libfoo.$Config{so}" => '',
+        },
     );
     $cwd = getcwd; END { chdir $cwd } # so File::Temp can cleanup
     return if !$os_test_dirs{$OS};
-    my $new_dir;
-    if (ref $os_test_dirs{$OS}) {
-        $new_dir = tempdir( DIR => 't', CLEANUP => 1 );
-        my $lib = File::Spec->catfile($new_dir, "libfoo.$Config{so}");
-        open my $fh, '>', $lib;
-    } else {
-        $new_dir = $os_test_dirs{$OS};
-    }
+    my $new_dir = tempdir( DIR => 't', CLEANUP => 1 );
+    hash2files($new_dir, $os_test_dirs{$OS});
     chdir $new_dir or die "Could not change to liblist test dir '$new_dir': $!";
 }
 

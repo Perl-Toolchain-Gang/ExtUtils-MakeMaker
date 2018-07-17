@@ -100,23 +100,6 @@ t/lib/Test/Simple.pm
 t/lib/TieIn.pm
 t/lib/TieOut.pm
 t/Liblist.t
-t/liblist/win32/__test.lib
-'t/liblist/win32/di r/dir_test.lib'
-t/liblist/win32/dir/dir_test.lib
-t/liblist/win32/double.lib
-t/liblist/win32/imp.dll.a
-t/liblist/win32/lib/CORE/c_test.lib
-t/liblist/win32/lib/CORE/double.lib
-t/liblist/win32/lib__test.lib
-t/liblist/win32/lib_test.lib
-t/liblist/win32/libpath/lp_test.lib
-t/liblist/win32/pl.lib
-'t/liblist/win32/space lib.lib'
-t/liblist/win32/test.a.lib
-t/liblist/win32/test.lib
-t/liblist/win32/test.meep
-t/liblist/win32/test2.lib
-t/liblist/win32/vc/vctest.lib
 t/Liblist_Kid.t
 t/make.t
 t/MakeMaker_Parameters.t
