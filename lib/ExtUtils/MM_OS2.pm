@@ -5,7 +5,7 @@ use strict;
 use ExtUtils::MakeMaker qw(neatvalue);
 use File::Spec;
 
-our $VERSION = '7.35_05';
+our $VERSION = '7.35_06';
 $VERSION =~ tr/_//d;
 
 require ExtUtils::MM_Any;

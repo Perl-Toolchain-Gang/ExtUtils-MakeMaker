@@ -1,3 +1,11 @@
+7.35_06 Thu Jul 19 20:30:55 BST 2018
+
+    Enhancements:
+    - Override shebang with PERL_MM_SHEBANG=relocatable env var
+
+    Bug fixes:
+    - Refactored Liblist::Kid tests, enabling UNIX testing
+
 7.35_05 Tue Jul 10 09:44:25 BST 2018
 
     Win32 fixes:
