@@ -2373,7 +2373,7 @@ CODE
     $self->{UNINSTALL}   ||= $self->oneliner('uninstall', ["-MExtUtils::Command::MM"]);
     $self->{WARN_IF_OLD_PACKLIST} ||=
       $self->oneliner('warn_if_old_packlist', ["-MExtUtils::Command::MM"]);
-    $self->{FIXIN}       ||= $self->oneliner('MY->fixin(shift)', ["-MExtUtils::MY"]);
+    $self->{FIXIN}       ||= $self->oneliner('$ENV{PERL_MM_SHEBANG} ||= "$(SHEBANG)"; MY->fixin(shift)', ["-MExtUtils::MY"]);
     $self->{EQUALIZE_TIMESTAMP} ||= $self->oneliner('eqtime', ["-MExtUtils::Command"]);
 
     $self->{UNINST}     ||= 0;
