@@ -195,7 +195,7 @@ sub can_redirect_error {
 
     my $is_dmake = $self->is_make_type('dmake');
 
-Returns true if C<<$self->make>> is the given type; possibilities are:
+Returns true if C<< $self->make >> is the given type; possibilities are:
 
   gmake    GNU make
   dmake
