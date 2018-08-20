@@ -84,7 +84,7 @@ ExtUtils::Mkbootstrap - make a bootstrap file for use by DynaLoader
 
 =head1 SYNOPSIS
 
-C<Mkbootstrap>
+  Mkbootstrap
 
 =head1 DESCRIPTION
 
