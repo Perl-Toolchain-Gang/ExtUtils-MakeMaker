@@ -1256,8 +1256,8 @@ sub _fixin_replace_shebang {
     my ( $self, $file, $line ) = @_;
 
     # Now figure out the interpreter name.
-    my ( $cmd, $arg ) = split ' ', $line, 2;
-    $cmd =~ s!^.*/!!;
+    my ( $origcmd, $arg ) = split ' ', $line, 2;
+    (my $cmd = $origcmd) =~ s!^.*/!!;
 
     # Now look (in reverse) for interpreter in absolute PATH (unless perl).
     my $interpreter;
@@ -1284,6 +1284,24 @@ sub _fixin_replace_shebang {
                 warn "Ignoring $interpreter in $file\n"
                     if $Verbose && $interpreter;
                 $interpreter = $maybefile;
+            }
+        }
+
+        # If the shebang is absolute and exists in PATH, but was not
+        # the first one found, leave it alone if it's actually the
+        # same file as first one.  This avoids packages built on
+        # merged-/usr systems with /usr/bin before /bin in the path
+        # breaking when installed on systems without merged /usr
+        if ($origcmd ne $interpreter and $self->file_name_is_absolute($origcmd)) {
+            my $origdir = dirname($origcmd);
+            if ($self->maybe_command($origcmd) && grep { $_ eq $origdir } @absdirs) {
+                my ($odev, $oino) = stat $origcmd;
+                my ($idev, $iino) = stat $interpreter;
+                if ($odev == $idev && $oino == $iino) {
+                    warn "$origcmd is the same as $interpreter, leaving alone"
+                        if $Verbose;
+                    $interpreter = $origcmd;
+                }
             }
         }
     }
