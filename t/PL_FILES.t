@@ -37,7 +37,7 @@ WriteMakefile(
     PL_FILES => { 'single.PL' => 'single.out',
                   'multi.PL'  => [qw(1.out 2.out)],
                   'single-in.PL' => { 'single-in.out' => 'single.in' },
-                  'multi-in.PL ' => { 'multi-in.out'  => [qw(1.in 2.in)] },
+                  'multi-in.PL' => { 'multi-in.out'  => [qw(1.in 2.in)] },
                   'Bar_pm.PL' => '$(INST_LIB)/PL/Bar.pm',
                   'Bar2.pm.PL' => 'Bar2.pm',
     },
