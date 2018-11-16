@@ -127,6 +127,7 @@ END
 SKIP: {
     eval { chmod(0755, "usrbin/interp") }
         or skip "no chmod", 8;
+    skip "Not relevant on VMS", 8 if $^O eq 'VMS';
 
     my $dir = getcwd();
     local $ENV{PATH} = join $Config{path_sep}, map "$dir/$_", qw(usrbin bin);
