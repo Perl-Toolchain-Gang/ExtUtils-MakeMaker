@@ -1,3 +1,13 @@
+7.35_07 Fri Nov 23 11:34:27 GMT 2018
+
+    Bug fixes:
+    - Avoid mangling /bin non-perl shebangs on merged-/usr systems
+
+    VMS fixes:
+    - Handle PERL_ARCHLIBDEP and DESTINSTALL... macros on VMS.
+    - Remove trailing space from multi-in.PL in PL_FILES.t
+    - Skip "merged /usr" tests on VMS.
+
 7.35_06 Thu Jul 19 20:30:55 BST 2018
 
     Enhancements:
