@@ -44,10 +44,15 @@ ok((my $stdout = tie *STDOUT, 'TieOut'), 'tie stdout');
 
 {
     local $Config{installman3dir} = File::Spec->catdir(qw(t lib));
-    my $mm = WriteMakefile(
-        NAME            => 'Big::Dummy',
-        VERSION_FROM    => 'lib/Big/Dummy.pm',
-    );
+    my $mm;
+    {
+        # suppress noisy & unnecessary "WARNING: Older versions of ExtUtils::MakeMaker may errantly install README.pod..."
+        local $SIG{__WARN__} = sub { };
+        $mm = WriteMakefile(
+            NAME            => 'Big::Dummy',
+            VERSION_FROM    => 'lib/Big/Dummy.pm',
+        );
+    }
     my %got = %{ $mm->{MAN3PODS} };
     # because value too OS-specific
     my $delete_key = $^O eq 'VMS' ? '[.lib.Big]Dummy.pm' : 'lib/Big/Dummy.pm';
@@ -56,29 +61,44 @@ ok((my $stdout = tie *STDOUT, 'TieOut'), 'tie stdout');
 }
 
 {
-    my $mm = WriteMakefile(
-        NAME            => 'Big::Dummy',
-        VERSION_FROM    => 'lib/Big/Dummy.pm',
-        INSTALLMAN3DIR  => 'none'
-    );
+    my $mm;
+    {
+        # suppress noisy & unnecessary "WARNING: Older versions of ExtUtils::MakeMaker may errantly install README.pod..."
+        local $SIG{__WARN__} = sub { };
+        $mm = WriteMakefile(
+            NAME            => 'Big::Dummy',
+            VERSION_FROM    => 'lib/Big/Dummy.pm',
+            INSTALLMAN3DIR  => 'none'
+        );
+    }
     is_deeply $mm->{MAN3PODS}, {}, 'suppress man3pod with "none"';
 }
 
 {
-    my $mm = WriteMakefile(
-        NAME            => 'Big::Dummy',
-        VERSION_FROM    => 'lib/Big/Dummy.pm',
-        MAN3PODS        => {}
-    );
+    my $mm;
+    {
+        # suppress noisy & unnecessary "WARNING: Older versions of ExtUtils::MakeMaker may errantly install README.pod..."
+        local $SIG{__WARN__} = sub { };
+        $mm = WriteMakefile(
+            NAME            => 'Big::Dummy',
+            VERSION_FROM    => 'lib/Big/Dummy.pm',
+            MAN3PODS        => {}
+        );
+    }
     is_deeply $mm->{MAN3PODS}, {}, 'suppress man3pod with {}';
 }
 
 {
-    my $mm = WriteMakefile(
-        NAME            => 'Big::Dummy',
-        VERSION_FROM    => 'lib/Big/Dummy.pm',
-        MAN3PODS        => { "Foo.pm" => "Foo.1" }
-    );
+    my $mm;
+    {
+        # suppress noisy & unnecessary "WARNING: Older versions of ExtUtils::MakeMaker may errantly install README.pod..."
+        local $SIG{__WARN__} = sub { };
+        $mm = WriteMakefile(
+            NAME            => 'Big::Dummy',
+            VERSION_FROM    => 'lib/Big/Dummy.pm',
+            MAN3PODS        => { "Foo.pm" => "Foo.1" }
+        );
+    }
     is_deeply $mm->{MAN3PODS}, { "Foo.pm" => "Foo.1" }, 'override man3pod';
 }
 
