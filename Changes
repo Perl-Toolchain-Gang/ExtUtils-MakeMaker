@@ -1,3 +1,8 @@
+7.35_08 Thu Dec  6 10:22:02 GMT 2018
+
+    Enhancements:
+    - propagate all variables used by Buildroot to subdirs
+
 7.35_07 Fri Nov 23 11:34:27 GMT 2018
 
     Bug fixes:
