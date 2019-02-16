@@ -8,7 +8,7 @@ our $VERSION = '0.99';
 $VERSION = eval $VERSION;    ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
 BEGIN {
-    if( $] < 5.008 ) {
+    if( "$]" < 5.008 ) {
         require Test::Builder::IO::Scalar;
     }
 }
@@ -19,7 +19,7 @@ BEGIN {
     use Config;
     # Load threads::shared when threads are turned on.
     # 5.8.0's threads are so busted we no longer support them.
-    if( $] >= 5.008001 && $Config{useithreads} && $INC{'threads.pm'} ) {
+    if( "$]" >= 5.008001 && $Config{useithreads} && $INC{'threads.pm'} ) {
         require threads::shared;
 
         # Hack around YET ANOTHER threads::shared bug.  It would
@@ -1891,7 +1891,7 @@ sub _new_fh {
     }
     elsif( ref $file_or_fh eq 'SCALAR' ) {
         # Scalar refs as filehandles was added in 5.8.
-        if( $] >= 5.008 ) {
+        if( "$]" >= 5.008 ) {
             open $fh, ">>", $file_or_fh
               or $self->croak("Can't open scalar ref $file_or_fh: $!");
         }

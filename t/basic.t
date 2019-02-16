@@ -128,7 +128,7 @@ like( $ppd_html, qr{^\s*<REQUIRE NAME="strict::" />}m,  '  <REQUIRE>' );
 unlike( $ppd_html, qr{^\s*<REQUIRE NAME="warnings::" />}m,  'no <REQUIRE> for build_require' );
 
 my $archname = $Config{archname};
-if( $] >= 5.008 ) {
+if( "$]" >= 5.008 ) {
     # XXX This is a copy of the internal logic, so it's not a great test
     $archname .= "-$Config{PERL_REVISION}.$Config{PERL_VERSION}";
 }

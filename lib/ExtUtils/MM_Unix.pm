@@ -2906,7 +2906,7 @@ sub parse_abstract {
     }
     close $fh;
 
-    if ( $pod_encoding and !( $] < 5.008 or !$Config{useperlio} ) ) {
+    if ( $pod_encoding and !( "$]" < 5.008 or !$Config{useperlio} ) ) {
         # Have to wrap in an eval{} for when running under PERL_CORE
         # Encode isn't available during build phase and parsing
         # ABSTRACT isn't important there
@@ -3185,7 +3185,7 @@ PPD_PERLVERS
     }
 
     my $archname = $Config{archname};
-    if ($] >= 5.008) {
+    if ("$]" >= 5.008) {
         # archname did not change from 5.6 to 5.8, but those versions may
         # not be not binary compatible so now we append the part of the
         # version that changes when binary compatibility may change

@@ -934,11 +934,11 @@ sub _un_vstring {
     if ( length($value) >= 3 && $value !~ /[._]/
 	&& _is_non_alphanumeric($value)) {
 	my $tvalue;
-	if ( $] ge 5.008_001 ) {
+	if ( "$]" >= 5.008_001 ) {
 	    $tvalue = _find_magic_vstring($value);
 	    $value = $tvalue if length $tvalue;
 	}
-	elsif ( $] ge 5.006_000 ) {
+	elsif ( "$]" >= 5.006_000 ) {
 	    $tvalue = sprintf("v%vd",$value);
 	    if ( $tvalue =~ /^v\d+(\.\d+){2,}$/ ) {
 		# must be a v-string
@@ -973,7 +973,7 @@ sub _VERSION {
     my $class = ref($obj) || $obj;
 
     no strict 'refs';
-    if ( exists $INC{"$class.pm"} and not %{"$class\::"} and $] >= 5.008) {
+    if ( exists $INC{"$class.pm"} and not %{"$class\::"} and "$]" >= 5.008) {
 	 # file but no package
 	require Carp;
 	Carp::croak( "$class defines neither package nor VERSION"
@@ -982,14 +982,14 @@ sub _VERSION {
 
     my $version = eval "\$$class\::VERSION";
     if ( defined $version ) {
-	local $^W if $] <= 5.008;
+	local $^W if "$]" <= 5.008;
 	$version = ExtUtils::MakeMaker::version::vpp->new($version);
     }
 
     if ( defined $req ) {
 	unless ( defined $version ) {
 	    require Carp;
-	    my $msg =  $] < 5.006
+	    my $msg = "$]" < 5.006
 	    ? "$class version $req required--this is only version "
 	    : "$class does not define \$$class\::VERSION"
 	      ."--version check failed";

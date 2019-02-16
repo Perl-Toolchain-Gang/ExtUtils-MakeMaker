@@ -192,7 +192,7 @@ MAKE_FRAG
     }
     # Reconstruct the X.Y.Z version.
     my $version = join '.', map { sprintf "%d", $_ }
-                              $] =~ /(\d)\.(\d{3})(\d{2})/;
+                              "$]" =~ /(\d)\.(\d{3})(\d{2})/;
     push @m, sprintf <<'EOF', $from, $version, $to, $exportlist;
 	$(LD) $(LDFLAGS) %s -desc "Perl %s Extension ($(BASEEXT))  XS_VERSION: $(XS_VERSION)" -nlmversion $(NLM_VERSION) -o %s $(MYEXTLIB) $(PERL_INC)\Main.lib -commandfile %s
 	$(CHMOD) 755 $@
