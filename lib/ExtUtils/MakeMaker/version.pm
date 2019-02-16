@@ -35,7 +35,7 @@ $CLASS = 'version';
         *version::_VERSION = \&ExtUtils::MakeMaker::version::vpp::_VERSION;
         *version::vcmp = \&ExtUtils::MakeMaker::version::vpp::vcmp;
         *version::new = \&ExtUtils::MakeMaker::version::vpp::new;
-        if ($] >= 5.009000) {
+        if ("$]" >= 5.009000) {
             no strict 'refs';
             *version::stringify = \&ExtUtils::MakeMaker::version::vpp::stringify;
             *{'version::(""'} = \&ExtUtils::MakeMaker::version::vpp::stringify;

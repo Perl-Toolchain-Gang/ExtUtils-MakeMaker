@@ -86,7 +86,7 @@ sub init_linker {
 
     if ($Config{useshrplib} eq 'true') {
         my $libperl = '$(PERL_INC)' .'/'. "$Config{libperl}";
-        if( $] >= 5.006002 ) {
+        if( "$]" >= 5.006002 ) {
             $libperl =~ s/(dll\.)?a$/dll.a/;
         }
         $self->{PERL_ARCHIVE} = $libperl;

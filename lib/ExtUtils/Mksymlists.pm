@@ -148,7 +148,7 @@ sub _write_win32 {
     # linked to directly from C. GSAR 97-07-10
 
     #bcc dropped in 5.16, so dont create useless extra symbols for export table
-    unless($] >= 5.016) {
+    unless("$]" >= 5.016) {
         if ($Config::Config{'cc'} =~ /^bcc/i) {
             push @syms, "_$_", "$_ = _$_"
                 for (@{$data->{DL_VARS}}, @{$data->{FUNCLIST}});

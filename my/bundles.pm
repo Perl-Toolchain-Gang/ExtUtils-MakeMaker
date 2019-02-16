@@ -46,7 +46,7 @@ my %special_dist = (
     },
     "cpan-meta" => sub {
         # Only for perls > 5.008
-        return if $] < 5.008;
+        return if "$]" < 5.008;
         &should_use_dist;
     },
 );
@@ -153,7 +153,7 @@ package my::bundles::Copy::Recursive;
 use strict;
 BEGIN {
     # Keep older versions of Perl from trying to use lexical warnings
-    $INC{'warnings.pm'} = "fake warnings entry for < 5.6 perl ($])" if $] < 5.006;
+    $INC{'warnings.pm'} = "fake warnings entry for < 5.6 perl ($])" if "$]" < 5.006;
 }
 use warnings;
 
@@ -371,7 +371,7 @@ sub dircopy {
 
       
       my @files;
-      if ( $] < 5.006 ) {
+      if ( "$]" < 5.006 ) {
           opendir(STR_DH, $str) or return;
           @files = grep( $_ ne '.' && $_ ne '..', readdir(STR_DH));
           closedir STR_DH;
@@ -461,7 +461,7 @@ sub pathempty {
 
    my @names;
    my $pth_dh;
-   if ( $] < 5.006 ) {
+   if ( "$]" < 5.006 ) {
        opendir(PTH_DH, $pth) or return;
        @names = grep !/^\.+$/, readdir(PTH_DH);
    }
@@ -485,7 +485,7 @@ sub pathempty {
       }
    }
 
-   if ( $] < 5.006 ) {
+   if ( "$]" < 5.006 ) {
        closedir PTH_DH;
    }
    else {
