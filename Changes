@@ -1,3 +1,14 @@
+7.35_09 Mon Feb 18 10:05:42 GMT 2019
+
+    Bug fixes:
+    - stringify version before comparing
+
+    Test fixes:
+    - Changed wording of skip message for xsstatic
+
+    QA fixes:
+    - travis is deprecating container-based environments
+
 7.35_08 Thu Dec  6 10:22:02 GMT 2018
 
     Enhancements:
