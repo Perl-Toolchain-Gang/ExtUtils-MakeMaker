@@ -1,7 +1,7 @@
 package ExtUtils::MM_AIX;
 
 use strict;
-our $VERSION = '7.35_09';
+our $VERSION = '7.35_10';
 $VERSION =~ tr/_//d;
 
 use ExtUtils::MakeMaker::Config;

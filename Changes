@@ -1,3 +1,8 @@
+7.35_10 Wed Feb 20 10:03:50 GMT 2019
+
+    Test fixes:
+    - Skip "merged /usr" tests on MSWin32
+
 7.35_09 Mon Feb 18 10:05:42 GMT 2019
 
     Bug fixes:
