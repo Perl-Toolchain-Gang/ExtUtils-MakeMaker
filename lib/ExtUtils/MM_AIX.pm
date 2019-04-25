@@ -50,7 +50,9 @@ sub xs_dlsyms_ext {
 
 sub xs_dlsyms_arg {
     my($self, $file) = @_;
-    return qq{-bE:${file}};
+    my $arg = qq{-bE:${file}};
+    $arg = '-Wl,'.$arg if $Config{lddlflags} =~ /-Wl,-bE:/;
+    return $arg;
 }
 
 sub init_others {
