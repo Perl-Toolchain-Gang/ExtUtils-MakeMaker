@@ -1,3 +1,8 @@
+7.35_11 Thu Apr 25 11:53:59 BST 2019
+
+    Bug fixes:
+    - Fix RT#128004 gcc AIX builds broken
+
 7.35_10 Wed Feb 20 10:03:50 GMT 2019
 
     Test fixes:
