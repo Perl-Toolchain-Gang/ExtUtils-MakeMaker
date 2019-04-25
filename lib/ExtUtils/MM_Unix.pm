@@ -37,6 +37,10 @@ BEGIN {
                    grep( $^O eq $_, qw(bsdos interix dragonfly) )
                   );
     $Is{Android} = $^O =~ /android/;
+    if ( $^O eq 'darwin' && $^X eq '/usr/bin/perl' ) {
+      my @osvers = split /\./, $Config{osvers};
+      $Is{ApplCor} = ( $osvers[0] >= 18 );
+    }
 }
 
 BEGIN {
@@ -131,6 +135,10 @@ sub c_o {
 
     my $command = '$(CCCMD)';
     my $flags   = '$(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
+
+    if ( $Is{ApplCor} ) {
+        $flags   = '$(CCCDLFLAGS) -iwithsysroot "$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
+    }
 
     if (my $cpp = $Config{cpprun}) {
         my $cpp_cmd = $self->const_cccmd;
@@ -474,12 +482,20 @@ MAN1PODS = ".$self->wraplist(sort keys %{$self->{MAN1PODS}})."
 MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS}})."
 ";
 
+    push @m, q{
+SDKROOT := $(shell xcrun --show-sdk-path)
+PERL_SYSROOT = $(SDKROOT)
+} if $Is{ApplCor} && $self->{'PERL_INC'} =~ m!^/System/Library/Perl/!;
+
+    push @m, q{
+# Where is the Config information that we are using/depend on
+CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_SYSROOT)$(PERL_INCDEP)$(DFSEP)config.h
+} if $Is{ApplCor};
 
     push @m, q{
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
-} if -e $self->catfile( $self->{PERL_INC}, 'config.h' );
-
+} if -e $self->catfile( $self->{PERL_INC}, 'config.h' ) && !$Is{ApplCor};
 
     push @m, qq{
 # Where to build things
