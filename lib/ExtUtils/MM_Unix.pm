@@ -137,7 +137,7 @@ sub c_o {
     my $flags   = '$(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
 
     if ( $Is{ApplCor} ) {
-        $flags   = '$(CCCDLFLAGS) -iwithsysroot "$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
+        $flags =~ s/"-I(\$\(PERL_INC\))"/-iwithsysroot "$1"/;
     }
 
     if (my $cpp = $Config{cpprun}) {
@@ -4064,6 +4064,7 @@ EOF
 EOF
 	}
     }
+    $frag =~ s/"-I(\$\(PERL_INC\))"/-iwithsysroot "$1"/sg if $Is{ApplCor};
     $frag;
 }
 
