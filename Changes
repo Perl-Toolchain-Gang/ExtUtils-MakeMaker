@@ -1,3 +1,18 @@
+7.35_12 Sat Apr 27 22:37:26 BST 2019
+
+    Enhancements:
+    - add AppVeyor CI configuration
+      see <https://github.com/rivy/CI.AppVeyor.helpers-perl> for more information
+
+    Bug fixes:
+    - Resolve RTs 127028 && 127316 on Mojave system perl
+    - Honour man page disablement under INSTALL_BASE
+    - fix `dmake` warning by removing dmake-superfluous ".NOTPARALLEL" target
+    - suppress inherited AUTOLOAD warning for 'Win32::ConsoleCP()'
+    - fix perl image (aka, executable) quoting for `dmake` builds
+    - skip broken test for Win32 strawberry perl v5.10 (and some earlier versions)
+    - add workaround to ExtUtils::MakeMaker::Locale for code pages 'cp65000' and 'cp65001'
+
 7.35_11 Thu Apr 25 11:53:59 BST 2019
 
     Bug fixes:
