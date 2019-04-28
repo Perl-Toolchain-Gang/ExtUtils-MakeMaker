@@ -128,7 +128,7 @@ use strict;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
-$VERSION = '7.35_12';
+$VERSION = '7.35_13';
 $VERSION =~ tr/_//d;
 $CLASS = 'ExtUtils::MakeMaker::version::vpp';
 

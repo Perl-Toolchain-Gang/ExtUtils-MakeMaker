@@ -1,3 +1,8 @@
+7.35_13 Sun Apr 28 11:57:57 BST 2019
+
+    Bug fixes:
+    - Suppress warnings from EUMM::Locale code page workaround
+
 7.35_12 Sat Apr 27 22:37:26 BST 2019
 
     Enhancements:
