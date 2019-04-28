@@ -1,3 +1,8 @@
+7.35_14 Sun Apr 28 14:12:22 BST 2019
+
+    Win32 fixes:
+    - Add ExtUtils::PL2Bat path to pl2bat when PERL_CORE
+
 7.35_13 Sun Apr 28 11:57:57 BST 2019
 
     Bug fixes:
