@@ -1,3 +1,15 @@
+7.36  Sun Apr 28 16:28:20 BST 2019
+
+    No changes since v7.35_14
+
+    This release was made possible by the kind
+    sponsors of the 2019 Perl Toolchain Summit
+    held in Marlow, UK:
+
+    Booking.com, cPanel, MaxMind, FastMail, ZipRecruiter,
+    Cogendo, Elastic, OpenCage Data, Bluehost, Perl Services,
+    Zoopla, Archer Education, OpusVL, Oetiker+Partner, YEF
+
 7.35_14 Sun Apr 28 14:12:22 BST 2019
 
     Win32 fixes:
