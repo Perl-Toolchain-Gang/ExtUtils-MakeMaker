@@ -968,6 +968,7 @@ sub dynamic_lib {
             my ($v, $d, $f) = File::Spec->splitpath($ext);
             my @d = File::Spec->splitdir($d);
             shift @d if $d[0] eq 'lib';
+            pop @d if $d[$#d] eq '';
             my $instdir = $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
 
             # Dynamic library names may need special handling.
@@ -2227,6 +2228,7 @@ sub init_xs {
 		my ($v, $d, $f) = File::Spec->splitpath($ext);
 		my @d = File::Spec->splitdir($d);
 		shift @d if defined $d[0] and $d[0] eq 'lib';
+        pop @d if $d[$#d] eq '';
 		my $instdir = $self->catdir('$(INST_ARCHLIB)', 'auto', @d, $f);
 		my $instfile = $self->catfile($instdir, $f);
 		push @statics, "$instfile\$(LIB_EXT)";
