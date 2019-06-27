@@ -1,3 +1,9 @@
+7.37_02 Thu Jun 27 11:10:39 BST 2019
+
+    Test fixes:
+    - Fix test failures in 02-xsdynamic.t on Android native builds
+      Github issue #337
+
 7.37_01 Fri Jun  7 11:21:39 BST 2019
 
     Test fixes:
