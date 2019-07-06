@@ -419,6 +419,7 @@ sub constants {
               INST_ARCHLIB INST_SCRIPT INST_BIN INST_LIB
               INST_MAN1DIR INST_MAN3DIR
               MAN1EXT      MAN3EXT
+              MAN1SECTION  MAN3SECTION
               INSTALLDIRS INSTALL_BASE DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
                    ),
@@ -1499,6 +1500,24 @@ sub init_MANPODS {
             my $init_method = "init_${man}PODS";
             $self->$init_method();
         }
+    }
+
+    # logic similar to picking man${num}ext in perl's Configure script
+    foreach my $num (1,3) {
+        my $installdirs = uc $self->{INSTALLDIRS};
+        $installdirs = '' if $installdirs eq 'PERL';
+        my $mandir = $self->_expand_macros(
+            $self->{ "INSTALL${installdirs}MAN${num}DIR" } );
+        my $section = $num;
+
+        foreach ($num, "${num}p", "${num}pm", qw< l n o C L >, "L$num") {
+            if ( $mandir =~ /\b(?:man|cat)$_$/ ) {
+                $section = $_;
+                last;
+            }
+        }
+
+        $self->{"MAN${num}SECTION"} = $section;
     }
 }
 
