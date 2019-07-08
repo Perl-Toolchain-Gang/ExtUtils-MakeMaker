@@ -174,8 +174,8 @@ unlink $README;
 
         my $makefile = slurp('Makefile');
 
-        like $makefile, qr/^\QMAN1SECTION = 1pm\E$/xms, "Set MAN1SECTION";
-        like $makefile, qr/^\QMAN3SECTION = 3pm\E$/xms, "Set MAN3SECTION";
+        like $makefile, qr/\QMAN1SECTION = 1pm\E/xms, "Set MAN1SECTION";
+        like $makefile, qr/\QMAN3SECTION = 3pm\E/xms, "Set MAN3SECTION";
 
         like $makefile, qr/\Q$(POD2MAN) --section=$(MAN1SECTION) \E/,
             "Set POD2MAN section to \$(MAN1SECTION)";
