@@ -1,3 +1,8 @@
+7.37_04 Thu 22 Aug 15:20:34 BST 2019
+
+    Bug fixes:
+    - Fix static linking on macOS
+
 7.37_03 Sat Aug  3 12:37:29 BST 2019
 
     Enhancements:

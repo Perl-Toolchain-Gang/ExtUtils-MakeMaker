@@ -22,7 +22,7 @@ use strict;
 use ExtUtils::MakeMaker::Config;
 use File::Basename;
 
-our $VERSION = '7.37_03';
+our $VERSION = '7.37_04';
 $VERSION =~ tr/_//d;
 
 require ExtUtils::MM_Win32;
