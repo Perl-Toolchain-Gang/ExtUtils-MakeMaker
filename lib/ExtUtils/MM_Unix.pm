@@ -2818,14 +2818,14 @@ sub _find_static_libs {
 
 Called by a utility method of makeaperl. Checks whether a given file
 is an XS library by seeing whether it defines any symbols starting
-with C<boot_>.
+with C<boot_> (with an optional leading underscore - needed on MacOS).
 
 =cut
 
 sub xs_static_lib_is_xs {
     my ($self, $libfile) = @_;
     my $devnull = File::Spec->devnull;
-    return `nm $libfile 2>$devnull` =~ /\bboot_/;
+    return `nm $libfile 2>$devnull` =~ /\b_?boot_/;
 }
 
 =item makefile (o)
