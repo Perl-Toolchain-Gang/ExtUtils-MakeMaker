@@ -3021,23 +3021,66 @@ sub parse_version {
     return $result;
 }
 
+my $v = qr{v?[0-9._]+};
+my $_quoted_version = qr{
+  \s*
+  (?:
+      (['"]?) ($v) \1
+    | qq? \s* (?:
+      | ([^\s\w]) ($v) \3
+      | \s ([\w]) ($v) \5
+      | \( ($v) \)
+      | \< ($v) \>
+      | \[ ($v) \]
+      | \{ ($v) \}
+    )
+  )
+  \s*
+}x;
+
 sub get_version {
     my ($self, $parsefile, $sigil, $name) = @_;
     my $line = $_; # from the while() loop in parse_version
-    {
-        package ExtUtils::MakeMaker::_version;
-        undef *version; # in case of unexpected version() sub
-        eval {
-            require version;
-            version::->import;
-        };
-        no strict;
-        local *{$name};
-        local $^W = 0;
-        $line = $1 if $line =~ m{^(.+)}s;
-        eval($line); ## no critic
-        return ${$name};
+
+    if ($line =~ m{^\s*
+        (use \s+ version \s* ;)?
+        \s* (?:our)? \s* \Q${sigil}${name}\E \s* = (.+?) (?:;|$)
+    }x) {
+        my ($used_version, $assign) = ($1, $2);
+        my @match;
+        @match = $assign =~ m{^$_quoted_version$}
+          or @match = $assign =~ m{^\s*
+            version (?: ::qv | ->(?:parse|declare) ) \s* \(
+            $_quoted_version
+            \) \s*
+          $}x
+          or $used_version && (@match = $assign =~ m{^\s*
+            qv \s* \(
+            $_quoted_version
+            \) \s*
+          $}x);
+        # there will be either one or two defined matches.  if there are two,
+        # the first is the quote character
+        return $_ for grep defined, reverse @match;
     }
+
+    $self->_eval_version($parsefile, $sigil, $name, $line);
+}
+
+sub _eval_version {
+    my ($self, $parsefile, $sigil, $name, $line) = @_;
+    package ExtUtils::MakeMaker::_version;
+    undef *version; # in case of unexpected version() sub
+    eval {
+        require version;
+        version::->import;
+    };
+    no strict;
+    local *{$name};
+    local $^W = 0;
+    $line = $1 if $line =~ m{^(.+)}s;
+    eval($line); ## no critic
+    return ${$name};
 }
 
 =item pasthru (o)
