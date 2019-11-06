@@ -21,7 +21,7 @@ ExtUtils::MM_Win95 - method to customize MakeMaker for Win9X
 
 =head1 DESCRIPTION
 
-This is a subclass of ExtUtils::MM_Win32 containing changes necessary
+This is a subclass of L<ExtUtils::MM_Win32> containing changes necessary
 to get MakeMaker playing nice with command.com and other Win9Xisms.
 
 =head2 Overridden methods

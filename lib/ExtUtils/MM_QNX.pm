@@ -19,10 +19,10 @@ ExtUtils::MM_QNX - QNX specific subclass of ExtUtils::MM_Unix
 
 =head1 DESCRIPTION
 
-This is a subclass of ExtUtils::MM_Unix which contains functionality for
+This is a subclass of L<ExtUtils::MM_Unix> which contains functionality for
 QNX.
 
-Unless otherwise stated it works just like ExtUtils::MM_Unix
+Unless otherwise stated it works just like ExtUtils::MM_Unix.
 
 =head2 Overridden methods
 
