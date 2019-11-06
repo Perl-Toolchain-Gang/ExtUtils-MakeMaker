@@ -22,7 +22,7 @@ ExtUtils::MM_Cygwin - methods to override UN*X behaviour in ExtUtils::MakeMaker
 
 =head1 DESCRIPTION
 
-See ExtUtils::MM_Unix for a documentation of the methods provided there.
+See L<ExtUtils::MM_Unix> for a documentation of the methods provided there.
 
 =over 4
 
