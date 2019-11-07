@@ -100,6 +100,26 @@ sub init_linker {
     $self->{EXPORT_LIST}  ||= '';
 }
 
+=item maybe_command
+
+Determine whether a file is native to Cygwin by checking whether it
+resides inside the Cygwin installation (using Windows paths). If so,
+use C<ExtUtils::MM_Unix> to determine if it may be a command.
+Otherwise use the tests from C<ExtUtils::MM_Win32>.
+
+=cut
+
+sub maybe_command {
+    my ($self, $file) = @_;
+
+    my $cygpath = Cygwin::posix_to_win_path('/', 1);
+    my $filepath = Cygwin::posix_to_win_path($file, 1);
+
+    return (substr($filepath,0,length($cygpath)) eq $cygpath)
+    ? $self->SUPER::maybe_command($file) # Unix
+    : ExtUtils::MM_Win32->maybe_command($file); # Win32
+}
+
 =item dynamic_lib
 
 Use the default to produce the *.dll's.
