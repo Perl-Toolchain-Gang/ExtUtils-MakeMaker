@@ -104,8 +104,8 @@ sub init_linker {
 
 Determine whether a file is native to Cygwin by checking whether it
 resides inside the Cygwin installation (using Windows paths). If so,
-use C<ExtUtils::MM_Unix> to determine if it may be a command.
-Otherwise use the tests from C<ExtUtils::MM_Win32>.
+use L<ExtUtils::MM_Unix> to determine if it may be a command.
+Otherwise use the tests from L<ExtUtils::MM_Win32>.
 
 =cut
 
