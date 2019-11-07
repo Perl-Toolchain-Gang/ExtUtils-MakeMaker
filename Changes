@@ -1,3 +1,11 @@
+7.39_02 Thu  7 Nov 09:33:29 GMT 2019
+
+    Cygwin fixes:
+    - Removed MM_Cygwin all_target() override
+
+    Doc fixes:
+    - Add crosslinks to various referenced documentation
+
 7.39_01 Mon 16 Sep 07:19:37 BST 2019
 
     Test fixes:

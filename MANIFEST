@@ -122,6 +122,7 @@ t/MM_Unix.t
 t/MM_VMS.t
 t/MM_Win32.t
 t/oneliner.t
+t/os_unsupported.t
 t/parse_abstract.t
 t/parse_version.t
 t/PL_FILES.t
@@ -134,7 +135,6 @@ t/prereq.t
 t/prereq_print.t
 t/problems.t
 t/prompt.t
-t/os_unsupported.t
 t/recurs.t
 t/revision.t
 t/several_authors.t
@@ -143,6 +143,7 @@ t/test_boilerplate.t
 t/testdata/reallylongdirectoryname/arch1/Config.pm
 t/testdata/reallylongdirectoryname/arch2/Config.pm
 t/testlib.t
+t/testrules.yml
 t/unicode.t
 t/VERSION_FROM.t
 t/vstrings.t
