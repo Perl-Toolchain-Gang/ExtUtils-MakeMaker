@@ -609,7 +609,7 @@ modules except L<ExtUtils::MM_Any> chosen based on your operating system.
 
 NOTE: The main object used by MakeMaker is a PACK### object, *not*
 L<ExtUtils::MakeMaker>.  It is, effectively, a subclass of L<MY|ExtUtils::MY>,
-L<ExtUtils::Makemaker>, L<ExtUtils::Liblist> and ExtUtils::MM_{Current OS}
+L<ExtUtils::MakeMaker>, L<ExtUtils::Liblist> and ExtUtils::MM_{Current OS}
 
 NOTE: The methods in L<MY|ExtUtils::MY> are simply copied into PACK### rather
 than MY being a superclass of PACK###.  I don't remember the rationale.
