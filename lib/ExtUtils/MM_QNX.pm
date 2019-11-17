@@ -1,7 +1,7 @@
 package ExtUtils::MM_QNX;
 
 use strict;
-our $VERSION = '7.39_02';
+our $VERSION = '7.39_03';
 $VERSION =~ tr/_//d;
 
 require ExtUtils::MM_Unix;

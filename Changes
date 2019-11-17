@@ -1,3 +1,9 @@
+7.39_03 Sun 17 Nov 19:53:04 GMT 2019
+
+    Doc fixes:
+    - Fix typo in link to MakeMaker
+    - Link to referenced modules from MM_Cygwin maybe_command
+
 7.39_02 Thu  7 Nov 09:33:29 GMT 2019
 
     Cygwin fixes:

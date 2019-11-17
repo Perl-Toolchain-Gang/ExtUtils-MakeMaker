@@ -1,7 +1,7 @@
 package ExtUtils::MM_Any;
 
 use strict;
-our $VERSION = '7.39_02';
+our $VERSION = '7.39_03';
 $VERSION =~ tr/_//d;
 
 use Carp;
