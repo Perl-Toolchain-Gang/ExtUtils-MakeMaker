@@ -1,3 +1,12 @@
+7.39_04 Mon 18 Nov 14:54:46 GMT 2019
+
+    Test Fixes:
+    - Skip "merged /usr" tests on Cygwin
+
+    QA Fixes:
+    - Added cygwin testing with Github actions
+    - Added macos testing with Github actions
+
 7.39_03 Sun 17 Nov 19:53:04 GMT 2019
 
     Doc fixes:
