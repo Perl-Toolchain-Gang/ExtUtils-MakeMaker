@@ -210,7 +210,8 @@ sub _unix_os2_ext {
             # Now update library lists
 
             # what do we know about this library...
-            my $is_dyna = ( $fullname !~ /\Q$Config_libext\E\z/ );
+            # "Sounds like we should always assume it's a dynamic library on AIX."
+            my $is_dyna = $^O eq 'aix' ? 1 : ( $fullname !~ /\Q$Config_libext\E\z/ );
             my $in_perl = ( $libs =~ /\B-l:?\Q${thislib}\E\b/s );
 
             # include the path to the lib once in the dynamic linker path
