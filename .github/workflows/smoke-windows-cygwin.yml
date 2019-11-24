@@ -27,8 +27,6 @@ jobs:
         run: |
           dir c:\tools\cygwin
           path
-          C:\tools\cygwin\usr\bin\id.exe
-          C:\tools\cygwin\usr\bin\uname.exe -a
       - name: Check out again, using Cygwin git, to reset file permissions
         shell: cmd
         run: |
