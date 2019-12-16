@@ -2910,8 +2910,7 @@ sub libscan {
     my($self,$path) = @_;
 
     if ($path =~ m<^README\.pod$>i) {
-        warn "WARNING: Older versions of ExtUtils::MakeMaker may errantly install $path as part of this distribution. It is recommended to avoid using this path in CPAN modules.\n"
-          unless $ENV{PERL_CORE};
+        warn "WARNING: Older versions of ExtUtils::MakeMaker may errantly install $path as part of this distribution. It is recommended to avoid using this path in CPAN modules.\n";
         return '';
     }
 
