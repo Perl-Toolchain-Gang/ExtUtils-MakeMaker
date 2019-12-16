@@ -1,3 +1,13 @@
+7.41_01 Mon 16 Dec 21:36:24 GMT 2019
+
+    Test fixes:
+    - README.pod warnings are suppressed during testing
+      so no need to skip when PERL_CORE is defined
+
+    Doc fixes:
+    - Update referenced modules for new distributions
+    - Updated SEE ALSO section accordingly
+
 7.40    Mon 16 Dec 19:33:13 GMT 2019
 
     No changes since v7.39_05
