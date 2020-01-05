@@ -1,3 +1,11 @@
+7.43_01 Sun  5 Jan 12:41:43 GMT 2020
+
+    Bug fixes:
+    - Match final dir component in init_MANPODS
+
+    Test Fixes:
+    - Use internal reference to Makefile in build_man.t
+
 7.42    Tue 17 Dec 22:02:25 GMT 2019
 
     No changes since v7.41_01
