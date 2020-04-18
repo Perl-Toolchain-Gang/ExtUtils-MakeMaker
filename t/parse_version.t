@@ -62,10 +62,7 @@ if( "$]" >= 5.011001 ) {
     $versions{'package Foo::Bar v1.2.3;'  } = 'v1.2.3';
     $versions{' package Foo::Bar 1.23 ;'  } = '1.23';
     $versions{"package Foo'Bar 1.23;"     } = '1.23';
-    $versions{"package Foo::Bar 1.2.3;"   } = '1.2.3';
     $versions{'package Foo 1.230;'        } = '1.230';
-    $versions{'package Foo 1.23_01;'      } = '1.23_01';
-    $versions{'package Foo v1.23_01;'     } = 'v1.23_01';
     $versions{q["package Foo 1.23"]}        = undef;
     $versions{q[our $VERSION = "1.00 / the fucking fuck";]} = 'undef';
     $versions{<<'END'}                      = '1.23';
@@ -91,10 +88,7 @@ if( "$]" >= 5.014 ) {
     $versions{'package Foo::Bar v1.2.3 { }'  } = 'v1.2.3';
     $versions{' package Foo::Bar 1.23 { }'   } = '1.23';
     $versions{"package Foo'Bar 1.23 { }"     } = '1.23';
-    $versions{"package Foo::Bar 1.2.3 { }"   } = '1.2.3';
     $versions{'package Foo 1.230 { }'        } = '1.230';
-    $versions{'package Foo 1.23_01 { }'      } = '1.23_01';
-    $versions{'package Foo v1.23_01 { }'     } = 'v1.23_01';
     $versions{<<'END'}                      = '1.23';
 package Foo 1.23 {
 our $VERSION = 2.34;
