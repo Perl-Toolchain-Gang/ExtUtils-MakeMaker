@@ -25,7 +25,7 @@ my %versions = (q[$VERSION = '1.00']            => '1.00',
                 q[my $VERSION = '1.01']         => 'undef',
                 q[local $VERSION = '1.02']      => 'undef',
                 q[local $FOO::VERSION = '1.30'] => 'undef',
-                q[if( $Foo::VERSION >= 3.00 ) {]=> 'undef',
+                q[if( $Foo::VERSION >= 3.00 ) {]=> undef,
                 q[our $VERSION = '1.23';]       => '1.23',
                 q[$CGI::VERSION='3.63']         => '3.63',
                 q[$VERSION = "1.627"; # ==> ALSO update the version in the pod text below!] => '1.627',
@@ -64,7 +64,7 @@ if( "$]" >= 5.011001 ) {
     $versions{'package Foo 1.230;'        } = '1.230';
     $versions{'package Foo 1.23_01;'      } = '1.23_01';
     $versions{'package Foo v1.23_01;'     } = 'v1.23_01';
-    $versions{q["package Foo 1.23"]}        = 'undef';
+    $versions{q["package Foo 1.23"]}        = undef;
     $versions{<<'END'}                      = '1.23';
 package Foo 1.23;
 our $VERSION = 2.34;
