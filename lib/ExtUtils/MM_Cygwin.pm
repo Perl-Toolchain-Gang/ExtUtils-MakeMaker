@@ -100,6 +100,16 @@ sub init_linker {
     $self->{EXPORT_LIST}  ||= '';
 }
 
+sub init_others {
+    my $self = shift;
+
+    $self->SUPER::init_others;
+
+    $self->{LDLOADLIBS} ||= $Config{perllibs};
+
+    return;
+}
+
 =item maybe_command
 
 Determine whether a file is native to Cygwin by checking whether it
