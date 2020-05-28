@@ -1,3 +1,14 @@
+7.45_01 Thu 28 May 17:29:45 BST 2020
+
+    Bug fixes:
+    - Always link to $Config{libs} on cygwin
+
+    Test fixes:
+    - Fix testing how some versions should be parsed
+
+    QA fixes:
+    - Add libnsl-devel to Cygwin packages we need
+
 7.44    Tue 14 Jan 16:35:06 GMT 2020
 
     No changes since v7.43_01
