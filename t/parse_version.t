@@ -44,7 +44,7 @@ my %versions = (q[$VERSION = '1.00']            => '1.00',
                 '$VERSION = substr(q$Revision: 2.8 $, 10) + 2 . "";'                   => '4.8',
                 q[our $VERSION = do { my @r = ( q$Revision: 2.7 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };] => '2.07', # Fucking seriously?
                 'elsif ( $Something::VERSION >= 1.99 )' => undef,
-
+                q[our $VERSION = "1.00 / the fucking fuck";] => 'undef',
                );
 
 if( $Has_Version ) {
