@@ -1,3 +1,9 @@
+7.47_01 Fri 26 Jun 10:55:42 BST 2020
+
+    Bug fixes:
+    - Sanitise provided VERSION and VERSION_FROM
+      ( RT#132875 )
+
 7.46  Tue 23 Jun 10:19:40 BST 2020
 
     No changes since v7.45_01

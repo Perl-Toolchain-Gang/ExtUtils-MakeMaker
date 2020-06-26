@@ -9,7 +9,7 @@ require ExtUtils::MM_Unix;
 require ExtUtils::MM_Win32;
 our @ISA = qw( ExtUtils::MM_Unix );
 
-our $VERSION = '7.46';
+our $VERSION = '7.47_01';
 $VERSION =~ tr/_//d;
 
 
