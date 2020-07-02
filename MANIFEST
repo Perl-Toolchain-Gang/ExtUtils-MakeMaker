@@ -50,6 +50,7 @@ lib/ExtUtils/MM_DOS.pm
 lib/ExtUtils/MM_MacOS.pm
 lib/ExtUtils/MM_NW5.pm
 lib/ExtUtils/MM_OS2.pm
+lib/ExtUtils/MM_OS390.pm
 lib/ExtUtils/MM_QNX.pm
 lib/ExtUtils/MM_Unix.pm
 lib/ExtUtils/MM_UWIN.pm

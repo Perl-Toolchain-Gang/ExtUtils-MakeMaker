@@ -70,6 +70,7 @@ $Is{VOS}    = $^O eq 'vos';
 $Is{QNX}    = $^O eq 'qnx';
 $Is{AIX}    = $^O eq 'aix';
 $Is{Darwin} = $^O eq 'darwin';
+$IS{OS390}  = $^O eq 'os390';
 
 $Is{Unix}   = !grep { $_ } values %Is;
 
