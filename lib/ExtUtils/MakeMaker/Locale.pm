@@ -1,7 +1,7 @@
 package ExtUtils::MakeMaker::Locale;
 
 use strict;
-our $VERSION = "7.47_01";
+our $VERSION = "7.47_02";
 $VERSION =~ tr/_//d;
 
 use base 'Exporter';

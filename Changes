@@ -1,3 +1,9 @@
+7.47_02 Tue  7 Jul 01:40:13 BST 2020
+
+    OS390 Enhancements:
+    - Added MM subclass for OS390
+    - Override xs_make_dynamic_lib() for os390
+
 7.47_01 Fri 26 Jun 10:55:42 BST 2020
 
     Bug fixes:
