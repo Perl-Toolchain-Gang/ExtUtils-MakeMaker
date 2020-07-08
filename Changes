@@ -1,3 +1,8 @@
+7.47_03 Wed  8 Jul 21:58:29 BST 2020
+
+    Test fixes:
+    - Correct skip count in MM_Cygwin.t
+
 7.47_02 Tue  7 Jul 01:40:13 BST 2020
 
     OS390 Enhancements:
