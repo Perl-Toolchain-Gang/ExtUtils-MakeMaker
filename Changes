@@ -1,3 +1,12 @@
+7.47_04 Tue 28 Jul 19:34:00 BST 2020
+
+    Test fixes:
+    - Skip static tests on AIX and z/OS when in
+      core
+
+    QA fixes:
+    - Added v5.30 and v5.32 to travis build
+
 7.47_03 Wed  8 Jul 21:58:29 BST 2020
 
     Test fixes:
