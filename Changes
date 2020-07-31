@@ -1,3 +1,8 @@
+7.47_05 Fri 31 Jul 10:35:54 BST 2020
+
+    Bug fixes:
+    - use $^V instead of PERL_VERSION after Perl 5.10
+
 7.47_04 Tue 28 Jul 19:34:00 BST 2020
 
     Test fixes:

@@ -24,7 +24,7 @@ my %Recognized_Att_Keys;
 our %macro_fsentity; # whether a macro is a filesystem name
 our %macro_dep; # whether a macro is a dependency
 
-our $VERSION = '7.47_04';
+our $VERSION = '7.47_05';
 $VERSION =~ tr/_//d;
 
 # Emulate something resembling CVS $Revision$
