@@ -122,9 +122,9 @@ install:
   # setup testing method/options and test files
   - ps: . "${env:CI_HELPERS}\#install.setup-testing.PS1"
   # distribution prep prior to the build/make process (ie, build dependencies and OS_unsupported check)
-  - ps: ; write-host $("[{0:HH:mm:ss}].install (distribution requirements and recommendations)" -f $($mark_sub = get-date; $mark_sub)) -f darkgray
-  - ps: . "${env:CI_HELPERS}\#install.setup-dist.PS1"
-  - ps: ; write-host $("[{0:HH:mm:ss}].install (distribution requirements and recommendations) ... done ({1:0.0}s)" -f $(get-date; $($(get-date) - $mark_sub).totalseconds)) -f gray
+  # ps: ; write-host $("[{0:HH:mm:ss}].install (distribution requirements and recommendations)" -f $($mark_sub = get-date; $mark_sub)) -f darkgray
+  # ps: . "${env:CI_HELPERS}\#install.setup-dist.PS1"
+  # ps: ; write-host $("[{0:HH:mm:ss}].install (distribution requirements and recommendations) ... done ({1:0.0}s)" -f $(get-date; $($(get-date) - $mark_sub).totalseconds)) -f gray
   # coverage prep
   - ps: ; write-host $("[{0:HH:mm:ss}].install (coverage requirements)" -f $($mark_sub = get-date; $mark_sub)) -f darkgray
   - ps: . "${env:CI_HELPERS}\#install.setup-coverage.PS1"
