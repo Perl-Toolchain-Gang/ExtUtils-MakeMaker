@@ -1,3 +1,8 @@
+7.47_06 Sat  1 Aug 14:36:00 BST 2020
+
+    Bug fixes:
+    - Refine archname to use abi_version and abi_revision
+
 7.47_05 Fri 31 Jul 10:35:54 BST 2020
 
     Bug fixes:
