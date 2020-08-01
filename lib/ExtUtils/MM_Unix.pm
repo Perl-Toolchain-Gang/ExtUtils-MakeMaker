@@ -3240,11 +3240,8 @@ PPD_PERLVERS
     # archname did not change from 5.6 to 5.8, but those versions may
     # not be not binary compatible so now we append the part of the
     # version that changes when binary compatibility may change
-    if( "$]" >= 5.010) {
-        $archname .= "-$^V->{version}->[0].$^V->{version}->[1]"; # v5.32.5 => 5.32
-    }
-    elsif ("$]" >= 5.008) {
-        $archname .= "-$Config{PERL_REVISION}.$Config{PERL_VERSION}";
+    if ("$]" >= 5.008) {
+        $archname .= "-$Config{api_revision}.$Config{api_version}";
     }
     push @ppd_chunks, sprintf <<'PPD_OUT', $archname;
         <ARCHITECTURE NAME="%s" />
