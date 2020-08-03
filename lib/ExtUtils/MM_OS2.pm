@@ -1,6 +1,7 @@
 package ExtUtils::MM_OS2;
 
 use strict;
+use warnings;
 
 use ExtUtils::MakeMaker qw(neatvalue);
 use File::Spec;

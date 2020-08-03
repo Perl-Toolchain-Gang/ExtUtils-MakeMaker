@@ -12,6 +12,7 @@ package ExtUtils::MakeMaker::version;
 
 use 5.006001;
 use strict;
+use warnings;
 
 use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
 

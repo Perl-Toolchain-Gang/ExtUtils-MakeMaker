@@ -2,6 +2,7 @@
 package ExtUtils::MakeMaker;
 
 use strict;
+use warnings;
 
 BEGIN {require 5.006;}
 

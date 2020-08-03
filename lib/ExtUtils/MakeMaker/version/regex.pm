@@ -7,6 +7,7 @@
 package ExtUtils::MakeMaker::version::regex;
 
 use strict;
+use warnings;
 
 use vars qw($VERSION $CLASS $STRICT $LAX);
 

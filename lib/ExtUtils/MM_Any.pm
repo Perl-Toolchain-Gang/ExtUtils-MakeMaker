@@ -1,6 +1,7 @@
 package ExtUtils::MM_Any;
 
 use strict;
+use warnings;
 our $VERSION = '7.47_06';
 $VERSION =~ tr/_//d;
 
@@ -1670,7 +1671,7 @@ sub _mymeta_from_meta {
     # rolled their own tarball rather than using "make dist".
     if ($meta->{generated_by} &&
         $meta->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
-        my $eummv = do { local $^W = 0; $1+0; };
+        my $eummv = do { no warnings; $1+0; };
         if ($eummv < 6.2501) {
             return;
         }

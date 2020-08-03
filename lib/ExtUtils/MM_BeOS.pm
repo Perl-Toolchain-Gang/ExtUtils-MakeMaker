@@ -1,6 +1,7 @@
 package ExtUtils::MM_BeOS;
 
 use strict;
+use warnings;
 
 =head1 NAME
 

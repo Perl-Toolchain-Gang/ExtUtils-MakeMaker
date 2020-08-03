@@ -1,6 +1,7 @@
 package ExtUtils::MM_Cygwin;
 
 use strict;
+use warnings;
 
 use ExtUtils::MakeMaker::Config;
 use File::Spec;

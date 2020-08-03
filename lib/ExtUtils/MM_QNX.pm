@@ -1,6 +1,7 @@
 package ExtUtils::MM_QNX;
 
 use strict;
+use warnings;
 our $VERSION = '7.47_06';
 $VERSION =~ tr/_//d;
 

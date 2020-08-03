@@ -3,6 +3,7 @@ package ExtUtils::MM_Unix;
 require 5.006;
 
 use strict;
+use warnings;
 
 use Carp;
 use ExtUtils::MakeMaker::Config;
@@ -3000,7 +3001,7 @@ sub parse_version {
         chop;
         next if /^\s*(if|unless|elsif)/;
         if ( m{^ \s* package \s+ \w[\w\:\']* \s+ (v?[0-9._]+) \s* (;|\{)  }x ) {
-            local $^W = 0;
+            no warnings;
             $result = $1;
         }
         elsif ( m{(?<!\\) ([\$*]) (([\w\:\']*) \bVERSION)\b .* (?<![<>=!])\=[^=]}x ) {
@@ -3037,8 +3038,8 @@ sub get_version {
             version::->import;
         };
         no strict;
+        no warnings;
         local *{$name};
-        local $^W = 0;
         $line = $1 if $line =~ m{^(.+)}s;
         eval($line); ## no critic
         return ${$name};
