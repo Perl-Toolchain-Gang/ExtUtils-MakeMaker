@@ -142,8 +142,10 @@ sub init_tools {
     $self->{NOOP}     ||= 'rem';
     $self->{DEV_NULL} ||= '> NUL';
 
+    my $src = $self->{PERL_SRC} || '';
+
     $self->{FIXIN}    ||= $self->{PERL_CORE} ?
-      "\$(PERLRUN) -I$self->{PERL_SRC}\\cpan\\ExtUtils-PL2Bat\\lib $self->{PERL_SRC}\\win32\\bin\\pl2bat.pl" :
+      "\$(PERLRUN) -I$src\\cpan\\ExtUtils-PL2Bat\\lib $src\\win32\\bin\\pl2bat.pl" :
       'pl2bat.bat';
 
     $self->SUPER::init_tools;
