@@ -32,6 +32,7 @@ modify it under the same terms as Perl itself.
 
 use Carp;
 use strict;
+use warnings;
 use vars qw($VERSION @ISA);
 use IO::Handle;
 

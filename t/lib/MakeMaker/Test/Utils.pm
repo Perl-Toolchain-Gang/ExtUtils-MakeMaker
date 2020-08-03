@@ -2,6 +2,7 @@ package MakeMaker::Test::Utils;
 
 use File::Spec;
 use strict;
+use warnings;
 use Config;
 use Cwd qw(getcwd);
 use Carp qw(croak);

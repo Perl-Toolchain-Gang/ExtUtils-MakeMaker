@@ -2,6 +2,8 @@ package MakeMaker::Test::NoXS;
 
 # Disable all XS loading.
 
+use strict;
+use warnings;
 use Carp;
 
 require DynaLoader;

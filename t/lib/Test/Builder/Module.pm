@@ -1,6 +1,7 @@
 package Test::Builder::Module;
 
 use strict;
+use warnings;
 
 use Test::Builder 0.99;
 

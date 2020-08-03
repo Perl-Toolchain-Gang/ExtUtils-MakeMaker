@@ -5,6 +5,7 @@ require Exporter;
 @EXPORT = qw(run_tests list_dynamic list_static);
 
 use strict;
+use warnings;
 use File::Path;
 use MakeMaker::Test::Utils;
 use Config;

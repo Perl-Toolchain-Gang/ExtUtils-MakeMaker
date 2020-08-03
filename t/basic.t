@@ -13,6 +13,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use Config;
 use ExtUtils::MakeMaker;
 use utf8;
