@@ -1,3 +1,13 @@
+7.47_07 Mon  3 Aug 22:34:08 BST 2020
+
+    Bug fixes:
+    - Ensure all modules have 'use warnings'
+    - Resolve revealed problems with warnings
+
+    Test fixes:
+    - Ensure all tests have strict and warnings
+    - Resolve revealed problems with strict and warnings
+
 7.47_06 Sat  1 Aug 14:36:00 BST 2020
 
     Bug fixes:
