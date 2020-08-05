@@ -21,8 +21,11 @@ jobs:
       - name: Find out environment
         shell: cmd
         run: |
-          dir c:\strawberryperl
+          dir c:\Strawberry
           path
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{gcc})"
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
       - name: Configure
         shell: cmd
         run: |
