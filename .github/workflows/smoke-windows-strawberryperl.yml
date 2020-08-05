@@ -1,0 +1,37 @@
+name: smoke-windows-strawberryperl
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+
+    runs-on: windows-latest
+
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@master
+        with:
+            fetch-depth: 10
+      - name: Find out environment
+        shell: cmd
+        run: |
+          dir c:\strawberryperl
+          path
+      - name: Configure
+        shell: cmd
+        run: |
+            perl Makefile.PL
+      - name: Build
+        shell: cmd
+        run: |
+            make
+      - name: Run Tests
+        shell: cmd
+        run: |
+            make test
