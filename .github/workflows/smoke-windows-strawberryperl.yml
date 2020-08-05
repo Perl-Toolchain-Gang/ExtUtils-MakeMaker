@@ -26,15 +26,22 @@ jobs:
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{gcc})"
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
+          path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{gcc})"
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
       - name: Configure
         shell: cmd
         run: |
+            path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
             perl Makefile.PL
       - name: Build
         shell: cmd
         run: |
-            make
+            path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
+            gmake
       - name: Run Tests
         shell: cmd
         run: |
-            make test
+            path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
+            gmake test
