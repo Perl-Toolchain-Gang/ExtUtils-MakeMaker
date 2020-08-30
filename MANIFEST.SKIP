@@ -34,3 +34,4 @@ inc/
 admin
 .gitignore
 .travis.yml
+^\.github
