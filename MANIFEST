@@ -144,7 +144,6 @@ t/test_boilerplate.t
 t/testdata/reallylongdirectoryname/arch1/Config.pm
 t/testdata/reallylongdirectoryname/arch2/Config.pm
 t/testlib.t
-t/testrules.yml
 t/unicode.t
 t/VERSION_FROM.t
 t/vstrings.t
