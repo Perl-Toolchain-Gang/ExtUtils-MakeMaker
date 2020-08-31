@@ -1,3 +1,13 @@
+7.47_08 Mon 31 Aug 09:43:01 BST 2020
+
+    Test fixes:
+    - Resolved race conditions so the whole testsuite
+      can be run in parallel safely again
+
+    QA Fixes:
+    - Added github action for Strawberry Perl
+    - Added github action for Ubuntu/Linux
+
 7.47_07 Mon  3 Aug 22:34:08 BST 2020
 
     Bug fixes:
