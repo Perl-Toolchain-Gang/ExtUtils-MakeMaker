@@ -3979,8 +3979,6 @@ sub top_targets {
 pure_all :: config pm_to_blib subdirs linkext
 	$(NOECHO) $(NOOP)
 
-	$(NOECHO) $(NOOP)
-
 subdirs :: $(MYEXTLIB)
 	$(NOECHO) $(NOOP)
 
