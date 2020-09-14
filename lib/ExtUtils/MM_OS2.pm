@@ -6,7 +6,7 @@ use warnings;
 use ExtUtils::MakeMaker qw(neatvalue);
 use File::Spec;
 
-our $VERSION = '7.47_08';
+our $VERSION = '7.47_09';
 $VERSION =~ tr/_//d;
 
 require ExtUtils::MM_Any;

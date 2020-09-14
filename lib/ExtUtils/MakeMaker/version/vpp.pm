@@ -129,7 +129,7 @@ use warnings;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
-$VERSION = '7.47_08';
+$VERSION = '7.47_09';
 $VERSION =~ tr/_//d;
 $CLASS = 'ExtUtils::MakeMaker::version::vpp';
 
