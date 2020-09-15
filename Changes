@@ -1,3 +1,8 @@
+7.47_10 Tue 15 Sep 19:30:32 BST 2020
+
+    Test fixes:
+    - BareV2String should also be skipped on v5.8.0
+
 7.47_09 Mon 14 Sep 14:33:52 BST 2020
 
     Bug fixes:
