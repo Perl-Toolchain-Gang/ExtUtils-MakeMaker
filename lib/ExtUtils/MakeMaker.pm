@@ -1155,20 +1155,19 @@ sub check_hints {
 }
 
 sub _run_hintfile {
-    our $self;
-    local($self) = shift;       # make $self available to the hint file.
-    my($hint_file) = shift;
+    my ($self, $hint_file) = @_;
 
     local($@, $!);
     print "Processing hints file $hint_file\n" if $Verbose;
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into @INC
-    local @INC = (File::Spec->curdir, @INC);
-    my $ret = do $hint_file;
-    if( !defined $ret ) {
-        my $error = $@ || $!;
-        warn $error;
+    if(open(my $fh, '<', $hint_file)) {
+        eval join('', <$fh>);
+        warn "Failed to run hint file $hint_file: $@" if $@;
+    }
+    else {
+        warn "Could not open $hint_file for read: $!";
     }
 }
 
