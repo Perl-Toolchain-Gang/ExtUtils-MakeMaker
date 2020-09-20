@@ -1,3 +1,8 @@
+7.47_11 Sun 20 Sep 10:02:15 BST 2020
+
+    Enhancements:
+    - Hint file loading returned to using eval() as documented
+
 7.47_10 Tue 15 Sep 19:30:32 BST 2020
 
     Test fixes:
