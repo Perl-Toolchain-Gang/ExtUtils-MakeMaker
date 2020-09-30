@@ -1,3 +1,11 @@
+7.47_12 Wed 30 Sep 16:19:25 BST 2020
+
+    Bug fixes:
+    - Make Mkbootstrap.pm strict
+
+    Test fixes:
+    - Skip the failing dynamic vs static tests on Win32
+
 7.47_11 Sun 20 Sep 10:02:15 BST 2020
 
     Enhancements:
