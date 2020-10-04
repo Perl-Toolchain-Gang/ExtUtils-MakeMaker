@@ -2976,7 +2976,7 @@ that purpose.
 
 =item XSPROTOARG
 
-May be set to C<-protoypes>, C<-noprototypes> or the empty string.  The
+May be set to C<-prototypes>, C<-noprototypes> or the empty string.  The
 empty string is equivalent to the xsubpp default, or C<-noprototypes>.
 See the xsubpp documentation for details.  MakeMaker
 defaults to the empty string.
