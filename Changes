@@ -1,3 +1,12 @@
+7.49_02 Thu  8 Oct 08:35:05 BST 2020
+
+    Bug fixes:
+    - Change wording of MIN_PERL_VERSION format message to clarify
+      fatally
+
+    Doc fixes:
+    - Fixed some typos
+
 7.49_01 Tue  6 Oct 18:01:38 BST 2020
 
     Regression fixes:

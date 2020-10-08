@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker::Config;
 
-our $VERSION = '7.49_01';
+our $VERSION = '7.49_02';
 $VERSION =~ tr/_//d;
 
 require ExtUtils::Liblist;
