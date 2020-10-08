@@ -158,7 +158,7 @@ END
         );
     };
     is( $@, <<'END', 'Invalid MIN_PERL_VERSION is fatal' );
-Warning: MIN_PERL_VERSION is not in a recognized format.
+MakeMaker FATAL: MIN_PERL_VERSION is not in a recognized format.
 Recommended is a quoted numerical value like '5.005' or '5.008001'.
 END
 
