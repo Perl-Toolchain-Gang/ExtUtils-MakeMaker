@@ -511,50 +511,43 @@ sub new {
 
     check_hints($self);
 
-    if ( defined $self->{MIN_PERL_VERSION}
-          && $self->{MIN_PERL_VERSION} !~ /^v?[\d_\.]+$/ ) {
-      require version;
-      my $normal = eval {
-        local $SIG{__WARN__} = sub {
-            # simulate "use warnings FATAL => 'all'" for vintage perls
-            die @_;
-        };
-        version->new( $self->{MIN_PERL_VERSION} )
-      };
-      $self->{MIN_PERL_VERSION} = $normal if defined $normal && !$@;
-    }
+    if ( $self->{MIN_PERL_VERSION}) {
+        my $perl_version = $self->{MIN_PERL_VERSION};
+        if (ref $perl_version) {
+            # assume a version object
+        }
+        else {
+            $perl_version = eval {
+                local $SIG{__WARN__} = sub {
+                    # simulate "use warnings FATAL => 'all'" for vintage perls
+                    die @_;
+                };
+                version->new( $perl_version )->numify;
+            };
+            $perl_version =~ tr/_//d
+                if defined $perl_version;
+        }
 
-    # Translate X.Y.Z to X.00Y00Z
-    if( defined $self->{MIN_PERL_VERSION} ) {
-        $self->{MIN_PERL_VERSION} =~ s{ ^v? (\d+) \. (\d+) \. (\d+) $ }
-                                      {sprintf "%d.%03d%03d", $1, $2, $3}ex;
-    }
-
-    my $perl_version_ok = eval {
-        local $SIG{__WARN__} = sub {
-            # simulate "use warnings FATAL => 'all'" for vintage perls
-            die @_;
-        };
-        !$self->{MIN_PERL_VERSION} or $self->{MIN_PERL_VERSION} <= "$]"
-    };
-    if (!$perl_version_ok) {
-        if (!defined $perl_version_ok) {
-            die <<'END';
-MakeMaker FATAL: MIN_PERL_VERSION is not in a recognized format.
+        if (!defined $perl_version) {
+            # should this be a warning?
+            die sprintf <<'END', $self->{MIN_PERL_VERSION};
+MakeMaker FATAL: MIN_PERL_VERSION (%s) is not in a recognized format.
 Recommended is a quoted numerical value like '5.005' or '5.008001'.
 END
         }
-        elsif ($self->{PREREQ_FATAL}) {
-            die sprintf <<"END", $self->{MIN_PERL_VERSION}, $];
-MakeMaker FATAL: perl version too low for this distribution.
-Required is %s. We run %s.
+        elsif ($perl_version > "$]") {
+            my $message = sprintf <<'END', $perl_version, $];
+Perl version %s or higher required. We run %s.
 END
+            if ($self->{PREREQ_FATAL}) {
+                die "MakeMaker FATAL: $message";
+            }
+            else {
+                warn "Warning: $message";
+            }
         }
-        else {
-            warn sprintf
-                "Warning: Perl version %s or higher required. We run %s.\n",
-                $self->{MIN_PERL_VERSION}, $];
-        }
+
+        $self->{MIN_PERL_VERSION} = $perl_version;
     }
 
     my %configure_att;         # record &{$self->{CONFIGURE}} attributes
