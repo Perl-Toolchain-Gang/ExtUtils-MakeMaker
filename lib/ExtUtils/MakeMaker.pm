@@ -1160,10 +1160,10 @@ sub _run_hintfile {
     local($@, $!);
     print "Processing hints file $hint_file\n" if $Verbose;
 
-    # Just in case the ./ isn't on the hint file, which File::Spec can
-    # often strip off, we bung the curdir into @INC
     if(open(my $fh, '<', $hint_file)) {
-        eval join('', <$fh>);
+        my $hints_content = do { local $/; <$fh> };
+        no strict;
+        eval $hints_content;
         warn "Failed to run hint file $hint_file: $@" if $@;
     }
     else {
