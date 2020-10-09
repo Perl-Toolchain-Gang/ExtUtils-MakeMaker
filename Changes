@@ -1,3 +1,11 @@
+7.49_03 Fri  9 Oct 21:30:57 BST 2020
+
+    Regression fixes:
+    - disable strict when evaling hints files
+
+    Bug fixes:
+    - clean up and improve MIN_PERL_VERSION handling
+
 7.49_02 Thu  8 Oct 08:35:05 BST 2020
 
     Bug fixes:
