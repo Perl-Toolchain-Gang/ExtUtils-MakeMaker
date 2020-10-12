@@ -46,4 +46,18 @@ sub init_dist {
     $self->SUPER::init_dist(@_);
 }
 
+=head3 cflags
+
+Over-ride Apple's automatic setting of -Werror
+
+=cut
+
+sub cflags {
+    my $self = shift;
+
+    $self->{CCFLAGS} .= ($self->{CCFLAGS} ? ' ' : '').'-Wno-error=implicit-function-declaration';
+
+    $self->SUPER::cflags(@_);
+}
+
 1;
