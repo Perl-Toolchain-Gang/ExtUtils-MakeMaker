@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - run: git config --global core.autocrlf false
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
             fetch-depth: 10
       - name: Set up Cygwin
@@ -27,23 +27,17 @@ jobs:
         run: |
           dir c:\tools\cygwin
           path
+          echo "c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin" ^| Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
+          path
       - name: Check out again, using Cygwin git, to reset file permissions
         shell: cmd
-        run: |
-            path c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin
-            git checkout --force
+        run: git checkout --force
       - name: Configure
         shell: cmd
-        run: |
-            path c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin
-            perl Makefile.PL
+        run: perl Makefile.PL
       - name: Build
         shell: cmd
-        run: |
-            path c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin
-            make
+        run: make
       - name: Run Tests
         shell: cmd
-        run: |
-            path c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin
-            make test
+        run: make test

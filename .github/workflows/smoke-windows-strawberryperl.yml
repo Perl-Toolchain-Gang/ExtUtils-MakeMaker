@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - run: git config --global core.autocrlf false
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
             fetch-depth: 10
       - name: Find out environment
@@ -26,22 +26,17 @@ jobs:
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{gcc})"
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
-          path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
+          echo "C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;$env:PATH" ^| Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{gcc})"
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
+      - run: $env:PATH
       - name: Configure
         shell: cmd
-        run: |
-            path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
-            perl Makefile.PL
+        run: perl Makefile.PL
       - name: Build
         shell: cmd
-        run: |
-            path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
-            gmake
+        run: gmake
       - name: Run Tests
         shell: cmd
-        run: |
-            path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
-            gmake test
+        run: gmake test
