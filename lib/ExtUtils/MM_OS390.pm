@@ -2,7 +2,7 @@ package ExtUtils::MM_OS390;
 
 use strict;
 use warnings;
-our $VERSION = '7.49_03';
+our $VERSION = '7.49_04';
 $VERSION =~ tr/_//d;
 
 use ExtUtils::MakeMaker::Config;
