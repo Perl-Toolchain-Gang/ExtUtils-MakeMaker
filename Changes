@@ -1,3 +1,8 @@
+7.51_01 Wed  4 Nov 00:01:41 GMT 2020
+
+    Test fixes:
+    - prevent MM_Win32::init_tools() warning in core
+
 7.50    Wed 21 Oct 17:33:53 BST 2020
 
     No changes since v7.49_04
