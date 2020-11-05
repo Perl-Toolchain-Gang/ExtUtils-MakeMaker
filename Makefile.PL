@@ -82,10 +82,10 @@ my $MM = WriteMakefile(
             directory => [ qw(bundled my) ],
         },
         resources => {
-            license     => 'http://dev.perl.org/licenses/',
+            license     => 'https://dev.perl.org/licenses/',
             homepage    => 'https://metacpan.org/release/ExtUtils-MakeMaker',
-            bugtracker  => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
-            repository  => 'http://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker',
+            bugtracker  => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
+            repository  => 'https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker',
             MailingList => 'makemaker@perl.org',
         },
     },
