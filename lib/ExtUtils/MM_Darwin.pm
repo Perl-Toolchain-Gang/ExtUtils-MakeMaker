@@ -2,6 +2,7 @@ package ExtUtils::MM_Darwin;
 
 use strict;
 use warnings;
+use Config;
 
 BEGIN {
     require ExtUtils::MM_Unix;
@@ -55,7 +56,7 @@ Over-ride Apple's automatic setting of -Werror
 sub cflags {
     my $self = shift;
 
-    $self->{CCFLAGS} .= ($self->{CCFLAGS} ? ' ' : '').'-Wno-error=implicit-function-declaration';
+    $self->{CCFLAGS} .= ($self->{CCFLAGS} ? ' ' : "$Config{ccflags} ").'-Wno-error=implicit-function-declaration';
 
     $self->SUPER::cflags(@_);
 }
