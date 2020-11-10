@@ -1,3 +1,11 @@
+7.53_01 Tue 10 Nov 03:34:42 GMT 2020
+
+    Regression fixes:
+    - Fixed Darwin cflags override
+
+    Meta fixes:
+    - Updated URLs to use https
+
 7.52    Wed  4 Nov 19:49:43 GMT 2020
 
     No changes since v7.51_01
