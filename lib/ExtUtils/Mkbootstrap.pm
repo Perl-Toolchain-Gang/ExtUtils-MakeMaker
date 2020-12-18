@@ -3,7 +3,7 @@ package ExtUtils::Mkbootstrap;
 use strict;
 use warnings;
 
-our $VERSION = '7.56';
+our $VERSION = '7.57_01';
 $VERSION =~ tr/_//d;
 
 require Exporter;

@@ -1,3 +1,11 @@
+7.57_01 Fri 18 Dec 13:30:30 GMT 2020
+
+    Macosx fixes:
+    - Use dlopen to check for library presence on Mac OS (Big Sur fix)
+
+    Bug fixes:
+    - check CPAN::Meta::Requirements capabilities rather than prereqs
+
 7.56    Thu 19 Nov 19:57:05 GMT 2020
 
     No changes since v7.55_01
