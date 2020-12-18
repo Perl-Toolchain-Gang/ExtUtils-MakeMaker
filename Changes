@@ -1,3 +1,8 @@
+7.57_02 Fri 18 Dec 23:04:09 GMT 2020
+
+    Macosx fixes:
+    - Improve dlopen check on MacOS
+
 7.57_01 Fri 18 Dec 13:30:30 GMT 2020
 
     Macosx fixes:
