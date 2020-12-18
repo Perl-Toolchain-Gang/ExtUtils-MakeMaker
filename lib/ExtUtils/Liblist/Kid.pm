@@ -174,6 +174,10 @@ sub _unix_os2_ext {
                 && -f ( $fullname = "$thispth/lib$thislib.$Config_dlext" ) )
             {
             }
+            elsif ( defined( $Config_dlext ) && $^O eq 'darwin' && require DynaLoader && defined &DynaLoader::dl_load_file
+                && DynaLoader::dl_load_file( $fullname = "$thispth/lib$thislib.$Config_dlext", 0 ) )
+            {
+            }
             elsif ( -f ( $fullname = "$thispth/$thislib$Config_libext" ) ) {
             }
             elsif ( -f ( $fullname = "$thispth/lib$thislib.dll$Config_libext" ) ) {
