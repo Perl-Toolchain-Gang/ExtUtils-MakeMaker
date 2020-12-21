@@ -1,4 +1,4 @@
-name: smoke-macos-xcode11
+name: smoke-macos-bigsur
 
 on:
   push:
