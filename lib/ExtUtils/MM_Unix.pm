@@ -2590,7 +2590,7 @@ MAP_PERLINC   = @{$perlinc || []}
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
 
-$(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
+$(MAKE_APERL_FILE) : static pm_to_blib
 	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR="}, $dir, q{" \
@@ -3989,7 +3989,7 @@ sub top_targets {
     push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
 
     push @m, sprintf <<'EOF';
-pure_all :: config pm_to_blib subdirs linkext
+pure_all :: pm_to_blib subdirs linkext
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)

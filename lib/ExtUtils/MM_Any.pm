@@ -874,7 +874,7 @@ create_distdir :
 	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
 		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
 
-distdir : create_distdir %s %s
+distdir : %s %s
 	$(NOECHO) $(NOOP)
 
 MAKE_FRAG
@@ -1037,7 +1037,7 @@ sub dynamic {
 
     my($self) = shift;
     '
-dynamic :: $(FIRST_MAKEFILE) config $(INST_BOOT) $(INST_DYNAMIC)
+dynamic :: config $(INST_BOOT) $(INST_DYNAMIC)
 	$(NOECHO) $(NOOP)
 ';
 }
@@ -1075,17 +1075,8 @@ all POD files in MAN1PODS and MAN3PODS.
 sub manifypods_target {
     my($self) = shift;
 
-    my $man1pods      = '';
-    my $man3pods      = '';
-    my $dependencies  = '';
-
-    # populate manXpods & dependencies:
-    foreach my $name (sort keys %{$self->{MAN1PODS}}, sort keys %{$self->{MAN3PODS}}) {
-        $dependencies .= " \\\n\t$name";
-    }
-
     my $manify = <<END;
-manifypods : pure_all config $dependencies
+manifypods : pure_all config
 END
 
     my @man_cmds;
@@ -1609,7 +1600,7 @@ CODE
     my @add_meta_to_distdir = map { $self->cd('$(DISTVNAME)', $_) } @add_meta;
 
     return sprintf <<'MAKE', @add_meta_to_distdir;
-distmeta : create_distdir metafile
+distmeta : metafile
 	$(NOECHO) %s
 	$(NOECHO) %s
 
