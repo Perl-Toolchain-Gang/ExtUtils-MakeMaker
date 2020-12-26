@@ -45,3 +45,8 @@ jobs:
         run: |
             path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
             gmake test
+      - name: Run disttest
+        shell: cmd
+        run: |
+            path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
+            gmake disttest NOECHO=
