@@ -25,7 +25,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 188);
+    : (tests => 195);
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -186,64 +186,48 @@ open $fh, '>', $makefile;
 print $fh $mtext;
 close $fh;
 
-my $install_out = run("$make install");
-is( $?, 0, 'install' ) || diag $install_out;
-like( $install_out, qr/^Installing /m );
-
 sub check_dummy_inst {
-    my ($loc, $skipsubdir) = @_;
-    my %files = ();
-    find( sub {
-	# do it case-insensitive for non-case preserving OSs
-	my $file = lc $_;
-	# VMS likes to put dots on the end of things that don't have them.
-	$file =~ s/\.$// if $Is_VMS;
-	$files{$file} = $File::Find::name;
-    }, $loc );
-    ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'liar.pm'},      '  Liar.pm installed'  ) unless $skipsubdir;
-    ok( $files{'program'},      '  program installed'  );
-    ok( $files{'.packlist'},    '  packlist created'   );
-    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    my ($loc, $install_args, $label, $skipsubdir) = @_;
+    my %files;
+    SKIP: {
+        my $install_out = run("$make install NOECHO= $install_args");
+        is( $?, 0, "install $label" ) || diag $install_out;
+        like( $install_out, qr/^Installing /m, "/Installing/ $label" );
+        ok( -r $loc,     "$label install dir created" )
+            or skip "$loc doesn't exist", 5;
+        find( sub {
+            # do it case-insensitive for non-case preserving OSs
+            my $file = lc $_;
+            # VMS likes to put dots on the end of things that don't have them.
+            $file =~ s/\.$// if $Is_VMS;
+            $files{$file} = $File::Find::name;
+        }, $loc );
+        ok( $files{'dummy.pm'},     "  Dummy.pm installed $label" );
+        if ($skipsubdir) { ok 1 } else {
+            ok( $files{'liar.pm'},      "  Liar.pm installed $label"  );
+        }
+        ok( $files{'program'},      "  program installed $label"  );
+        ok( $files{'.packlist'},    "  packlist created $label"   );
+        ok( $files{'perllocal.pod'},"  perllocal.pod created $label" );
+    }
     \%files;
 }
 
-SKIP: {
-    ok( -r $DUMMYINST,     '  install dir created' )
-	or skip "$DUMMYINST doesn't exist", 5;
-    check_dummy_inst($DUMMYINST);
-}
+check_dummy_inst($DUMMYINST, '', 'Module::Install style');
 
 SKIP: {
     skip 'VMS install targets do not preserve $(PREFIX)', 8 if $Is_VMS;
-
-    $install_out = run("$make install PREFIX=elsewhere");
-    is( $?, 0, 'install with PREFIX override' ) || diag $install_out;
-    like( $install_out, qr/^Installing /m );
-
-    ok( -r 'elsewhere',     '  install dir created' );
-    check_dummy_inst('elsewhere');
+    check_dummy_inst('elsewhere', "PREFIX=elsewhere", 'with PREFIX');
     rmtree('elsewhere');
 }
 
-
 SKIP: {
     skip 'VMS install targets do not preserve $(DESTDIR)', 10 if $Is_VMS;
-
-    $install_out = run("$make install PREFIX= DESTDIR=other");
-    is( $?, 0, 'install with DESTDIR' ) ||
-        diag $install_out;
-    like( $install_out, qr/^Installing /m );
-
-    ok( -d 'other',  '  destdir created' );
-    my $files = check_dummy_inst('other');
-
-    ok( open(PERLLOCAL, $files->{'perllocal.pod'} ) ) ||
-        diag("Can't open $files->{'perllocal.pod'}: $!");
-    { local $/;
-      unlike(<PERLLOCAL>, qr/other/, 'DESTDIR should not appear in perllocal');
-    }
-    close PERLLOCAL;
+    my $files = check_dummy_inst('other', 'PREFIX= DESTDIR=other', 'with DESTDIR');
+    eval {
+        unlike slurp($files->{'perllocal.pod'}), qr/other/, 'DESTDIR should not appear in perllocal'; 1
+    } or fail "error in slurp: $@";
+    is $@, '';
 
 # TODO not available in the min version of Test::Harness we require
 #    ok( open(PACKLIST, $files{'.packlist'} ) ) ||
@@ -257,18 +241,10 @@ SKIP: {
     rmtree('other');
 }
 
-
 SKIP: {
     skip 'VMS install targets do not preserve $(PREFIX)', 9 if $Is_VMS;
-
-    $install_out = run("$make install PREFIX=elsewhere DESTDIR=other/");
-    is( $?, 0, 'install with PREFIX override and DESTDIR' ) ||
-        diag $install_out;
-    like( $install_out, qr/^Installing /m );
-
+    check_dummy_inst('other/elsewhere', 'PREFIX=elsewhere DESTDIR=other/', 'PREFIX override and DESTDIR');
     ok( !-d 'elsewhere',       '  install dir not created' );
-    ok( -d 'other/elsewhere',  '  destdir created' );
-    check_dummy_inst('other/elsewhere');
     rmtree('other');
 }
 
@@ -491,18 +467,15 @@ close $fh;
 # now do with "Liar" subdir still there
 rmtree $DUMMYINST; # so no false positive from before
 @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
-$install_out = run("$make install");
-check_dummy_inst($DUMMYINST);
+check_dummy_inst($DUMMYINST, '', "with PREFIX=$DUMMYINST");
 # now clean, delete "Liar" subdir, do again
 $realclean_out = run("$make realclean");
 rmtree 'Liar';
 rmtree $DUMMYINST; # so no false positive from before
 @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
-$install_out = run("$make install");
-check_dummy_inst($DUMMYINST, 1);
+check_dummy_inst($DUMMYINST, '', "with PREFIX=$DUMMYINST minus subdir", 1);
 
 sub _normalize {
     my $hash = shift;
-
     %$hash= map { lc($_) => $hash->{$_} } keys %$hash;
 }
