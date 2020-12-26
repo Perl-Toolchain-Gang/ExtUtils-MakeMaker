@@ -762,7 +762,7 @@ print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
 CODE
 
     return sprintf <<'MAKE_FRAG', $date_check;
-dist : $(DIST_DEFAULT) $(FIRST_MAKEFILE)
+dist : $(DIST_DEFAULT) config
 	$(NOECHO) %s
 MAKE_FRAG
 }
@@ -941,7 +941,7 @@ sub _xs_make_bs {
 # As Mkbootstrap might not write a file (if none is required)
 # we use touch to prevent make continually trying to remake it.
 # The DynaLoader only reads a non-empty file.
-%1$s.bs : $(FIRST_MAKEFILE) $(BOOTDEP)
+%1$s.bs : config $(BOOTDEP)
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for %1$s ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
@@ -2489,7 +2489,7 @@ realclean ::
     for my $from (@froms) {
         #                              1      2
         push @m, _sprintf562 <<'MAKE', $from, $fromto{$from};
-%2$s : %1$s $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+%2$s : %1$s config
 	$(NOECHO) $(RM_F) %2$s
 	$(CP) %1$s %2$s
 	$(FIXIN) %2$s
@@ -3170,7 +3170,7 @@ sub pm_to_blib {
     my $self = shift;
     my($autodir) = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
-pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
+pm_to_blib : config $(TO_INST_PM)
 };
 
     # VMS will swallow '' and PM_FILTER is often empty.  So use q[]
@@ -3581,7 +3581,7 @@ sub static {
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
-static :: $(FIRST_MAKEFILE) $(INST_STATIC)
+static :: config $(INST_STATIC)
 	$(NOECHO) $(NOOP)
 ';
 }

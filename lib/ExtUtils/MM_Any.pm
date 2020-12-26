@@ -1076,7 +1076,7 @@ sub manifypods_target {
     my($self) = shift;
 
     my $manify = <<END;
-manifypods : pure_all config
+manifypods : pure_all
 END
 
     my @man_cmds;
