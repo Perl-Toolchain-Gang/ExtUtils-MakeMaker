@@ -3020,7 +3020,7 @@ sub parse_version {
       $result = $normal if defined $normal;
     }
     if ( defined $result ) {
-      $result = "undef" unless $result =~ m!^v?[\d_\.\-]+$!
+      $result = "undef" unless $result =~ m!^v?[\d_\.]+$!
                         or eval { version->parse( $result ) };
     }
     $result = "undef" unless defined $result;
