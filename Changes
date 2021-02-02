@@ -1,3 +1,11 @@
+7.59_01 Tue  2 Feb 09:47:29 GMT 2021
+
+    Bug fixes:
+    - Don't allow hyphens in parsed versions
+
+    Test fixes:
+    - Use correct hint file name in hints.t
+
 7.58    Mon 21 Dec 18:16:04 GMT 2020
 
     No changes since v7.57_02
