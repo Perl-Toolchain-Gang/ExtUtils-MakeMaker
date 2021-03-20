@@ -96,6 +96,8 @@ sub _unix_os2_ext {
             next;
         }
 
+        next unless defined $thislib;
+
         if ( $thislib =~ m!^-Wl,! ) {
             push( @extralibs,  $thislib );
             push( @ldloadlibs, $thislib );
