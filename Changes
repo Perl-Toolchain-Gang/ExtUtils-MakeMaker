@@ -1,3 +1,8 @@
+7.61_01 Sun 21 Mar 09:24:57 GMT 2021
+
+    Bug fixes:
+    - Use shellwords in ExtUtils::Liblist::Kid::_unix_os2_ext
+
 7.60    Wed 17 Feb 10:45:47 GMT 2021
 
     No changes since v7.59_01
