@@ -1315,7 +1315,7 @@ sub _fixin_replace_shebang {
             if ($self->maybe_command($origcmd) && grep { $_ eq $origdir } @absdirs) {
                 my ($odev, $oino) = stat $origcmd;
                 my ($idev, $iino) = stat $interpreter;
-                if ($odev == $idev && $oino == $iino) {
+                if ($odev == $idev && $oino eq $iino) {
                     warn "$origcmd is the same as $interpreter, leaving alone"
                         if $Verbose;
                     $interpreter = $origcmd;
