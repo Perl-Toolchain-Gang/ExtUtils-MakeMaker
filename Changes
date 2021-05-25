@@ -1,3 +1,8 @@
+7.63_01 Tue 25 May 16:22:50 BST 2021
+
+    Bug fixes:
+    - Comparing inodes numerically is unsafe
+
 7.62    Tue 13 Apr 18:58:24 BST 2021
 
     No changes since v7.61_01
