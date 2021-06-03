@@ -2671,10 +2671,9 @@ instead. See above, or the L<ExtUtils::MakeMaker::FAQ> entry.
 
 =item POLLUTE
 
-Release 5.005 grandfathered old global symbol names by providing preprocessor
-macros for extension source compatibility.  As of release 5.6, these
-preprocessor definitions are not available by default.  The POLLUTE flag
-specifies that the old names should still be defined:
+Prior to 5.6 various interpreter variables were available without a C<PL_>
+prefix, eg. C<PL_undef> was available as C<undef>. As of release 5.6, these
+are only defined if the POLLUTE flag is enabled:
 
   perl Makefile.PL POLLUTE=1
 
