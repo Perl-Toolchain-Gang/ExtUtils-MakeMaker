@@ -47,3 +47,8 @@ jobs:
         run: |
             path c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin
             make test
+      - name: Run Tests
+        shell: cmd
+        run: |
+            path c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin
+            make disttest NOECHO=
