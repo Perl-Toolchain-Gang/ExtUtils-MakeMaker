@@ -1836,7 +1836,11 @@ currently used by MakeMaker but may be handy in Makefile.PLs.
 =item CCFLAGS
 
 String that will be included in the compiler call command line between
-the arguments INC and OPTIMIZE.
+the arguments INC and OPTIMIZE. Note that setting this will overwrite its
+default value (C<$Config::Config{ccflags}>); to preserve that, include
+the default value directly, e.g.:
+
+    CCFLAGS => "$Config::Config{ccflags} ..."
 
 =item CONFIG
 
