@@ -393,7 +393,7 @@ sub full_setup {
     # we will use all these variables in the Makefile
     @Get_from_Config =
         qw(
-           ar cc cccdlflags ccdlflags dlext dlsrc exe_ext full_ar ld
+           ar cc cccdlflags ccdlflags cpprun dlext dlsrc exe_ext full_ar ld
            lddlflags ldflags libc lib_ext obj_ext osname osvers ranlib
            sitelibexp sitearchexp so
           );
@@ -1850,6 +1850,7 @@ ar
 cc
 cccdlflags
 ccdlflags
+cpprun
 dlext
 dlsrc
 ld
