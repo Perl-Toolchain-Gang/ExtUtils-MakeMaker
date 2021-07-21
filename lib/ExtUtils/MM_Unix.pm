@@ -141,9 +141,9 @@ sub c_o {
         $flags =~ s/"-I(\$\(PERL_INC\))"/-iwithsysroot "$1"/;
     }
 
-    if (my $cpp = $Config{cpprun}) {
+    if (my $cpp = $self->{CPPRUN}) {
         my $cpp_cmd = $self->const_cccmd;
-        $cpp_cmd =~ s/^CCCMD\s*=\s*\$\(CC\)/$cpp/;
+        $cpp_cmd =~ s/^CCCMD\s*=\s*\$\(CC\)/\$(CPPRUN)/;
         push @m, qq{
 .c.i:
 	$cpp_cmd $flags \$*.c > \$*.i
