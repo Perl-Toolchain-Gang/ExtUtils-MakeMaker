@@ -1049,8 +1049,8 @@ sub xs_make_dynamic_lib {
     $ldfrom = "-all $ldfrom -none" if $Is{OSF};
 
     # The IRIX linker doesn't use LD_RUN_PATH
-    my $ldrun = $Is{IRIX} && $self->{LD_RUN_PATH} ?
-                       qq{-rpath "$self->{LD_RUN_PATH}"} : '';
+    my $ldrun = ($Is{IRIX} || $^O eq "darwin") && $self->{LD_RUN_PATH} ?
+            qq{-rpath "$self->{LD_RUN_PATH}"} : '';
 
     # For example in AIX the shared objects/libraries from previous builds
     # linger quite a while in the shared dynalinker cache even when nobody
