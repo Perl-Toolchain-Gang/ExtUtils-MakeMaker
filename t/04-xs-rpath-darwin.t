@@ -33,10 +33,8 @@ use File::Spec;
     $| = 1;
     # We need this when re-running "perl Makefile.PL"
     my $ext_utils_lib_dir = File::Spec->rel2abs('../lib');
-    note "libdir = ", $ext_utils_lib_dir;
     # This tmpdir will be removed when the program exits
     my $tmpdir = tempdir( DIR => '.', CLEANUP => 1 );
-    note "using tempdir = $tmpdir";
     my $cwd = getcwd;
     # File::Temp will not clean up the temp directory if the current directory
     #   is a sub directory of the temp dir. This can happen in the case of an
@@ -100,8 +98,6 @@ END
     my $xs_name = pop @module_name;
     $xs_name .= '.xs';
     _write_file( $xs_name, $str );
-    note "xs : ", $str;
-    
 }
 
 sub write_test_script {
@@ -117,7 +113,6 @@ use <<module_name_colon>>;
 END
     $str =~ s/\Q<<module_name_colon>>\E/$self->{module_name}/g;
     _write_file( $self->{test_script_name}, $str );
-    note "test script : ", $str;
 }
 
 sub run_make {
@@ -152,7 +147,6 @@ bootstrap <<module_name_colon>> $VERSION;
 END
     $str =~ s/\Q<<module_name_colon>>\E/$self->{module_name}/g;
     _write_file( $fn, $str );
-    note "$fn : ", $str;
 }
 
 sub write_makefile_pl {
@@ -180,7 +174,6 @@ END
     $str =~ s/\Q<<lib_dir>>\E/$self->{mylib_dir}/g;
     $str =~ s/\Q<<lib_name>>\E/$self->{mylib_lib_name}/g;
     _write_file('Makefile.PL', $str);
-    note "debug: ", $str;
 }
 
 sub compile_library {
@@ -192,7 +185,6 @@ sub compile_library {
     $self->write_mylib_h();
     $self->write_mylib_c();
     $self->compile_mylib();
-    note "debug: ", `ls -l`;
     _chdir( $cwd );
 }
 
