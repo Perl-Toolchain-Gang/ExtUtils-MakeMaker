@@ -1048,9 +1048,19 @@ sub xs_make_dynamic_lib {
     }
     $ldfrom = "-all $ldfrom -none" if $Is{OSF};
 
+    my $ldrun = '';
     # The IRIX linker doesn't use LD_RUN_PATH
-    my $ldrun = ($Is{IRIX} || $^O eq "darwin") && $self->{LD_RUN_PATH} ?
-            qq{-rpath "$self->{LD_RUN_PATH}"} : '';
+    if ( $self->{LD_RUN_PATH} ) {
+        if ( $Is{IRIX} ) {
+            $ldrun = qq{-rpath "$self->{LD_RUN_PATH}"};
+        }
+        elsif ( $^O eq 'darwin' ) {
+            # both clang and gcc support -Wl,-rpath, but only clang supports
+            # -rpath so by using -Wl,-rpath we avoid having to check for the
+            # type of compiler
+            $ldrun = qq{-Wl,-rpath,"$self->{LD_RUN_PATH}"};
+        }
+    }
 
     # For example in AIX the shared objects/libraries from previous builds
     # linger quite a while in the shared dynalinker cache even when nobody
