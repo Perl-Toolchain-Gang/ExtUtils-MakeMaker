@@ -1,3 +1,8 @@
+7.63_06 Wed  3 Nov 01:24:05 GMT 2021
+
+    Bug fixes:
+    - Add -rpath when compiling XS modules on macOS
+
 7.63_05 Sat 14 Aug 09:04:08 BST 2021
 
     Enhancements:
