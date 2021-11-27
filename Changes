@@ -1,3 +1,8 @@
+7.63_07 Sat 27 Nov 11:34:12 GMT 2021
+
+    Enhancements:
+    - Add $(LDFLAGS) when linking binary modules
+
 7.63_06 Wed  3 Nov 01:24:05 GMT 2021
 
     Bug fixes:
