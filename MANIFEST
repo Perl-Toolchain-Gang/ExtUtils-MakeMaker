@@ -70,6 +70,7 @@ t/00compile.t
 t/01perl_bugs.t
 t/02-xsdynamic.t
 t/03-xsstatic.t
+t/04-xs-rpath-darwin.t
 t/arch_check.t
 t/backwards.t
 t/basic.t
