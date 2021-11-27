@@ -1,3 +1,8 @@
+7.63_08 Sat 27 Nov 17:28:03 GMT 2021
+
+    Correction:
+    - Previous change to ${LDFLAGS) was reverted
+
 7.63_07 Sat 27 Nov 11:34:12 GMT 2021
 
     Enhancements:
