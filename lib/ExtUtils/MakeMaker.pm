@@ -3297,7 +3297,7 @@ are generated when F<Makefile.PL> generates a F<Makefile> (if L<CPAN::Meta>
 is installed).  Clients like L<CPAN> or L<CPANPLUS> will read these
 files to see what prerequisites must be fulfilled before building or testing
 the distribution.  If you wish to shut this feature off, set the C<NO_MYMETA>
-C<WriteMakeFile()> flag to true.
+C<WriteMakefile()> flag to true.
 
 =head2 Disabling an extension
 
