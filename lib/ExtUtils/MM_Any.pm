@@ -774,7 +774,7 @@ clean :: clean_subdirs
     # Leave Makefile.old around for realclean
     push @m, <<'MAKE';
 	  $(NOECHO) $(RM_F) $(MAKEFILE_OLD)
-	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
+	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
 MAKE
 
     push(@m, "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
