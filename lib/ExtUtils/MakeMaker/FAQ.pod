@@ -536,8 +536,7 @@ And of course a very basic test:
 
   t/cool.t:
   --------
-  use Test;
-  BEGIN { plan tests => 1 };
+  use Test::More tests => 1;
   use Cool::Foo;
   use Cool::Bar;
   Cool::Foo::perl_rules();
