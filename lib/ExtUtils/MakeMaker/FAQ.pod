@@ -129,7 +129,7 @@ Let's take the following test directory structure:
     t/bar/othertest.t
     t/bar/baz/anothertest.t
 
-Now, inside of the C<WriteMakeFile()> function in your F<Makefile.PL>, specify
+Now, inside of the C<WriteMakefile()> function in your F<Makefile.PL>, specify
 where your tests are located with the C<test> directive:
 
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
