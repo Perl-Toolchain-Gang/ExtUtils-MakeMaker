@@ -1,3 +1,9 @@
+7.65_01 Mon 30 May 10:44:31 BST 2022
+
+    Doc fixes:
+    - use Test::More rather than Test.pm in FAQ example
+    - fix typos using WriteMakeFile rather than WriteMakefile
+
 7.64  Fri 17 Dec 15:35:46 GMT 2021
 
     No changes since v7.63_11

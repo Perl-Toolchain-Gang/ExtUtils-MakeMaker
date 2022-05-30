@@ -11,7 +11,7 @@ use Config;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&Mksymlists);
-our $VERSION = '7.64';
+our $VERSION = '7.65_01';
 $VERSION =~ tr/_//d;
 
 sub Mksymlists {
