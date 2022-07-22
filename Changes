@@ -1,3 +1,10 @@
+7.65_02 Fri 22 Jul 13:44:57 BST 2022
+
+    Bug fixes:
+    - Don't use rpath for macOS <= 10.4
+    - Only include existent directories in libpath
+    - Silence spurious warning when a postamble returns undef
+
 7.65_01 Mon 30 May 10:44:31 BST 2022
 
     Doc fixes:

@@ -3,7 +3,7 @@ package ExtUtils::MM_Win95;
 use strict;
 use warnings;
 
-our $VERSION = '7.65_01';
+our $VERSION = '7.65_02';
 $VERSION =~ tr/_//d;
 
 require ExtUtils::MM_Win32;
