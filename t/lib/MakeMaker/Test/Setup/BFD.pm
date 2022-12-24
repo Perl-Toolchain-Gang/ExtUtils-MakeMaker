@@ -108,7 +108,7 @@ my $tmpdir;
 # if given args, those are inserted as components in resulting path, eg:
 # setup_recurs('dir') means instead of creating Big-Dummy/*, dir/Big-Dummy/*
 sub setup_recurs {
-    my @chrs=("A".."Z",0-9);
+    my @chrs = ( "A" .. "Z", 0 .. 9 );
     # annoyingly we cant use File::Temp here as it drags in XS code
     # and we run under blocks to prevent XS code loads. This is a minimal
     # patch to fix the issue.
