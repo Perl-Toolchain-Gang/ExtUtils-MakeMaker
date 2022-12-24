@@ -1,3 +1,10 @@
+7.65_03 Sat 24 Dec 00:14:35 GMT 2022
+
+    Bug fixes:
+    - Reverted "Return hint file loading to quoted eval" introduced with
+      v7.47_11
+    - Implement tempdir() logic for parallel tests
+
 7.65_02 Fri 22 Jul 13:44:57 BST 2022
 
     Bug fixes:
