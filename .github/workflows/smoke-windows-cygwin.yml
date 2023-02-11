@@ -14,7 +14,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - run: git config --global core.autocrlf false
+      - run: |
+          git config --global core.autocrlf false
+          git config --global --add safe.directory /cygdrive/d/a/ExtUtils-MakeMaker/ExtUtils-MakeMaker
       - uses: actions/checkout@master
         with:
             fetch-depth: 10
