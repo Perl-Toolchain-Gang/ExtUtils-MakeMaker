@@ -31,7 +31,7 @@ jobs:
         shell: cmd
         run: |
             path c:\tools\cygwin\bin;c:\tools\cygwin\usr\bin
-            git config --global --add safe.directory /cygdrive/d/a/ExtUtils-MakeMaker/ExtUtils-MakeMaker
+            git config --system --add safe.directory /cygdrive/d/a/ExtUtils-MakeMaker/ExtUtils-MakeMaker
             git checkout --force
       - name: Configure
         shell: cmd
