@@ -525,7 +525,10 @@ sub new {
                     # simulate "use warnings FATAL => 'all'" for vintage perls
                     die @_;
                 };
-                version->new( $perl_version )->numify;
+                my $v = version->new($perl_version);
+                # we care about parse issues, not numify warnings
+                no warnings;
+                $v->numify;
             };
             $perl_version =~ tr/_//d
                 if defined $perl_version;
