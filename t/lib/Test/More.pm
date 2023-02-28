@@ -382,8 +382,6 @@ sub isnt ($$;$) {
     return $tb->isnt_eq(@_);
 }
 
-*isn't = \&isnt;
-
 =item B<like>
 
   like( $got, qr/expected/, $test_name );
