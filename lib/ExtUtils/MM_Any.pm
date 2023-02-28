@@ -1671,7 +1671,7 @@ sub _mymeta_from_meta {
     # rolled their own tarball rather than using "make dist".
     if ($meta->{generated_by} &&
         $meta->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
-        my $eummv = do { no warnings; $1+0; };
+        my $eummv = do { no warnings; eval("$1") + 0; }; # deal with underbars gracefully
         if ($eummv < 6.2501) {
             return;
         }
