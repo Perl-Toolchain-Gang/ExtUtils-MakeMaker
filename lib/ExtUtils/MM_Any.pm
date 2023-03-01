@@ -1166,18 +1166,19 @@ MAKE_FRAG
 
 =head3 _fix_metadata_before_conversion
 
-    $mm->_fix_metadata_before_conversion( \%metadata );
+    $mm->_fix_metadata_before_conversion( \%metadata, $meta_file );
 
 Fixes errors in the metadata before it's handed off to L<CPAN::Meta> for
 conversion. This hopefully results in something that can be used further
-on, no guarantee is made though.
+on, no guarantee is made though. The meta file name can be omitted if
+the source of the metadata was not a META file.
 
 =end private
 
 =cut
 
 sub _fix_metadata_before_conversion {
-    my ( $self, $metadata ) = @_;
+    my ( $self, $metadata, $meta_file ) = @_;
 
     # we should never be called unless this already passed but
     # prefer to be defensive in case somebody else calls this
@@ -1237,7 +1238,7 @@ sub _fix_metadata_before_conversion {
     }
 
     my $now_license = $meta->as_struct({ version => 2 })->{license};
-    if ($self->{LICENSE} and $self->{LICENSE} ne 'unknown' and
+    if (!$meta_file and $self->{LICENSE} and $self->{LICENSE} ne 'unknown' and
         @{$now_license} == 1 and $now_license->[0] eq 'unknown'
     ) {
         warn "Invalid LICENSE value '$self->{LICENSE}' ignored\n";
@@ -1630,15 +1631,13 @@ sub mymeta {
     my $self = shift;
     my $file = shift || ''; # for testing
 
-    my $mymeta = $self->_mymeta_from_meta($file);
-    my $v2 = 1;
+    my ($mymeta, $from_meta) = $self->_mymeta_from_meta($file);
 
     unless ( $mymeta ) {
         $mymeta = $self->metafile_data(
             $self->{META_ADD}   || {},
             $self->{META_MERGE} || {},
         );
-        $v2 = 0;
     }
 
     # Overwrite the non-configure dependency hashes
@@ -1646,7 +1645,7 @@ sub mymeta {
 
     $mymeta->{dynamic_config} = 0;
 
-    return $mymeta;
+    return $self->_fix_metadata_before_conversion( $mymeta, $from_meta );
 }
 
 
@@ -1656,13 +1655,17 @@ sub _mymeta_from_meta {
 
     return unless _has_cpan_meta();
 
+    my $found_file;
     my $meta;
     for my $file ( $metafile, "META.json", "META.yml" ) {
       next unless -e $file;
       eval {
           $meta = CPAN::Meta->load_file($file)->as_struct( { version => 2 } );
       };
-      last if $meta;
+      if ($meta) {
+          $found_file = $file;
+          last;
+      }
     }
     return unless $meta;
 
@@ -1677,7 +1680,7 @@ sub _mymeta_from_meta {
         }
     }
 
-    return $meta;
+    return ($meta, $found_file);
 }
 
 =head3 write_mymeta
@@ -1694,7 +1697,7 @@ sub write_mymeta {
 
     return unless _has_cpan_meta();
 
-    my $meta_obj = $self->_fix_metadata_before_conversion( $mymeta );
+    my $meta_obj = bless { %$mymeta }, 'CPAN::Meta';
 
     $meta_obj->save( 'MYMETA.json', { version => "2.0" } );
     $meta_obj->save( 'MYMETA.yml', { version => "1.4" } );
