@@ -1,3 +1,13 @@
+7.67_02 Mon  6 Mar 10:53:22 GMT 2023
+
+    Core fixes:
+    - initialize PERL_CORE object var early and use it consistently
+    - only search for PERL_SRC when PERL_CORE is true or unset
+
+    Clean-ups:
+    - remove use vars from non-bundled modules
+    - remove unused _find_magic_vstring function
+
 7.67_01 Wed  1 Mar 12:38:00 GMT 2023
 
     Bug fixes:
