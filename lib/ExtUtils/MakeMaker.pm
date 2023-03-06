@@ -1336,26 +1336,6 @@ sub neatvalue {
     return "{ ".join(', ',@m)." }";
 }
 
-sub _find_magic_vstring {
-    my $value = shift;
-    return $value if $UNDER_CORE;
-    my $tvalue = '';
-    require B;
-    my $sv = B::svref_2object(\$value);
-    my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
-    while ( $magic ) {
-        if ( $magic->TYPE eq 'V' ) {
-            $tvalue = $magic->PTR;
-            $tvalue =~ s/^v?(.+)$/v$1/;
-            last;
-        }
-        else {
-            $magic = $magic->MOREMAGIC;
-        }
-    }
-    return $tvalue;
-}
-
 sub selfdocument {
     my($self) = @_;
     my(@m);
