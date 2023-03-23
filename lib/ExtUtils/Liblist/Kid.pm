@@ -84,6 +84,10 @@ sub _unix_os2_ext {
                 elsif ( $Config{'lddlflags'} =~ /-R/ ) {
                     $rtype = '-R';
                 }
+                if ($thislib =~ s{(?<!\$)\$(?!\$)}{\\\$\$}g) {
+                    print "Escaping single dollar sign for Makefile\n"
+                      if $verbose;
+                }
             } elsif (!-d $thislib ) {
                 warn "$ptype$thislib ignored, directory does not exist\n"
                   if $verbose;
