@@ -1759,8 +1759,9 @@ sub init_CORE {
 
     # Are we building the core?
     $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
+    $self->{PERL_CORE} = 0               unless defined $self->{PERL_CORE};
 
-    if ((!defined $self->{PERL_CORE} || $self->{PERL_CORE}) && !$self->{PERL_SRC}){
+    unless ($self->{PERL_SRC}){
         foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
             my $dir = $self->catdir(($Updir) x $dir_count);
 
@@ -1769,7 +1770,6 @@ sub init_CORE {
                 -f $self->catfile($dir,"lib","strict.pm")
             ) {
                 $self->{PERL_SRC} = $dir ;
-                $self->{PERL_CORE} = 1;
                 last;
             }
         }
