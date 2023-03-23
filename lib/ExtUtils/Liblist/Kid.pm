@@ -76,11 +76,6 @@ sub _unix_os2_ext {
         # Handle possible linker path arguments.
         if ( $thislib =~ s/^(-[LR]|-Wl,-R|-Wl,-rpath,)// ) {    # save path flag type
             my ( $ptype ) = $1;
-            unless ( -d $thislib ) {
-                warn "$ptype$thislib ignored, directory does not exist\n"
-                  if $verbose;
-                next;
-            }
             my ( $rtype ) = $ptype;
             if ( ( $ptype eq '-R' ) or ( $ptype =~ m!^-Wl,-[Rr]! ) ) {
                 if ( $Config{'lddlflags'} =~ /-Wl,-[Rr]/ ) {
@@ -89,8 +84,12 @@ sub _unix_os2_ext {
                 elsif ( $Config{'lddlflags'} =~ /-R/ ) {
                     $rtype = '-R';
                 }
+            } elsif (!-d $thislib ) {
+                warn "$ptype$thislib ignored, directory does not exist\n"
+                  if $verbose;
+                next;
             }
-            unless ( File::Spec->file_name_is_absolute( $thislib ) ) {
+            if (-d $thislib && !File::Spec->file_name_is_absolute( $thislib ) ) {
                 warn "Warning: $ptype$thislib changed to $ptype$pwd/$thislib\n";
                 $thislib = $self->catdir( $pwd, $thislib );
             }
