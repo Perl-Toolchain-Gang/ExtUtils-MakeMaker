@@ -1,3 +1,9 @@
+7.69_01 Sat 25 Mar 11:06:19 GMT 2023
+
+    Core reversions:
+    - Reverted the PERL_CORE and PERL_SRC changes from v7.67_02
+      These will be reintroduced after more testing in core
+
 7.68    Tue 14 Mar 21:38:00 GMT 2023
 
     No changes since v7.67_02
