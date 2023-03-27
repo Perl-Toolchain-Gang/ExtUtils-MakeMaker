@@ -164,8 +164,7 @@ sub _unix_os2_ext {
                       } @fullname
                 )[0];
             }
-            elsif ( -f ( $fullname = "$thispth/lib$thislib.$so" )
-                && ( ( $Config{'dlsrc'} ne "dl_dld.xs" ) || ( $thislib eq "m" ) ) )
+            elsif ( -f ( $fullname = "$thispth/lib$thislib.$so" ))
             {
             }
             elsif (-f ( $fullname = "$thispth/lib${thislib}_s$Config_libext" )
@@ -245,8 +244,7 @@ sub _unix_os2_ext {
             }
 
             # We might be able to load this archive file dynamically
-            if (   ( $Config{'dlsrc'} =~ /dl_next/ && $Config{'osvers'} lt '4_0' )
-                || ( $Config{'dlsrc'} =~ /dl_dld/ ) )
+            if ($Config{'dlsrc'} =~ /dl_next/ && $Config{'osvers'} lt '4_0')
             {
 
                 # We push -l$thislib instead of $fullname because
