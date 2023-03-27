@@ -42,12 +42,6 @@ sub Mkbootstrap {
 	shift @INC;
     }
 
-    if ($Config{'dlsrc'} =~ /^dl_dld/){
-	package DynaLoader;
-	no strict 'vars';
-	push(@dl_resolve_using, dl_findfile('-lc'));
-    }
-
     my(@all) = (@bsloadlibs, @DynaLoader::dl_resolve_using);
     my($method) = '';
     if (@all || (defined $DynaLoader::bscode && length $DynaLoader::bscode)){
