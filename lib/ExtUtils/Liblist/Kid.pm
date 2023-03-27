@@ -64,7 +64,7 @@ sub _unix_os2_ext {
 	}
 	@libpath = grep -d, @libpath;
 
-    if ( $^O eq 'darwin' or $^O eq 'next' )  {
+    if ($^O eq 'darwin')  {
         # 'escape' Mach-O ld -framework and -F flags, so they aren't dropped later on
         $potential_libs =~ s/(^|\s)(-(?:weak_|reexport_|lazy_)?framework)\s+(\S+)/$1-Wl,$2 -Wl,$3/g;
         $potential_libs =~ s/(^|\s)(-F)\s*(\S+)/$1-Wl,$2 -Wl,$3/g;
@@ -164,7 +164,7 @@ sub _unix_os2_ext {
                       } @fullname
                 )[0];
             }
-            elsif ( -f ( $fullname = "$thispth/lib$thislib.$so" ))
+            elsif ( -f ( $fullname = "$thispth/lib$thislib.$so" ) )
             {
             }
             elsif (-f ( $fullname = "$thispth/lib${thislib}_s$Config_libext" )
@@ -232,41 +232,18 @@ sub _unix_os2_ext {
 
             # Do not add it into the list if it is already linked in
             # with the main perl executable.
-            # We have to special-case the NeXT, because math and ndbm
-            # are both in libsys_s
-            unless (
-                $in_perl
-                || ( $Config{'osname'} eq 'next'
-                    && ( $thislib eq 'm' || $thislib eq 'ndbm' ) )
-              )
-            {
-                push( @extralibs, "-l$custom_name$thislib" );
-            }
+            push( @extralibs, "-l$custom_name$thislib" )
+                unless $in_perl;
 
-            # We might be able to load this archive file dynamically
-            if ($Config{'dlsrc'} =~ /dl_next/ && $Config{'osvers'} lt '4_0')
-            {
+            if ( $is_dyna ) {
 
-                # We push -l$thislib instead of $fullname because
-                # it avoids hardwiring a fixed path into the .bs file.
-                # Mkbootstrap will automatically add dl_findfile() to
-                # the .bs file if it sees a name in the -l format.
-                # USE THIS, when dl_findfile() is fixed:
-                # push(@bsloadlibs, "-l$thislib");
-                # OLD USE WAS while checking results against old_extliblist
-                push( @bsloadlibs, "$fullname" );
+                # For SunOS4, do not add in this shared library if
+                # it is already linked in the main perl executable
+                push( @ldloadlibs, "-l$custom_name$thislib" )
+                  unless ( $in_perl and $^O eq 'sunos' );
             }
             else {
-                if ( $is_dyna ) {
-
-                    # For SunOS4, do not add in this shared library if
-                    # it is already linked in the main perl executable
-                    push( @ldloadlibs, "-l$custom_name$thislib" )
-                      unless ( $in_perl and $^O eq 'sunos' );
-                }
-                else {
-                    push( @ldloadlibs, "-l$custom_name$thislib" );
-                }
+                push( @ldloadlibs, "-l$custom_name$thislib" );
             }
             last;    # found one here so don't bother looking further
         }
