@@ -1925,13 +1925,6 @@ EOP
         $once_only{$m} = 1;
     }
 
-# This is too dangerous:
-#    if ($^O eq "next") {
-#	$self->{AR} = "libtool";
-#	$self->{AR_STATIC_ARGS} = "-o";
-#    }
-# But I leave it as a placeholder
-
     $self->{AR_STATIC_ARGS} ||= "cr";
 
     # These should never be needed
