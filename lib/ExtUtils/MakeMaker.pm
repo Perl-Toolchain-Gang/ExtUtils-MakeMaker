@@ -216,9 +216,18 @@ sub prompt ($;$) {  ## no critic
         print "$def\n";
     }
     else {
+        my $codepage;
+        if ($Is_Win32) {
+            require Win32::Console;
+            require Encode;
+            my $codepage = Win32::GetConsoleCP();  # get the input code page
+        }
         $ans = <STDIN>;
         if( defined $ans ) {
             $ans =~ s{\015?\012$}{};
+            if ($Is_Win32) {
+                $ans = Encode::decode("cp". $codepage, $ans);
+            }
         }
         else { # user hit ctrl-D
             print "\n";
