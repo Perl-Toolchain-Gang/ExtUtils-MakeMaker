@@ -220,12 +220,12 @@ sub prompt ($;$) {  ## no critic
         if ($Is_Win32) {
             require Win32::Console;
             require Encode;
-            my $codepage = Win32::GetConsoleCP();  # get the input code page
+            $codepage = Win32::GetConsoleCP();  # get the input code page
         }
         $ans = <STDIN>;
         if( defined $ans ) {
             $ans =~ s{\015?\012$}{};
-            if ($Is_Win32) {
+            if ($Is_Win32 and defined $codepage) {
                 $ans = Encode::decode("cp". $codepage, $ans);
             }
         }
