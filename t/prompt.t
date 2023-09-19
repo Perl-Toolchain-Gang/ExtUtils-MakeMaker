@@ -6,7 +6,7 @@ BEGIN {
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use ExtUtils::MakeMaker;
 use TieOut;
 use TieIn;
