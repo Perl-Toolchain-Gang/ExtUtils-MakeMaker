@@ -225,7 +225,7 @@ sub prompt ($;$) {  ## no critic
         $ans = <STDIN>;
         if( defined $ans ) {
             $ans =~ s{\015?\012$}{};
-            if ($Is_Win32 and defined $codepage) {
+            if ($Is_Win32 and defined $codepage and length $codepage) {
                 $ans = Encode::decode("cp". $codepage, $ans);
             }
         }
