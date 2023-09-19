@@ -216,17 +216,12 @@ sub prompt ($;$) {  ## no critic
         print "$def\n";
     }
     else {
-        my $codepage;
-        if ($Is_Win32) {
-            require Win32::Console;
-            require Encode;
-            $codepage = Win32::GetConsoleCP();  # get the input code page
-        }
         $ans = <STDIN>;
         if( defined $ans ) {
             $ans =~ s{\015?\012$}{};
-            if ($Is_Win32 and defined $codepage and length $codepage) {
-                $ans = Encode::decode("cp". $codepage, $ans);
+            if ($Is_Win32 and $CAN_DECODE) {
+                my $codepage = $ExtUtils::MakeMaker::Locale::ENCODING_CONSOLE_IN;
+                $ans = Encode::decode($codepage, $ans);
             }
         }
         else { # user hit ctrl-D

@@ -44,3 +44,16 @@ ok( !-t STDIN,      'STDIN not a tty' );
 
 is( prompt("Foo?", 'Bar!'), 'From STDIN',     'from STDIN' );
 like( $stdout->read,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );
+
+{
+    my $CAN_DECODE = eval { require ExtUtils::MakeMaker::Locale; };
+    SKIP: {
+        skip 'Encode not available', 1 unless $CAN_DECODE;
+        skip 'Not MSWin32', 1 unless $^O eq 'MSWin32';
+        local $ExtUtils::MakeMaker::Locale::ENCODING_CONSOLE_IN = "cp850";
+        $ENV{PERL_MM_USE_DEFAULT} = 0;
+        $stdin->write("\x{86}\x{91}"); # åæ in cp850
+        is( prompt("Foo?", 'Bar!'), "\x{e5}\x{e6}",
+              'read cp850 encoded letters from STDIN' );
+    }
+}
