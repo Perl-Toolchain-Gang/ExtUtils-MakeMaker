@@ -1062,7 +1062,8 @@ sub xs_make_dynamic_lib {
             # both clang and gcc support -Wl,-rpath, but only clang supports
             # -rpath so by using -Wl,-rpath we avoid having to check for the
             # type of compiler
-            $ldrun = qq{-Wl,-rpath,"$self->{LD_RUN_PATH}"};
+	    my @dirs = split ':', $self->{LD_RUN_PATH};
+	    $ldrun = join " ", map(qq{-Wl,-rpath,"$_"}, @dirs);
         }
     }
 
