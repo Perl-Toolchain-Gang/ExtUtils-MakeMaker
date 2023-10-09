@@ -2896,6 +2896,7 @@ Returns true, if the argument is likely to be a command.
 
 sub maybe_command {
     my($self,$file) = @_;
+    $file = '' if (!defined $file or !length $file);
     return $file if -x $file && ! -d $file;
     return;
 }
