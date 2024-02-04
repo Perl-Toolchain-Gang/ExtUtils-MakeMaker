@@ -3005,16 +3005,32 @@ sub parse_version {
     my($self,$parsefile) = @_;
     my $result;
 
+    my $package_version_rx = qr{ \w[\w\:\']* \s+ (v?[0-9._]+) \s* (;|\{) }x;
+
     local $/ = "\n";
     local $_;
     open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
+    my $maybe_hide_from_cpan = 0;
     while (<$fh>) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if $inpod || /^\s*#/;
         chop;
         next if /^\s*(if|unless|elsif)/;
-        if ( m{^ \s* package \s+ \w[\w\:\']* \s+ (v?[0-9._]+) \s* (;|\{)  }x ) {
+        if ($maybe_hide_from_cpan) {
+            $maybe_hide_from_cpan = 0;
+            if ( m{^ \s* $package_version_rx  }x ) {
+                no warnings;
+                $result = $1;
+            } else {
+                next;
+            }
+        }
+        elsif ( m{^ \s* package \s+ \# }x) {
+            $maybe_hide_from_cpan = 1;
+            next;
+        }
+        elsif ( m{^ \s* package \s+ $package_version_rx  }x ) {
             no warnings;
             $result = $1;
         }
