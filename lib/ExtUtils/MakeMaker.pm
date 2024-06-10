@@ -1370,6 +1370,12 @@ __END__
 
 ExtUtils::MakeMaker - Create a module Makefile
 
+==head1 SEE INSTEAD?
+
+This module is about creating a Makefile for an perl extension module
+from a Makefile.PL. If you are looking for creating skeleton module
+distribution for your new module, please see L<perlnewmod>
+
 =head1 SYNOPSIS
 
   use ExtUtils::MakeMaker;
