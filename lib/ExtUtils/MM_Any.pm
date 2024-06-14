@@ -1302,7 +1302,8 @@ sub metafile_data {
     $meta_merge ||= {};
 
     my $version = _normalize_version($self->{VERSION});
-    my $release_status = ($version =~ /_/) ? 'unstable' : 'stable';
+    my $unstable = $version =~ /_/ || $self->{DISTVNAME} =~ /-TRIAL\d*$/;
+    my $release_status = $unstable ? 'unstable' : 'stable';
     my %meta = (
         # required
         abstract     => $self->{ABSTRACT} || 'unknown',
