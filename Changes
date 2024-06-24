@@ -1,3 +1,11 @@
+7.71_01 Mon 24 Jun 15:08:55 BST 2024
+
+    Core fixes:
+    - Set META status as "unstable" for -TRIAL releases
+
+    Test fixes:
+    - Add DISTVNAME to tests
+
 7.70    Sun 26 Mar 14:13:20 BST 2023
 
     No changes since v7.69_01
