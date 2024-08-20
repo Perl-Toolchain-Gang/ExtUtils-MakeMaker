@@ -144,6 +144,8 @@ sub init_tools {
 
     $self->{FIXIN}    ||= $self->{PERL_CORE} ?
       "\$(PERLRUN) -I$self->{PERL_SRC}\\cpan\\ExtUtils-PL2Bat\\lib $self->{PERL_SRC}\\win32\\bin\\pl2bat.pl" :
+      -e "$Config{installscript}\\pl2bat.bat" ?
+      qq{"$Config{installscript}\\pl2bat.bat"} :
       'pl2bat.bat';
 
     $self->SUPER::init_tools;
