@@ -142,11 +142,16 @@ sub init_tools {
     $self->{NOOP}     ||= 'rem';
     $self->{DEV_NULL} ||= '> NUL';
 
-    $self->{FIXIN}    ||= $self->{PERL_CORE} ?
-      "\$(PERLRUN) -I$self->{PERL_SRC}\\cpan\\ExtUtils-PL2Bat\\lib $self->{PERL_SRC}\\win32\\bin\\pl2bat.pl" :
-      -e "$Config{installscript}\\pl2bat.bat" ?
-      qq{"$Config{installscript}\\pl2bat.bat"} :
-      'pl2bat.bat';
+    if (!$self->{FIXIN}) {
+        if ($self->{PERL_CORE}) {
+            my $psrc = $self->{PERL_SRC};  #  shorten next line
+            $self->{FIXIN} = "\$(PERLRUN) -I${psrc}\\cpan\\ExtUtils-PL2Bat\\lib ${psrc}\\win32\\bin\\pl2bat.pl";
+        }
+        else {
+            my $p2bpath = "$Config{installscript}\\pl2bat.bat";
+            $self->{FIXIN} = -e $p2bpath ? qq{"$p2bpath"} : 'pl2bat.bat';
+        }
+    }
 
     $self->SUPER::init_tools;
 
