@@ -148,8 +148,9 @@ sub init_tools {
             $self->{FIXIN} = "\$(PERLRUN) -I${psrc}\\cpan\\ExtUtils-PL2Bat\\lib ${psrc}\\win32\\bin\\pl2bat.pl";
         }
         else {
-            my $p2bpath = "$Config{installscript}\\pl2bat.bat";
-            $self->{FIXIN} = -e $p2bpath ? qq{"$p2bpath"} : 'pl2bat.bat';
+            my @path = split $Config{path_sep}, $ENV{PATH};
+            my @found = grep {-e qq{$_\\pl2bat.bat}} @path;
+            $self->{FIXIN} = @found ? qq{"$found[0]\\pl2bat.bat"} : "pl2bat.bat";
         }
     }
 
