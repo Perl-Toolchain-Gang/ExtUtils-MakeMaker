@@ -326,6 +326,8 @@ sub full_setup {
 
     MACPERL_SRC MACPERL_LIB MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC
     MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED
+
+    SHEBANG
         /;
     push @attrib_help, @fs_macros;
     @macro_fsentity{@fs_macros, @dep_macros} = (1) x (@fs_macros+@dep_macros);
@@ -2773,6 +2775,16 @@ RedHatism for C<PREREQ_PRINT>.  The output format is different, though:
 A minimal required perl version, if present, will look like this:
 
     perl(perl)>=5.008001
+
+=item SHEBANG
+
+When set to C<relocatable>, it makes C<ExtUtils::MM_Unix-E<gt>fixup()> change
+any shebang lines found (e.g. C<#!/usr/local/bin/perl>) into a relocatable
+version C<#!/usr/bin/env perl>. This is useful when writing tools that are
+intended to work seamlessly in different environments, eg. both in containers
+and with C<plenv(1)>.
+
+If C<SHEBANG> is set to anything else than C<relocatable>, it is ignored.
 
 =item SITEPREFIX
 
