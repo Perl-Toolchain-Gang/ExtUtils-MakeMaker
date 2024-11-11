@@ -520,7 +520,7 @@ bareword. For example:
     # Assign the value of the $(VERSION_FROM) make macro to $vf.
     $oneliner = $MM->oneliner('$vf = "$(VERSION_FROM)"');
 
-Its currently very simple and may be expanded sometime in the figure
+It's currently very simple, and may be expanded sometime in the future
 to include more flexible code and switches.
 
 
