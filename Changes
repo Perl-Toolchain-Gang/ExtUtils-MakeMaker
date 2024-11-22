@@ -1,3 +1,19 @@
+7.71_02 Fri 22 Nov 18:37:30 GMT 2024
+
+    Core Fixes:
+    - maybe_command() now handles an undefined or empty argument
+
+    Macosx fixes:
+    - rpath requires a minimum of Darwin 9
+    - Fix rpath issue on MacOSX, it only accepts a single path
+
+    Doc fixes:
+    - typos were squashed
+
+    Removals:
+    - Removed support for NeXT
+    - Removed support for GNU DLD
+
 7.71_01 Mon 24 Jun 15:08:55 BST 2024
 
     Core fixes:
