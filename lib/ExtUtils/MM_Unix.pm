@@ -443,6 +443,7 @@ sub constants {
               PERL_CORE
               PERM_DIR PERM_RW PERM_RWX
 
+              SHEBANG
 	      ) )
     {
 	next unless defined $self->{$macro};
@@ -1220,6 +1221,10 @@ WARNING
 
 Inserts the sharpbang or equivalent magic number to a set of @files.
 
+If the WriteMakefile option C<SHEBANG> is set to "relocatable", then any found
+shebang/sharpbang lines are set to C<#!/usr/bin/env perl> instead of the
+default perl.
+
 =cut
 
 sub fixin {    # stolen from the pink Camel book, more or less
@@ -1294,8 +1299,17 @@ sub _fixin_replace_shebang {
 
     # Now look (in reverse) for interpreter in absolute PATH (unless perl).
     my $interpreter;
-    if ( defined $ENV{PERL_MM_SHEBANG} && $ENV{PERL_MM_SHEBANG} eq "relocatable" ) {
-        $interpreter = "/usr/bin/env perl";
+    if ( defined $ENV{PERL_MM_SHEBANG} ) {
+        if ( $ENV{PERL_MM_SHEBANG} eq "relocatable" ) {
+            $interpreter = "/usr/bin/env perl";
+            print "SHEBANG option set to 'relocatable': Changing shebang from '$cmd $arg' to '$interpreter'"
+                if $Verbose;
+            $arg = ""; # args don't work with /usr/bin/env perl
+        }
+        else {
+            print "SHEBANG option set to something other than 'relocatable': Ignoring it"
+                if $Verbose;
+        }
     }
     elsif ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
         if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
