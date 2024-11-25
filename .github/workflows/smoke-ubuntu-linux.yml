@@ -20,12 +20,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: perl -V
-        run: perl -V
-      - name: Makefile.PL
-        run: perl Makefile.PL
-      - name: make test
-        run: make test
+      - run: perl -V
+      - run: perl Makefile.PL
+      - run: make test
+      - run: make disttest NOECHO=
 
   linux:
     name: "linux ${{ matrix.perl-version }}"
@@ -63,10 +61,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: perl -V
-        run: perl -V
-      - name: Makefile.PL
-        run: perl Makefile.PL
-      - name: make test
-        run: make test
-
+      - run: perl -V
+      - run: perl Makefile.PL
+      - run: make test
+      - run: make disttest NOECHO=

@@ -43,4 +43,4 @@ install:
 script:
   - perl Makefile.PL
   - make test
-  - make disttest
+  - make disttest NOECHO=
