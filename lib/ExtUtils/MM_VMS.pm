@@ -264,6 +264,7 @@ sub _fixin_replace_shebang {
     my ( $self, $file, $line ) = @_;
 
     my ( undef, $arg ) = split ' ', $line, 2;
+    $arg ||= '';
 
     return $Config{startperl} . "\n" . $Config{sharpbang} . "perl $arg\n";
 }
