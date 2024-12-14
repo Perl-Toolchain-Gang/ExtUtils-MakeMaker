@@ -1449,7 +1449,10 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     foreach my $name ($self->lsdir($Curdir)){
 	next if $name =~ /\#/;
 	next if $name =~ $distprefix && -d $name;
-	$name = lc($name) if $Is{VMS};
+	if ($Is{VMS}) {
+		$name = lc($name);
+		$name = $Curdir if $name eq '.'; # don't confuse '.;1' with magic directory '.'
+	}
 	next if $name eq $Curdir or $name eq $Updir or $ignore{$name};
 	next unless $self->libscan($name);
 	if (-d $name){
