@@ -3134,7 +3134,7 @@ sub perldepend {
     my $make_config = $self->cd('$(PERL_SRC)', '$(MAKE) lib/Config.pm');
 
     push @m, sprintf <<'MAKE_FRAG', $make_config if $self->{PERL_SRC};
-# Check for unpropogated config.sh changes. Should never happen.
+# Check for unpropagated config.sh changes. Should never happen.
 # We do NOT just update config.h because that is not sufficient.
 # An out of date config.h is not fatal but complains loudly!
 $(PERL_INCDEP)/config.h: $(PERL_SRC)/config.sh
