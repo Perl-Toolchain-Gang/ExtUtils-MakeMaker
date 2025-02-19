@@ -1,3 +1,9 @@
+7.71_03 Wed 19 Feb 01:11:31 GMT 2025
+
+    VMS fixes:
+    - Avoid uninitialized value in MM_VMS::_fixin_replace_shebang
+    - Take care with '.' in init_dirscan on VMS
+
 7.71_02 Fri 22 Nov 18:37:30 GMT 2024
 
     Core Fixes:
