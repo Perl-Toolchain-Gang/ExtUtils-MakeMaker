@@ -45,7 +45,7 @@ MODULE = XS::Test       PACKAGE = XS::Test
 PROTOTYPES: DISABLE
 int
 is_even(input)
-       int     input
+  int input
    CODE:
        RETVAL = (input % 2 == 0);
    OUTPUT:
@@ -103,15 +103,14 @@ my $XS_OTHER = <<'END';
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+
+int is_odd(int input) { return (INVAR % 2 == 1); }
+
 MODULE = XS::Other       PACKAGE = XS::Other
 PROTOTYPES: DISABLE
 int
 is_odd(input)
-       int     input
-   CODE:
-       RETVAL = (INVAR % 2 == 1);
-   OUTPUT:
-       RETVAL
+  int input
 END
 
 my $T_OTHER = <<'END';
