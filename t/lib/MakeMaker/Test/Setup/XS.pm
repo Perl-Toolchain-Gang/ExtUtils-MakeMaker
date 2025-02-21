@@ -53,7 +53,6 @@ is_even(input)
 END
 
 my $T_TEST = <<'END';
-#!/usr/bin/perl -w
 use strict;
 use warnings;
 use Test::More tests => 3;
@@ -116,7 +115,6 @@ is_odd(input)
 END
 
 my $T_OTHER = <<'END';
-#!/usr/bin/perl -w
 use strict;
 use warnings;
 use Test::More tests => 3;
@@ -270,7 +268,8 @@ SNIP
 }
 EOF
   't/plus1.t' => <<'END',
-#!/usr/bin/perl -w
+use strict;
+use warnings;
 use Test::More tests => 2;
 use_ok "XS::Test";
 is XS::Test::plus1(3), 4;
@@ -366,7 +365,8 @@ EOF
   'lib/XS/plus1.c' => $PLUS1_C,
 
   't/is_odd.t' => <<'END',
-#!/usr/bin/perl -w
+use strict;
+use warnings;
 use Test::More tests => 4;
 use_ok "XS::Other";
 ok is_odd(1);
@@ -439,7 +439,7 @@ sub run_tests {
 
   my @mpl_out = run(qq{$perl Makefile.PL});
   SKIP: {
-    unless (cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' )) {
+    unless (cmp_ok( $?, '==', 0, "Makefile.PL exited with zero ($label)" )) {
       diag(@mpl_out);
       skip 'perl Makefile.PL failed', 2;
     }
@@ -457,7 +457,7 @@ sub run_tests {
     }
     my $make_cmd = make_macro($make, $target, %macros);
     my $make_out = run($make_cmd);
-    unless (is( $?, 0, "$make_cmd exited normally" )) {
+    unless (is( $?, 0, "$make_cmd exited normally ($label)" )) {
         diag $make_out;
         skip 'Make failed - skipping test', 1;
     }
@@ -478,7 +478,7 @@ sub run_tests {
     }
     my $test_cmd = make_macro($make, $target, %macros);
     my $test_out = run($test_cmd);
-    is( $?, 0, "$test_cmd exited normally" ) || diag "$make_out\n$test_out";
+    is( $?, 0, "$test_cmd exited normally ($label)" ) || diag "$make_out\n$test_out";
   }
 
   chdir File::Spec->updir or die;
