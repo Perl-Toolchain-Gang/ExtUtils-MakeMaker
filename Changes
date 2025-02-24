@@ -1,3 +1,14 @@
+7.71_04 Mon 24 Feb 15:15:59 GMT 2025
+
+    Doc fixes:
+    - Typo fixed in MM_Unix
+
+    Test fixes:
+    - execute bit removed from two .t files
+
+    QA fixes:
+    - removed Travis and non-working macos-11 CI config
+
 7.71_03 Wed 19 Feb 01:11:31 GMT 2025
 
     VMS fixes:
