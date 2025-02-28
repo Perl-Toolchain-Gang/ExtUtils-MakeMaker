@@ -1,3 +1,17 @@
+7.71_05 Fri 28 Feb 16:53:16 GMT 2025
+
+    Enhancements:
+    - Reinstated %Recognized_Att_Keys
+
+    Win32 fixes:
+    - GNU Make supports spaces in deps on Win32 as elsewhere
+
+    Test fixes:
+    - Various improvements to MakeMaker::Test::Setup::XS
+
+    QA fixes:
+    - Added disttest checks to CI
+
 7.71_04 Mon 24 Feb 15:15:59 GMT 2025
 
     Doc fixes:
