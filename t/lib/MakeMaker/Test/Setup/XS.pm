@@ -428,8 +428,9 @@ sub list_dynamic {
   );
 }
 
+my $held_dir = undef;
 sub run_tests {
-  my ($perl, $label, $add_target, $add_testtarget) = @_;
+  my ($perl, $label, $add_target, $add_testtarget, $hold_dir) = @_;
   my $sublabel = $add_target;
   $sublabel =~ s#[\s=]##g;
   ok( my $dir = setup_xs($label, $sublabel), "setup $label$sublabel" );
@@ -483,6 +484,14 @@ sub run_tests {
   chdir File::Spec->updir or die;
   if ($ENV{EUMM_KEEP_TESTDIRS}) {
     ok 1, "don't teardown $dir";
+    return;
+  }
+  if (defined $held_dir) {
+    ok rmtree($held_dir), "belated teardown $held_dir";
+    $held_dir = undef;
+  }
+  if ($hold_dir) {
+    $held_dir = $dir;
   } else {
     ok rmtree($dir), "teardown $dir";
   }
