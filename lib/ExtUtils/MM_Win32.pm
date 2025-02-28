@@ -396,6 +396,7 @@ sub perl_script {
 
 sub can_dep_space {
     my ($self) = @_;
+    return 1 if $self->is_make_type('gmake'); # GNU Make is fine
     return 0 unless $self->can_load_xs;
     require Win32;
     require File::Spec;
