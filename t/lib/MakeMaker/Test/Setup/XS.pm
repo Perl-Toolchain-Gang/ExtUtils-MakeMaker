@@ -25,12 +25,14 @@ $typemap =~ s/ //g unless $MM->can_dep_space;
 chdir File::Spec->updir;
 
 my $PM_TEST = <<'END';
+use strict;
+use warnings;
 package XS::Test;
 require Exporter;
 require DynaLoader;
-$VERSION = 1.01;
-@ISA    = qw(Exporter DynaLoader);
-@EXPORT = qw(is_even);
+our $VERSION = 1.01;
+our @ISA    = qw(Exporter DynaLoader);
+our @EXPORT = qw(is_even);
 bootstrap XS::Test $VERSION;
 1;
 END
@@ -52,6 +54,8 @@ END
 
 my $T_TEST = <<'END';
 #!/usr/bin/perl -w
+use strict;
+use warnings;
 use Test::More tests => 3;
 use_ok "XS::Test";
 ok !is_even(1);
@@ -59,6 +63,8 @@ ok is_even(2);
 END
 
 my $MAKEFILEPL = <<'END';
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME          => 'XS::%s',
@@ -72,6 +78,8 @@ END
 my $BS_TEST = '$DynaLoader::bscode = q(warn "BIG NOISE";)';
 
 my $T_BOOTSTRAP = <<'EOF';
+use strict;
+use warnings;
 use Test::More tests => 1;
 my $w = '';
 $SIG{__WARN__} = sub { $w .= join '', @_; };
@@ -80,12 +88,14 @@ like $w, qr/NOISE/;
 EOF
 
 my $PM_OTHER = <<'END';
+use strict;
+use warnings;
 package XS::Other;
 require Exporter;
 require DynaLoader;
-$VERSION = 1.20;
-@ISA    = qw(Exporter DynaLoader);
-@EXPORT = qw(is_odd);
+our $VERSION = 1.20;
+our @ISA    = qw(Exporter DynaLoader);
+our @EXPORT = qw(is_odd);
 bootstrap XS::Other $VERSION;
 1;
 END
@@ -107,6 +117,8 @@ END
 
 my $T_OTHER = <<'END';
 #!/usr/bin/perl -w
+use strict;
+use warnings;
 use Test::More tests => 3;
 use_ok "XS::Other";
 ok is_odd(1);
