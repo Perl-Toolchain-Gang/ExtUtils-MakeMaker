@@ -1,0 +1,81 @@
+name: smoke-windows-msvc
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Get/extract
+        shell: bash
+        run: |
+          cd $TEMP
+          curl https://cpan.metacpan.org/src/5.0/perl-5.40.1.tar.gz -o perl.tgz
+          tar zxvf perl.tgz
+      - name: Build
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          cd /d %TEMP%\perl-5.40.1\win32
+          nmake CCTYPE=MSVC142 CFG=Debug INST_TOP=D:\perl
+      - name: Show config of built
+        shell: cmd
+        run: |
+          cd /d %TEMP%\perl-5.40.1
+          .\perl.exe -V
+      - name: Install
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          cd /d %TEMP%\perl-5.40.1\win32
+          nmake CCTYPE=MSVC142 CFG=Debug INST_TOP=D:\perl installbare
+      - name: Add to start of path
+        shell: cmd
+        run: | # any whitespace in `echo` command line is kept
+          echo D:\perl\bin>%TEMP%\p.txt
+          type %GITHUB_PATH% >>%TEMP%\p.txt
+          type %TEMP%\p.txt >%GITHUB_PATH%
+      - name: Show config of installed
+        shell: cmd
+        run: |
+          path
+          perl -V
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@master
+        with:
+            fetch-depth: 10
+      - name: Find out environment
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          dir D:\perl
+          path
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{cl})"
+          perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{link})"
+      - name: Configure
+        shell: cmd
+        run: |
+            perl Makefile.PL
+      - name: Build
+        shell: cmd
+        run: |
+            call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+            nmake
+      - name: Run Tests
+        shell: cmd
+        run: |
+            call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+            nmake test
+      - name: Run disttest
+        shell: cmd
+        run: |
+            call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+            nmake disttest NOECHO=
