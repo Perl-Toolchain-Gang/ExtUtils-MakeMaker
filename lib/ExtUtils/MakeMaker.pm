@@ -1356,6 +1356,7 @@ sub selfdocument {
 # gmake will silently still work if any are .PHONY-ed but nmake won't
 EOF
     push @m, join "\n", map "$_ ::\n\t\$(NOECHO) \$(NOOP)\n",
+        qw(test_static test_dynamic),
         # config is so manifypods won't puke if no subdirs
         grep !$self->{SKIPHASH}{$_},
         qw(static dynamic config);
