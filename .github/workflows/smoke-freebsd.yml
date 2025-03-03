@@ -1,0 +1,42 @@
+name: smoke-freebsd
+
+on:
+  push:
+    branches:
+      - "*"
+    tags-ignore:
+      - "*"
+  pull_request:
+
+jobs:
+  freebsd:
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 1
+      AUTOMATED_TESTING: 1
+      RELEASE_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test in FreeBSD
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          copyback: false
+          prepare: |
+            pkg install -y perl5
+          run: |
+            set -x
+            freebsd-version
+            sysctl hw.model
+            sysctl hw.ncpu
+            sysctl hw.physmem
+            sysctl hw.usermem
+            CPU=$(sysctl -n hw.ncpu)
+            export HARNESS_OPTIONS=j$CPU
+            perl -V
+            perl Makefile.PL
+            make test
+            make disttest NOECHO=
