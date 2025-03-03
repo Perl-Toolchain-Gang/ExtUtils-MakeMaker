@@ -1,3 +1,14 @@
+7.71_06 Mon  3 Mar 16:40:57 GMT 2025
+
+    BSD fixes:
+    - RT#117800 affecting BSD make fixed
+    - distmeta and co fixed when using make -j
+
+    QA fixes:
+    - Added Windows MSVC-built Perl CI
+    - Added Windows Strawberry Perl CI
+    - Added FreeBSD CI
+
 7.71_05 Fri 28 Feb 16:53:16 GMT 2025
 
     Enhancements:
