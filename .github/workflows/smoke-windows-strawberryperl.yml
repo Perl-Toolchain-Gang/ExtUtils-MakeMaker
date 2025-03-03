@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  perl:
+  gha-strawberry-gmake:
 
     runs-on: windows-latest
 
@@ -50,3 +50,58 @@ jobs:
         run: |
             path C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;%PATH%
             gmake disttest NOECHO=
+
+  # last version with dmake
+  strawberry-524-dmake:
+    runs-on: windows-latest
+    steps:
+
+      # lifted from PDLPorters/devops/github-actions/ci-dist/action.yml
+      - name: target-setup-perl (actions-setup-perl)
+        shell: bash
+        run: |
+            echo "::group::setup-perl (actions-setup-perl)"
+            git clone \
+                    https://github.com/shogo82148/actions-setup-perl.git \
+                    -b v1 \
+                    .github/actions/actions-setup-perl;
+            node .github/actions/actions-setup-perl/dist/setup/index.js
+            echo "::endgroup::"
+        env:
+          INPUT_DISTRIBUTION: strawberry
+          INPUT_PERL-VERSION: 5.24
+          INPUT_MULTI-THREAD: true
+          INPUT_ENABLE-MODULES-CACHE: false
+      - name: target-setup-perl (perl -V)
+        shell: bash
+        run: |
+            echo "::group::setup-perl (perl -V)"
+            export MYPERL=$(which -a perl | grep -m 1 hostedtoolcache)
+            echo "MYPERL=$MYPERL" >> $GITHUB_ENV
+            $MYPERL -V
+            echo "::endgroup::"
+
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@master
+        with:
+            fetch-depth: 10
+      - name: Find out environment
+        shell: bash
+        run: |
+          $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{gcc})"
+          $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
+          $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
+          $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{dmake})"
+      - name: Configure
+        shell: bash
+        run: |
+            $MYPERL Makefile.PL
+      - name: Build
+        shell: cmd
+        run: dmake
+      - name: Run Tests
+        shell: cmd
+        run: dmake test
+      - name: Run disttest
+        shell: cmd
+        run: dmake disttest NOECHO=
