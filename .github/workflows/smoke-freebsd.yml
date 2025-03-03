@@ -35,7 +35,7 @@ jobs:
             sysctl hw.physmem
             sysctl hw.usermem
             CPU=$(sysctl -n hw.ncpu)
-            export HARNESS_OPTIONS=j$CPU
+            export HARNESS_OPTIONS=j$CPU MAKEFLAGS=-j$CPU
             perl -V
             perl Makefile.PL
             make test

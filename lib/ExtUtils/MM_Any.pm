@@ -225,7 +225,7 @@ sub is_make_type {
         if $type eq 'gmake' and $minus_v =~ /GNU make/i;
     return $maketype2true{$type} = 1
         if $type eq 'bsdmake'
-      and $minus_v =~ /^usage: make \[-BeikNnqrstWwX\]/im;
+      and $minus_v =~ /^usage:.*make\s*\[-B/im;
     $maketype2true{$type} = 0; # it wasn't whatever you asked
 }
 

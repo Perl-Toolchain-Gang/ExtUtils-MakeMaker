@@ -3471,14 +3471,16 @@ sub replace_manpage_separator {
 
 =item cd
 
+On BSD make, will add a countervailing C<cd ..> on each command since
+parallel builds run all the commands in a recipe in the same shell.
+
 =cut
 
 sub cd {
     my($self, $dir, @cmds) = @_;
-
+    @cmds = map "$_ && cd $Updir", @cmds if $self->is_make_type('bsdmake');
     # No leading tab and no trailing newline makes for easier embedding
-    my $make_frag = join "\n\t", map { "cd $dir && $_" } @cmds;
-
+    my $make_frag = join "\n\t", map "cd $dir && $_", @cmds;
     return $make_frag;
 }
 
