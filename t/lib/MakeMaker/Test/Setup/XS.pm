@@ -344,7 +344,7 @@ delete $label2files{bscodemulti}->{'t/is_odd.t'};
 $label2files{staticmulti} = +{
   %{ $label2files{'multi'} }, # make copy
   'Makefile.PL' => sprintf(
-    $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
+    $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{},
     q{LINKTYPE => 'static', XSMULTI => 1,},
   ),
 };
@@ -352,7 +352,7 @@ $label2files{staticmulti} = +{
 $label2files{xsbuild} = +{
   %{ $label2files{'multi'} }, # make copy
   'Makefile.PL' => sprintf(
-    $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
+    $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{},
     q{
       XSMULTI => 1,
       XSBUILD => {
