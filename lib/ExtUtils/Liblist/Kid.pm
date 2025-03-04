@@ -379,6 +379,7 @@ sub _win32_default_search_paths {
 
     push @libpath, split /;/, $ENV{LIB}          if $VC and $ENV{LIB};
     push @libpath, split /;/, $ENV{LIBRARY_PATH} if $GC and $ENV{LIBRARY_PATH};
+    push @libpath, "$ENV{SYSTEMROOT}\\system32"  if $ENV{SYSTEMROOT};
 
     return @libpath;
 }
@@ -435,8 +436,8 @@ sub _win32_try_attach_extension {
 }
 
 sub _win32_lib_extensions {
-    my @extensions;
-    push @extensions, $Config{'lib_ext'} if $Config{'lib_ext'};
+    my @extensions = grep $_, @Config{qw(lib_ext)};
+    push @extensions, map ".$_", grep $_, @Config{qw(dlext so)};
     push @extensions, '.dll.a' if grep { m!^\.a$! } @extensions;
     push @extensions, '.lib' unless grep { m!^\.lib$! } @extensions;
     return \@extensions;

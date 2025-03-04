@@ -1,12 +1,12 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More 'no_plan';
 use ExtUtils::MakeMaker::Config;
 use File::Spec;
 use Cwd;
 use File::Temp qw[tempdir];
 
-use lib 't/lib';
 use MakeMaker::Test::Utils;
 
 # Liblist wants to be an object which has File::Spec capabilities, so we
@@ -141,6 +141,8 @@ sub test_kid_unix_os2 {
 sub test_kid_win32 {
     my $warnings = "";
     local $SIG{__WARN__} = sub { $warnings .= "@_\n"; };
+    my @got32 = _ext( 'kernel32' );
+    like $got32[0], qr/kernel32/, 'found Win32 system library' or diag 'got: ', explain \@got32;
     is_deeply( [ _ext( 'test' ) ], [ double(quote('test.lib'), '') ], 'existent file results in a path to the file. .lib is default extension with empty %Config' );
     is_deeply( [ _ext( 'c_test' ) ], [ double(quote('lib\CORE\c_test.lib'), '') ], '$Config{installarchlib}/CORE is the default search dir aside from cwd' );
     is_deeply( [ _ext( 'double' ) ], [ double(quote('double.lib'), '') ], 'once an instance of a lib is found, the search stops' );
