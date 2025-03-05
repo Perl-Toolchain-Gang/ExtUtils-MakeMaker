@@ -2435,10 +2435,9 @@ sub init_others {
     foreach my $libs ( @{$self->{LIBS}} ){
         $libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
         my(@libs) = $self->extliblist($libs);
-        if ($libs[0] or $libs[1] or $libs[2]){
+        if (grep $_, @libs[0..2]) {
             # LD_RUN_PATH now computed by ExtUtils::Liblist
-            ($self->{EXTRALIBS},  $self->{BSLOADLIBS},
-             $self->{LDLOADLIBS}, $self->{LD_RUN_PATH}) = @libs;
+            @$self{qw(EXTRALIBS BSLOADLIBS LDLOADLIBS LD_RUN_PATH)} = @libs;
             last;
         }
     }

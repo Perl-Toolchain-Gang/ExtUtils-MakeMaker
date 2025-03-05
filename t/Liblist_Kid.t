@@ -45,7 +45,6 @@ sub conf_reset {
     my @save_keys = qw{ so dlsrc osname };
     my %save_config;
     @save_config{ @save_keys } = @Config{ @save_keys };
-    delete $Config{$_} for keys %Config;
     %Config = %save_config;
     # The following are all used and always are defined in the real world.
     # Define them to something here to avoid spewing uninitialized value warnings.
@@ -136,6 +135,11 @@ sub test_kid_unix_os2 {
     my $curr_dirspace = File::Spec->rel2abs( 'di r' );
     my $cmd_frag = '-L'.quote($curr_dirspace) . ' -ldir_test';
     is_deeply [ _ext( '-L"di r" -ldir_test' ) ], [ $cmd_frag, '', $cmd_frag, $curr_dirspace ], '-L directories with spaces work';
+    {
+      local $Config{libpth} = 'di r';
+      my @got = _ext( '-ldir_test' );
+      is_deeply \@got, [ '-ldir_test', '', '-ldir_test', 'di r' ], 'Config.libpth directories with spaces work' or diag explain \@got;
+    }
 }
 
 sub test_kid_win32 {
@@ -147,7 +151,7 @@ sub test_kid_win32 {
     is_deeply( [ _ext( 'c_test' ) ], [ double(quote('lib\CORE\c_test.lib'), '') ], '$Config{installarchlib}/CORE is the default search dir aside from cwd' );
     is_deeply( [ _ext( 'double' ) ], [ double(quote('double.lib'), '') ], 'once an instance of a lib is found, the search stops' );
     is_deeply( [ _ext( 'test.lib' ) ], [ double(quote('test.lib'), '') ], 'the extension is not tacked on twice' );
-    is_deeply( [ _ext( 'test.a' ) ], [ double(quote('test.a.lib'), '') ], 'but it will be tacked onto filenamess with other kinds of library extension' );
+    is_deeply( [ _ext( 'test.a' ) ], [ double(quote('test.a.lib'), '') ], 'but it will be tacked onto filenames with other kinds of library extension' );
     is_deeply( [ _ext( 'test test2' ) ], [ double(quote(qw(test.lib test2.lib)), '') ], 'multiple existing files end up separated by spaces' );
     is_deeply( [ _ext( 'test test2 unreal_test' ) ], [ double(quote(qw(test.lib test2.lib)),  '') ], "some existing files don't cause false positives" );
     is_deeply( [ _ext( '-l_test' ) ], [ double(quote('lib_test.lib'), '') ], 'prefixing a lib with -l triggers a second search with prefix "lib" when gcc is not in use' );
@@ -179,9 +183,13 @@ sub test_kid_win32 {
     is_deeply( [ _ext( 'unreal_test :nodefault' ) ], [ ('') x 4 ], ':nodefault flag prevents $Config{perllibs} from being added' );
     delete $Config{perllibs};
 
-    $Config{libpth} = 'libpath';
-    is_deeply( [ _ext( 'lp_test' ) ], [ double(quote('libpath\lp_test.lib'), '') ], '$Config{libpth} adds extra search paths' );
-    delete $Config{libpth};
+    {
+      local $Config{libpth} = 'libpath';
+      is_deeply( [ _ext( 'lp_test' ) ], [ double(quote('libpath\lp_test.lib'), '') ], '$Config{libpth} adds extra search paths' );
+      $Config{libpth} = 'di r';
+      my @got = _ext( '-ldir_test' );
+      is_deeply \@got, [double('"di r\\dir_test.lib"', '')], 'Config.libpth directories with spaces work' or diag explain \@got;
+    }
 
     $Config{lib_ext} = '.meep';
     is_deeply( [ _ext( 'test' ) ], [ double(quote('test.meep'), '') ], '$Config{lib_ext} changes the lib extension to be searched for' );

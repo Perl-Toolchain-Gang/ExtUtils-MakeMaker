@@ -20,9 +20,29 @@ use File::Basename;
 use File::Spec;
 
 sub ext {
-    if    ( $^O eq 'VMS' )     { return &_vms_ext; }
-    elsif ( $^O eq 'MSWin32' ) { return &_win32_ext; }
-    else                       { return &_unix_os2_ext; }
+    if    ( $^O eq 'VMS' )     { goto &_vms_ext; }
+    elsif ( $^O eq 'MSWin32' ) { goto &_win32_ext; }
+    else                       { goto &_unix_os2_ext; }
+}
+
+sub _space_dirs_split {
+  my ($libpth) = @_;
+  return if !length $libpth;
+  my (@chunks, @ret);
+  push @chunks, [$1,$2] while $libpth =~ /(\S+)(\s*)/g;
+  CHUNK: while (@chunks) {
+    my ($c, $ind) = (shift(@chunks), 0);
+    if (-d $c->[0]) { push @ret, $c->[0]; next CHUNK; }
+    my $sofar = join '', @$c;
+    while ($ind < @chunks) {
+      my ($this_word, $this_space) = @{ $chunks[$ind] };
+      $sofar .= $this_word;
+      if (-d $sofar) { push @ret, $sofar; next CHUNK; }
+      $sofar .= $this_space;
+      $ind++;
+    }
+  }
+  @ret;
 }
 
 sub _unix_os2_ext {
@@ -51,18 +71,18 @@ sub _unix_os2_ext {
 
     require Text::ParseWords;
 
-    my ( @searchpath );    # from "-L/path" entries in $potential_libs
-    my ( @libpath ) = Text::ParseWords::shellwords( $Config{'libpth'} || '' );
+    my @searchpath;    # from "-L/path" entries in $potential_libs
+    my @libpath = _space_dirs_split($Config{libpth} || '');
     my ( @ldloadlibs, @bsloadlibs, @extralibs, @ld_run_path, %ld_run_path_seen );
     my ( @libs,       %libs_seen );
     my ( $fullname,   @fullname );
     my ( $pwd )   = cwd();    # from Cwd.pm
     my ( $found ) = 0;
-	if ($Config{gccversion}) {
-		chomp(my @incpath = grep s/^ //, grep { /^#include </ .. /^End of search / } `$Config{cc} -E -v - </dev/null 2>&1 >/dev/null`);
-		unshift @libpath, map { s{/include[^/]*}{/lib}; $_ } @incpath
-	}
-	@libpath = grep -d, @libpath;
+    if ($Config{gccversion}) {
+        chomp(my @incpath = grep s/^ //, grep { /^#include </ .. /^End of search / } `$Config{cc} -E -v - </dev/null 2>&1 >/dev/null`);
+        unshift @libpath, map { s{/include[^/]*}{/lib}; $_ } @incpath
+    }
+    @libpath = grep -d, @libpath;
 
     if ($^O eq 'darwin')  {
         # 'escape' Mach-O ld -framework and -F flags, so they aren't dropped later on
@@ -374,7 +394,7 @@ sub _win32_default_search_paths {
     my $libpth = $Config{'libpth'} || '';
     $libpth =~ s,\\,/,g;            # normalize to forward slashes
 
-    my @libpath = Text::ParseWords::quotewords( '\s+', 0, $libpth );
+    my @libpath = _space_dirs_split($libpth);
     push @libpath, "$Config{installarchlib}/CORE";    # add "$Config{installarchlib}/CORE" to default search path
 
     push @libpath, split /;/, $ENV{LIB}          if $VC and $ENV{LIB};
