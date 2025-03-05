@@ -1,3 +1,14 @@
+7.71_07 Wed  5 Mar 21:32:41 GMT 2025
+
+    Core fixes:
+    - Liblist work with Config.libpth supporting paths with spaces
+
+    Win32 fixes:
+    - Win32 Liblist test for system library
+
+    Test fixes:
+    - Added test of XS loading other XS, using C symbols within
+
 7.71_06 Mon  3 Mar 16:40:57 GMT 2025
 
     BSD fixes:
