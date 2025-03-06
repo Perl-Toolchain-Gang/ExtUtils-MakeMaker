@@ -178,13 +178,9 @@ is( $?, 0,                                  '  exited normally' ) ||
     diag $test_out;
 
 # now simulate what Module::Install does, and edit $(PERL) to add flags
-open my $fh, '<', $makefile;
-my $mtext = join '', <$fh>;
-close $fh;
+my $mtext = slurp($makefile);
 $mtext =~ s/^(\s*PERL\s*=.*)$/$1 -Iinc/m;
-open $fh, '>', $makefile;
-print $fh $mtext;
-close $fh;
+write_file($makefile, $mtext);
 
 sub check_dummy_inst {
     my ($loc, $install_args, $label, $skipsubdir) = @_;
@@ -424,10 +420,10 @@ note "META file validity"; SKIP: {
 
 # Make sure init_dirscan doesn't go into the distdir
 # also with a "messup.PL" that will make a build fail
-open $fh, '>', 'messup.PL' or die "messup.PL: $!";
-print $fh 'print "Extracting messup (with variable substitutions)\n";' . "\n";
-print $fh 'die';
-close $fh;
+write_file('messup.PL', <<'TEXT');
+print "Extracting messup (with variable substitutions)\n";
+die;
+TEXT
 @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
@@ -457,13 +453,10 @@ open(STDERR, ">&SAVERR") or die $!;
 close SAVERR;
 
 # test linkext=>{LINKTYPE=>''} still installs a pure-perl installation
-# warning, edits the Makefile.PL so either rewrite after this or do this last
 my $file = 'Makefile.PL';
-my $text = slurp $file;
+my $text = my $preserve_MPL = slurp $file;
 ok(($text =~ s#\);#    linkext=>{LINKTYPE=>''},\n$&#), 'successful M.PL edit');
-open $fh, '>', $file or die "$file: $!";
-print $fh $text;
-close $fh;
+write_file($file, $text);
 # now do with "Liar" subdir still there
 rmtree $DUMMYINST; # so no false positive from before
 @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
@@ -474,6 +467,10 @@ rmtree 'Liar';
 rmtree $DUMMYINST; # so no false positive from before
 @mpl_out = run(qq{$perl Makefile.PL "PREFIX=$DUMMYINST"});
 check_dummy_inst($DUMMYINST, '', "with PREFIX=$DUMMYINST minus subdir", 1);
+write_file($file, $preserve_MPL); # restore Makefile.PL
+$realclean_out = run("$make realclean");
+rmtree 'Liar';
+rmtree $DUMMYINST;
 
 sub _normalize {
     my $hash = shift;
