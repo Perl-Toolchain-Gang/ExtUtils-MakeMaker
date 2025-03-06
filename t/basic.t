@@ -25,7 +25,7 @@ use ExtUtils::MM;
 use Test::More
     !MM->can_run(make()) && $ENV{PERL_CORE} && $Config{'usecrosscompile'}
     ? (skip_all => "cross-compiling and make not available")
-    : (tests => 195);
+    : (tests => 198);
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -471,6 +471,18 @@ write_file($file, $preserve_MPL); # restore Makefile.PL
 $realclean_out = run("$make realclean");
 rmtree 'Liar';
 rmtree $DUMMYINST;
+
+# test PM_FILTER - RT#144085
+$text = $preserve_MPL;
+ok(($text =~ s:\);:    PM_FILTER => '\$(ABSPERLRUN) -ne "print unless /^#/"',\n$&:), 'successful M.PL edit');
+write_file($file, $text);
+@mpl_out = run(qq{$perl Makefile.PL});
+$test_out = run("$make test NOECHO=");
+like( $test_out, qr/All tests successful/, 'make test' );
+is( $?, 0,                                 '  exited normally' ) ||
+    diag $test_out;
+write_file($file, $preserve_MPL); # restore Makefile.PL
+$realclean_out = run("$make realclean");
 
 sub _normalize {
     my $hash = shift;

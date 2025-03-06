@@ -15,9 +15,16 @@ skip_tags: true     ## do not build on tags
 
 environment:
   matrix:
+    # this has dmake "Version 4.12 (Windows / MinGW)"
     - Perl_VERSION: "5.12"
-    - Perl_VERSION: "5.10"
-    - Perl_VERSION: "5.8.9"
+    # these have dmake -V "Version 4.8-20070327-SHAY (Windows / MS Visual C++)"
+    # which appear to be broken with the PM_FILTER fix; when running `dmake`
+    # with EUMM's Makefile, it says
+    # "C:\strawberry\perl\bin\perl.exe" "-Iblib\arch" "-Iblib\lib" -MExtUtils::Command -e mkpath -- blib\lib\ExtUtils
+    # The system cannot find the path specified.
+    # dmake:  Error code 129, while making 'blib\lib\ExtUtils\.exists'
+    # - Perl_VERSION: "5.10"
+    # - Perl_VERSION: "5.8.9"
   global:
     AUTOMATED_TESTING: 1
     CI_CACHE_DIR: "C:\\cache"
@@ -130,12 +137,12 @@ before_build:
 
 build_script:
   - ps: ; write-host $("[{0:HH:mm:ss}].build.build_script" -f $($mark = get-date; $mark)) -f darkgray
-  - ps: . "${env:CI_HELPERS}\#build-build_script.PS1"
+  - dmake NOECHO=
   - ps: ; write-host $("[{0:HH:mm:ss}].build.build_script ... done ({1:0.0}s)" -f $(get-date; $($(get-date) - $mark).totalseconds)) -f green
 
 test_script:
   - ps: ; write-host $("[{0:HH:mm:ss}].test.test_script" -f $($mark = get-date; $mark)) -f darkgray
-  - ps: . "${env:CI_HELPERS}\#test-test_script.PS1"
+  - dmake test NOECHO=
   - ps: ; write-host $("[{0:HH:mm:ss}].test.test_script ... done ({1:0.0}s)" -f $(get-date; $($(get-date) - $mark).totalseconds)) -f green
 
 after_test:

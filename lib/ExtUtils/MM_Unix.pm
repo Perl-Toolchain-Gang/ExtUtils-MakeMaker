@@ -2151,11 +2151,6 @@ sub init_PERL {
     # already escaped spaces.
     $self->{FULLPERL} =~ tr/"//d if $Is{VMS};
 
-    # `dmake` can fail for image (aka, executable) names which start with double-quotes
-    # * push quote inward by at least one character (or the drive prefix, if present)
-    # * including any initial directory separator preserves the `file_name_is_absolute` property
-    $self->{FULLPERL} =~ s/^"(\S(:\\|:)?)/$1"/ if $self->is_make_type('dmake');
-
     # Little hack to get around VMS's find_perl putting "MCR" in front
     # sometimes.
     $self->{ABSPERL} = $self->{PERL};
@@ -2177,11 +2172,6 @@ sub init_PERL {
     # Can't have an image name with quotes, and findperl will have
     # already escaped spaces.
     $self->{PERL} =~ tr/"//d if $Is{VMS};
-
-    # `dmake` can fail for image (aka, executable) names which start with double-quotes
-    # * push quote inward by at least one character (or the drive prefix, if present)
-    # * including any initial directory separator preserves the `file_name_is_absolute` property
-    $self->{PERL} =~ s/^"(\S(:\\|:)?)/$1"/ if $self->is_make_type('dmake');
 
     # Are we building the core?
     $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
@@ -3201,11 +3191,17 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 
     # VMS will swallow '' and PM_FILTER is often empty.  So use q[]
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, '$autodir', q[\$(PM_FILTER)], '\$(PERM_DIR)')
+\$i=0; \$i++ until \$i > \$#ARGV or \$ARGV[\$i] eq "--";
+die "Failed to find -- in ".join("|",\@ARGV) if \$i > \$#ARGV;
+\@parts=splice \@ARGV,0,\$i+1;
+pop \@parts; \$filter=join " ", map qq{"\$_"}, \@parts;
+pm_to_blib({\@ARGV}, '$autodir', \$filter, '\$(PERM_DIR)')
 CODE
+    $pm_to_blib .= q[ $(PM_FILTER) --];
 
     my @cmds = $self->split_command($pm_to_blib,
-                  map { ($self->quote_literal($_) => $self->quote_literal($self->{PM}->{$_})) } sort keys %{$self->{PM}});
+      map +($self->quote_literal($_) => $self->quote_literal($self->{PM}{$_})),
+        sort keys %{$self->{PM}});
 
     $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
     $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};

@@ -2499,6 +2499,10 @@ sub tools_other {
     my($self) = shift;
     my @m;
 
+    my $is_nmake = $self->is_make_type('nmake');
+    push @m, <<'EOF' if $is_nmake;
+EUMM_NMAKE_HASH = ^# # to get hash character into strings - yes, horrible
+EOF
     # We set PM_FILTER as late as possible so it can see all the earlier
     # on macro-order sensitive makes such as nmake.
     for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH
@@ -2515,8 +2519,14 @@ sub tools_other {
                       CP_NONEMPTY
                     } )
     {
-        next unless defined $self->{$tool};
-        push @m, "$tool = $self->{$tool}\n";
+        next unless defined(my $value = $self->{$tool});
+        # https://learn.microsoft.com/en-us/cpp/build/reference/contents-of-a-makefile?view=msvc-170#special-characters-in-a-makefile
+        if ($is_nmake) {
+          $value =~ s/#/\$(EUMM_NMAKE_HASH)/g
+        } else {
+          $value =~ s/#/\\#/g
+        }
+        push @m, "$tool = $value\n";
     }
 
     return join "", @m;

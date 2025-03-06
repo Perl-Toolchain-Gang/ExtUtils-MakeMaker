@@ -693,7 +693,6 @@ END
             } else {
                 my $value = $self->{$key};
                 # not going to test in FS so only stripping start
-                $value =~ s/"// if $key =~ /PERL$/ and $self->is_make_type('dmake');
                 $value =~ s/^"// if $key =~ /PERL$/;
                 $value = $self->catdir("..", $value)
                   unless $self->file_name_is_absolute($value);
@@ -2650,17 +2649,13 @@ to stdout) that is passed on each .pm file during the build (in the
 pm_to_blib() phase).  It is empty by default, meaning no filtering is done.
 You could use:
 
-  PM_FILTER => 'perl -ne "print unless /^\\#/"',
+  PM_FILTER => 'perl -ne "print unless /^#/"',
 
 to remove all the leading comments on the fly during the build.  In order
 to be as portable as possible, please consider using a Perl one-liner
-rather than Unix (or other) utilities, as above.  The # is escaped for
-the Makefile, since what is going to be generated will then be:
-
-  PM_FILTER = perl -ne "print unless /^\#/"
-
-Without the \ before the #, we'd have the start of a Makefile comment,
-and the macro would be incorrectly defined.
+rather than Unix (or other) utilities, as above. MakeMaker will escape the
+C<#> for the Makefile, since what goes in the Makefile will depend on
+which C<make> implementation is being targeted.
 
 You will almost certainly be better off using the C<PL_FILES> system,
 instead. See above, or the L<ExtUtils::MakeMaker::FAQ> entry.
