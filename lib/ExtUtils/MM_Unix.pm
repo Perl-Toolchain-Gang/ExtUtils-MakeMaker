@@ -410,7 +410,7 @@ Prints out macros for lots of constants.
 =cut
 
 sub constants {
-    my($self) = @_;
+    my ($self) = @_;
     my @m = ();
 
     $self->{DFSEP} = '$(DIRFILESEP)';  # alias for internal use
@@ -433,17 +433,17 @@ sub constants {
                         } $self->installvars),
                    qw(
               PERL_LIB
-              PERL_ARCHLIB PERL_ARCHLIBDEP
+              PERL_ARCHLIB
               LIBPERL_A MYEXTLIB
               FIRST_MAKEFILE MAKEFILE_OLD MAKE_APERL_FILE
-              PERLMAINCC PERL_SRC PERL_INC PERL_INCDEP
+              PERLMAINCC PERL_SRC PERL_INC
               PERL            FULLPERL          ABSPERL
               PERLRUN         FULLPERLRUN       ABSPERLRUN
               PERLRUNINST     FULLPERLRUNINST   ABSPERLRUNINST
               PERL_CORE
               PERM_DIR PERM_RW PERM_RWX
 
-	      ) )
+	      ))
     {
 	next unless defined $self->{$macro};
 
@@ -493,16 +493,6 @@ SDKROOT := $(shell xcrun --show-sdk-path)
 PERL_SYSROOT = $(SDKROOT)
 } if $Is{ApplCor} && $self->{'PERL_INC'} =~ m!^/System/Library/Perl/!;
 
-    push @m, q{
-# Where is the Config information that we are using/depend on
-CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_SYSROOT)$(PERL_INCDEP)$(DFSEP)config.h
-} if $Is{ApplCor};
-
-    push @m, q{
-# Where is the Config information that we are using/depend on
-CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
-} if -e $self->catfile( $self->{PERL_INC}, 'config.h' ) && !$Is{ApplCor};
-
     push @m, qq{
 # Where to build things
 INST_LIBDIR      = $self->{INST_LIBDIR}
@@ -520,7 +510,6 @@ INST_BOOT        = $self->{INST_BOOT}
 # Extra linker info
 EXPORT_LIST        = $self->{EXPORT_LIST}
 PERL_ARCHIVE       = $self->{PERL_ARCHIVE}
-PERL_ARCHIVEDEP    = $self->{PERL_ARCHIVEDEP}
 PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 };
 
@@ -528,9 +517,46 @@ PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 
 TO_INST_PM = ".$self->wraplist(map $self->quote_dep($_), sort keys %{$self->{PM}})."\n";
 
-    join('',@m);
+    join('', @m) . $self->dep_constants;
 }
 
+=item dep_constants (o)
+
+  my $make_frag = $mm->dep_constants;
+
+Prints out macros for dependency constants.
+
+=cut
+
+sub dep_constants {
+    my ($self) = @_;
+    my @m = ();
+    for my $macro (qw(PERL_ARCHLIBDEP PERL_INCDEP)) {
+	next unless defined $self->{$macro};
+        # pathnames can have sharp signs in them; escape them so
+        # make doesn't think it is a comment-start character.
+        $self->{$macro} =~ s/#/\\#/g;
+	$self->{$macro} = $self->quote_dep($self->{$macro})
+	  if $ExtUtils::MakeMaker::macro_dep{$macro};
+	push @m, "$macro = $self->{$macro}\n";
+    }
+
+    push @m, qq{
+\n# Dependencies info
+PERL_ARCHIVEDEP    = $self->{PERL_ARCHIVEDEP}
+};
+
+    push @m, q{
+# Where is the Config information that we are using/depend on
+CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_SYSROOT)$(PERL_INCDEP)$(DFSEP)config.h
+} if $Is{ApplCor};
+    push @m, q{
+# Where is the Config information that we are using/depend on
+CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
+} if -e $self->catfile( $self->{PERL_INC}, 'config.h' ) && !$Is{ApplCor};
+
+    join '', @m;
+}
 
 =item depend (o)
 
@@ -3946,20 +3972,23 @@ sub tool_xsubpp {
 
 
     $self->{XSPROTOARG} = "" unless defined $self->{XSPROTOARG};
+    $self->tool_xsubpp_emit($xsdir, \@tmdeps, \@tmargs);
+}
+
+sub tool_xsubpp_emit {
+    my ($self, $xsdir, $tmdeps, $tmargs) = @_;
     my $xsdirdep = $self->quote_dep($xsdir);
     # -dep for use when dependency not command
-
     return qq{
 XSUBPPDIR = $xsdir
 XSUBPP = "\$(XSUBPPDIR)\$(DFSEP)xsubpp"
 XSUBPPRUN = \$(PERLRUN) \$(XSUBPP)
 XSPROTOARG = $self->{XSPROTOARG}
-XSUBPPDEPS = @tmdeps $xsdirdep\$(DFSEP)xsubpp
-XSUBPPARGS = @tmargs
+XSUBPPDEPS = @$tmdeps $xsdirdep\$(DFSEP)xsubpp
+XSUBPPARGS = @$tmargs
 XSUBPP_EXTRA_ARGS =
 };
 }
-
 
 =item all_target
 
