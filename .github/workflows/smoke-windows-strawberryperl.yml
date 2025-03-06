@@ -50,6 +50,13 @@ jobs:
           $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
           $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
           $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{gmake})"
+      - name: CPUs
+        shell: bash
+        run: |
+          export SYSTEM_CORES=$( powershell -NoProfile -Command "& { Get-WmiObject Win32_Processor | Select-Object -Property NumberOfCores }" | perl -0777 -ne 'print $1, "\n" while /(\d+)/g' );
+          echo "SYSTEM_CORES=$SYSTEM_CORES" >> $GITHUB_ENV
+          echo "MAKEFLAGS=-j$SYSTEM_CORES" >> $GITHUB_ENV
+          echo "HARNESS_OPTIONS=j$SYSTEM_CORES" >> $GITHUB_ENV
       - name: Configure
         shell: bash
         run: |
@@ -102,6 +109,13 @@ jobs:
           $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{g++})"
           $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{ld})"
           $MYPERL -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{dmake})"
+      - name: CPUs
+        shell: bash
+        run: |
+          export SYSTEM_CORES=$( powershell -NoProfile -Command "& { Get-WmiObject Win32_Processor | Select-Object -Property NumberOfCores }" | perl -0777 -ne 'print $1, "\n" while /(\d+)/g' );
+          echo "SYSTEM_CORES=$SYSTEM_CORES" >> $GITHUB_ENV
+          echo "MAXPROCESS=$SYSTEM_CORES" >> $GITHUB_ENV
+          echo "HARNESS_OPTIONS=j$SYSTEM_CORES" >> $GITHUB_ENV
       - name: Configure
         shell: bash
         run: |
