@@ -123,7 +123,7 @@ Using \ for Windows, except for "gmake" where it is /.
 sub init_DIRFILESEP {
     my($self) = shift;
 
-    # The ^ makes sure its not interpreted as an escape in nmake
+    # The ^ makes sure it's not interpreted as an escape in nmake
     $self->{DIRFILESEP} = $self->is_make_type('nmake') ? '^\\' :
                           $self->is_make_type('dmake') ? '\\\\' :
                           $self->is_make_type('gmake') ? '/'
@@ -165,6 +165,7 @@ Adjustments are made for Borland's quirks needing -L to come first.
 
 =cut
 
+my @LIBS_VARNAMES = qw(EXTRALIBS BSLOADLIBS LDLOADLIBS LD_RUN_PATH);
 sub init_others {
     my $self = shift;
 
@@ -172,6 +173,18 @@ sub init_others {
     $self->{AR}     ||= 'lib';
 
     $self->SUPER::init_others;
+    # If Config.pm defines a set of default libs,
+    # add them to EXTRALIBS, BSLOADLIBS and LDLOADLIBS, unless the user
+    # specified :nodefault or gave no LIBS
+    if (grep /\S/ && !/:nodefault/i, @{$self->{LIBS}}) {
+        my @libs = $self->extliblist($Config{perllibs});
+        for my $ind (0..$#LIBS_VARNAMES) {
+          next unless my $to_add = $libs[$ind];
+          my $varname = $LIBS_VARNAMES[$ind];
+          $self->{$varname} .= ' ' if $self->{$varname};
+          $self->{$varname} .= $to_add;
+        }
+    }
 
     $self->{LDLOADLIBS} ||= $Config{libs};
     # -Lfoo must come first for Borland, so we put it in LDDLFLAGS

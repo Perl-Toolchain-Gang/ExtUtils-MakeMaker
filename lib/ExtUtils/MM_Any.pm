@@ -2432,9 +2432,9 @@ sub init_others {
     $self->{LIBS} = $self->_fix_libs($self->{LIBS});
 
     # Compute EXTRALIBS, BSLOADLIBS and LDLOADLIBS from $self->{LIBS}
-    foreach my $libs ( @{$self->{LIBS}} ){
+    foreach my $libs ( @{$self->{LIBS}} ) {
         $libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
-        my(@libs) = $self->extliblist($libs);
+        my @libs = $self->extliblist($libs);
         if (grep $_, @libs[0..2]) {
             # LD_RUN_PATH now computed by ExtUtils::Liblist
             @$self{qw(EXTRALIBS BSLOADLIBS LDLOADLIBS LD_RUN_PATH)} = @libs;

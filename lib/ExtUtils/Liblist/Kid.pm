@@ -373,19 +373,9 @@ sub _win32_ext {
 
 sub _win32_make_lib_search_list {
     my ( $potential_libs, $verbose ) = @_;
-
-    # If Config.pm defines a set of default libs, we always
-    # tack them on to the user-supplied list, unless the user
-    # specified :nodefault
-    my $libs = $Config{'perllibs'};
-    $potential_libs = join( ' ', $potential_libs, $libs ) if $libs and $potential_libs !~ /:nodefault/i;
     _debug( "Potential libraries are '$potential_libs':\n", $verbose );
-
     $potential_libs =~ s,\\,/,g;    # normalize to forward slashes
-
-    my @list = Text::ParseWords::quotewords( '\s+', 0, $potential_libs );
-
-    return @list;
+    Text::ParseWords::quotewords( '\s+', 0, $potential_libs );
 }
 
 sub _win32_default_search_paths {

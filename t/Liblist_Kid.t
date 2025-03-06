@@ -7,6 +7,7 @@ use File::Spec;
 use Cwd;
 use File::Temp qw[tempdir];
 
+use ExtUtils::MakeMaker;
 use MakeMaker::Test::Utils;
 
 # Liblist wants to be an object which has File::Spec capabilities, so we
@@ -42,7 +43,7 @@ test_kid_win32() if $OS eq 'win32';
 # system configuration does not affect the test results.
 
 sub conf_reset {
-    my @save_keys = qw{ so dlsrc osname };
+    my @save_keys = qw{ so dlsrc osname make };
     my %save_config;
     @save_config{ @save_keys } = @Config{ @save_keys };
     %Config = %save_config;
@@ -129,7 +130,7 @@ sub test_kid_unix_os2 {
     my @out = _ext( '-L. -lfoo' );
     my $qlibre = qr/-L[^"]+\s+-lfoo/;
     like( $out[0], $qlibre, 'existing file results in quoted extralibs' );
-    like( $out[2], $qlibre, 'existing file results in quotes ldloadlibs' );
+    like( $out[2], $qlibre, 'existing file results in quoted ldloadlibs' );
     ok $out[3], 'existing file results in true LD_RUN_PATH';
     is_deeply [ _ext( '-L. -lnotthere' ) ], [ ('') x 4 ], 'non-present lib = empty';
     my $curr_dirspace = File::Spec->rel2abs( 'di r' );
@@ -140,6 +141,18 @@ sub test_kid_unix_os2 {
       my @got = _ext( '-ldir_test' );
       is_deeply \@got, [ '-ldir_test', '', '-ldir_test', 'di r' ], 'Config.libpth directories with spaces work' or diag explain \@got;
     }
+    my $mm = WriteMakefile(
+        NAME            => 'Big::Dummy',
+        VERSION    => '1.00',
+        LIBS => ['-L. -lfoo'],
+    );
+    like $mm->{LDLOADLIBS}, $qlibre, 'single LIBS works';
+    $mm = WriteMakefile(
+        NAME            => 'Big::Dummy',
+        VERSION    => '1.00',
+        LIBS => ['-L. -lnotthere', '-L. -lfoo'],
+    );
+    like $mm->{LDLOADLIBS}, $qlibre, 'two LIBS correctly gets second';
 }
 
 sub test_kid_win32 {
@@ -178,10 +191,24 @@ sub test_kid_win32 {
     is_deeply( [ _ext( qq{"-Ldir" dir_test} ) ], [ double(quote("$curr\\dir\\dir_test.lib"), '') ], 'relative -L directories work' );
     is_deeply( [ _ext( '-L"di r" dir_test' ) ], [ double(quote($curr . '\di r\dir_test.lib'), '') ], '-L directories with spaces work' );
 
-    $Config{perllibs} = 'pl';
-    is_deeply( [ _ext( 'unreal_test' ) ], [ double(quote('pl.lib'), '') ], '$Config{perllibs} adds extra libs to be searched' );
-    is_deeply( [ _ext( 'unreal_test :nodefault' ) ], [ ('') x 4 ], ':nodefault flag prevents $Config{perllibs} from being added' );
-    delete $Config{perllibs};
+    {
+      local $Config{perllibs} = 'pl';
+      is_deeply( [ _ext( 'unreal_test' ) ], [ ('') x 4 ], '_ext not add $Config{perllibs}' );
+      is_deeply( [ _ext( 'unreal_test :nodefault' ) ], [ ('') x 4 ], ':nodefault flag prevents $Config{perllibs} from being added' );
+      my $mm = WriteMakefile(
+          NAME            => 'Big::Dummy',
+          VERSION    => '1.00',
+          LIBS => ['-l_test'],
+      );
+      my $exp = '"lib_test.lib" "pl.lib"';
+      is $mm->{LDLOADLIBS}, $exp, 'single LIBS works';
+      $mm = WriteMakefile(
+          NAME            => 'Big::Dummy',
+          VERSION    => '1.00',
+          LIBS => ['-L. -lnotthere', '-l_test'],
+      );
+      is $mm->{LDLOADLIBS}, $exp, 'two LIBS correctly gets second';
+    }
 
     {
       local $Config{libpth} = 'libpath';
@@ -219,6 +246,4 @@ sub test_kid_win32 {
 
     $ENV{LIB} = 'vc';
     is_deeply( [ _ext( 'vctest.lib' ) ], [ double(quote('vc\vctest.lib'), '') ], '[vc] $ENV{LIB} adds search paths' );
-
-    return;
 }
