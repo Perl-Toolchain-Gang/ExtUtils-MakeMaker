@@ -287,7 +287,8 @@ the args.  Collectively they will process all the arguments.  Each
 individual line in @cmds will not be longer than the
 $self->max_exec_len being careful to take into account macro expansion.
 
-$cmd should include any switches and repeated initial arguments.
+$cmd should include any switches and repeated initial arguments. If it
+has newlines, they should be already escaped.
 
 If no @args are given, no @cmds will be returned.
 
@@ -334,7 +335,7 @@ sub split_command {
         }
         chop $arg_str;
 
-        push @cmds, $self->escape_newlines("$cmd \n$arg_str");
+        push @cmds, $cmd . $self->escape_newlines(" \n$arg_str");
     } while @args;
 
     return @cmds;
