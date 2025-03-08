@@ -1,3 +1,22 @@
+7.71_08 Sat  8 Mar 23:39:43 GMT 2025
+
+    Core fixes:
+    - Fixed split_command with multi-line oneliner
+
+    Win32 fixes:
+    - Reverted a change from v7.36 to fix RT#144085
+    - Win32 Liblist stop false positives on multi-LIB (RT#53676)
+
+    Test fixes:
+    - Added Test::Utils::write_file
+    - test oneliner with multi-line
+
+    QA fixes:
+    - use GHA for all Strawberry, cut down AppVeyor
+    - CI parallel build & test on Strawberry
+    - CI parallel test on MSVC build (nmake no parallel capability)
+    - Add test for PM_FILTER
+
 7.71_07 Wed  5 Mar 21:32:41 GMT 2025
 
     Core fixes:
