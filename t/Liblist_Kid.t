@@ -133,6 +133,14 @@ sub test_kid_unix_os2 {
     like( $out[2], $qlibre, 'existing file results in quoted ldloadlibs' );
     ok $out[3], 'existing file results in true LD_RUN_PATH';
     is_deeply [ _ext( '-L. -lnotthere' ) ], [ ('') x 4 ], 'non-present lib = empty';
+    if ($^O eq 'darwin') {
+      my @got = _ext( '-framework Something -L. -lfoo' );
+      like $got[0], qr/Something/, '-framework with other lib works' or diag explain \@got;
+      like $got[2], qr/Something/, '-framework with other lib works' or diag explain \@got;
+      @got = _ext( '-framework Something' );
+      like $got[0], qr/Something/, 'no drop -framework without other lib' or diag explain \@got;
+      like $got[2], qr/Something/, 'no drop -framework without other lib' or diag explain \@got;
+    }
     my $curr_dirspace = File::Spec->rel2abs( 'di r' );
     my $cmd_frag = '-L'.quote($curr_dirspace) . ' -ldir_test';
     is_deeply [ _ext( '-L"di r" -ldir_test' ) ], [ $cmd_frag, '', $cmd_frag, $curr_dirspace ], '-L directories with spaces work';
