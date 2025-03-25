@@ -864,27 +864,27 @@ sub WriteEmptyMakefile {
     }
     open my $mfh, '>', $new or die "open $new for write: $!";
     print $mfh <<'EOP';
-all :
+all ::
 
 manifypods :
 
-subdirs :
+subdirs ::
 
-dynamic :
+dynamic ::
 
-static :
+static ::
 
-clean :
+clean ::
 
-install :
+install ::
 
 makemakerdflt :
 
-test :
+test ::
 
-test_dynamic :
+test_dynamic ::
 
-test_static :
+test_static ::
 
 EOP
     close $mfh or die "close $new for write: $!";
