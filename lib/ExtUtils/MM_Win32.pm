@@ -142,9 +142,17 @@ sub init_tools {
     $self->{NOOP}     ||= 'rem';
     $self->{DEV_NULL} ||= '> NUL';
 
-    $self->{FIXIN}    ||= $self->{PERL_CORE} ?
-      "\$(PERLRUN) -I$self->{PERL_SRC}\\cpan\\ExtUtils-PL2Bat\\lib $self->{PERL_SRC}\\win32\\bin\\pl2bat.pl" :
-      'pl2bat.bat';
+    if (!$self->{FIXIN}) {
+        if ($self->{PERL_CORE}) {
+            my $psrc = $self->{PERL_SRC};  #  shorten next line
+            $self->{FIXIN} = "\$(PERLRUN) -I${psrc}\\cpan\\ExtUtils-PL2Bat\\lib ${psrc}\\win32\\bin\\pl2bat.pl";
+        }
+        else {
+            my @path = split $Config{path_sep}, $ENV{PATH};
+            my @found = grep {-e qq{$_\\pl2bat.bat}} @path;
+            $self->{FIXIN} = @found ? qq{"$found[0]\\pl2bat.bat"} : "pl2bat.bat";
+        }
+    }
 
     $self->SUPER::init_tools;
 
