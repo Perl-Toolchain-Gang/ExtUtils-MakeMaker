@@ -1,3 +1,14 @@
+7.73_01 Sun 30 Mar 11:45:44 BST 2025
+
+    Core fixes:
+    - WriteEmptyMakefile now produces the same target types as WriteMakefile
+
+    VMS fixes:
+    - fixed pm_to_blib regression
+
+    Macosx fixes:
+    - stop MacOS dropping LIBS=>"-framework X" with no "-l" libs
+
 7.72    Fri 14 Mar 10:15:56 GMT 2025
 
     No changes since v7.71_08
