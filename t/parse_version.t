@@ -79,6 +79,11 @@ END
 package Foo::100;
 our $VERSION = 2.34;
 END
+
+    $versions{<<'END'}                      = '1.23';
+package # hide from CPAN
+    Foo 1.23;
+END
 }
 
 if( "$]" >= 5.014 ) {
