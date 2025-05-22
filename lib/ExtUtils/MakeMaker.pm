@@ -624,7 +624,7 @@ END
         elsif (
             $cmr
                 ? !$cmr->accepts_module($prereq, $pr_version)
-                : $required_version > $pr_version
+                : version->new($required_version) > version->new($pr_version)
         ) {
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $required_version, ($pr_version || 'unknown version')
