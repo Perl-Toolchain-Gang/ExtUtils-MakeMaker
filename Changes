@@ -1,3 +1,8 @@
+7.75_01 Fri 23 May 15:03:40 BST 2025
+
+    Core fixes:
+    - Allow dotted decimal versions in absence of CPAN::Meta::Requirements
+
 7.74    Wed  9 Apr 13:28:16 BST 2025
 
     No changes since v7.73_01
