@@ -3967,7 +3967,7 @@ sub tool_xsubpp {
     }
 
 
-    $self->{XSPROTOARG} = "" unless defined $self->{XSPROTOARG};
+    $self->{XSPROTOARG} = "-noprototypes" unless defined $self->{XSPROTOARG};
     $self->tool_xsubpp_emit($xsdir, \@tmdeps, \@tmargs);
 }
 
