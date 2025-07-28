@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker qw($Verbose neatvalue _sprintf562);
 
 # If $VERSION is in scope, parse_version() breaks
 {
-our $VERSION = '7.76';
+our $VERSION = '7.77_01';
 $VERSION =~ tr/_//d;
 }
 

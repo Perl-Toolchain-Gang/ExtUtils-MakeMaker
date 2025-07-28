@@ -1,3 +1,16 @@
+7.77_01 Mon 28 Jul 18:46:15 BST 2025
+
+    Enhancements:
+    - Support 'class' VERSIONs, like 'package'
+
+    Core fixes:
+    - Disable XS prototypes by default
+
+    Test fixes:
+    - Make macros portably in basic.t
+    - Can't test embedded newlines on VMS in oneliner.t
+    - Use LIBS not LDFROM to link against a library in 02-xsdynamic.t
+
 7.76    Fri 23 May 20:14:03 BST 2025
 
     No changes since v7.75_01
