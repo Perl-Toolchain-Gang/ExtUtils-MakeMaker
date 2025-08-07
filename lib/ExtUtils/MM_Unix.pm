@@ -1322,6 +1322,7 @@ sub _fixin_replace_shebang {
     my $interpreter;
     if ( defined $ENV{PERL_MM_SHEBANG} && $ENV{PERL_MM_SHEBANG} eq "relocatable" ) {
         $interpreter = "/usr/bin/env perl";
+        $arg = '';
     }
     elsif ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
         if ( $Config{startperl} =~ m,^\#!.*/perl, ) {

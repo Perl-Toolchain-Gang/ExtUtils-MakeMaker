@@ -5,6 +5,7 @@
 
     Core fixes:
     - Disable XS prototypes by default
+    - Do not copy args when using PERL_MM_SHEBANG=relocatable
 
     Test fixes:
     - Make macros portably in basic.t
