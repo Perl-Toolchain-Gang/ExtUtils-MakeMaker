@@ -126,7 +126,7 @@ END
 }
 
 SKIP: {
-    skip "Not relevant on VMS or MSWin32", 6 if $^O eq 'VMS' || $^O eq 'MSWin32' || $^O eq 'cygwin';
+    skip "Not relevant on VMS or MSWin32", 3 if $^O eq 'VMS' || $^O eq 'MSWin32' || $^O eq 'cygwin';
     local $ENV{PERL_MM_SHEBANG}='relocatable';
     test_fixin(<<END,
 #!/usr/bin/env perl
