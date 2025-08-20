@@ -1,3 +1,8 @@
+7.77_02 Wed 20 Aug 11:00:32 BST 2025
+
+    Core fixes:
+    - Do not copy args when using PERL_MM_SHEBANG=relocatable
+
 7.77_01 Mon 28 Jul 18:46:15 BST 2025
 
     Enhancements:
@@ -5,7 +10,6 @@
 
     Core fixes:
     - Disable XS prototypes by default
-    - Do not copy args when using PERL_MM_SHEBANG=relocatable
 
     Test fixes:
     - Make macros portably in basic.t
