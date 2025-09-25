@@ -1185,6 +1185,8 @@ sub _fix_metadata_before_conversion {
 
     return unless _has_cpan_meta;
 
+    my $generated_metadata = $self->{generated_metadata};
+
     my $bad_version = $metadata->{version} &&
                       !CPAN::Meta::Validator->new->version( 'version', $metadata->{version} );
     # just delete all invalid versions
@@ -1237,12 +1239,26 @@ sub _fix_metadata_before_conversion {
         $meta = bless $metadata, 'CPAN::Meta';
     }
 
+
+    my $gen_license;
+    $gen_license = $generated_metadata->as_struct({version => 2})->{license}
+        if $generated_metadata;
     my $now_license = $meta->as_struct({ version => 2 })->{license};
-    if ($self->{LICENSE} and $self->{LICENSE} ne 'unknown' and
-        @{$now_license} == 1 and $now_license->[0] eq 'unknown'
-    ) {
-        warn "Invalid LICENSE value '$self->{LICENSE}' ignored\n";
+
+    if ($self->{LICENSE} and $self->{LICENSE} ne 'unknown') {
+        if (@{$now_license} == 1 and $now_license->[0] eq 'unknown') {
+            if (!$gen_license or (@{$gen_license} == 1 and $gen_license->[0] eq "unknown")) {
+                warn "Invalid LICENSE value '$self->{LICENSE}' ignored\n";
+            } else {
+                $meta->{license}= $generated_metadata->{license};
+            }
+        }
+        if ($gen_license and $now_license and "@$gen_license" ne "@$now_license") {
+            warn "Your META.yml has a different license (@$now_license) than your Makefile.PL (@$gen_license)\n";
+        }
     }
+
+    $self->{generated_metadata} ||= $meta;
 
     $meta;
 }
@@ -1673,7 +1689,7 @@ sub _mymeta_from_meta {
     # rolled their own tarball rather than using "make dist".
     if ($meta->{generated_by} &&
         $meta->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
-        my $eummv = do { no warnings; $1+0; };
+        my $eummv = do { no warnings; eval("$1") + 0; }; # deal with underbars gracefully
         if ($eummv < 6.2501) {
             return;
         }
