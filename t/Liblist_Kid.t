@@ -201,7 +201,7 @@ sub test_kid_win32 {
 
     {
       local $Config{perllibs} = 'pl';
-      is_deeply( [ _ext( 'unreal_test' ) ], [ ('') x 4 ], '_ext not add $Config{perllibs}' );
+      is_deeply( [ _ext( 'unreal_test' ) ], [ double(quote('pl.lib'), '') ], '_ext adds $Config{perllibs}' );
       is_deeply( [ _ext( 'unreal_test :nodefault' ) ], [ ('') x 4 ], ':nodefault flag prevents $Config{perllibs} from being added' );
       my $mm = WriteMakefile(
           NAME            => 'Big::Dummy',
