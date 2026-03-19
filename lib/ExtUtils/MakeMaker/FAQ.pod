@@ -613,7 +613,7 @@ L<ExtUtils::MakeMaker>, L<ExtUtils::Liblist> and ExtUtils::MM_{Current OS}
 NOTE: The methods in L<MY|ExtUtils::MY> are simply copied into PACK### rather
 than MY being a superclass of PACK###.  I don't remember the rationale.
 
-NOTE: L<ExtUtils::Liblist> should be removed from the inheritance hiearchy
+NOTE: L<ExtUtils::Liblist> should be removed from the inheritance hierarchy
 and simply be called as functions.
 
 NOTE: Modules like L<File::Spec> and L<Exporter> have been omitted for clarity.
