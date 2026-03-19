@@ -97,6 +97,28 @@ dynamically at run time on this platform.  SunOS/Solaris does not need
 this because ld records the information (from LDLOADLIBS) into the
 object file.  This list is used to create a .bs (bootstrap) file.
 
+=head1 ENVIRONMENT
+
+=over 4
+
+=item LIBRARY_PATH
+
+On Unix and OS/2, if the C<LIBRARY_PATH> environment variable is set, its
+colon-separated list of directories is prepended to the default library search
+path derived from C<$Config{libpth}>.  This allows users to point to a
+custom or updated version of a library without modifying Perl's configuration:
+
+    LIBRARY_PATH=/opt/mylibs/lib perl Makefile.PL
+
+Directories listed in C<LIBRARY_PATH> take priority over those in
+C<$Config{libpth}>, but C<-L> flags explicitly passed via C<LIBS> still take
+the highest priority.
+
+On Win32 the same variable is honoured when GCC is in use (as
+C<$Config{cc}> contains C<gcc>).
+
+=back
+
 =head1 PORTABILITY
 
 This module deals with a lot of system dependencies and has quite a

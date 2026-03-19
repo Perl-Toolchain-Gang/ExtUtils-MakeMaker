@@ -73,6 +73,11 @@ sub _unix_os2_ext {
 
     my @searchpath;    # from "-L/path" entries in $potential_libs
     my @libpath = _space_dirs_split($Config{libpth} || '');
+    # Honor LIBRARY_PATH environment variable (colon-separated, used by GCC and
+    # other tools).  Prepend so user-specified paths take priority over libpth.
+    if ( defined $ENV{LIBRARY_PATH} ) {
+        unshift @libpath, grep { length } split /:/, $ENV{LIBRARY_PATH};
+    }
     my ( @ldloadlibs, @bsloadlibs, @extralibs, @ld_run_path, %ld_run_path_seen );
     my ( @libs,       %libs_seen );
     my ( $fullname,   @fullname );

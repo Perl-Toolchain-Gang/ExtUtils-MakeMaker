@@ -149,6 +149,22 @@ sub test_kid_unix_os2 {
       my @got = _ext( '-ldir_test' );
       is_deeply \@got, [ '-ldir_test', '', '-ldir_test', 'di r' ], 'Config.libpth directories with spaces work' or diag explain \@got;
     }
+    {
+      my $abs = File::Spec->rel2abs('.');
+      local $ENV{LIBRARY_PATH} = $abs;
+      local $Config{libpth} = '';
+      my @got = _ext( '-lfoo' );
+      like $got[0], qr/-lfoo/, '$ENV{LIBRARY_PATH} adds search paths for extralibs' or diag explain \@got;
+      like $got[2], qr/-lfoo/, '$ENV{LIBRARY_PATH} adds search paths for ldloadlibs' or diag explain \@got;
+      ok $got[3], '$ENV{LIBRARY_PATH} results in non-empty LD_RUN_PATH' or diag explain \@got;
+    }
+    {
+      my $abs = File::Spec->rel2abs('.');
+      local $ENV{LIBRARY_PATH} = "/nonexistent:$abs";
+      local $Config{libpth} = '';
+      my @got = _ext( '-lfoo' );
+      like $got[0], qr/-lfoo/, '$ENV{LIBRARY_PATH} with multiple colon-separated entries finds lib in second path' or diag explain \@got;
+    }
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION    => '1.00',
