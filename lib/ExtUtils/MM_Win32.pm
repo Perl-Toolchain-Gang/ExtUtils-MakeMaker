@@ -172,12 +172,20 @@ sub init_others {
     $self->{LD}     ||= 'link';
     $self->{AR}     ||= 'lib';
 
-    $self->SUPER::init_others;
+    {
+        # Use :nodefault during LIBS selection to prevent perllibs from causing
+        # false positives when probing multiple LIBS alternatives (RT-53676/GH-478).
+        # ext() appends perllibs by default, so without :nodefault even a failing
+        # LIBS entry would appear to succeed, preventing fallback to later entries.
+        local $self->{LIBS} = [map { "$_ :nodefault" } @{$self->{LIBS}}];
+        $self->SUPER::init_others;
+    }
     # If Config.pm defines a set of default libs,
     # add them to EXTRALIBS, BSLOADLIBS and LDLOADLIBS, unless the user
-    # specified :nodefault or gave no LIBS
+    # specified :nodefault or gave no LIBS.
+    # Use :nodefault here to avoid perllibs referencing themselves.
     if (grep /\S/ && !/:nodefault/i, @{$self->{LIBS}}) {
-        my @libs = $self->extliblist($Config{perllibs});
+        my @libs = $self->extliblist("$Config{perllibs} :nodefault");
         for my $ind (0..$#LIBS_VARNAMES) {
           next unless my $to_add = $libs[$ind];
           my $varname = $LIBS_VARNAMES[$ind];
