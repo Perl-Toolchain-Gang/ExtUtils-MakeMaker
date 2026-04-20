@@ -1854,7 +1854,7 @@ sub special_targets {
     my $make_frag = <<'MAKE_FRAG';
 .SUFFIXES : .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
 
-.PHONY: all config static dynamic test linkext manifest blibdirs clean realclean disttest distdir pure_all subdirs clean_subdirs makemakerdflt manifypods realclean_subdirs subdirs_dynamic subdirs_pure_nolink subdirs_static subdirs-test_dynamic subdirs-test_static test_dynamic test_static
+.PHONY: all config static dynamic test linkext manifest blibdirs clean realclean disttest distdir pure_all subdirs clean_subdirs makemakerdflt manifypods realclean_subdirs subdirs_dynamic subdirs_pure_nolink subdirs_static subdirs-test_dynamic subdirs-test_static test_dynamic test_static sharedir
 
 MAKE_FRAG
 
@@ -1936,6 +1936,8 @@ sub init_INST {
                                               '$(FULLEXT)');
     $self->{INST_ARCHAUTODIR} = $self->catdir('$(INST_ARCHLIB)', 'auto',
                                               '$(FULLEXT)');
+
+    $self->{INST_SHARE}   ||= $self->catdir('$(INST_LIB)', 'auto', 'share');
 
     $self->{INST_SCRIPT}  ||= $self->catdir($Curdir,'blib','script');
 
@@ -2978,6 +2980,37 @@ text to the Makefile at the end.
 
 sub postamble {
     "";
+}
+
+sub sharedir {
+	my ($self, %share) = @_;
+	return '' unless %share;
+
+	my %files;
+	$self->_sharedir_find_files(\%files, $share{dist}, [qw/ $(INST_SHARE) dist $(DISTNAME) /], \%share) if $share{dist};
+	for my $module (keys %{ $share{module} || {} }) {
+		my $destination = [ qw/$(INST_SHARE) module/, $module ];
+		$self->_sharedir_find_files(\%files, $share{module}{$module}, $destination, \%share);
+	}
+	my $pm_to_blib = $self->oneliner(q{pm_to_blib({@ARGV}, '$(INST_LIB)')}, ['-MExtUtils::Install']);
+	return "\npure_all :: sharedir\n\nsharedir : \n" . join '', map { "\t\$(NOECHO) $_\n" } $self->split_command($pm_to_blib, %files);
+}
+
+sub _sharedir_find_files {
+	my ($self, $files, $source, $sink, $options) = @_;
+	File::Find::find({
+		wanted => sub {
+			if (-d) {
+				$File::Find::prune = 1 if $options->{skip_dotdir} && /^\./;
+				return;
+			}
+			return if $options->{skip_dotfile} && /^\./;
+			my $file = $self->abs2rel($_, $source);
+			$files->{$_} = $self->catfile(@{$sink}, $file);
+		},
+		no_chdir => 1,
+	}, $source);
+	return;
 }
 
 =begin private

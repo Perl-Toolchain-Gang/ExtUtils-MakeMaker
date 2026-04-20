@@ -129,6 +129,7 @@ my %Special_Sigs = (
  macro      => 'HASH',
  postamble  => 'HASH',
  realclean  => 'HASH',
+ sharedir   => 'HASH',
  test       => 'HASH',
  tool_autosplit => 'HASH',
 );
@@ -351,7 +352,7 @@ sub full_setup {
  makemakerdflt
 
  dist macro depend cflags const_loadlibs const_cccmd
- post_constants
+ post_constants sharedir
 
  pasthru
 
@@ -3033,6 +3034,16 @@ L<MY::postamble()|ExtUtils::MM_Any/postamble (o)> if you have one.
 =item realclean
 
   {FILES => '$(INST_ARCHAUTODIR)/*.xyz'}
+
+=item sharedir
+
+This sets the sharedirs to install.
+
+  {dist => 'share', module => { Foo => 'foo', ... }}
+
+The C<dist> key sets the source for the dist specific sharedir content. The
+C<module> key is a hash mapping module names to their specific sharedir. The
+keys C<skip_dotdir> and C<skip_dotfile> will make it skip dot-directories
 
 =item test
 
