@@ -29,7 +29,7 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          call "C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           cd /d %TEMP%\perl-5.40.1\win32
           nmake CCTYPE=MSVC142 CFG=Debug INST_TOP=D:\perl
       - name: Show config of built
@@ -40,7 +40,7 @@ jobs:
       - name: Install
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          call "C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           cd /d %TEMP%\perl-5.40.1\win32
           nmake CCTYPE=MSVC142 CFG=Debug INST_TOP=D:\perl installbare
       - name: Add to start of path
@@ -61,7 +61,7 @@ jobs:
       - name: Find out environment
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          call "C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           dir D:\perl
           path
           perl -MIPC::Cmd -E "say IPC::Cmd::can_run(qq{cl})"
@@ -73,15 +73,15 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-            call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+            call "C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
             nmake
       - name: Run Tests
         shell: cmd
         run: |
-            call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+            call "C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
             nmake test
       - name: Run disttest
         shell: cmd
         run: |
-            call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+            call "C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
             nmake disttest NOECHO=
