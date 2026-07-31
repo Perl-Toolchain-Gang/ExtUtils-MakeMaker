@@ -2947,8 +2947,27 @@ Available in version 7.12 and above.
 
 When this is set to C<1>, multiple XS files may be placed under F<lib/>
 next to their corresponding C<*.pm> files (this is essential for compiling
-with the correct C<VERSION> values). This feature should be considered
-experimental, and details of it may change.
+with the correct C<VERSION> values).
+
+To avoid installing specific files you have in your F<lib/>, consider
+using this:
+
+  {
+    package MY; # so that "SUPER" works right
+    sub init_PM {
+      my ($self) = @_;
+      $self->SUPER::init_PM;
+      my $pm = $self->{PM};
+      delete @$pm{grep /(?:\.(?:c|xs|bs)|\Q$Config{obj_ext}\E)$/, keys %$pm};
+    }
+  }
+
+This will prevent installation of any files ending in C<.c>, C<.xs>,
+C<.bs>, or object files. The last one is taken care of by default,
+but this ensures they will not get picked up by re-running F<Makefile.PL>
+during development. You will see that in this example, C<.h> files
+are I<not> removed by this, hence still installed; if your needs
+are different, just add that to the pattern.
 
 This feature was inspired by, and small portions of code copied from,
 L<ExtUtils::MakeMaker::BigHelper>. Hopefully this feature will render
