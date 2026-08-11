@@ -69,7 +69,7 @@ WriteMakefile(
   NAME          => 'XS::%s',
   VERSION_FROM  => '%s',
   TYPEMAPS      => [ %s ],
-  PERL          => "$^X -w",
+  PERL          => qq["$^X" -w],
   %s
 );
 END
