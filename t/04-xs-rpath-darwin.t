@@ -165,7 +165,7 @@ WriteMakefile(
   NAME          => '<<module_name_colon>>',
   VERSION_FROM  => 'lib/<<module_name_slash>>.pm',
   ABSTRACT_FROM => 'lib/<<module_name_slash>>.pm',
-  PERL          => "$^X -w",
+  PERL          => qq["$^X" -w],
   LIBS          => ['-L./<<lib_dir>> -l<<lib_name>>'],
   INC           => '-I. -I./<<lib_dir>>',
 );

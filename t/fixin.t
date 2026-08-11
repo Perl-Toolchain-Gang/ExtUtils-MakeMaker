@@ -146,6 +146,9 @@ SKIP: {
     skip "Not relevant on VMS or MSWin32", 6 if $^O eq 'VMS' || $^O eq 'MSWin32' || $^O eq 'cygwin';
 
     my $dir = getcwd();
+    skip "Can't test shebang with path containing spaces", 6
+        if $dir =~ /\s/;
+
     local $ENV{PATH} = join $Config{path_sep}, map "$dir/$_", qw(usrbin bin);
 
     test_fixin(<<END,
