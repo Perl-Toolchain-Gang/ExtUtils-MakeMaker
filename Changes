@@ -1,3 +1,18 @@
+7.79_01 Tue 18 Aug 22:03:20 BST 2026
+
+    Win32 fixes:
+    - Unconditionally add "" in Win32 oneliner
+
+    Core fixes:
+    - XSMULTI no longer experimental
+    - Document how to not install some files
+
+    Doc fixes:
+    - FAQ.pod: Correct typo reported by Igor Sobrado.
+
+    CI fixes:
+    - update MSVC location in windows-latest
+
 7.78    Tue  3 Mar 20:21:53 GMT 2026
 
     No changes since v7.77_03

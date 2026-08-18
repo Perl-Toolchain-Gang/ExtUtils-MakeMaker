@@ -3,7 +3,7 @@ package ExtUtils::MM_MacOS;
 use strict;
 use warnings;
 
-our $VERSION = '7.78';
+our $VERSION = '7.79_01';
 $VERSION =~ tr/_//d;
 
 sub new {
