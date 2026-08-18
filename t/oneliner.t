@@ -11,7 +11,7 @@ chdir 't';
 
 use Config;
 use MakeMaker::Test::Utils;
-use Test::More tests => 17;
+use Test::More tests => 18;
 use File::Spec;
 
 my $TB = Test::More->builder;
@@ -22,7 +22,6 @@ BEGIN { use_ok('ExtUtils::MM') }
 my $mm = bless { NAME => "Foo", MAKE => $Config{make} }, 'MM';
 isa_ok($mm, 'ExtUtils::MakeMaker');
 isa_ok($mm, 'ExtUtils::MM_Any');
-
 
 sub try_oneliner {
     my($code, $switches, $expect, $name) = @_;
@@ -46,6 +45,7 @@ try_oneliner(q{$PATH = 'foo'; print $PATH},[], q{foo},   'dollar signs' );
 try_oneliner(q{print 'foo'}, ['-l'],           "foo\n",       'switches' );
 
 # some DOS-specific things
+try_oneliner(q{print@ARGV}, [],  q{},  'no spaces with @' );
 try_oneliner(q{print " \" "}, [],  q{ " },  'single quote' );
 try_oneliner(q{print " < \" "}, [],  q{ < " },  'bracket, then quote' );
 try_oneliner(q{print " \" < "}, [],  q{ " < },  'quote, then bracket' );
