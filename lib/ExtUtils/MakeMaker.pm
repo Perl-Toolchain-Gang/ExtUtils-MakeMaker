@@ -219,6 +219,10 @@ sub prompt ($;$) {  ## no critic
         $ans = <STDIN>;
         if( defined $ans ) {
             $ans =~ s{\015?\012$}{};
+            if ($Is_Win32 and $CAN_DECODE) {
+                my $codepage = $ExtUtils::MakeMaker::Locale::ENCODING_CONSOLE_IN;
+                $ans = Encode::decode($codepage, $ans);
+            }
         }
         else { # user hit ctrl-D
             print "\n";
