@@ -1620,43 +1620,41 @@ Initializes MAN3PODS from the list of PM files.
 sub init_MAN3PODS {
     my $self = shift;
 
-    my %manifypods = (); # we collect the keys first, i.e. the files
-                         # we have to convert to pod
-
-    foreach my $name (keys %{$self->{PM}}) {
-	if ($name =~ /\.pod\z/ ) {
-	    $manifypods{$name} = $self->{PM}{$name};
-	} elsif ($name =~ /\.p[ml]\z/ ) {
-	    if( $self->_has_pod($name) ) {
-		$manifypods{$name} = $self->{PM}{$name};
-	    }
-	}
-    }
-
     my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
-
-    # Remove "Configure.pm" and similar, if it's not the only pod listed
-    # To force inclusion, just name it "Configure.pod", or override
-    # MAN3PODS
-    foreach my $name (keys %manifypods) {
-	if (
+    my %man;
+    foreach my $name (sort keys %{$self->{PM}}) {
+        # Remove "Configure.pm" and similar, if it's not the only pod listed
+        # To force inclusion, just name it "Configure.pod", or override
+        # MAN3PODS
+        if (
             ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) or
             ( $name =~ m/^README\.pod$/i ) # don't manify top-level README.pod
         ) {
-	    delete $manifypods{$name};
-	    next;
-	}
-	my($manpagename) = $name;
-	$manpagename =~ s/\.p(od|m|l)\z//;
-	# everything below lib is ok
-	unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
-	    $manpagename = $self->catfile(
-	        split(/::/,$self->{PARENT_NAME}),$manpagename
-	    );
-	}
-	$manpagename = $self->replace_manpage_separator($manpagename);
-	$self->{MAN3PODS}->{$name} =
-	    $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
+            next;
+        }
+        my $man = $name;
+        $man =~ s/\.(p(?:od|m|l))\z//;
+        my $ext = $1;
+        unless ($man =~ s!^\W*($parentlibs_re)\W+!!s) {
+            $man = $self->catfile(
+                split(/::/,$self->{PARENT_NAME}),$man
+            );
+        }
+        $man = $self->replace_manpage_separator($man) .'.$(MAN3EXT)';
+        if ($ext && $ext eq 'pod') {
+            $man{$man} = $name;
+        }
+        else {
+            $man{$man} ||= $name;
+        }
+    }
+
+    foreach my $man (keys %man) {
+        my $name = $man{$man};
+        next
+            if $name =~ /\.p[ml]\z/ && !$self->_has_pod($name);
+        $self->{MAN3PODS}->{$name} =
+            $self->catfile("\$(INST_MAN3DIR)", $man);
     }
 }
 
