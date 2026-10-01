@@ -1830,7 +1830,44 @@ the arguments INC and OPTIMIZE. Note that setting this will overwrite its
 default value (C<$Config::Config{ccflags}>); to preserve that, include
 the default value directly, e.g.:
 
-    CCFLAGS => "$Config::Config{ccflags} ..."
+ CCFLAGS => "$Config::Config{ccflags} -Ditem-to-add -Uitem-to-exclude ..."
+
+It is a Very Bad Idea to not use the default flags as a base for what you need
+to add or subtract.  Failure to do so can lead to subtle bugs that are hard
+and time-consuming to diagnose.  The base flags represent the best available
+knowledge that the perl5-porters have on what is required to compile and run
+perl on the given target platform and compiler.  Here are a few of the gotchas
+you could run into.
+
+=over 4
+
+=item * The target platform has peculiar behavior.
+
+For example, its floats by default don't act as you might expect .
+
+=item * The target compiler has peculiar behavior
+
+For example, the particular version being used is buggy at some optimization
+levels, or it needs special alignment constraints.
+
+Or its default is to not furnish some libc functions that perl expects to be
+available.
+
+Or large file could get corrupted because by default, this compiler assumes
+they always will be no larger than some particular (too-small) size.
+
+Or the compiler by default makes other unwarranted assumptions (See gcc and
+clang's C<-fno-strict-aliasing> option for example.)
+
+=item * There may be data structure mismatch
+
+Some settings of CCFLAGS affect the layout of data structures that are shared
+(behind your back) between your module and the interpreter.  If you're lucky
+you'll get a "loadable library and perl binaries are mismatched" panic.  If
+you're not so lucky, you'll get heisenbug reports from the field, or maybe a
+hacker will take advantage of it and you and many others will be very sorry.
+
+=back
 
 =item CONFIG
 
