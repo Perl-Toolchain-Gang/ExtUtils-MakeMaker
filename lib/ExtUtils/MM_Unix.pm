@@ -3680,7 +3680,7 @@ sub static_lib_fixtures {
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
     return unless $self->{MYEXTLIB};
-    "\t\$(CP) \$(MYEXTLIB) \"\$\@\"\n";
+    "\t\$(CP) \$(MYEXTLIB) \$(INST_ARCHAUTODIR)\n";
 }
 
 =item static_lib_pure_cmd
