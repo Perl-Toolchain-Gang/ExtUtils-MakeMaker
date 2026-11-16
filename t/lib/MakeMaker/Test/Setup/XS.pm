@@ -125,11 +125,8 @@ END
 my $PLUS1_C = <<'EOF';
 #ifdef __cplusplus
 extern "C" {
-int plus1(int i)
-#else
-int plus1(i)
-int i;
 #endif
+int plus1(int i)
 { return i + 1; }
 #ifdef __cplusplus
 }
