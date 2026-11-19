@@ -121,28 +121,19 @@ sub install_version {
 
 my $packlist;
 
-########################################################################
-subtest 'Version 0.01, includes executable' => sub {
-########################################################################
-  ok( install_version( '0.01', 1 ), 'initial installation with executable succeeded' );
+ok( install_version( '0.01', 1 ), 'initial installation with executable succeeded' );
 
-  my @packlists = get_packlists();
+my @packlists = get_packlists();
 
-  is( scalar @packlists, 1, 'initial installation created one packlist' );
+is( scalar @packlists, 1, 'initial installation created one packlist' );
 
-  $packlist = $packlists[0];
+$packlist = $packlists[0];
 
-  ok( has_legacy_script( $packlists[0] ), 'first packlist includes the executable' );
-};
+ok( has_legacy_script( $packlists[0] ), 'first packlist includes the executable' );
 
-########################################################################
-subtest 'Version 0.02, omits executable, retains files from version 0.01' => sub {
-########################################################################
+# Version 2 omits the executable
+ok( install_version( '0.02', 0 ), 'second installation without executable succeeded' );
 
-  # Version 2 omits the executable
-  ok( install_version( '0.02', 0 ), 'second installation without executable succeeded' );
-
-  ok( has_legacy_script($packlist), 'reinstall retains obsolete executable in packlist' );
-};
+ok( has_legacy_script($packlist), 'reinstall retains obsolete executable in packlist' );
 
 done_testing;
