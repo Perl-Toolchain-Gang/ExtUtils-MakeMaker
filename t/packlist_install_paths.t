@@ -17,6 +17,8 @@ my $make = $Config{make};
 plan skip_all => 'make unavailable'
   if !$make;
 
+use Test::More tests => 5;
+
 my $temp = tempdir( CLEANUP => 1 );
 my $base = File::Spec->catdir( $temp, 'install-root' );
 my $lib  = abs_path('lib');
@@ -135,5 +137,3 @@ ok( has_legacy_script( $packlists[0] ), 'first packlist includes the executable'
 ok( install_version( '0.02', 0 ), 'second installation without executable succeeded' );
 
 ok( has_legacy_script($packlist), 'reinstall retains obsolete executable in packlist' );
-
-done_testing;
