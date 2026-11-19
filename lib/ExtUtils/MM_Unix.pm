@@ -2313,12 +2313,6 @@ sub install {
     my($self, %attribs) = @_;
     my(@m);
 
-    # INSTALL_BASE redirects the installation tree without changing
-    # Perl's configured *ARCHEXP paths.  Read the packlist from the
-    # destination tree so a reinstall preserves obsolete entries.
-    my $site_packlist_dir = $self->{INSTALL_BASE}
-        ? '$(INSTALLSITEARCH)' : '$(SITEARCHEXP)';
-
     push @m, q{
 install :: pure_install doc_install
 	$(NOECHO) $(NOOP)
@@ -2349,7 +2343,7 @@ pure_perl_install :: all
 };
 
     push @m,
-q{		read "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
+q{		read "}.$self->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
 		write "}.$self->catfile('$(DESTINSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
@@ -2368,7 +2362,7 @@ pure_site_install :: all
 	$(NOECHO) $(MOD_INSTALL) \
 };
     push @m,
-q{		read "}.$self->catfile($site_packlist_dir,'auto','$(FULLEXT)','.packlist').q{" \
+q{		read "}.$self->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{" \
 		write "}.$self->catfile('$(DESTINSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
@@ -2386,7 +2380,7 @@ pure_vendor_install :: all
 	$(NOECHO) $(MOD_INSTALL) \
 };
     push @m,
-q{		read "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{" \
+q{		read "}.$self->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{" \
 		write "}.$self->catfile('$(DESTINSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{" \
 } unless $self->{NO_PACKLIST};
 
@@ -2453,13 +2447,13 @@ uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(PERL_ARCHLIB)','auto','$(FULLEXT)','.packlist').q{"
+	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(INSTALLARCHLIB)','auto','$(FULLEXT)','.packlist').q{"
 
 uninstall_from_sitedirs ::
-	$(NOECHO) $(UNINSTALL) "}.$self->catfile($site_packlist_dir,'auto','$(FULLEXT)','.packlist').q{"
+	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(INSTALLSITEARCH)','auto','$(FULLEXT)','.packlist').q{"
 
 uninstall_from_vendordirs ::
-	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{"
+	$(NOECHO) $(UNINSTALL) "}.$self->catfile('$(INSTALLVENDORARCH)','auto','$(FULLEXT)','.packlist').q{"
 };
 
     join("",@m);
